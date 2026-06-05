@@ -9,6 +9,13 @@ Publish Android and Windows client source in a way that is useful to developers
 without exposing private operations, secret-bearing history, signing material,
 or unsupported release claims.
 
+The public client should preserve two target product tracks:
+
+- operator / company client for teams that want a configurable client for their
+  own VPN service
+- personal key client for users who paste a key, QR code, or subscription URL
+  and connect without POKROV billing or account management
+
 ## Import Strategy
 
 Use a clean snapshot import.
@@ -25,9 +32,13 @@ Do not import private development history into the public repository.
 5. Remove private logs, screenshots, release evidence, and operator notes.
 6. Confirm assets have source and license notes.
 7. Complete the dependency license audit.
-8. Run secret scanning.
-9. Build from a clean clone without private files.
-10. Record checks in `docs/MAINTAINER_CHECKLIST.md` or the release PR.
+8. Document which code paths belong to the operator/company track and which
+   belong to the personal key track.
+9. Keep optional third-party public config catalogs disabled unless their
+   license, parser, safety-copy, and freshness gates are documented.
+10. Run secret scanning.
+11. Build from a clean clone without private files.
+12. Record checks in `docs/MAINTAINER_CHECKLIST.md` or the release PR.
 
 ## Acceptance Criteria
 
@@ -38,6 +49,9 @@ Do not import private development history into the public repository.
   than the available public evidence.
 - Forks can understand what is official POKROV service territory and what is
   open client code.
+- Users can understand the difference between official POKROV service mode,
+  operator/custom-service mode, personal key mode, and optional third-party
+  public config catalogs.
 
 ## Do Not Import
 
@@ -53,12 +67,23 @@ Do not import private development history into the public repository.
 - raw vulnerability details
 - operator runbooks
 
+## Third-Party Public Config Feeds
+
+Do not import third-party public config feeds directly into the first source
+snapshot unless they have a documented product gate.
+
+The first research candidate is `AvenCores/goida-vpn-configs`. It must remain
+an opt-in `Free VPN` catalog candidate until license, attribution, parser,
+freshness, failure-mode, and safety-copy checks are complete.
+
 ## First Import PR Checklist
 
 - [ ] Source snapshot added.
 - [ ] Build docs added.
 - [ ] Configuration examples added.
 - [ ] Dependency license audit updated.
+- [ ] Product tracks documented.
+- [ ] Optional third-party config feeds documented or disabled.
 - [ ] Secret scan completed.
 - [ ] Clean clone build smoke completed.
 - [ ] README status updated from `pending import`.
