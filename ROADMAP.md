@@ -1,0 +1,31 @@
+# Roadmap
+
+This roadmap describes the public repository path. It is not a release promise.
+
+## Phase 1: Repository Foundation
+
+- Add public project documentation.
+- Add security and contribution rules.
+- Add issue and pull request templates.
+- Define brand and official-build boundaries.
+
+## Phase 2: Sanitized Source Import
+
+- Import Android and Windows client source from the private client lane.
+- Exclude private history, secrets, signing material, and operator evidence.
+- Add build instructions and configuration examples.
+- Verify a clean clone can build without private files.
+
+## Phase 3: Public Build And Release Hygiene
+
+- Add CI for analysis and tests.
+- Add dependency license inventory.
+- Publish checksums with release artifacts.
+- Keep official release claims aligned with current evidence.
+
+## Phase 4: Community Contributions
+
+- Label good first issues.
+- Document architecture and package boundaries.
+- Accept focused bug fixes and platform-specific improvements.
+- Keep security reports private until coordinated disclosure.
