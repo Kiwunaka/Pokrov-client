@@ -1,0 +1,35 @@
+name: Build problem
+description: Report a problem building from source.
+title: "[Build]: "
+labels: ["build"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Build reports will become more useful after the first source snapshot lands.
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Android
+        - Windows
+        - Repository setup
+    validations:
+      required: true
+  - type: input
+    id: commit
+    attributes:
+      label: Commit or tag
+  - type: textarea
+    id: command
+    attributes:
+      label: Command
+      description: What command did you run?
+      render: shell
+  - type: textarea
+    id: output
+    attributes:
+      label: Output
+      description: Redact secrets, tokens, paths containing personal data, and private URLs.
+      render: text

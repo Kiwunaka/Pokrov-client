@@ -1,0 +1,33 @@
+# OS and editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Local environment and secrets
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# Build outputs
+build/
+dist/
+out/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+node_modules/
+
+# Local logs and reports
+*.log
+coverage/
+reports/
+tmp/
+.tmp/
