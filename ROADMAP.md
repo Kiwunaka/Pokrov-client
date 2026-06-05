@@ -8,6 +8,8 @@ This roadmap describes the public repository path. It is not a release promise.
 - Add security and contribution rules.
 - Add issue and pull request templates.
 - Define brand and official-build boundaries.
+- Add bilingual README entrypoints.
+- Add visual repository identity assets.
 
 ## Phase 2: Sanitized Source Import
 
@@ -20,6 +22,7 @@ This roadmap describes the public repository path. It is not a release promise.
 
 - Add CI for analysis and tests.
 - Add dependency license inventory.
+- Add source import playbook and governance docs.
 - Publish checksums with release artifacts.
 - Keep official release claims aligned with current evidence.
 

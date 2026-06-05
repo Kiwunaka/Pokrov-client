@@ -1,23 +1,46 @@
-# POKROV Client
+<p align="center">
+  <img src="assets/brand/pokrov-oss-banner.svg" alt="POKROV Client open-source banner" width="100%">
+</p>
 
-Open-source client foundation for POKROV on Android and Windows.
+<p align="center">
+  <a href="README.en.md"><strong>English</strong></a>
+  ·
+  <a href="README.ru.md"><strong>Русский</strong></a>
+</p>
 
-This repository is being prepared as the public home for the POKROV client app.
-It currently contains the open-source project structure, policy documents, and
-contribution workflow. The sanitized application source snapshot will be added
-only after the private client lane passes the publication checklist.
+<p align="center">
+  <a href="LICENSE"><img alt="License: GPLv3" src="https://img.shields.io/badge/license-GPLv3-0f766e?style=for-the-badge"></a>
+  <img alt="Source status: pending import" src="https://img.shields.io/badge/source-pending%20import-f59e0b?style=for-the-badge">
+  <img alt="Platforms: Android and Windows" src="https://img.shields.io/badge/platforms-Android%20%2B%20Windows-2563eb?style=for-the-badge">
+  <img alt="Official service: POKROV operated" src="https://img.shields.io/badge/service-POKROV%20operated-111827?style=for-the-badge">
+</p>
 
-## Status
+<p align="center">
+  Public open-source foundation for the POKROV client app.
+  The sanitized Android and Windows source snapshot will land here after the
+  private client lane passes the publication checklist.
+</p>
 
-- Repository status: public open-source foundation
-- App source status: pending sanitized source import
-- License: GNU General Public License v3.0
-- Current official app scope: Android and Windows beta
-- Official service backend: operated separately by POKROV
+---
 
-This repository does not contain the POKROV backend, billing system, admin
-surface, deployment scripts, private release evidence, signing keys, or
-operator runbooks.
+## Choose Your README
+
+- [English README](README.en.md)
+- [Русская версия](README.ru.md)
+
+## Current Status
+
+<p align="center">
+  <img src="assets/brand/oss-status-card.svg" alt="POKROV Client repository status card" width="100%">
+</p>
+
+This repository is intentionally documentation-first today:
+
+- the public repository is ready for open-source collaboration
+- the app source has not been imported yet
+- official POKROV backend and operations remain private
+- the repository license is GNU GPLv3
+- public release claims stay beta-safe and evidence-based
 
 ## Official Links
 
@@ -26,47 +49,28 @@ operator runbooks.
 - Public channel: https://t.me/pokrov_vpn
 - Support bot: https://t.me/pokrov_supportbot
 
-Official binaries are published only through POKROV-owned release channels.
-Forks and rebuilt clients must not imply that they are official POKROV builds.
+## Public Boundary
 
-## What Will Live Here
+<p align="center">
+  <img src="assets/diagrams/open-source-boundary.svg" alt="Open-source client and private service boundary" width="100%">
+</p>
 
-The first source import is expected to include:
+Read the scope documents before opening issues or pull requests:
 
-- Android client source
-- Windows client source
-- shared client packages
-- build instructions
-- configuration examples
-- public release notes and checksums
-
-The import will not include private operational material or secret-bearing
-history.
-
-## Build From Source
-
-Build instructions will be added with the first sanitized source snapshot.
-
-Until then, this repository is intentionally documentation-only. A clean source
-import must be buildable from a fresh clone without access to private files.
-
-## Contributing
-
-Contributions are welcome after the first source snapshot lands. For now,
-documentation, issue triage, build policy feedback, and security-process
-feedback are the safest contribution areas.
-
-Read:
-
-- [CONTRIBUTING.md](CONTRIBUTING.md)
-- [SECURITY.md](SECURITY.md)
-- [BRAND.md](BRAND.md)
-- [docs/OPEN_SOURCE_SCOPE.md](docs/OPEN_SOURCE_SCOPE.md)
+- [Open-source scope](docs/OPEN_SOURCE_SCOPE.md)
+- [Release policy](docs/RELEASE_POLICY.md)
+- [Dependency license audit](docs/DEPENDENCY_LICENSE_AUDIT.md)
+- [Maintainer checklist](docs/MAINTAINER_CHECKLIST.md)
+- [Project principles](docs/PROJECT_PRINCIPLES.md)
+- [Source import playbook](docs/SOURCE_IMPORT_PLAYBOOK.md)
+- [Governance](docs/GOVERNANCE.md)
+- [Brand policy](BRAND.md)
+- [Security policy](SECURITY.md)
 
 ## License
 
 This repository is licensed under the GNU General Public License v3.0. See
 [LICENSE](LICENSE).
 
-The POKROV name, logos, domains, official channels, signing identities, and
-release distribution channels are governed separately by [BRAND.md](BRAND.md).
+The POKROV name, logos, domains, support channels, signing identities, and
+official release channels are governed separately by [BRAND.md](BRAND.md).
