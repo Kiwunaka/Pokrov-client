@@ -1,7 +1,7 @@
 # POKROV Client
 
 <p align="center">
-  <img src="assets/brand/pokrov-oss-banner.svg" alt="POKROV Client open-source banner" width="100%">
+  <img src="assets/brand/pokrov-oss-hero.png" alt="POKROV Client open-source hero artwork" width="100%">
 </p>
 
 <p align="center">
@@ -55,7 +55,7 @@ The public client is being prepared around a few product principles:
 ## Status
 
 <p align="center">
-  <img src="assets/brand/oss-status-card.svg" alt="POKROV Client repository status card" width="100%">
+  <img src="assets/brand/oss-status-card.png" alt="POKROV Client repository status artwork" width="100%">
 </p>
 
 | Area | Current state |
@@ -70,7 +70,7 @@ The public client is being prepared around a few product principles:
 ## Architecture Boundary
 
 <p align="center">
-  <img src="assets/diagrams/open-source-boundary.svg" alt="Open-source client and private service boundary" width="100%">
+  <img src="assets/diagrams/open-source-boundary.png" alt="Open-source client and private service boundary artwork" width="100%">
 </p>
 
 This repository is for the client app. It does not contain the official POKROV
