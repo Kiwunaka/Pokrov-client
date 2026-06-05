@@ -17,14 +17,24 @@ This roadmap describes the public repository path. It is not a release promise.
 - Exclude private history, secrets, signing material, and operator evidence.
 - Add build instructions and configuration examples.
 - Verify a clean clone can build without private files.
+- Preserve the operator/company client track and personal key client track.
 
 ## Phase 3: Public Build And Release Hygiene
 
 - Add CI for analysis and tests.
 - Add dependency license inventory.
 - Add source import playbook and governance docs.
+- Add product-track documentation and optional public-config catalog gates.
 - Publish checksums with release artifacts.
 - Keep official release claims aligned with current evidence.
+
+## Phase 3.5: Optional Free VPN Catalog
+
+- Research third-party public config feeds.
+- Start with `AvenCores/goida-vpn-configs` as an opt-in candidate.
+- Add parser fixtures and tests before shipping.
+- Label all third-party feeds clearly in UI.
+- Keep official POKROV service and third-party public feeds separate.
 
 ## Phase 4: Community Contributions
 
