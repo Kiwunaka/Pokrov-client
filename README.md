@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/brand/pokrov-oss-banner.svg" alt="POKROV Client open-source banner" width="100%">
+  <img src="assets/brand/pokrov-oss-hero.png" alt="POKROV Client open-source hero artwork" width="100%">
 </p>
 
 <p align="center">
@@ -31,7 +31,7 @@
 ## Current Status
 
 <p align="center">
-  <img src="assets/brand/oss-status-card.svg" alt="POKROV Client repository status card" width="100%">
+  <img src="assets/brand/oss-status-card.png" alt="POKROV Client repository status artwork" width="100%">
 </p>
 
 This repository is intentionally documentation-first today:
@@ -52,7 +52,7 @@ This repository is intentionally documentation-first today:
 ## Public Boundary
 
 <p align="center">
-  <img src="assets/diagrams/open-source-boundary.svg" alt="Open-source client and private service boundary" width="100%">
+  <img src="assets/diagrams/open-source-boundary.png" alt="Open-source client and private service boundary artwork" width="100%">
 </p>
 
 Read the scope documents before opening issues or pull requests:
