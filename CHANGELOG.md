@@ -11,5 +11,8 @@ production readiness without matching public evidence.
 - Added the public open-source repository foundation.
 - Added contribution, security, support, brand, release, and issue-template
   documents.
+- Added English and Russian README entrypoints.
+- Added public SVG repository visuals for the README and architecture boundary.
+- Added governance and source-import playbook documentation.
 - Kept the repository documentation-only until the sanitized client source
   snapshot is ready.
