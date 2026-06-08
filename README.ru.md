@@ -109,6 +109,13 @@ signing material, private release evidence или operator runbooks.
 Инструкции по сборке появятся вместе с первым санитизированным snapshot
 исходников.
 
+Для maintainers уже есть инструмент подготовки импорта:
+
+```powershell
+python -m pytest tests/test_source_import.py
+python -m tools.source_import.safe_import --source <snapshot> --staging <stage> --manifest <manifest.json>
+```
+
 Планка приемки для импорта простая:
 
 - clean clone должен собираться без приватных файлов

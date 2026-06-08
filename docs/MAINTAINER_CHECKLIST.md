@@ -5,6 +5,11 @@ Use this checklist before importing source or publishing an official release.
 ## Before Source Import
 
 - [ ] Export from the private client lane into a temporary staging area.
+- [ ] Run `python -m pytest tests/test_source_import.py`.
+- [ ] Run `python -m tools.source_import.safe_import` in dry-run mode.
+- [ ] Review the dry-run manifest and every blocked item.
+- [ ] Run the same tool with `--apply` into a temporary staging folder only.
+- [ ] Rescan the staging folder and confirm `blocked=0`.
 - [ ] Remove private history.
 - [ ] Remove secrets, tokens, certificates, and signing config.
 - [ ] Remove private endpoints and operator-only paths.

@@ -31,3 +31,7 @@ coverage/
 reports/
 tmp/
 .tmp/
+
+# Python test/tool caches
+__pycache__/
+*.py[cod]
