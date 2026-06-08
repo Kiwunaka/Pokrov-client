@@ -22,23 +22,53 @@ Use a clean snapshot import.
 
 Do not import private development history into the public repository.
 
+Use the checked-in source import tool before any source snapshot PR:
+
+```powershell
+python -m pytest tests/test_source_import.py
+python -m tools.source_import.safe_import `
+  --source <local-client-snapshot> `
+  --staging <temporary-oss-stage> `
+  --manifest <dry-run-manifest.json>
+```
+
+The command above is a dry-run. It writes the manifest only and does not copy
+source files into staging.
+
+When the dry-run result is reviewed, copy the allowlisted files into a temporary
+staging folder:
+
+```powershell
+python -m tools.source_import.safe_import `
+  --source <local-client-snapshot> `
+  --staging <temporary-oss-stage> `
+  --manifest <stage-manifest.json> `
+  --apply
+```
+
+The tool must not be pointed at the public repository root as `--staging`.
+Review the temporary staging folder first, then open a separate source import
+PR.
+
 ## Required Steps
 
 1. Export the candidate source from the private client lane into a temporary
    staging folder.
-2. Remove private history and local-only generated outputs.
-3. Remove secrets, certificates, signing configs, private URLs, and tokens.
-4. Replace private configuration with examples and placeholders.
-5. Remove private logs, screenshots, release evidence, and operator notes.
-6. Confirm assets have source and license notes.
-7. Complete the dependency license audit.
-8. Document which code paths belong to the operator/company track and which
+2. Run `python -m pytest tests/test_source_import.py`.
+3. Run the source import tool in dry-run mode and review the manifest.
+4. Remove private history and local-only generated outputs.
+5. Remove secrets, certificates, signing configs, private URLs, and tokens.
+6. Replace private configuration with examples and placeholders.
+7. Remove private logs, screenshots, release evidence, and operator notes.
+8. Confirm assets have source and license notes.
+9. Complete the dependency license audit.
+10. Document which code paths belong to the operator/company track and which
    belong to the personal key track.
-9. Keep optional third-party public config catalogs disabled unless their
+11. Keep optional third-party public config catalogs disabled unless their
    license, parser, safety-copy, and freshness gates are documented.
-10. Run secret scanning.
-11. Build from a clean clone without private files.
-12. Record checks in `docs/MAINTAINER_CHECKLIST.md` or the release PR.
+12. Run secret scanning.
+13. Build from a clean clone without private files.
+14. Record checks in `docs/MAINTAINER_CHECKLIST.md` or the release PR.
 
 ## Acceptance Criteria
 
@@ -66,6 +96,21 @@ Do not import private development history into the public repository.
 - personal connection URLs
 - raw vulnerability details
 - operator runbooks
+
+The default import policy also blocks release handoff seed files, runtime
+binaries, signing material, env files, local platform config, private keys, and
+generated build folders.
+
+## Local Preparation Note
+
+On 2026-06-09, a local non-public preparation pass was run against a copied
+client snapshot, not the production client checkout. The dry-run allowlisted 77
+files for Android, Windows, shared Flutter packages, public seed config, and
+brand assets. The only policy block was `config/release-handoff.seed.json`.
+
+The sanitized staging copy then rescanned with `blocked=0`. Source files were
+not committed to this repository in that pass; the result is a prepared staging
+candidate for a later dedicated source import review.
 
 ## Third-Party Public Config Feeds
 

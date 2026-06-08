@@ -108,6 +108,13 @@ boundary.
 
 Build instructions will be added with the first sanitized source snapshot.
 
+Source import tooling is already available for maintainers:
+
+```powershell
+python -m pytest tests/test_source_import.py
+python -m tools.source_import.safe_import --source <snapshot> --staging <stage> --manifest <manifest.json>
+```
+
 The acceptance bar for that import is simple:
 
 - a clean clone must build without private files
