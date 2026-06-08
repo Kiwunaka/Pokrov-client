@@ -104,13 +104,13 @@ generated build folders.
 ## Local Preparation Note
 
 On 2026-06-09, a local non-public preparation pass was run against a copied
-client snapshot, not the production client checkout. The dry-run allowlisted 77
-files for Android, Windows, shared Flutter packages, public seed config, and
-brand assets. The only policy block was `config/release-handoff.seed.json`.
+client snapshot, not the production client checkout. The final dry-run
+allowlisted 128 files for Android, Windows, shared Flutter packages, public seed
+config, local scripts, and brand assets. The only policy block was
+`config/release-handoff.seed.json`.
 
 The sanitized staging copy then rescanned with `blocked=0`. Source files were
-not committed to this repository in that pass; the result is a prepared staging
-candidate for a later dedicated source import review.
+then imported through a dedicated source snapshot PR.
 
 ## Third-Party Public Config Feeds
 

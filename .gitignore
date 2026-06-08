@@ -20,10 +20,17 @@ Thumbs.db
 build/
 dist/
 out/
+artifacts/
 .dart_tool/
+.gradle/
+ephemeral/
 .flutter-plugins
 .flutter-plugins-dependencies
 node_modules/
+pubspec.lock
+
+# Generated local config
+config/local/
 
 # Local logs and reports
 *.log

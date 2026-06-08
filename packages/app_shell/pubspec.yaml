@@ -1,0 +1,29 @@
+name: pokrov_app_shell
+description: Beta app shell widgets for the POKROV client program.
+publish_to: none
+version: 1.0.0-beta.2
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  path_provider: ^2.1.5
+  pokrov_core_domain:
+    path: ../core_domain
+  pokrov_platform_contracts:
+    path: ../platform_contracts
+  pokrov_runtime_engine:
+    path: ../runtime_engine
+  pokrov_support_context:
+    path: ../support_context
+  url_launcher: ^6.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  assets:
+    - assets/brand/

@@ -1,0 +1,11 @@
+name: pokrov_support_context
+description: Beta support-safe models for the POKROV client program.
+publish_to: none
+version: 1.0.0-beta
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  pokrov_core_domain:
+    path: ../core_domain

@@ -10,15 +10,14 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: GPLv3" src="https://img.shields.io/badge/license-GPLv3-0f766e?style=for-the-badge"></a>
-  <img alt="Source status: pending import" src="https://img.shields.io/badge/source-pending%20import-f59e0b?style=for-the-badge">
+  <img alt="Source status: snapshot imported" src="https://img.shields.io/badge/source-snapshot%20imported-0f766e?style=for-the-badge">
   <img alt="Platforms: Android and Windows" src="https://img.shields.io/badge/platforms-Android%20%2B%20Windows-2563eb?style=for-the-badge">
   <img alt="Official service: POKROV operated" src="https://img.shields.io/badge/service-POKROV%20operated-111827?style=for-the-badge">
 </p>
 
 <p align="center">
-  Public open-source foundation for the POKROV client app.
-  The sanitized Android and Windows source snapshot will land here after the
-  private client lane passes the publication checklist.
+  Public open-source home for the POKROV client app.
+  The first sanitized Android and Windows source snapshot is now imported.
 </p>
 
 ---
@@ -34,10 +33,10 @@
   <img src="assets/brand/oss-status-card.png" alt="POKROV Client repository status artwork" width="100%">
 </p>
 
-This repository is intentionally documentation-first today:
+Current repository state:
 
 - the public repository is ready for open-source collaboration
-- the app source has not been imported yet
+- the first sanitized Android and Windows app source snapshot is imported
 - official POKROV backend and operations remain private
 - the repository license is GNU GPLv3
 - public release claims stay beta-safe and evidence-based
