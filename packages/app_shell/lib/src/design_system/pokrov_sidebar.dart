@@ -30,6 +30,7 @@ class PokrovDesktopSidebar extends StatelessWidget {
     this.versionLabel = '1.0.0-beta.2',
     this.betaLabel = 'Beta',
     this.brandMarkAssetName = PokrovBrandAssets.mark,
+    this.brandFallbackText = 'P',
     super.key,
   }) : assert(destinations.isNotEmpty);
 
@@ -46,6 +47,7 @@ class PokrovDesktopSidebar extends StatelessWidget {
   final String versionLabel;
   final String betaLabel;
   final String brandMarkAssetName;
+  final String brandFallbackText;
 
   Key get effectiveKey => key ?? (collapsed ? iconRailKey : expandedKey);
 
@@ -71,12 +73,17 @@ class PokrovDesktopSidebar extends StatelessWidget {
               collapsed ? CrossAxisAlignment.center : CrossAxisAlignment.start,
           children: [
             if (collapsed)
-              PokrovBrandMark(size: 32, assetName: brandMarkAssetName)
+              PokrovBrandMark(
+                size: 32,
+                assetName: brandMarkAssetName,
+                fallbackText: brandFallbackText,
+              )
             else ...[
               _PokrovBrandLockup(
                 markSize: 34,
                 title: brandTitle,
                 assetName: brandMarkAssetName,
+                fallbackText: brandFallbackText,
               ),
               const SizedBox(height: 4),
               Text(
@@ -122,29 +129,39 @@ class _PokrovBrandLockup extends StatelessWidget {
   const _PokrovBrandLockup({
     required this.title,
     required this.assetName,
+    required this.fallbackText,
     this.markSize = 32,
   });
 
   final String title;
   final String assetName;
+  final String fallbackText;
   final double markSize;
 
   @override
   Widget build(BuildContext context) {
-    final label = Text(
-      title,
-      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            color: PokrovPalette.ink,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0,
-          ),
-    );
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        PokrovBrandMark(size: markSize, assetName: assetName),
+        PokrovBrandMark(
+          size: markSize,
+          assetName: assetName,
+          fallbackText: fallbackText,
+        ),
         const SizedBox(width: 10),
-        label,
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 130),
+          child: Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: PokrovPalette.ink,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0,
+                ),
+          ),
+        ),
       ],
     );
   }

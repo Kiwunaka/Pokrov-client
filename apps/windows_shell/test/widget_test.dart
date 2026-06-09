@@ -18,7 +18,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Защита'), findsWidgets);
-    expect(find.text('POKROV'), findsWidgets);
+    expect(find.text('Open Client'), findsWidgets);
     expect(find.byKey(const ValueKey('desktop-shell')), findsOneWidget);
     expect(
       find.byKey(const ValueKey('desktop-sidebar-expanded')),

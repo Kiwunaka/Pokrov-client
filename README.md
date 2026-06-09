@@ -62,6 +62,8 @@ Read the scope documents before opening issues or pull requests:
 - [Maintainer checklist](docs/MAINTAINER_CHECKLIST.md)
 - [Project principles](docs/PROJECT_PRINCIPLES.md)
 - [Source import playbook](docs/SOURCE_IMPORT_PLAYBOOK.md)
+- [Product variants](docs/PRODUCT_VARIANTS.md)
+- [Operator integration](docs/OPERATOR_INTEGRATION.md)
 - [Governance](docs/GOVERNANCE.md)
 - [Brand policy](BRAND.md)
 - [Security policy](SECURITY.md)

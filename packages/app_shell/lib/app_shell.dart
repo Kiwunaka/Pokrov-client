@@ -104,7 +104,30 @@ abstract final class _SeedPalette {
   static const muted = PokrovPalette.muted;
 }
 
-const _pokrovBrandMarkAsset = PokrovBrandAssets.mark;
+const _openClientVariant = String.fromEnvironment(
+  'OPEN_CLIENT_VARIANT',
+  defaultValue: 'community',
+);
+const _openClientBrandName = String.fromEnvironment(
+  'OPEN_CLIENT_BRAND_NAME',
+  defaultValue: '',
+);
+const _openClientApiBaseUrl = String.fromEnvironment(
+  'OPEN_CLIENT_API_BASE_URL',
+  defaultValue: '',
+);
+const _openClientCheckoutUrl = String.fromEnvironment(
+  'OPEN_CLIENT_CHECKOUT_URL',
+  defaultValue: '',
+);
+const _openClientCabinetUrl = String.fromEnvironment(
+  'OPEN_CLIENT_CABINET_URL',
+  defaultValue: '',
+);
+const _openClientBrandAsset = String.fromEnvironment(
+  'OPEN_CLIENT_BRAND_ASSET',
+  defaultValue: '',
+);
 const _selectedAppsEnforcementReady = true;
 const _pokrovAppVersion = '1.0.0-beta.2';
 const _seedRulesetVersion = '2026-04-13';
@@ -153,6 +176,7 @@ String _normalizeSeedUrl(String value, String fallback) {
 class SeedAppContext {
   const SeedAppContext({
     required this.hostPlatform,
+    required this.variantProfile,
     required this.accessLane,
     required this.scope,
     required this.runtimeProfile,
@@ -168,6 +192,7 @@ class SeedAppContext {
   });
 
   final HostPlatform hostPlatform;
+  final ClientVariantProfile variantProfile;
   final AccessLane accessLane;
   final ProgramScope scope;
   final RuntimeProfile runtimeProfile;
@@ -187,6 +212,122 @@ class SeedAppContext {
         SeedTab.rules,
         SeedTab.profile,
       ];
+}
+
+class ClientVariantProfile {
+  const ClientVariantProfile({
+    required this.id,
+    required this.displayName,
+    required this.brandMarkAssetName,
+    required this.apiBaseUrl,
+    required this.checkoutUrl,
+    required this.cabinetUrl,
+    required this.supportBot,
+    required this.feedbackBot,
+    required this.publicChannel,
+    required this.supportEmail,
+    required this.usesApiServices,
+    required this.description,
+  });
+
+  final String id;
+  final String displayName;
+  final String brandMarkAssetName;
+  final String apiBaseUrl;
+  final String checkoutUrl;
+  final String cabinetUrl;
+  final String supportBot;
+  final String feedbackBot;
+  final String publicChannel;
+  final String supportEmail;
+  final bool usesApiServices;
+  final String description;
+
+  String get fallbackMarkText =>
+      displayName.trim().isEmpty ? 'O' : displayName.trim().substring(0, 1);
+
+  bool get isCommunity => id == 'community';
+  bool get isOperator => id == 'operator';
+  bool get isOfficialPokrov => id == 'pokrov';
+}
+
+ClientVariantProfile selectedClientVariantProfile() {
+  final variant = _openClientVariant.trim().toLowerCase();
+  if (variant == 'pokrov' || variant == 'official') {
+    return ClientVariantProfile(
+      id: 'pokrov',
+      displayName: _openClientBrandName.trim().isEmpty
+          ? 'POKROV'
+          : _openClientBrandName.trim(),
+      brandMarkAssetName: _openClientBrandAsset.trim().isEmpty
+          ? PokrovBrandAssets.mark
+          : _openClientBrandAsset.trim(),
+      apiBaseUrl: _normalizeSeedUrl(
+        _openClientApiBaseUrl.trim().isEmpty
+            ? _apiBaseUrlOverride
+            : _openClientApiBaseUrl,
+        'https://api.pokrov.space/',
+      ),
+      checkoutUrl: _openClientCheckoutUrl.trim().isEmpty
+          ? _checkoutUrlOverride
+          : _openClientCheckoutUrl.trim(),
+      cabinetUrl: _normalizeSeedUrl(
+        _openClientCabinetUrl.trim().isEmpty
+            ? _cabinetUrlOverride
+            : _openClientCabinetUrl,
+        'https://app.pokrov.space/',
+      ),
+      supportBot: '@pokrov_supportbot',
+      feedbackBot: '@pokrov_feedbackbot',
+      publicChannel: '@pokrov_vpn',
+      supportEmail: 'support@pokrov.space',
+      usesApiServices: true,
+      description: 'Official POKROV service client mode.',
+    );
+  }
+
+  if (variant == 'operator' || variant == 'company') {
+    return ClientVariantProfile(
+      id: 'operator',
+      displayName: _openClientBrandName.trim().isEmpty
+          ? 'Operator Connect'
+          : _openClientBrandName.trim(),
+      brandMarkAssetName: _openClientBrandAsset.trim(),
+      apiBaseUrl: _normalizeSeedUrl(
+        _openClientApiBaseUrl,
+        'https://api.example.invalid/',
+      ),
+      checkoutUrl: _openClientCheckoutUrl.trim(),
+      cabinetUrl: _normalizeSeedUrl(
+        _openClientCabinetUrl,
+        'https://app.example.invalid/',
+      ),
+      supportBot: '',
+      feedbackBot: '',
+      publicChannel: '',
+      supportEmail: 'support@example.invalid',
+      usesApiServices: true,
+      description: 'White-label operator mode for a custom service backend.',
+    );
+  }
+
+  return ClientVariantProfile(
+    id: 'community',
+    displayName: _openClientBrandName.trim().isEmpty
+        ? 'Open Client'
+        : _openClientBrandName.trim(),
+    brandMarkAssetName: _openClientBrandAsset.trim(),
+    apiBaseUrl: '',
+    checkoutUrl: '',
+    cabinetUrl: '',
+    supportBot: '',
+    feedbackBot: '',
+    publicChannel: '',
+    supportEmail: '',
+    usesApiServices: false,
+    description:
+        'Community client mode for local keys, subscriptions, and public catalogs.',
+  );
 }
 
 enum RulesPresetState {
@@ -227,9 +368,21 @@ class RulesPresetContract {
       .length;
 }
 
-RulesPresetContract _seedRulesPresetContractFor(HostPlatform hostPlatform) {
+String _brandText(String value, ClientVariantProfile profile) {
+  return value.replaceAll('POKROV', profile.displayName);
+}
+
+String _brandTextForName(String value, String brandName) {
+  return value.replaceAll('POKROV', brandName);
+}
+
+RulesPresetContract _seedRulesPresetContractFor(
+  HostPlatform hostPlatform,
+  ClientVariantProfile profile,
+) {
+  final brandName = profile.displayName;
   return switch (hostPlatform) {
-    HostPlatform.windows => const RulesPresetContract(
+    HostPlatform.windows => RulesPresetContract(
         rulesetVersion: _seedRulesetVersion,
         packageCatalogVersion: _seedPackageCatalogVersion,
         presets: [
@@ -249,18 +402,24 @@ RulesPresetContract _seedRulesPresetContractFor(HostPlatform hostPlatform) {
           RulesPresetStatus(
             id: 'full-tunnel',
             title: 'Всё устройство',
-            subtitle: 'Можно направить весь трафик Windows через POKROV.',
+            subtitle: _brandTextForName(
+              'Можно направить весь трафик Windows через POKROV.',
+              brandName,
+            ),
             state: RulesPresetState.enabled,
           ),
           RulesPresetStatus(
             id: 'selected-apps',
             title: 'Выбранные приложения',
-            subtitle: 'POKROV работает только для выбранных .exe и процессов.',
+            subtitle: _brandTextForName(
+              'POKROV работает только для выбранных .exe и процессов.',
+              brandName,
+            ),
             state: RulesPresetState.enabled,
           ),
         ],
       ),
-    HostPlatform.android => const RulesPresetContract(
+    HostPlatform.android => RulesPresetContract(
         rulesetVersion: _seedRulesetVersion,
         packageCatalogVersion: _seedPackageCatalogVersion,
         presets: [
@@ -273,7 +432,10 @@ RulesPresetContract _seedRulesPresetContractFor(HostPlatform hostPlatform) {
           RulesPresetStatus(
             id: 'gosuslugi',
             title: 'Госуслуги',
-            subtitle: 'Государственные сервисы остаются без POKROV.',
+            subtitle: _brandTextForName(
+              'Государственные сервисы остаются без POKROV.',
+              brandName,
+            ),
             state: RulesPresetState.enabled,
           ),
           RulesPresetStatus(
@@ -291,12 +453,15 @@ RulesPresetContract _seedRulesPresetContractFor(HostPlatform hostPlatform) {
           RulesPresetStatus(
             id: 'selected-apps',
             title: 'Выбранные приложения',
-            subtitle: 'Можно выбрать приложения, которые идут через POKROV.',
+            subtitle: _brandTextForName(
+              'Можно выбрать приложения, которые идут через POKROV.',
+              brandName,
+            ),
             state: RulesPresetState.enabled,
           ),
         ],
       ),
-    HostPlatform.ios || HostPlatform.macos => const RulesPresetContract(
+    HostPlatform.ios || HostPlatform.macos => RulesPresetContract(
         rulesetVersion: _seedRulesetVersion,
         packageCatalogVersion: _seedPackageCatalogVersion,
         presets: [
@@ -309,7 +474,10 @@ RulesPresetContract _seedRulesPresetContractFor(HostPlatform hostPlatform) {
           RulesPresetStatus(
             id: 'full-tunnel',
             title: 'Всё устройство',
-            subtitle: 'Весь трафик устройства идет через POKROV.',
+            subtitle: _brandTextForName(
+              'Весь трафик устройства идет через POKROV.',
+              brandName,
+            ),
             state: RulesPresetState.enabled,
           ),
           RulesPresetStatus(
@@ -360,7 +528,9 @@ const _seedManagedProfilePayload = ManagedProfilePayload(
 
 SeedAppContext buildSeedAppContext({
   required HostPlatform hostPlatform,
+  ClientVariantProfile? variantProfile,
 }) {
+  final profile = variantProfile ?? selectedClientVariantProfile();
   final bootstrapContract = switch (hostPlatform) {
     HostPlatform.android => const PlatformBootstrapContract(
         hostPlatform: HostPlatform.android,
@@ -407,7 +577,9 @@ SeedAppContext buildSeedAppContext({
 
   return SeedAppContext(
     hostPlatform: hostPlatform,
-    accessLane: AccessLane.trialPremium,
+    variantProfile: profile,
+    accessLane:
+        profile.isCommunity ? AccessLane.freeMonthly : AccessLane.trialPremium,
     scope: const ProgramScope(
       publicReleaseTargets: [
         ClientPlatform.android,
@@ -429,8 +601,8 @@ SeedAppContext buildSeedAppContext({
             _selectedAppsEnforcementReady)
           RouteMode.selectedApps,
       ],
-      trialDays: 5,
-      telegramBonusDays: 10,
+      trialDays: profile.isCommunity ? 0 : 5,
+      telegramBonusDays: profile.isCommunity ? 0 : 10,
       freeTier: const FreeTierPolicy(
         trafficGb: 5,
         periodDays: 30,
@@ -442,25 +614,25 @@ SeedAppContext buildSeedAppContext({
       firstPartyPromosOnly: true,
     ),
     bootstrapContract: bootstrapContract,
-    supportSnapshot: const SupportSnapshot(
-      supportBot: '@pokrov_supportbot',
-      feedbackBot: '@pokrov_feedbackbot',
-      publicChannel: '@pokrov_vpn',
-      supportEmail: 'support@pokrov.space',
+    supportSnapshot: SupportSnapshot(
+      supportBot: profile.supportBot,
+      feedbackBot: profile.feedbackBot,
+      publicChannel: profile.publicChannel,
+      supportEmail: profile.supportEmail,
       safeNotes:
           'Поддержка видит только безопасный контекст: версию приложения, платформу, режим и статус подключения.',
       recommendedRouteMode: RouteMode.allExceptRu,
       channelBonusDays: 10,
     ),
-    rulesPresetContract: _seedRulesPresetContractFor(hostPlatform),
-    locations: const [
+    rulesPresetContract: _seedRulesPresetContractFor(hostPlatform, profile),
+    locations: [
       LocationCluster(
-        code: 'pokrov-managed',
-        label: 'POKROV',
+        code: profile.isCommunity ? 'local-profile' : 'managed-service',
+        label: profile.displayName,
         city: 'Автоматический выбор',
-        countryCode: 'PO',
+        countryCode: profile.isCommunity ? 'LC' : 'OP',
         recommendedLane: 'Авто',
-        variants: [
+        variants: const [
           LocationVariant(kind: TransportKind.vlessReality),
           LocationVariant(kind: TransportKind.vmess),
           LocationVariant(kind: TransportKind.trojan),
@@ -472,17 +644,9 @@ SeedAppContext buildSeedAppContext({
         ],
       ),
     ],
-    apiBaseUrl: _normalizeSeedUrl(
-      _apiBaseUrlOverride,
-      'https://api.pokrov.space/',
-    ),
-    checkoutUrl: _checkoutUrlOverride.trim().isEmpty
-        ? 'https://pay.pokrov.space/checkout/?plan=1_month'
-        : _checkoutUrlOverride.trim(),
-    cabinetUrl: _normalizeSeedUrl(
-      _cabinetUrlOverride,
-      'https://app.pokrov.space/',
-    ),
+    apiBaseUrl: profile.apiBaseUrl,
+    checkoutUrl: profile.checkoutUrl,
+    cabinetUrl: profile.cabinetUrl,
     redeemHint: '',
     managedProfileSeed: _seedManagedProfilePayload,
   );
@@ -520,7 +684,7 @@ class PokrovSeedApp extends StatelessWidget {
     );
 
     return MaterialApp(
-      title: 'POKROV',
+      title: appContext.variantProfile.displayName,
       theme: ThemeData(
         colorScheme: colorScheme,
         useMaterial3: true,
@@ -618,6 +782,76 @@ class PokrovSeedShell extends StatefulWidget {
   State<PokrovSeedShell> createState() => _PokrovSeedShellState();
 }
 
+class _StaticManagedProfileBootstrapper implements ManagedProfileBootstrapper {
+  const _StaticManagedProfileBootstrapper(this.payload);
+
+  final ManagedProfilePayload payload;
+
+  @override
+  Future<ManagedProfilePayload> resolveManagedProfile({
+    required HostPlatform hostPlatform,
+    required RouteMode routeMode,
+    List<String> selectedApps = const <String>[],
+  }) async {
+    return payload;
+  }
+}
+
+class _OfflineSupportTicketService implements SupportTicketService {
+  const _OfflineSupportTicketService();
+
+  @override
+  Future<List<SupportTicketThread>> listTickets({
+    required HostPlatform hostPlatform,
+    int limit = 20,
+  }) async {
+    return const <SupportTicketThread>[];
+  }
+
+  @override
+  Future<SupportTicketThread> getTicket({
+    required HostPlatform hostPlatform,
+    required int ticketId,
+  }) async {
+    throw const SupportTicketFailure(
+      'Support API is not configured for this open client build.',
+    );
+  }
+
+  @override
+  Future<SupportTicketReceipt> createTicket({
+    required HostPlatform hostPlatform,
+    required RouteMode routeMode,
+    required String statusLabel,
+    required String body,
+    String subject = '',
+    Map<String, Object?> diagnostics = const <String, Object?>{},
+  }) async {
+    if (body.trim().isEmpty) {
+      throw const SupportTicketFailure('Message must not be empty.');
+    }
+    return const SupportTicketReceipt(
+      ticketId: 0,
+      statusTitle: 'Local draft',
+      messageCount: 1,
+    );
+  }
+
+  @override
+  Future<SupportTicketThread> sendMessage({
+    required HostPlatform hostPlatform,
+    required int ticketId,
+    required String body,
+    RouteMode? routeMode,
+    String statusLabel = '',
+    Map<String, Object?> diagnostics = const <String, Object?>{},
+  }) async {
+    throw const SupportTicketFailure(
+      'Support API is not configured for this open client build.',
+    );
+  }
+}
+
 class _PokrovSeedShellState extends State<PokrovSeedShell>
     with WidgetsBindingObserver {
   int _selectedIndex = 0;
@@ -631,6 +865,13 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
   late final AppFirstNodePreferenceService? _nodePreferenceService;
   late final SupportTicketService _supportTicketService;
   late final PokrovFirstLaunchStore _firstLaunchStore;
+
+  String get _brandName => widget.appContext.variantProfile.displayName;
+
+  String _brand(String value) {
+    return _brandText(value, widget.appContext.variantProfile);
+  }
+
   final TextEditingController _firstLaunchRestoreCodeController =
       TextEditingController();
   RuntimeSnapshot? _runtimeSnapshot;
@@ -668,9 +909,13 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
       hostPlatform: widget.appContext.hostPlatform,
     );
     final bootstrapper = widget.bootstrapper ??
-        AppFirstRuntimeBootstrapper(
-          apiBaseUrl: widget.appContext.apiBaseUrl,
-        );
+        (widget.appContext.variantProfile.usesApiServices
+            ? AppFirstRuntimeBootstrapper(
+                apiBaseUrl: widget.appContext.apiBaseUrl,
+              )
+            : _StaticManagedProfileBootstrapper(
+                widget.appContext.managedProfileSeed,
+              ));
     _bootstrapper = bootstrapper;
     _accountActionService = bootstrapper is AppFirstAccountActionService
         ? bootstrapper as AppFirstAccountActionService
@@ -688,9 +933,11 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
         ? bootstrapper as AppFirstNodePreferenceService
         : null;
     _supportTicketService = widget.supportTicketService ??
-        AppFirstSupportTicketService(
-          apiBaseUrl: widget.appContext.apiBaseUrl,
-        );
+        (widget.appContext.variantProfile.usesApiServices
+            ? AppFirstSupportTicketService(
+                apiBaseUrl: widget.appContext.apiBaseUrl,
+              )
+            : const _OfflineSupportTicketService());
     _firstLaunchStore =
         widget.firstLaunchStore ?? const PokrovFileFirstLaunchStore();
     unawaited(_loadFirstLaunchState());
@@ -743,8 +990,8 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Локация сохранена. Переподключите POKROV.'),
+        SnackBar(
+          content: Text(_brand('Локация сохранена. Переподключите POKROV.')),
         ),
       );
     } on BootstrapFailure catch (error) {
@@ -854,8 +1101,9 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
       return;
     }
     _clientUpdatePromptVisible = true;
-    final title =
-        update.isRequired ? 'Нужно обновить POKROV' : 'Доступно обновление';
+    final title = update.isRequired
+        ? _brand('Нужно обновить POKROV')
+        : 'Доступно обновление';
     final version = update.latestVersion.trim();
     final notes = update.releaseNotes.trim();
     try {
@@ -1750,7 +1998,7 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
   Future<void> _toggleRuntime() async {
     if (_runtimeBusy) {
       setState(() {
-        _runtimeHeadline = 'POKROV уже обновляется. Подождите немного.';
+        _runtimeHeadline = _brand('POKROV уже обновляется. Подождите немного.');
       });
       return;
     }
@@ -1840,8 +2088,8 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
           _runtimeSnapshot = current;
           _runtimeHeadline = current.phase == RuntimePhase.running
               ? current.isCleanlyHealthy
-                  ? 'POKROV включен.'
-                  : 'POKROV включен, но требует внимания.'
+                  ? _brand('POKROV включен.')
+                  : _brand('POKROV включен, но требует внимания.')
               : current.message;
         });
         if (current.phase != RuntimePhase.running &&
@@ -1895,9 +2143,11 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
         ? '${normalizedDetail.substring(0, 180)}...'
         : normalizedDetail;
     if (detail.isEmpty) {
-      return 'POKROV не смог начать подключение. Откройте поддержку и приложите диагностику.';
+      return _brand(
+        'POKROV не смог начать подключение. Откройте поддержку и приложите диагностику.',
+      );
     }
-    return 'POKROV не смог начать подключение: $detail';
+    return _brand('POKROV не смог начать подключение: $detail');
   }
 
   Future<void> _reportWarpRuntimeFallback(RuntimeSnapshot snapshot) async {
@@ -2139,6 +2389,7 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
             .disableAnimations;
     final shell = isDesktopShell
         ? _DesktopShell(
+            appContext: widget.appContext,
             selectedIndex: _selectedIndex,
             sections: sections,
             onSelected: (index) {
@@ -2527,11 +2778,13 @@ class _FirstLaunchRestoreScreen extends StatelessWidget {
 
 class _DesktopShell extends StatelessWidget {
   const _DesktopShell({
+    required this.appContext,
     required this.selectedIndex,
     required this.sections,
     required this.onSelected,
   }) : super(key: const ValueKey('desktop-shell'));
 
+  final SeedAppContext appContext;
   final int selectedIndex;
   final List<Widget> sections;
   final ValueChanged<int> onSelected;
@@ -2542,6 +2795,7 @@ class _DesktopShell extends StatelessWidget {
       builder: (context, constraints) {
         if (constraints.maxWidth < 900) {
           return _DesktopDrawerShell(
+            appContext: appContext,
             selectedIndex: selectedIndex,
             sections: sections,
             onSelected: onSelected,
@@ -2551,6 +2805,7 @@ class _DesktopShell extends StatelessWidget {
         return Row(
           children: [
             _DesktopSidebar(
+              variantProfile: appContext.variantProfile,
               selectedIndex: selectedIndex,
               onSelected: onSelected,
               collapsed: collapsed,
@@ -2577,11 +2832,13 @@ class _DesktopShell extends StatelessWidget {
 
 class _DesktopDrawerShell extends StatelessWidget {
   const _DesktopDrawerShell({
+    required this.appContext,
     required this.selectedIndex,
     required this.sections,
     required this.onSelected,
   }) : super(key: const ValueKey('desktop-drawer-shell'));
 
+  final SeedAppContext appContext;
   final int selectedIndex;
   final List<Widget> sections;
   final ValueChanged<int> onSelected;
@@ -2596,6 +2853,7 @@ class _DesktopDrawerShell extends StatelessWidget {
         backgroundColor: _SeedPalette.canvas,
         child: SafeArea(
           child: _DesktopSidebar(
+            variantProfile: appContext.variantProfile,
             selectedIndex: selectedIndex,
             onSelected: (index) {
               Navigator.of(context).maybePop();
@@ -2624,7 +2882,10 @@ class _DesktopDrawerShell extends StatelessWidget {
                   },
                 ),
                 const SizedBox(width: 8),
-                const _BrandLockup(markSize: 28),
+                _BrandLockup(
+                  variantProfile: appContext.variantProfile,
+                  markSize: 28,
+                ),
               ],
             ),
           ),
@@ -2712,6 +2973,7 @@ class _MobileShell extends StatelessWidget {
 
 class _DesktopSidebar extends PokrovDesktopSidebar {
   _DesktopSidebar({
+    required ClientVariantProfile variantProfile,
     required int selectedIndex,
     required ValueChanged<int> onSelected,
     required bool collapsed,
@@ -2721,7 +2983,9 @@ class _DesktopSidebar extends PokrovDesktopSidebar {
           onSelected: onSelected,
           collapsed: collapsed,
           drawer: drawer,
-          brandMarkAssetName: _pokrovBrandMarkAsset,
+          brandTitle: variantProfile.displayName,
+          brandMarkAssetName: variantProfile.brandMarkAssetName,
+          brandFallbackText: variantProfile.fallbackMarkText,
           versionLabel: _pokrovAppVersion,
           destinations: const [
             PokrovSidebarDestination(
@@ -2790,7 +3054,10 @@ class PokrovLegacyDesktopSidebar extends StatelessWidget {
             if (collapsed)
               const _BrandMark(size: 32)
             else ...[
-              const _BrandLockup(markSize: 34),
+              _BrandLockup(
+                variantProfile: selectedClientVariantProfile(),
+                markSize: 34,
+              ),
               const SizedBox(height: 4),
               Text(
                 _pokrovAppVersion,
@@ -2862,27 +3129,37 @@ class PokrovLegacyDesktopSidebar extends StatelessWidget {
 
 class _BrandLockup extends StatelessWidget {
   const _BrandLockup({
+    required this.variantProfile,
     this.markSize = 32,
     this.center = false,
   });
 
+  final ClientVariantProfile variantProfile;
   final double markSize;
   final bool center;
 
   @override
   Widget build(BuildContext context) {
-    final label = Text(
-      'POKROV',
-      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            color: _SeedPalette.ink,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0,
-          ),
-    );
     final children = [
-      _BrandMark(size: markSize),
+      _BrandMark(
+        size: markSize,
+        assetName: variantProfile.brandMarkAssetName,
+        fallbackText: variantProfile.fallbackMarkText,
+      ),
       const SizedBox(width: 10),
-      label,
+      ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: center ? 220 : 180),
+        child: Text(
+          variantProfile.displayName,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: _SeedPalette.ink,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0,
+              ),
+        ),
+      ),
     ];
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -2897,10 +3174,13 @@ class _BrandMark extends PokrovBrandMark {
   const _BrandMark({
     required double size,
     double opacity = 1,
+    String assetName = _openClientBrandAsset,
+    String fallbackText = 'O',
   }) : super(
           size: size,
           opacity: opacity,
-          assetName: _pokrovBrandMarkAsset,
+          assetName: assetName,
+          fallbackText: fallbackText,
         );
 }
 
@@ -3058,6 +3338,7 @@ class _QuickConnectSection extends StatelessWidget {
       snapshot,
       headline: runtimeHeadline,
       hostPlatform: appContext.hostPlatform,
+      brandName: appContext.variantProfile.displayName,
     );
     final primaryActionEnabled = !runtimeBusy && primaryConnectEnabled;
     final isDesktop = switch (appContext.hostPlatform) {
@@ -3091,6 +3372,7 @@ class _QuickConnectSection extends StatelessWidget {
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: isDesktop ? 560 : 460),
             child: _HomeStage(
+              variantProfile: appContext.variantProfile,
               statusLabel: statusLabel,
               statusColor: statusColor,
               actionLabel: actionLabel,
@@ -3136,6 +3418,7 @@ class _QuickConnectSection extends StatelessWidget {
 
 class _HomeStage extends StatefulWidget {
   const _HomeStage({
+    required this.variantProfile,
     required this.statusLabel,
     required this.statusColor,
     required this.actionLabel,
@@ -3161,6 +3444,7 @@ class _HomeStage extends StatefulWidget {
     required this.onOpenWarp,
   });
 
+  final ClientVariantProfile variantProfile;
   final String statusLabel;
   final Color statusColor;
   final String actionLabel;
@@ -3236,7 +3520,11 @@ class _HomeStageState extends State<_HomeStage>
             controller: _revealController,
             begin: 0,
             end: 0.42,
-            child: const _BrandLockup(markSize: 38, center: true),
+            child: _BrandLockup(
+              variantProfile: widget.variantProfile,
+              markSize: 38,
+              center: true,
+            ),
           ),
           const SizedBox(height: 20),
           _HomeRevealSlice(
@@ -3821,7 +4109,10 @@ class _LocationsSection extends StatelessWidget {
               _SettingsRow(
                 key: const ValueKey('locations-auto-help-action'),
                 icon: Icons.check_circle_outline_rounded,
-                title: 'POKROV выберет сервер',
+                title: _brandText(
+                  'POKROV выберет сервер',
+                  appContext.variantProfile,
+                ),
                 value: preferredNodeCode.trim().isEmpty
                     ? 'Авто'
                     : preferredNodeCode.trim().toUpperCase(),
@@ -3829,9 +4120,15 @@ class _LocationsSection extends StatelessWidget {
                   context,
                   title: 'Автоматически',
                   lines: [
-                    'POKROV выбирает доступный сервер по вашему доступу и текущему состоянию узлов.',
+                    _brandText(
+                      'POKROV выбирает доступный сервер по вашему доступу и текущему состоянию узлов.',
+                      appContext.variantProfile,
+                    ),
                     'Пробный доступ использует премиум-пул, а не бесплатный узел.',
-                    'Если вы выберете узел ниже, POKROV поставит его первым при следующем профиле.',
+                    _brandText(
+                      'Если вы выберете узел ниже, POKROV поставит его первым при следующем профиле.',
+                      appContext.variantProfile,
+                    ),
                   ],
                 ),
               ),
@@ -4007,7 +4304,11 @@ class _ProfileSection extends StatelessWidget {
       runtimeSnapshot,
       headline: runtimeHeadline,
       hostPlatform: appContext.hostPlatform,
+      brandName: appContext.variantProfile.displayName,
     );
+    final usesApiServices = appContext.variantProfile.usesApiServices;
+    final hasCheckoutUrl = appContext.checkoutUrl.trim().isNotEmpty;
+    final hasCabinetUrl = appContext.cabinetUrl.trim().isNotEmpty;
     return _SeedContentList(
       top: 24,
       children: [
@@ -4041,81 +4342,96 @@ class _ProfileSection extends StatelessWidget {
                         lines: [statusSummary],
                       ),
                     ),
-                    _SettingsRow(
-                      key: const ValueKey('profile-plan-details-action'),
-                      icon: Icons.workspace_premium_outlined,
-                      title: 'Подписка',
-                      value: _accessShortValue(appContext, bonusSummary),
-                      onTap: () => _showSubscriptionSheet(
-                        context,
-                        appContext: appContext,
-                        hasProvisionedAccess: hasProvisionedAccess,
-                        onOpenHandoff: onOpenHandoff,
+                    if (usesApiServices)
+                      _SettingsRow(
+                        key: const ValueKey('profile-plan-details-action'),
+                        icon: Icons.workspace_premium_outlined,
+                        title: 'Подписка',
+                        value: _accessShortValue(appContext, bonusSummary),
+                        onTap: () => _showSubscriptionSheet(
+                          context,
+                          appContext: appContext,
+                          hasProvisionedAccess: hasProvisionedAccess,
+                          onOpenHandoff: onOpenHandoff,
+                        ),
                       ),
-                    ),
-                    _SettingsRow(
-                      key: const ValueKey('profile-checkout-action'),
-                      icon: Icons.shopping_bag_outlined,
-                      title: 'Оплата',
-                      value: 'Продлить',
-                      onTap: () =>
-                          onOpenHandoff('checkout', appContext.checkoutUrl),
-                    ),
-                    _SettingsRow(
-                      key: const ValueKey('profile-open-cabinet-action'),
-                      icon: Icons.web_outlined,
-                      title: 'Кабинет',
-                      value: 'Открыть',
-                      onTap: () =>
-                          onOpenHandoff('cabinet', appContext.cabinetUrl),
-                    ),
+                    if (hasCheckoutUrl)
+                      _SettingsRow(
+                        key: const ValueKey('profile-checkout-action'),
+                        icon: Icons.shopping_bag_outlined,
+                        title: 'Оплата',
+                        value: 'Продлить',
+                        onTap: () =>
+                            onOpenHandoff('checkout', appContext.checkoutUrl),
+                      ),
+                    if (hasCabinetUrl)
+                      _SettingsRow(
+                        key: const ValueKey('profile-open-cabinet-action'),
+                        icon: Icons.web_outlined,
+                        title: 'Кабинет',
+                        value: 'Открыть',
+                        onTap: () =>
+                            onOpenHandoff('cabinet', appContext.cabinetUrl),
+                      ),
                   ],
                 ),
               ),
               _SectionCard(
                 key: const ValueKey('profile-section-sync'),
-                title: 'Привязать доступ',
+                title: usesApiServices ? 'Привязать доступ' : 'Импорт доступа',
                 tone: _SectionTone.reward,
-                lines: const ['Код из Telegram, кабинета, сайта или письма.'],
+                lines: [
+                  usesApiServices
+                      ? 'Код из Telegram, кабинета, сайта или письма.'
+                      : 'Вставьте ключ, subscription URL или локальный профиль.',
+                ],
                 child: Column(
                   children: [
                     _SettingsRow(
                       key: const ValueKey('profile-redeem-code-action'),
                       icon: Icons.key_rounded,
-                      title: 'Код активации',
+                      title:
+                          usesApiServices ? 'Код активации' : 'Ключ или ссылка',
                       value: 'Ввести',
                       onTap: () => _showRedeemSheet(
                         context,
                         hintCode: appContext.redeemHint,
+                        hintPlaceholder:
+                            appContext.variantProfile.isOfficialPokrov
+                                ? 'POKROV-XXXX-XXXX'
+                                : 'vless://, ss://, trojan:// или https://',
                         onRedeem: (code) => onOpenHandoff('redeem', code),
                       ),
                     ),
-                    _SettingsRow(
-                      key: const ValueKey('profile-telegram-link-action'),
-                      icon: Icons.send_outlined,
-                      title:
-                          'Telegram +${appContext.runtimeProfile.telegramBonusDays} дней',
-                      value:
-                          telegramBonusBusy ? 'Проверяем' : telegramBonusStatus,
-                      onTap: telegramBonusBusy ? null : onCreateTelegramLink,
-                    ),
-                    _SettingsRow(
-                      key: const ValueKey('profile-telegram-check-action'),
-                      icon: Icons.fact_check_outlined,
-                      title: 'Проверить подписку',
-                      value: 'Канал',
-                      onTap: telegramBonusBusy ? null : onCheckTelegramBonus,
-                    ),
-                    _SettingsRow(
-                      key: const ValueKey('profile-telegram-claim-action'),
-                      icon: Icons.add_circle_outline_rounded,
-                      title:
-                          'Получить +${appContext.runtimeProfile.telegramBonusDays} дней',
-                      value: telegramBonusCanClaim
-                          ? 'Активировать'
-                          : 'После проверки',
-                      onTap: telegramBonusBusy ? null : onClaimTelegramBonus,
-                    ),
+                    if (usesApiServices) ...[
+                      _SettingsRow(
+                        key: const ValueKey('profile-telegram-link-action'),
+                        icon: Icons.send_outlined,
+                        title:
+                            'Telegram +${appContext.runtimeProfile.telegramBonusDays} дней',
+                        value: telegramBonusBusy
+                            ? 'Проверяем'
+                            : telegramBonusStatus,
+                        onTap: telegramBonusBusy ? null : onCreateTelegramLink,
+                      ),
+                      _SettingsRow(
+                        key: const ValueKey('profile-telegram-check-action'),
+                        icon: Icons.fact_check_outlined,
+                        title: 'Проверить подписку',
+                        value: 'Канал',
+                        onTap: telegramBonusBusy ? null : onCheckTelegramBonus,
+                      ),
+                      _SettingsRow(
+                        key: const ValueKey('profile-telegram-claim-action'),
+                        icon: Icons.add_circle_outline_rounded,
+                        title:
+                            'Получить +${appContext.runtimeProfile.telegramBonusDays} дней',
+                        value: telegramBonusCanClaim
+                            ? 'Активировать'
+                            : 'После проверки',
+                        onTap: telegramBonusBusy ? null : onClaimTelegramBonus,
+                      ),
+                    ],
                     if ((telegramBonusError ?? '').isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
@@ -5362,7 +5678,7 @@ class _RulesSection extends StatelessWidget {
         Text('Режим работы', style: theme.textTheme.headlineSmall),
         const SizedBox(height: 12),
         _SectionCard(
-          title: 'Что идет через POKROV',
+          title: _brandText('Что идет через POKROV', appContext.variantProfile),
           tone: _SectionTone.accent,
           lines: ['Сейчас · ${_routeModeShortLabel(selectedRouteMode)}'],
           child: Column(
@@ -5375,7 +5691,10 @@ class _RulesSection extends StatelessWidget {
                     RouteMode.fullTunnel => Icons.public_rounded,
                     RouteMode.selectedApps => Icons.apps_rounded,
                   },
-                  title: _routeModeRowTitle(mode),
+                  title: _routeModeRowTitle(
+                    mode,
+                    appContext.variantProfile.displayName,
+                  ),
                   value: selectedRouteMode == mode ? 'Выбран' : 'Выбрать',
                   onTap: () => onRouteModeSelected(mode),
                 ),
@@ -5389,10 +5708,10 @@ class _RulesSection extends StatelessWidget {
                   context,
                   title: 'Режим работы',
                   lines: [
-                    '${_routeModeShortLabel(RouteMode.allExceptRu)}: ${_routeModeRowSummary(RouteMode.allExceptRu)}',
-                    '${_routeModeShortLabel(RouteMode.fullTunnel)}: ${_routeModeRowSummary(RouteMode.fullTunnel)}',
+                    '${_routeModeShortLabel(RouteMode.allExceptRu)}: ${_routeModeRowSummary(RouteMode.allExceptRu, appContext.variantProfile.displayName)}',
+                    '${_routeModeShortLabel(RouteMode.fullTunnel)}: ${_routeModeRowSummary(RouteMode.fullTunnel, appContext.variantProfile.displayName)}',
                     selectedAppsActive
-                        ? '${_routeModeShortLabel(RouteMode.selectedApps)}: ${_routeModeRowSummary(RouteMode.selectedApps)}'
+                        ? '${_routeModeShortLabel(RouteMode.selectedApps)}: ${_routeModeRowSummary(RouteMode.selectedApps, appContext.variantProfile.displayName)}'
                         : selectedAppsStaged
                             ? '${_routeModeShortLabel(RouteMode.selectedApps)}: появится после системной проверки.'
                             : '${_routeModeShortLabel(RouteMode.selectedApps)}: недоступно на ${appContext.hostPlatform.label}.',
@@ -5403,7 +5722,7 @@ class _RulesSection extends StatelessWidget {
           ),
         ),
         _SectionCard(
-          title: 'Напрямую без POKROV',
+          title: _brandText('Напрямую без POKROV', appContext.variantProfile),
           lines: [
             'Российские и локальные сервисы не ломаются из-за маршрута.',
           ],
@@ -5415,6 +5734,7 @@ class _RulesSection extends StatelessWidget {
                   icon: _rulesPresetIcon(preset.id),
                   title: preset.title,
                   subtitle: preset.subtitle,
+                  brandName: appContext.variantProfile.displayName,
                   enabled: preset.enabled,
                   statusLabel: _rulesPresetStatusLabel(preset.state),
                 ),
@@ -5429,12 +5749,16 @@ class _RulesSection extends StatelessWidget {
             lines: [
               selectedAppIds.isEmpty
                   ? isWindows
-                      ? 'Выберите .exe, которые должны идти через POKROV.'
+                      ? _brandText(
+                          'Выберите .exe, которые должны идти через POKROV.',
+                          appContext.variantProfile,
+                        )
                       : 'Добавьте приложения для режима «только выбранные».'
                   : 'Выбрано: ${selectedAppIds.length}',
             ],
             child: _SelectedAppsEditor(
               hostPlatform: appContext.hostPlatform,
+              brandName: appContext.variantProfile.displayName,
               selectedAppIds: selectedAppIds,
               onAdd: onSelectedAppAdded,
               onRemove: onSelectedAppRemoved,
@@ -5448,12 +5772,14 @@ class _RulesSection extends StatelessWidget {
 class _SelectedAppsEditor extends StatefulWidget {
   const _SelectedAppsEditor({
     required this.hostPlatform,
+    required this.brandName,
     required this.selectedAppIds,
     required this.onAdd,
     required this.onRemove,
   });
 
   final HostPlatform hostPlatform;
+  final String brandName;
   final List<String> selectedAppIds;
   final ValueChanged<String> onAdd;
   final ValueChanged<String> onRemove;
@@ -5603,7 +5929,10 @@ class _SelectedAppsEditorState extends State<_SelectedAppsEditor> {
         const SizedBox(height: 10),
         if (widget.selectedAppIds.isEmpty)
           Text(
-            'POKROV применит выбранные приложения сам.',
+            _brandTextForName(
+              'POKROV применит выбранные приложения сам.',
+              widget.brandName,
+            ),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: _SeedPalette.muted,
                   height: 1.35,
@@ -6150,6 +6479,7 @@ void _showAdvancedSettingsSheet(BuildContext context) {
 void _showRedeemSheet(
   BuildContext context, {
   required String hintCode,
+  required String hintPlaceholder,
   required ValueChanged<String> onRedeem,
 }) {
   showModalBottomSheet<void>(
@@ -6183,6 +6513,10 @@ void _showRedeemSheet(
             const SizedBox(height: 14),
             _RedeemFields(
               hintCode: hintCode,
+              labelText: hintPlaceholder.startsWith('POKROV-')
+                  ? 'Код активации'
+                  : 'Ключ или subscription URL',
+              hintPlaceholder: hintPlaceholder,
               onRedeem: (code) {
                 Navigator.of(context).pop();
                 onRedeem(code);
@@ -6198,10 +6532,14 @@ void _showRedeemSheet(
 class _RedeemFields extends StatefulWidget {
   const _RedeemFields({
     required this.hintCode,
+    required this.labelText,
+    required this.hintPlaceholder,
     required this.onRedeem,
   });
 
   final String hintCode;
+  final String labelText;
+  final String hintPlaceholder;
   final ValueChanged<String> onRedeem;
 
   @override
@@ -6231,9 +6569,9 @@ class _RedeemFieldsState extends State<_RedeemFields> {
         TextField(
           key: const ValueKey('profile-redeem-code-field'),
           controller: _controller,
-          decoration: const InputDecoration(
-            labelText: 'Код активации',
-            hintText: 'POKROV-XXXX-XXXX',
+          decoration: InputDecoration(
+            labelText: widget.labelText,
+            hintText: widget.hintPlaceholder,
           ),
         ),
         const SizedBox(height: 12),
@@ -6314,6 +6652,7 @@ class _PresetRow extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.subtitle,
+    required this.brandName,
     required this.enabled,
     required this.statusLabel,
     super.key,
@@ -6322,6 +6661,7 @@ class _PresetRow extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
+  final String brandName;
   final bool enabled;
   final String statusLabel;
 
@@ -6338,7 +6678,10 @@ class _PresetRow extends StatelessWidget {
           subtitle,
           enabled
               ? 'Этот пресет уже учитывается в текущей карте правил.'
-              : 'POKROV покажет включение, когда пресет пройдет проверку.',
+              : _brandTextForName(
+                  'POKROV покажет включение, когда пресет пройдет проверку.',
+                  brandName,
+                ),
         ],
       ),
     );
@@ -6429,22 +6772,24 @@ String _routeModeShortLabel(RouteMode mode) {
   };
 }
 
-String _routeModeRowTitle(RouteMode mode) {
-  return switch (mode) {
+String _routeModeRowTitle(RouteMode mode, String brandName) {
+  final value = switch (mode) {
     RouteMode.allExceptRu => 'Российские сервисы напрямую',
     RouteMode.fullTunnel => 'Всё устройство через POKROV',
     RouteMode.selectedApps => 'Только выбранные приложения',
   };
+  return _brandTextForName(value, brandName);
 }
 
-String _routeModeRowSummary(RouteMode mode) {
-  return switch (mode) {
+String _routeModeRowSummary(RouteMode mode, String brandName) {
+  final value = switch (mode) {
     RouteMode.allExceptRu =>
       'Российские и локальные сервисы работают напрямую, остальное идет через POKROV.',
     RouteMode.fullTunnel => 'Весь трафик устройства идет через POKROV.',
     RouteMode.selectedApps =>
       'POKROV используют только выбранные приложения или .exe.',
   };
+  return _brandTextForName(value, brandName);
 }
 
 String _smartConnectNodeTitle(SmartConnectNode node) {
@@ -6674,7 +7019,7 @@ class _SupportChatScreenState extends State<_SupportChatScreen> {
   int? _ticketId;
   String _threadStatus = 'AI помощник';
   String? _threadError;
-  List<_SupportChatMessage> _messages = _supportGreetingMessages();
+  late List<_SupportChatMessage> _messages;
   bool _attachDiagnosticsToNextMessage = false;
 
   @override
@@ -6682,6 +7027,8 @@ class _SupportChatScreenState extends State<_SupportChatScreen> {
     super.initState();
     _composer = TextEditingController();
     _composerFocusNode = FocusNode(debugLabel: 'support-composer');
+    _messages =
+        _supportGreetingMessages(widget.appContext.variantProfile.displayName);
     unawaited(_loadInitialThread());
   }
 
@@ -6723,7 +7070,9 @@ class _SupportChatScreenState extends State<_SupportChatScreen> {
           _threadRefreshFailed = false;
           _hasOperatorReply = false;
           _loadingThread = false;
-          _messages = _supportGreetingMessages();
+          _messages = _supportGreetingMessages(
+            widget.appContext.variantProfile.displayName,
+          );
           _threadStatus = 'AI помощник';
         });
         _syncThreadPolling();
@@ -6771,8 +7120,11 @@ class _SupportChatScreenState extends State<_SupportChatScreen> {
     _threadStatus =
         thread.statusTitle.isEmpty ? thread.status : thread.statusTitle;
     final nextMessages = _messagesFromThread(thread);
-    _messages =
-        nextMessages.isEmpty ? _supportGreetingMessages() : nextMessages;
+    _messages = nextMessages.isEmpty
+        ? _supportGreetingMessages(
+            widget.appContext.variantProfile.displayName,
+          )
+        : nextMessages;
     _hasOperatorReply = nextMessages
         .any((message) => message.role == _SupportChatRole.operator);
     _threadRefreshFailed = false;
@@ -6915,7 +7267,8 @@ class _SupportChatScreenState extends State<_SupportChatScreen> {
         hostPlatform: widget.appContext.hostPlatform,
         routeMode: widget.selectedRouteMode,
         statusLabel: widget.statusLabel,
-        subject: 'Обращение из приложения POKROV',
+        subject:
+            'Обращение из приложения ${widget.appContext.variantProfile.displayName}',
         body: text,
         diagnostics: _supportDiagnostics(),
       );
@@ -6988,7 +7341,7 @@ class _SupportChatScreenState extends State<_SupportChatScreen> {
       'platform': widget.appContext.hostPlatform.name,
       'route_mode': widget.selectedRouteMode.name,
       'connection_status': widget.statusLabel,
-      'selected_region': 'POKROV auto',
+      'selected_region': '${widget.appContext.variantProfile.displayName} auto',
       ...widget.extraDiagnostics,
     };
   }
@@ -7179,6 +7532,7 @@ class _SupportChatScreenState extends State<_SupportChatScreen> {
                     padding: const EdgeInsets.fromLTRB(18, 0, 18, 10),
                     child: _SupportLifecycleHint(
                       state: _supportLifecycleState,
+                      brandName: widget.appContext.variantProfile.displayName,
                       onRetry: _retrySupportLifecycle,
                     ),
                   ),
@@ -7437,13 +7791,15 @@ class _SupportChatMessage {
   final String label;
 }
 
-List<_SupportChatMessage> _supportGreetingMessages() {
+List<_SupportChatMessage> _supportGreetingMessages(String brandName) {
   return <_SupportChatMessage>[
     _SupportChatMessage(
       role: _SupportChatRole.assistant,
       label: 'AI помощник',
-      body:
-          'Напишите, что случилось. POKROV приложит безопасный контекст и покажет ответ в этом чате.',
+      body: _brandTextForName(
+        'Напишите, что случилось. POKROV приложит безопасный контекст и покажет ответ в этом чате.',
+        brandName,
+      ),
     ),
   ];
 }
@@ -7461,10 +7817,12 @@ enum _SupportLifecycleState {
 class _SupportLifecycleHint extends StatelessWidget {
   const _SupportLifecycleHint({
     required this.state,
+    required this.brandName,
     required this.onRetry,
   });
 
   final _SupportLifecycleState state;
+  final String brandName;
   final VoidCallback onRetry;
 
   @override
@@ -7490,7 +7848,10 @@ class _SupportLifecycleHint extends StatelessWidget {
           key: 'tracking',
           icon: Icons.mark_chat_unread_outlined,
           label: 'Ответ появится здесь',
-          detail: 'POKROV проверяет тикет в фоне. Telegram остается запасным.',
+          detail: _brandTextForName(
+            'POKROV проверяет тикет в фоне. Telegram остается запасным.',
+            brandName,
+          ),
           accent: _SeedPalette.accent,
           retry: false,
         ),
@@ -7800,6 +8161,7 @@ String _consumerProtectionStatusSummary(
   RuntimeSnapshot? snapshot, {
   required String? headline,
   required HostPlatform hostPlatform,
+  required String brandName,
 }) {
   if ((headline ?? '').trim().isNotEmpty) {
     return headline!.trim();
@@ -7808,9 +8170,10 @@ String _consumerProtectionStatusSummary(
     return 'Проверяем, готово ли устройство ${hostPlatform.label}.';
   }
   if (snapshot.phase == RuntimePhase.running) {
-    return snapshot.isCleanlyHealthy
+    final value = snapshot.isCleanlyHealthy
         ? 'POKROV работает на этом устройстве.'
         : 'POKROV включен, но заметил состояние, которое стоит проверить.';
+    return _brandTextForName(value, brandName);
   }
   if (snapshot.phase == RuntimePhase.artifactMissing) {
     return 'Устройство еще завершает подготовку перед подключением.';
@@ -7818,7 +8181,10 @@ String _consumerProtectionStatusSummary(
   if ((snapshot.stagedConfigPath ?? '').isNotEmpty) {
     return 'Все готово. Нажмите главную кнопку, чтобы подключиться.';
   }
-  return 'POKROV готовит подключение в фоне, чтобы на первом экране осталась одна понятная кнопка.';
+  return _brandTextForName(
+    'POKROV готовит подключение в фоне, чтобы на первом экране осталась одна понятная кнопка.',
+    brandName,
+  );
 }
 
 class _SectionCard extends StatelessWidget {

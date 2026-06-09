@@ -15,7 +15,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Защита'), findsWidgets);
-    expect(find.text('POKROV'), findsOneWidget);
+    expect(find.text('Open Client'), findsOneWidget);
     expect(find.byKey(const ValueKey('mobile-shell')), findsOneWidget);
     expect(find.byKey(const ValueKey('pokrov-brand-mark')), findsWidgets);
     expect(

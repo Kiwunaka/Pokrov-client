@@ -140,6 +140,8 @@ build reproducibility и подготовки публичного source snapsh
 - [docs/MAINTAINER_CHECKLIST.md](docs/MAINTAINER_CHECKLIST.md)
 - [docs/PROJECT_PRINCIPLES.md](docs/PROJECT_PRINCIPLES.md)
 - [docs/SOURCE_IMPORT_PLAYBOOK.md](docs/SOURCE_IMPORT_PLAYBOOK.md)
+- [docs/PRODUCT_VARIANTS.md](docs/PRODUCT_VARIANTS.md)
+- [docs/OPERATOR_INTEGRATION.md](docs/OPERATOR_INTEGRATION.md)
 - [docs/GOVERNANCE.md](docs/GOVERNANCE.md)
 
 Пожалуйста, не открывай публичные issues с secrets, личными connection links,

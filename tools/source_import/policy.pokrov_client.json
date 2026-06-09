@@ -47,6 +47,7 @@
     "packages/**/test/**/*.dart",
     "packages/**/assets/brand/*.png",
     "config/*.seed.json",
+    "config/variants/*.seed.json",
     "config/templates/*.example",
     "assets/branding/README.md",
     "assets/branding/*.png"

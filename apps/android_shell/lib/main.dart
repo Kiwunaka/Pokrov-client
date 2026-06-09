@@ -3,9 +3,13 @@ import 'package:pokrov_app_shell/app_shell.dart';
 import 'package:pokrov_core_domain/core_domain.dart';
 
 void main() {
+  final variantProfile = selectedClientVariantProfile();
   runApp(
     PokrovSeedApp(
-      appContext: buildSeedAppContext(hostPlatform: HostPlatform.android),
+      appContext: buildSeedAppContext(
+        hostPlatform: HostPlatform.android,
+        variantProfile: variantProfile,
+      ),
     ),
   );
 }

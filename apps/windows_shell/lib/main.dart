@@ -9,11 +9,15 @@ import 'package:window_manager/window_manager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final variantProfile = selectedClientVariantProfile();
   await windowManager.ensureInitialized();
-  await _PokrovWindowsTray.install();
+  await _PokrovWindowsTray.install(variantProfile);
   runApp(
     PokrovSeedApp(
-      appContext: buildSeedAppContext(hostPlatform: HostPlatform.windows),
+      appContext: buildSeedAppContext(
+        hostPlatform: HostPlatform.windows,
+        variantProfile: variantProfile,
+      ),
     ),
   );
 }
@@ -23,19 +27,19 @@ final class _PokrovWindowsTray with TrayListener {
 
   static final _PokrovWindowsTray _instance = _PokrovWindowsTray._();
 
-  static Future<void> install() async {
+  static Future<void> install(ClientVariantProfile variantProfile) async {
     if (!Platform.isWindows) {
       return;
     }
     trayManager.addListener(_instance);
     await trayManager.setIcon('windows/runner/resources/app_icon.ico');
-    await trayManager.setToolTip('POKROV');
+    await trayManager.setToolTip(variantProfile.displayName);
     await trayManager.setContextMenu(
       Menu(
         items: [
           MenuItem(
             key: 'show_window',
-            label: 'Открыть POKROV',
+            label: 'Open ${variantProfile.displayName}',
           ),
           MenuItem(
             key: 'support',

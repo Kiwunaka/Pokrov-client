@@ -27,6 +27,36 @@ config/
   *.seed.json         Public seed configuration and runtime contracts
 ```
 
+## Choose A Product Variant
+
+The public client has two open-source product lines:
+
+- `community`: neutral client for ordinary users with local keys or
+  subscriptions; no POKROV logo and no POKROV API calls by default.
+- `operator`: white-label client for companies with their own API, cabinet,
+  support, billing, and branding.
+
+The `pokrov` variant is reserved for official POKROV service builds.
+
+Read [PRODUCT_VARIANTS.md](PRODUCT_VARIANTS.md) and
+[OPERATOR_INTEGRATION.md](OPERATOR_INTEGRATION.md) before shipping a fork.
+
+Example community run:
+
+```powershell
+flutter run --dart-define=OPEN_CLIENT_VARIANT=community --dart-define=OPEN_CLIENT_BRAND_NAME="Open Client"
+```
+
+Example operator run:
+
+```powershell
+flutter run `
+  --dart-define=OPEN_CLIENT_VARIANT=operator `
+  --dart-define=OPEN_CLIENT_BRAND_NAME="Acme VPN" `
+  --dart-define=OPEN_CLIENT_API_BASE_URL="https://api.acme.example/" `
+  --dart-define=OPEN_CLIENT_CABINET_URL="https://app.acme.example/"
+```
+
 ## Resolve Dependencies
 
 From the repository root:

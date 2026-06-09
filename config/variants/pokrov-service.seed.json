@@ -1,0 +1,25 @@
+{
+  "variant": "pokrov",
+  "display_name": "POKROV",
+  "brand_policy": {
+    "uses_pokrov_logo": true,
+    "official_build_only": true,
+    "forks_must_not_claim_official_status": true
+  },
+  "service_model": {
+    "uses_managed_service_api": true,
+    "api_base_url": "https://api.pokrov.space/",
+    "cabinet_url": "https://app.pokrov.space/",
+    "checkout_url": "https://pay.pokrov.space/checkout/",
+    "support_api": "pokrov_owned",
+    "billing": "pokrov_owned"
+  },
+  "build_defines": {
+    "OPEN_CLIENT_VARIANT": "pokrov",
+    "OPEN_CLIENT_BRAND_NAME": "POKROV",
+    "OPEN_CLIENT_BRAND_ASSET": "assets/brand/pokrov_mark.png",
+    "OPEN_CLIENT_API_BASE_URL": "https://api.pokrov.space/",
+    "OPEN_CLIENT_CABINET_URL": "https://app.pokrov.space/",
+    "OPEN_CLIENT_CHECKOUT_URL": "https://pay.pokrov.space/checkout/?plan=1_month"
+  }
+}
