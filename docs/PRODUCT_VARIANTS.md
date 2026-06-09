@@ -20,6 +20,7 @@ Default properties:
 - no managed-service API calls by default
 - local profile import for single `vless://`, `trojan://`, `ss://`, and
   `vmess://` keys
+- one active local profile can be replaced or removed from the profile screen
 - support API disabled by default
 - routing modes kept: full tunnel, selected apps, all-except-region
 - optional public config catalogs stay disabled until parser/license/safety
@@ -91,12 +92,14 @@ Implemented now:
 - community default avoids POKROV API bootstrap and POKROV support API calls
 - community redeem/import sheet can stage a local single-key profile for the
   runtime without calling the POKROV API
+- community profile screen shows the active local profile and supports
+  replace/remove actions
 - neutral fallback brand mark when no asset is supplied
 - operator/pokrov modes can opt into managed-service API bootstrap
 
 Still planned:
 
-- saved profile list and first-class import editor
+- multi-profile saved list and first-class import editor
 - QR import
 - local subscription refresh UI
 - operator API fixture server

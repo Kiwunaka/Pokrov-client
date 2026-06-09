@@ -854,23 +854,45 @@ class _LocalManagedProfileStore {
       flush: true,
     );
   }
+
+  Future<void> delete() async {
+    final file = await _profileFile();
+    if (await file.exists()) {
+      await file.delete();
+    }
+  }
 }
 
 class _LocalManagedProfileBootstrapper implements ManagedProfileBootstrapper {
   _LocalManagedProfileBootstrapper({
     required ManagedProfilePayload fallback,
     _LocalManagedProfileStore store = const _LocalManagedProfileStore(),
-  })  : _payload = fallback,
+  })  : _fallback = fallback,
+        _payload = fallback,
         _store = store;
 
   final _LocalManagedProfileStore _store;
+  final ManagedProfilePayload _fallback;
   ManagedProfilePayload _payload;
   bool _loaded = false;
+
+  Future<ManagedProfilePayload?> loadImportedProfile() async {
+    final imported = await _store.read();
+    _payload = imported ?? _fallback;
+    _loaded = true;
+    return imported;
+  }
 
   Future<void> saveImportedProfile(ManagedProfilePayload payload) async {
     _payload = payload;
     _loaded = true;
     await _store.write(payload);
+  }
+
+  Future<void> clearImportedProfile() async {
+    _payload = _fallback;
+    _loaded = true;
+    await _store.delete();
   }
 
   @override
@@ -1316,6 +1338,8 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
   late final SupportTicketService _supportTicketService;
   late final PokrovFirstLaunchStore _firstLaunchStore;
   late final _LocalManagedProfileBootstrapper? _localProfileBootstrapper;
+  ManagedProfilePayload? _communityProfile;
+  int _communityProfileRevision = 0;
 
   String _brand(String value) {
     return _brandText(value, widget.appContext.variantProfile);
@@ -1397,6 +1421,7 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
             : const _OfflineSupportTicketService());
     _firstLaunchStore =
         widget.firstLaunchStore ?? const PokrovFileFirstLaunchStore();
+    unawaited(_loadCommunityProfile());
     unawaited(_loadFirstLaunchState());
     _refreshRuntimeSnapshot();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -1727,16 +1752,18 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
         value,
         routeMode: _selectedRouteMode,
       );
-      await importer.saveImportedProfile(imported.payload);
-      if (!mounted) {
-        return true;
-      }
       HapticFeedback.selectionClick();
       setState(() {
+        _communityProfileRevision += 1;
+        _communityProfile = imported.payload;
         _managedProfileDirty = true;
         _runtimeHeadline =
             'Profile imported: ${imported.displayName}. Tap Connect to apply it.';
       });
+      await importer.saveImportedProfile(imported.payload);
+      if (!mounted) {
+        return true;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Imported ${imported.displayName}. Tap Connect.'),
@@ -1762,6 +1789,42 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
       );
       return false;
     }
+  }
+
+  Future<void> _loadCommunityProfile() async {
+    final importer = _localProfileBootstrapper;
+    if (importer == null) {
+      return;
+    }
+    final revision = _communityProfileRevision;
+    final profile = await importer.loadImportedProfile();
+    if (!mounted || revision != _communityProfileRevision) {
+      return;
+    }
+    setState(() {
+      _communityProfile = profile;
+    });
+  }
+
+  Future<void> _removeCommunityProfile() async {
+    final importer = _localProfileBootstrapper;
+    if (importer == null) {
+      return;
+    }
+    HapticFeedback.selectionClick();
+    setState(() {
+      _communityProfileRevision += 1;
+      _communityProfile = null;
+      _managedProfileDirty = true;
+      _runtimeHeadline = 'Local profile removed. Add a key to connect.';
+    });
+    await importer.clearImportedProfile();
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Local profile removed.')),
+    );
   }
 
   bool _looksLikeSubscriptionOrProxyLink(String value) {
@@ -2890,6 +2953,8 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
         runtimeSnapshot: _runtimeSnapshot,
         runtimeHeadline: _runtimeHeadline,
         onOpenWarp: _openWarpControl,
+        communityProfile: _communityProfile,
+        onRemoveCommunityProfile: _removeCommunityProfile,
       ),
     ];
 
@@ -4754,6 +4819,8 @@ class _ProfileSection extends StatelessWidget {
     required this.runtimeSnapshot,
     required this.runtimeHeadline,
     required this.onOpenWarp,
+    required this.communityProfile,
+    required this.onRemoveCommunityProfile,
   });
 
   final SeedAppContext appContext;
@@ -4778,6 +4845,8 @@ class _ProfileSection extends StatelessWidget {
   final RuntimeSnapshot? runtimeSnapshot;
   final String? runtimeHeadline;
   final Future<void> Function() onOpenWarp;
+  final ManagedProfilePayload? communityProfile;
+  final VoidCallback onRemoveCommunityProfile;
 
   List<String> _bonusSummaryLines() {
     final summary = bonusSummary;
@@ -4823,6 +4892,7 @@ class _ProfileSection extends StatelessWidget {
     final usesApiServices = appContext.variantProfile.usesApiServices;
     final hasCheckoutUrl = appContext.checkoutUrl.trim().isNotEmpty;
     final hasCabinetUrl = appContext.cabinetUrl.trim().isNotEmpty;
+    final activeCommunityProfile = communityProfile;
     return _SeedContentList(
       top: 24,
       children: [
@@ -4892,30 +4962,70 @@ class _ProfileSection extends StatelessWidget {
               ),
               _SectionCard(
                 key: const ValueKey('profile-section-sync'),
-                title: usesApiServices ? 'Привязать доступ' : 'Импорт доступа',
+                title: usesApiServices ? 'Привязать доступ' : 'Profiles',
                 tone: _SectionTone.reward,
                 lines: [
                   usesApiServices
                       ? 'Код из Telegram, кабинета, сайта или письма.'
-                      : 'Вставьте одиночный ключ vless, ss, trojan или vmess.',
+                      : activeCommunityProfile == null
+                          ? 'Add a single local key. Subscription refresh is planned.'
+                          : 'Active: ${activeCommunityProfile.profileName}',
                 ],
                 child: Column(
                   children: [
                     _SettingsRow(
                       key: const ValueKey('profile-redeem-code-action'),
                       icon: Icons.key_rounded,
-                      title: usesApiServices ? 'Код активации' : 'Ключ профиля',
-                      value: 'Ввести',
+                      title: usesApiServices
+                          ? 'Код активации'
+                          : activeCommunityProfile == null
+                              ? 'Add key'
+                              : 'Replace key',
+                      value: usesApiServices ? 'Ввести' : 'Open',
                       onTap: () => _showRedeemSheet(
                         context,
                         hintCode: appContext.redeemHint,
                         hintPlaceholder:
                             appContext.variantProfile.isOfficialPokrov
                                 ? 'POKROV-XXXX-XXXX'
-                                : 'vless://, ss://, trojan:// или vmess://',
+                                : 'vless://, ss://, trojan:// or vmess://',
+                        title: usesApiServices
+                            ? 'Код активации'
+                            : 'Add profile key',
+                        body: usesApiServices
+                            ? 'Введите код из приложения, кабинета, Telegram или письма.'
+                            : 'Paste one proxy key. URL subscriptions, QR import, and free catalogs are planned follow-ups.',
+                        submitLabel:
+                            usesApiServices ? 'Ввести код' : 'Save profile',
                         onRedeem: (code) => onOpenHandoff('redeem', code),
                       ),
                     ),
+                    if (!usesApiServices) ...[
+                      _SettingsRow(
+                        key: const ValueKey('profile-active-local-profile'),
+                        icon: Icons.dns_outlined,
+                        title: 'Active profile',
+                        value: activeCommunityProfile?.profileName ?? 'None',
+                        onTap: activeCommunityProfile == null
+                            ? null
+                            : () => _showInfoSheet(
+                                  context,
+                                  title: 'Active profile',
+                                  lines: [
+                                    activeCommunityProfile.profileName,
+                                    'Route mode: ${_routeModeShortLabel(selectedRouteMode)}',
+                                  ],
+                                ),
+                      ),
+                      if (activeCommunityProfile != null)
+                        _SettingsRow(
+                          key: const ValueKey('profile-remove-local-profile'),
+                          icon: Icons.delete_outline_rounded,
+                          title: 'Remove profile',
+                          value: 'Clear',
+                          onTap: onRemoveCommunityProfile,
+                        ),
+                    ],
                     if (usesApiServices) ...[
                       _SettingsRow(
                         key: const ValueKey('profile-telegram-link-action'),
@@ -6994,6 +7104,9 @@ void _showRedeemSheet(
   required String hintCode,
   required String hintPlaceholder,
   required ValueChanged<String> onRedeem,
+  String title = 'Код активации',
+  String body = 'Введите код из приложения, кабинета, Telegram или письма.',
+  String submitLabel = 'Ввести код',
 }) {
   showModalBottomSheet<void>(
     context: context,
@@ -7009,7 +7122,7 @@ void _showRedeemSheet(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Код активации',
+              title,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     color: _SeedPalette.ink,
                     fontWeight: FontWeight.w800,
@@ -7017,7 +7130,7 @@ void _showRedeemSheet(
             ),
             const SizedBox(height: 8),
             Text(
-              'Введите код из приложения, кабинета, Telegram или письма.',
+              body,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: _SeedPalette.muted,
                     height: 1.35,
@@ -7030,6 +7143,7 @@ void _showRedeemSheet(
                   ? 'Код активации'
                   : 'Ключ профиля',
               hintPlaceholder: hintPlaceholder,
+              submitLabel: submitLabel,
               onRedeem: (code) {
                 Navigator.of(context).pop();
                 onRedeem(code);
@@ -7047,12 +7161,14 @@ class _RedeemFields extends StatefulWidget {
     required this.hintCode,
     required this.labelText,
     required this.hintPlaceholder,
+    required this.submitLabel,
     required this.onRedeem,
   });
 
   final String hintCode;
   final String labelText;
   final String hintPlaceholder;
+  final String submitLabel;
   final ValueChanged<String> onRedeem;
 
   @override
@@ -7092,7 +7208,7 @@ class _RedeemFieldsState extends State<_RedeemFields> {
           key: const ValueKey('profile-redeem-submit'),
           onPressed: () => widget.onRedeem(_controller.text.trim()),
           icon: const Icon(Icons.verified_outlined),
-          label: const Text('Ввести код'),
+          label: Text(widget.submitLabel),
         ),
       ],
     );

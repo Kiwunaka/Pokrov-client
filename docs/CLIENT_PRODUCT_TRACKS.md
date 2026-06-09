@@ -57,9 +57,11 @@ Expected capabilities:
 
 - paste/import single key (`vless://`, `trojan://`, `ss://`, `vmess://`) -
   implemented as the first local-import MVP
+- one active local profile with replace/remove actions - implemented as the
+  first profile-management MVP
 - paste/import subscription URL - planned as a separate refresh/cache flow
 - QR import when available
-- local profile list
+- local multi-profile list
 - manual subscription refresh
 - basic latency and connection checks
 - clear unsupported-config errors

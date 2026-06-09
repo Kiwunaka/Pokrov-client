@@ -1125,6 +1125,7 @@ void main() {
       'POKROV-ACCESS-2026',
     );
     await tester.tap(find.byKey(const ValueKey('profile-redeem-submit')));
+    await tester.pump(const Duration(milliseconds: 50));
     await tester.pumpAndSettle();
 
     expect(bootstrapper.redeemCalls, 1);
@@ -1166,6 +1167,7 @@ void main() {
       'POKROV-GIFT-2026',
     );
     await tester.tap(find.byKey(const ValueKey('profile-redeem-submit')));
+    await tester.pump(const Duration(milliseconds: 50));
     await tester.pumpAndSettle();
 
     expect(bootstrapper.redeemCalls, 1);
@@ -3375,6 +3377,16 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('profile-redeem-submit')));
     await tester.pumpAndSettle();
 
+    final activeProfile =
+        find.byKey(const ValueKey('profile-active-local-profile'));
+    await tester.dragUntilVisible(
+      activeProfile,
+      find.byType(Scrollable).first,
+      const Offset(0, -220),
+    );
+    await tester.pumpAndSettle();
+    expect(activeProfile, findsOneWidget);
+
     await _tapNav(tester, 'nav-protection');
     await tester.tap(find.byKey(const ValueKey('primary-connect-action')));
     await tester.pumpAndSettle();
@@ -3385,6 +3397,74 @@ void main() {
     expect(stagedPayloads.single, contains('"server": "example.com"'));
     expect(stagedPayloads.single,
         contains('"uuid": "11111111-1111-1111-1111-111111111111"'));
+  });
+
+  testWidgets('community profile screen removes a local profile',
+      (tester) async {
+    const channel = MethodChannel('space.pokrov/runtime_engine');
+    final messenger =
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+
+    messenger.setMockMethodCallHandler(channel, (call) async {
+      if (call.method == 'runtimeEngine.snapshot') {
+        return <String, Object?>{
+          'phase': 'artifactReady',
+          'artifactDirectory': '/host/runtime',
+          'coreBinaryPath': '/host/runtime/libcore.aar',
+          'supportsLiveConnect': true,
+          'canInitialize': true,
+          'canConnect': false,
+          'message': 'Host bridge ready.',
+        };
+      }
+      return null;
+    });
+    addTearDown(() {
+      messenger.setMockMethodCallHandler(channel, null);
+    });
+
+    await tester.pumpWidget(
+      PokrovSeedApp(
+        appContext: buildSeedAppContext(hostPlatform: HostPlatform.android),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await _completeFirstLaunchIfPresent(tester);
+
+    await _tapNav(tester, 'nav-profile');
+    await _openRedeemSheetFromProfile(tester);
+    await tester.enterText(
+      find.byKey(const ValueKey('profile-redeem-code-field')),
+      'vless://22222222-2222-2222-2222-222222222222@example.org:443?security=tls&sni=example.org&type=tcp#Work',
+    );
+    await tester.tap(find.byKey(const ValueKey('profile-redeem-submit')));
+    await tester.pumpAndSettle();
+
+    final activeProfile =
+        find.byKey(const ValueKey('profile-active-local-profile'));
+    await tester.dragUntilVisible(
+      activeProfile,
+      find.byType(Scrollable).first,
+      const Offset(0, -220),
+    );
+    await tester.pumpAndSettle();
+    expect(activeProfile, findsOneWidget);
+    final remove = find.byKey(const ValueKey('profile-remove-local-profile'));
+    for (var attempt = 0;
+        attempt < 8 && remove.evaluate().isEmpty;
+        attempt += 1) {
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -140));
+      await tester.pumpAndSettle();
+    }
+    expect(remove, findsOneWidget);
+    await tester.tap(remove);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Active: open-client-work'), findsNothing);
+    expect(find.text('Active profile'), findsOneWidget);
+    expect(find.text('None'), findsWidgets);
+    expect(find.byKey(const ValueKey('profile-remove-local-profile')),
+        findsNothing);
   });
 
   testWidgets('primary connect action auto-prepares and starts host runtime',
