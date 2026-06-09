@@ -3403,6 +3403,60 @@ void main() {
         contains('"uuid": "11111111-1111-1111-1111-111111111111"'));
   });
 
+  testWidgets('community profile hub presents v0.2 local import boundaries',
+      (tester) async {
+    await tester.pumpWidget(
+      PokrovSeedApp(
+        appContext: buildSeedAppContext(hostPlatform: HostPlatform.android),
+        communityQrScanner: (context) async => null,
+      ),
+    );
+    await tester.pumpAndSettle();
+    await _completeFirstLaunchIfPresent(tester);
+
+    await _tapNav(tester, 'nav-profile');
+
+    expect(find.text('Open Client profiles'), findsOneWidget);
+    expect(
+      find.text(
+        'Add a key, scan QR, or import an HTTPS subscription. Everything stays local.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Add profile key'), findsOneWidget);
+    expect(find.text('Add subscription URL'), findsOneWidget);
+    expect(find.text('Scan QR code'), findsOneWidget);
+    expect(
+      find.textContaining('planned follow-ups'),
+      findsNothing,
+    );
+
+    final freeCatalog =
+        find.byKey(const ValueKey('profile-free-vpn-catalog-action'));
+    await tester.dragUntilVisible(
+      freeCatalog,
+      find.byType(Scrollable).first,
+      const Offset(0, -180),
+      maxIteration: 8,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(freeCatalog);
+    await tester.pumpAndSettle();
+
+    expect(find.text('This section is opt-in and disabled by default.'),
+        findsOneWidget);
+    expect(
+      find.text(
+        'Third-party public configs are not official POKROV nodes.',
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining('does not promise speed, privacy, uptime'),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('community profile screen removes a local profile',
       (tester) async {
     const channel = MethodChannel('space.pokrov/runtime_engine');

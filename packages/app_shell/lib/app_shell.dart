@@ -1000,8 +1000,7 @@ class _CommunityProfileRecord {
           : json['source_kind'].toString().trim(),
       sourceUrl: json['source_url']?.toString().trim() ?? '',
       lastFetchedAt: json['last_fetched_at']?.toString().trim() ?? '',
-      lastRefreshStatus:
-          json['last_refresh_status']?.toString().trim() ?? '',
+      lastRefreshStatus: json['last_refresh_status']?.toString().trim() ?? '',
       refreshError: json['refresh_error']?.toString().trim() ?? '',
       entryCount: _readInt(json['entry_count']),
       payload: ManagedProfilePayload(
@@ -5544,6 +5543,13 @@ class _ProfileSection extends StatelessWidget {
           profile.sourceUrl.trim().isNotEmpty &&
           profile.lastRefreshStatus == 'failed',
     );
+    final subscriptionSourceCount =
+        communityProfileState.subscriptionSourceUrls.length;
+    final communityProfileSummary = activeCommunityProfile == null
+        ? 'Add a key, scan QR, or import an HTTPS subscription. Everything stays local.'
+        : subscriptionSourceCount == 0
+            ? 'Active: ${activeCommunityProfile.displayName}. Local key profile.'
+            : 'Active: ${activeCommunityProfile.displayName}. $subscriptionSourceCount subscription source(s).';
     return _SeedContentList(
       top: 24,
       children: [
@@ -5613,14 +5619,14 @@ class _ProfileSection extends StatelessWidget {
               ),
               _SectionCard(
                 key: const ValueKey('profile-section-sync'),
-                title: usesApiServices ? 'Привязать доступ' : 'Profiles',
+                title: usesApiServices
+                    ? 'Привязать доступ'
+                    : 'Open Client profiles',
                 tone: _SectionTone.reward,
                 lines: [
                   usesApiServices
                       ? 'Код из Telegram, кабинета, сайта или письма.'
-                      : activeCommunityProfile == null
-                          ? 'Add a single local key. Subscription refresh is planned.'
-                          : 'Active: ${activeCommunityProfile.displayName}',
+                      : communityProfileSummary,
                 ],
                 child: Column(
                   children: [
@@ -5630,8 +5636,8 @@ class _ProfileSection extends StatelessWidget {
                       title: usesApiServices
                           ? 'Код активации'
                           : activeCommunityProfile == null
-                              ? 'Add key'
-                              : 'Replace key',
+                              ? 'Add profile key'
+                              : 'Replace profile key',
                       value: usesApiServices ? 'Ввести' : 'Open',
                       onTap: () => _showRedeemSheet(
                         context,
@@ -5645,7 +5651,7 @@ class _ProfileSection extends StatelessWidget {
                             : 'Add profile key',
                         body: usesApiServices
                             ? 'Введите код из приложения, кабинета, Telegram или письма.'
-                            : 'Paste one proxy key. URL subscriptions, QR import, and free catalogs are planned follow-ups.',
+                            : 'Paste one VLESS, Trojan, Shadowsocks, or VMess key. The key is parsed on this device and is not sent to POKROV.',
                         submitLabel:
                             usesApiServices ? 'Ввести код' : 'Save profile',
                         onRedeem: (code) => onOpenHandoff('redeem', code),
@@ -5663,7 +5669,7 @@ class _ProfileSection extends StatelessWidget {
                           hintPlaceholder: 'https://example.com/sub.txt',
                           title: 'Add subscription URL',
                           body:
-                              'The client fetches the URL once, parses supported keys, and stores profiles locally. Manual refresh is the safe first version.',
+                              'The client fetches the URL, parses supported keys, and stores profiles locally. Refresh runs only when you tap it or when the app returns to foreground.',
                           submitLabel: 'Import profiles',
                           onRedeem: (code) => onOpenHandoff('redeem', code),
                         ),
@@ -5683,7 +5689,7 @@ class _ProfileSection extends StatelessWidget {
                                       'vless://, ss://, trojan:// or vmess://',
                                   title: 'Import QR text',
                                   body:
-                                      'Paste the decoded QR payload. Camera scanning stays local and uses the same profile parser.',
+                                      'Paste the decoded QR payload. Camera scanning and pasted QR text stay local and use the same profile parser.',
                                   submitLabel: 'Import QR',
                                   onRedeem: (code) =>
                                       onOpenHandoff('redeem', code),
@@ -5707,7 +5713,8 @@ class _ProfileSection extends StatelessWidget {
                                   ],
                                 ),
                       ),
-                      if (communityProfileState.subscriptionSourceUrls.isNotEmpty)
+                      if (communityProfileState
+                          .subscriptionSourceUrls.isNotEmpty)
                         _SettingsRow(
                           key: const ValueKey(
                             'profile-refresh-subscriptions-action',
@@ -5716,21 +5723,22 @@ class _ProfileSection extends StatelessWidget {
                           title: 'Refresh subscriptions',
                           value: hasSubscriptionRefreshFailure
                               ? 'Error'
-                              : '${communityProfileState.subscriptionSourceUrls.length}',
+                              : '$subscriptionSourceCount source(s)',
                           onTap: onRefreshCommunitySubscriptions,
                         ),
                       _SettingsRow(
                         key: const ValueKey('profile-free-vpn-catalog-action'),
                         icon: Icons.public_rounded,
                         title: 'Free VPN catalog',
-                        value: 'Gated',
+                        value: 'Off',
                         onTap: () => _showInfoSheet(
                           context,
                           title: 'Free VPN catalog',
                           lines: const [
-                            'This section stays opt-in and disabled until feed license, attribution, freshness, parser tests, and safety copy are reviewed.',
+                            'This section is opt-in and disabled by default.',
                             'Candidate feed: AvenCores/goida-vpn-configs.',
                             'Third-party public configs are not official POKROV nodes.',
+                            'The client does not promise speed, privacy, uptime, safety, legality, or availability for third-party public configs.',
                           ],
                         ),
                       ),
