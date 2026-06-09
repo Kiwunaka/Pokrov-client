@@ -2,7 +2,19 @@
 
 Official public releases must be easy to verify and honest about their status.
 
-## Release Requirements
+## Source-Only Releases
+
+Source-only releases, such as `v0.1.0-source`, should include:
+
+- tag name
+- commit SHA
+- source archive checksum or reproducible checksum note
+- current feature status
+- known limitations
+- explicit note that no APK, EXE, store release, or trusted-signed binary is
+  shipped in that release
+
+## Binary Release Requirements
 
 Every official binary release should include:
 

@@ -3586,6 +3586,242 @@ void main() {
     expect(stagedPayloads.single, contains('"server": "ss.example"'));
   });
 
+  testWidgets('community subscription refresh updates existing local profiles',
+      (tester) async {
+    var fetchCount = 0;
+    const channel = MethodChannel('space.pokrov/runtime_engine');
+    final messenger =
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+    final stagedPayloads = <String>[];
+
+    messenger.setMockMethodCallHandler(channel, (call) async {
+      switch (call.method) {
+        case 'runtimeEngine.snapshot':
+          return <String, Object?>{
+            'phase': 'artifactReady',
+            'artifactDirectory': '/host/runtime',
+            'coreBinaryPath': '/host/runtime/libcore.aar',
+            'supportsLiveConnect': true,
+            'canInitialize': true,
+            'canConnect': false,
+            'message': 'Host bridge ready.',
+          };
+        case 'runtimeEngine.initialize':
+          return <String, Object?>{
+            'phase': 'initialized',
+            'artifactDirectory': '/host/runtime',
+            'coreBinaryPath': '/host/runtime/libcore.aar',
+            'supportsLiveConnect': true,
+            'canInitialize': true,
+            'canConnect': false,
+            'message': 'Runtime bootstrap completed.',
+          };
+        case 'runtimeEngine.stageManagedProfile':
+          final arguments = Map<Object?, Object?>.from(call.arguments as Map);
+          stagedPayloads.add(arguments['configPayload'].toString());
+          return <String, Object?>{
+            'phase': 'configStaged',
+            'artifactDirectory': '/host/runtime',
+            'coreBinaryPath': '/host/runtime/libcore.aar',
+            'stagedConfigPath': '/host/runtime/refreshed.json',
+            'supportsLiveConnect': true,
+            'canInitialize': true,
+            'canConnect': true,
+            'message': 'Subscription profile staged.',
+          };
+        case 'runtimeEngine.connect':
+          return <String, Object?>{
+            'phase': 'running',
+            'artifactDirectory': '/host/runtime',
+            'coreBinaryPath': '/host/runtime/libcore.aar',
+            'stagedConfigPath': '/host/runtime/refreshed.json',
+            'supportsLiveConnect': true,
+            'canInitialize': true,
+            'canConnect': true,
+            'message': 'Android runtime service is running.',
+          };
+      }
+      return null;
+    });
+    addTearDown(() {
+      messenger.setMockMethodCallHandler(channel, null);
+    });
+
+    await tester.pumpWidget(
+      PokrovSeedApp(
+        appContext: buildSeedAppContext(hostPlatform: HostPlatform.android),
+        communitySubscriptionFetcher: (uri) async {
+          fetchCount += 1;
+          if (fetchCount == 1) {
+            return 'trojan://old-secret@old.example:443?security=tls&sni=old.example#Trojan';
+          }
+          return [
+            'trojan://new-secret@new.example:443?security=tls&sni=new.example#Trojan',
+            'trojan://new-secret@new.example:443?security=tls&sni=new.example#Trojan',
+          ].join('\n');
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+    await _completeFirstLaunchIfPresent(tester);
+
+    await _tapNav(tester, 'nav-profile');
+    final subscription =
+        find.byKey(const ValueKey('profile-subscription-url-action'));
+    await tester.dragUntilVisible(
+      subscription,
+      find.byType(Scrollable).first,
+      const Offset(0, -220),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(subscription);
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('profile-redeem-code-field')),
+      'https://example.invalid/sub.txt',
+    );
+    await tester.tap(find.byKey(const ValueKey('profile-redeem-submit')));
+    await tester.pumpAndSettle();
+
+    final refresh =
+        find.byKey(const ValueKey('profile-refresh-subscriptions-action'));
+    await tester.dragUntilVisible(
+      refresh,
+      find.byType(Scrollable).first,
+      const Offset(0, -180),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(refresh);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('profile-local-profile-open-client-trojan')),
+      findsOneWidget,
+    );
+
+    await _tapNav(tester, 'nav-protection');
+    await tester.tap(find.byKey(const ValueKey('primary-connect-action')));
+    await tester.pumpAndSettle();
+
+    expect(fetchCount, 2);
+    expect(stagedPayloads.single, contains('"server": "new.example"'));
+  });
+
+  testWidgets('community subscription refresh failure preserves old profiles',
+      (tester) async {
+    var fetchCount = 0;
+    const channel = MethodChannel('space.pokrov/runtime_engine');
+    final messenger =
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+    final stagedPayloads = <String>[];
+
+    messenger.setMockMethodCallHandler(channel, (call) async {
+      switch (call.method) {
+        case 'runtimeEngine.snapshot':
+          return <String, Object?>{
+            'phase': 'artifactReady',
+            'artifactDirectory': '/host/runtime',
+            'coreBinaryPath': '/host/runtime/libcore.aar',
+            'supportsLiveConnect': true,
+            'canInitialize': true,
+            'canConnect': false,
+            'message': 'Host bridge ready.',
+          };
+        case 'runtimeEngine.initialize':
+          return <String, Object?>{
+            'phase': 'initialized',
+            'artifactDirectory': '/host/runtime',
+            'coreBinaryPath': '/host/runtime/libcore.aar',
+            'supportsLiveConnect': true,
+            'canInitialize': true,
+            'canConnect': false,
+            'message': 'Runtime bootstrap completed.',
+          };
+        case 'runtimeEngine.stageManagedProfile':
+          final arguments = Map<Object?, Object?>.from(call.arguments as Map);
+          stagedPayloads.add(arguments['configPayload'].toString());
+          return <String, Object?>{
+            'phase': 'configStaged',
+            'artifactDirectory': '/host/runtime',
+            'coreBinaryPath': '/host/runtime/libcore.aar',
+            'stagedConfigPath': '/host/runtime/preserved.json',
+            'supportsLiveConnect': true,
+            'canInitialize': true,
+            'canConnect': true,
+            'message': 'Subscription profile staged.',
+          };
+        case 'runtimeEngine.connect':
+          return <String, Object?>{
+            'phase': 'running',
+            'artifactDirectory': '/host/runtime',
+            'coreBinaryPath': '/host/runtime/libcore.aar',
+            'stagedConfigPath': '/host/runtime/preserved.json',
+            'supportsLiveConnect': true,
+            'canInitialize': true,
+            'canConnect': true,
+            'message': 'Android runtime service is running.',
+          };
+      }
+      return null;
+    });
+    addTearDown(() {
+      messenger.setMockMethodCallHandler(channel, null);
+    });
+
+    await tester.pumpWidget(
+      PokrovSeedApp(
+        appContext: buildSeedAppContext(hostPlatform: HostPlatform.android),
+        communitySubscriptionFetcher: (uri) async {
+          fetchCount += 1;
+          if (fetchCount > 1) {
+            throw StateError('offline');
+          }
+          return 'trojan://old-secret@old.example:443?security=tls&sni=old.example#Trojan';
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+    await _completeFirstLaunchIfPresent(tester);
+
+    await _tapNav(tester, 'nav-profile');
+    final subscription =
+        find.byKey(const ValueKey('profile-subscription-url-action'));
+    await tester.dragUntilVisible(
+      subscription,
+      find.byType(Scrollable).first,
+      const Offset(0, -220),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(subscription);
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('profile-redeem-code-field')),
+      'https://example.invalid/sub.txt',
+    );
+    await tester.tap(find.byKey(const ValueKey('profile-redeem-submit')));
+    await tester.pumpAndSettle();
+
+    final refresh =
+        find.byKey(const ValueKey('profile-refresh-subscriptions-action'));
+    await tester.dragUntilVisible(
+      refresh,
+      find.byType(Scrollable).first,
+      const Offset(0, -180),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(refresh);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Error'), findsWidgets);
+
+    await _tapNav(tester, 'nav-protection');
+    await tester.tap(find.byKey(const ValueKey('primary-connect-action')));
+    await tester.pumpAndSettle();
+
+    expect(fetchCount, 2);
+    expect(stagedPayloads.single, contains('"server": "old.example"'));
+  });
+
   testWidgets('community QR text import accepts VMess payload', (tester) async {
     final vmessJson = jsonEncode(<String, Object?>{
       'v': '2',
@@ -3698,6 +3934,105 @@ void main() {
     expect(stagedPayloads.single, contains('"type": "vmess"'));
     expect(stagedPayloads.single, contains('"server": "vmess.example"'));
     expect(stagedPayloads.single, contains('"type": "ws"'));
+  });
+
+  testWidgets('community QR camera host import stays local and stages payload',
+      (tester) async {
+    const scannedKey =
+        'trojan://camera-secret@camera.example:443?security=tls&sni=camera.example#Camera';
+    const channel = MethodChannel('space.pokrov/runtime_engine');
+    final messenger =
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+    final stagedPayloads = <String>[];
+    var scannerCalls = 0;
+
+    messenger.setMockMethodCallHandler(channel, (call) async {
+      switch (call.method) {
+        case 'runtimeEngine.snapshot':
+          return <String, Object?>{
+            'phase': 'artifactReady',
+            'artifactDirectory': '/host/runtime',
+            'coreBinaryPath': '/host/runtime/libcore.aar',
+            'supportsLiveConnect': true,
+            'canInitialize': true,
+            'canConnect': false,
+            'message': 'Host bridge ready.',
+          };
+        case 'runtimeEngine.initialize':
+          return <String, Object?>{
+            'phase': 'initialized',
+            'artifactDirectory': '/host/runtime',
+            'coreBinaryPath': '/host/runtime/libcore.aar',
+            'supportsLiveConnect': true,
+            'canInitialize': true,
+            'canConnect': false,
+            'message': 'Runtime bootstrap completed.',
+          };
+        case 'runtimeEngine.stageManagedProfile':
+          final arguments = Map<Object?, Object?>.from(call.arguments as Map);
+          stagedPayloads.add(arguments['configPayload'].toString());
+          return <String, Object?>{
+            'phase': 'configStaged',
+            'artifactDirectory': '/host/runtime',
+            'coreBinaryPath': '/host/runtime/libcore.aar',
+            'stagedConfigPath': '/host/runtime/camera.json',
+            'supportsLiveConnect': true,
+            'canInitialize': true,
+            'canConnect': true,
+            'message': 'Camera profile staged.',
+          };
+        case 'runtimeEngine.connect':
+          return <String, Object?>{
+            'phase': 'running',
+            'artifactDirectory': '/host/runtime',
+            'coreBinaryPath': '/host/runtime/libcore.aar',
+            'stagedConfigPath': '/host/runtime/camera.json',
+            'supportsLiveConnect': true,
+            'canInitialize': true,
+            'canConnect': true,
+            'message': 'Android runtime service is running.',
+          };
+      }
+      return null;
+    });
+    addTearDown(() {
+      messenger.setMockMethodCallHandler(channel, null);
+    });
+
+    await tester.pumpWidget(
+      PokrovSeedApp(
+        appContext: buildSeedAppContext(hostPlatform: HostPlatform.android),
+        communityQrScanner: (context) async {
+          scannerCalls += 1;
+          return scannedKey;
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+    await _completeFirstLaunchIfPresent(tester);
+
+    await _tapNav(tester, 'nav-profile');
+    final qr = find.byKey(const ValueKey('profile-qr-import-action'));
+    await tester.dragUntilVisible(
+      qr,
+      find.byType(Scrollable).first,
+      const Offset(0, -220),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(qr);
+    await tester.pumpAndSettle();
+
+    await _tapNav(tester, 'nav-protection');
+    final connect = find.byKey(const ValueKey('primary-connect-action'));
+    await tester.ensureVisible(connect);
+    await tester.pumpAndSettle();
+    await tester.tap(connect);
+    await tester.pumpAndSettle();
+
+    expect(scannerCalls, 1);
+    expect(stagedPayloads.single, contains('"type": "trojan"'));
+    expect(stagedPayloads.single, contains('"server": "camera.example"'));
+    expect(stagedPayloads.single, isNot(contains('subscription_url')));
   });
 
   testWidgets('primary connect action auto-prepares and starts host runtime',

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pokrov_app_shell/app_shell.dart';
@@ -35,5 +37,22 @@ void main() {
     final connectAction = find.byKey(const ValueKey('primary-connect-action'));
     expect(connectAction, findsOneWidget);
     expect(find.text('Пока недоступно'), findsOneWidget);
+  });
+  test('windows community QR scanner has camera and zxing adapter states',
+      () async {
+    final mainSource = File('lib/main.dart');
+    final scannerSource = File('lib/community_qr_scanner.dart');
+
+    expect(await mainSource.exists(), isTrue);
+    expect(await scannerSource.exists(), isTrue);
+
+    final mainContent = await mainSource.readAsString();
+    final scannerContent = await scannerSource.readAsString();
+
+    expect(mainContent, contains('scanCommunityQr'));
+    expect(scannerContent, contains('CameraController'));
+    expect(scannerContent, contains('QRCodeReader'));
+    expect(scannerContent, contains('No camera was found.'));
+    expect(scannerContent, contains('No QR code was found in this frame.'));
   });
 }

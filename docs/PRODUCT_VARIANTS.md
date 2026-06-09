@@ -10,7 +10,7 @@ For ordinary users.
 
 Goal: install the app, paste a local proxy key, choose routing, enable optional
 WARP/routing features, and connect without a POKROV account, POKROV billing, or
-POKROV branding. Subscription URL refresh is local/manual first; automatic
+POKROV branding. Subscription URL refresh is local/manual and foreground-first;
 background refresh remains a planned follow-up.
 
 Default properties:
@@ -21,9 +21,9 @@ Default properties:
 - local profile import for single `vless://`, `trojan://`, `ss://`, and
   `vmess://` keys
 - local multi-profile list with active selection, replace, and remove actions
-- manual subscription URL import for supported public key feeds
-- decoded QR payload import without adding a camera dependency to the shared
-  shell
+- manual and foreground subscription URL refresh for supported public key feeds
+- Android/Windows camera QR import through platform hosts; scanned payloads
+  still flow through the shared local parser
 - support API disabled by default
 - routing modes kept: full tunnel, selected apps, all-except-region
 - optional public config catalogs stay disabled until parser/license/safety
@@ -98,14 +98,16 @@ Implemented now:
 - community profile screen shows the active local profile and supports
   list/select/replace/remove actions
 - manual subscription URL import stores supported entries locally
-- decoded QR payload import reuses the same safe local parser
+- manual and foreground subscription refresh stores metadata and preserves old
+  profiles on failed refresh
+- Android/Windows camera QR import reuses the same safe local parser
+- reviewed disabled Free VPN catalog seed for `AvenCores/goida-vpn-configs`
 - neutral fallback brand mark when no asset is supplied
 - operator/pokrov modes can opt into managed-service API bootstrap
 
 Still planned:
 
-- camera-backed QR scanner in platform hosts
-- automatic subscription refresh scheduler
 - operator API fixture server
 - white-label color token export
-- free VPN catalog parser and safety-copy gate
+- background subscription refresh scheduler
+- enabled Free VPN catalog UI, fetcher, and cache-clear flow after all gates pass

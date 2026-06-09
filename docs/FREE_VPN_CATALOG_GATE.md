@@ -7,7 +7,9 @@ app must keep the catalog disabled until these gates are complete.
 
 - Source: `AvenCores/goida-vpn-configs`
 - URL: `https://github.com/AvenCores/goida-vpn-configs`
+- License observed on 2026-06-09: `GPL-3.0`
 - Intended UI label: third-party public configs
+- Reviewed seed file: `config/free-vpn-catalog.seed.json`
 
 ## Required Before Enabling
 
@@ -22,4 +24,6 @@ app must keep the catalog disabled until these gates are complete.
 ## Current State
 
 The app has a gated `Free VPN catalog` profile action. It explains the safety
-boundary and does not fetch or enable third-party feeds yet.
+boundary and does not fetch or enable third-party feeds by default. The first
+candidate catalog is recorded as a disabled opt-in source with attribution,
+manual refresh, local cache, and clear-action requirements.

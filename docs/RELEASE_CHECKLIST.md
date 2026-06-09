@@ -17,10 +17,11 @@ Use this checklist before publishing a public source or binary release.
 ## Community Client
 
 - Local profile import works for the documented key schemes.
-- Subscription URL refresh remains manual unless a scheduler is explicitly
-  tested and documented.
-- QR import copy distinguishes decoded payload import from camera scanning.
-- Free VPN catalog remains gated until feed review is complete.
+- Subscription URL import and foreground/manual refresh preserve old profiles
+  when refresh fails.
+- Android and Windows QR camera import stay local-only and reuse the safe local
+  parser.
+- Free VPN catalog remains disabled by default and opt-in with third-party copy.
 
 ## Operator Client
 
@@ -33,4 +34,6 @@ Use this checklist before publishing a public source or binary release.
 
 - Version, source reference, checksums, platform, install note, known
   limitations, and signing/store status are documented.
+- Source-only releases must explicitly say that no APK, EXE, store release, or
+  trusted-signed binary is included.
 - Claims stay beta-safe unless stronger public evidence exists.
