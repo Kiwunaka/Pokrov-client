@@ -34,8 +34,8 @@ The public client has two open-source product lines:
 - `community`: neutral client for ordinary users with local single-key import;
   no POKROV logo and no POKROV API calls by default. The current local importer
   accepts `vless://`, `trojan://`, `ss://`, and `vmess://` keys, supports local
-  multi-profile selection, manual subscription URL import, and decoded QR
-  payload import.
+  multi-profile selection, manual/foreground subscription URL refresh,
+  Android/Windows QR import, and gated third-party catalog metadata.
 - `operator`: white-label client for companies with their own API, cabinet,
   support, billing, and branding.
 
@@ -143,7 +143,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\bootstrap-local.ps1 -DryRun
 
 ## Release Boundary
 
-This source snapshot does not claim store readiness, trusted Windows signing,
-production release maturity, raw physical-device audit proof, or RU-origin
-readiness. Official binaries and signing remain a separate POKROV release
-process.
+This source snapshot does not claim APK/EXE delivery, store readiness, trusted
+Windows signing, production release maturity, raw physical-device audit proof,
+or RU-origin readiness. Official binaries and signing remain a separate POKROV
+release process.

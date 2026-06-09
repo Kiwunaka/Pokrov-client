@@ -7,6 +7,8 @@ import 'package:pokrov_core_domain/core_domain.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'community_qr_scanner.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final variantProfile = selectedClientVariantProfile();
@@ -18,6 +20,7 @@ Future<void> main() async {
         hostPlatform: HostPlatform.windows,
         variantProfile: variantProfile,
       ),
+      communityQrScanner: scanCommunityQr,
     ),
   );
 }

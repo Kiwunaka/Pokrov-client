@@ -59,9 +59,10 @@ Expected capabilities:
   implemented as the first local-import MVP
 - local multi-profile list with active selection, replace, and remove actions
 - paste/import subscription URL with manual refresh and local storage
-- decoded QR payload import through the shared shell
-- camera QR scanning in platform hosts when available
-- automatic subscription refresh scheduler when freshness policy is ready
+- foreground/manual subscription refresh that preserves old profiles on failure
+- Android/Windows camera QR scanning through platform hosts, with scanned
+  payloads handled by the shared local parser
+- background subscription refresh scheduler when freshness policy is ready
 - basic latency and connection checks
 - clear unsupported-config errors
 
@@ -119,3 +120,11 @@ Required gates:
    service
 5. release notes that do not imply POKROV operates or endorses third-party
    public feeds
+
+Current implementation:
+
+- `config/free-vpn-catalog.seed.json` records the first reviewed disabled
+  candidate metadata for `AvenCores/goida-vpn-configs`
+- the catalog remains disabled by default and requires explicit user opt-in
+- tests require license metadata, attribution, opt-in, and third-party boundary
+  copy before release

@@ -36,18 +36,20 @@ This roadmap describes the public repository path. It is not a release promise.
 
 - Research third-party public config feeds.
 - Start with `AvenCores/goida-vpn-configs` as an opt-in candidate.
-- Add parser fixtures and tests before shipping.
-- Label all third-party feeds clearly in UI.
+- Add reviewed disabled catalog metadata and parser/license gate tests. Initial
+  MVP added.
+- Label all third-party feeds clearly in UI and release notes.
 - Keep official POKROV service and third-party public feeds separate.
 
 ## Phase 3.6: Community Client UX
 
 - Local multi-profile list with active selection. Initial MVP added.
-- Manual subscription URL import. Initial MVP added.
+- Manual subscription URL import and foreground/manual refresh. Initial MVP
+  added.
 - Decoded QR payload import. Initial MVP added.
-- Camera-backed QR scanning remains a platform-host follow-up.
-- Automatic subscription refresh remains behind freshness and failure-mode
-  policy.
+- Android/Windows camera-backed QR scanning. Initial MVP added.
+- Background subscription refresh scheduler remains behind freshness,
+  permission, and failure-mode policy.
 
 ## Phase 4: Community Contributions
 

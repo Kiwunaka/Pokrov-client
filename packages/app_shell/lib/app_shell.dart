@@ -56,6 +56,7 @@ enum _FirstLaunchStep {
 }
 
 typedef ExternalHandoffLauncher = Future<bool> Function(Uri uri);
+typedef CommunityQrScanner = Future<String?> Function(BuildContext context);
 
 abstract class PokrovFirstLaunchStore {
   Future<bool> isCompleted();
@@ -661,6 +662,7 @@ class PokrovSeedApp extends StatelessWidget {
     this.handoffLauncher,
     this.firstLaunchStore,
     this.communitySubscriptionFetcher,
+    this.communityQrScanner,
     this.runtimeActionTimeout = const Duration(seconds: 18),
   });
 
@@ -670,6 +672,7 @@ class PokrovSeedApp extends StatelessWidget {
   final ExternalHandoffLauncher? handoffLauncher;
   final PokrovFirstLaunchStore? firstLaunchStore;
   final Future<String> Function(Uri uri)? communitySubscriptionFetcher;
+  final CommunityQrScanner? communityQrScanner;
   final Duration runtimeActionTimeout;
 
   @override
@@ -757,6 +760,7 @@ class PokrovSeedApp extends StatelessWidget {
         handoffLauncher: handoffLauncher,
         firstLaunchStore: firstLaunchStore,
         communitySubscriptionFetcher: communitySubscriptionFetcher,
+        communityQrScanner: communityQrScanner,
         runtimeActionTimeout: runtimeActionTimeout,
       ),
     );
@@ -772,6 +776,7 @@ class PokrovSeedShell extends StatefulWidget {
     this.handoffLauncher,
     this.firstLaunchStore,
     this.communitySubscriptionFetcher,
+    this.communityQrScanner,
     this.runtimeActionTimeout = const Duration(seconds: 18),
   });
 
@@ -781,6 +786,7 @@ class PokrovSeedShell extends StatefulWidget {
   final ExternalHandoffLauncher? handoffLauncher;
   final PokrovFirstLaunchStore? firstLaunchStore;
   final Future<String> Function(Uri uri)? communitySubscriptionFetcher;
+  final CommunityQrScanner? communityQrScanner;
   final Duration runtimeActionTimeout;
 
   @override
@@ -920,17 +926,54 @@ class _CommunityProfileRecord {
     required this.displayName,
     required this.sourceKind,
     required this.payload,
+    this.sourceUrl = '',
+    this.lastFetchedAt = '',
+    this.lastRefreshStatus = '',
+    this.refreshError = '',
+    this.entryCount = 0,
   });
 
   final String displayName;
   final String sourceKind;
   final ManagedProfilePayload payload;
+  final String sourceUrl;
+  final String lastFetchedAt;
+  final String lastRefreshStatus;
+  final String refreshError;
+  final int entryCount;
+
+  _CommunityProfileRecord copyWith({
+    String? displayName,
+    String? sourceKind,
+    ManagedProfilePayload? payload,
+    String? sourceUrl,
+    String? lastFetchedAt,
+    String? lastRefreshStatus,
+    String? refreshError,
+    int? entryCount,
+  }) {
+    return _CommunityProfileRecord(
+      displayName: displayName ?? this.displayName,
+      sourceKind: sourceKind ?? this.sourceKind,
+      payload: payload ?? this.payload,
+      sourceUrl: sourceUrl ?? this.sourceUrl,
+      lastFetchedAt: lastFetchedAt ?? this.lastFetchedAt,
+      lastRefreshStatus: lastRefreshStatus ?? this.lastRefreshStatus,
+      refreshError: refreshError ?? this.refreshError,
+      entryCount: entryCount ?? this.entryCount,
+    );
+  }
 
   Map<String, Object?> toJson() {
     return <String, Object?>{
       'profile_name': payload.profileName,
       'display_name': displayName,
       'source_kind': sourceKind,
+      'source_url': sourceUrl,
+      'last_fetched_at': lastFetchedAt,
+      'last_refresh_status': lastRefreshStatus,
+      'refresh_error': refreshError,
+      'entry_count': entryCount,
       'config_payload': payload.configPayload,
       'route_mode': payload.routeMode.name,
       'materialized_for_runtime': true,
@@ -955,6 +998,12 @@ class _CommunityProfileRecord {
       sourceKind: (json['source_kind']?.toString() ?? '').trim().isEmpty
           ? 'single_key'
           : json['source_kind'].toString().trim(),
+      sourceUrl: json['source_url']?.toString().trim() ?? '',
+      lastFetchedAt: json['last_fetched_at']?.toString().trim() ?? '',
+      lastRefreshStatus:
+          json['last_refresh_status']?.toString().trim() ?? '',
+      refreshError: json['refresh_error']?.toString().trim() ?? '',
+      entryCount: _readInt(json['entry_count']),
       payload: ManagedProfilePayload(
         profileName: profileName,
         configPayload: configPayload,
@@ -962,6 +1011,13 @@ class _CommunityProfileRecord {
         routeMode: routeMode,
       ),
     );
+  }
+
+  static int _readInt(Object? value) {
+    if (value is int) {
+      return value;
+    }
+    return int.tryParse(value?.toString() ?? '') ?? 0;
   }
 }
 
@@ -985,6 +1041,17 @@ class _CommunityProfileState {
       }
     }
     return profiles.isEmpty ? null : profiles.first;
+  }
+
+  List<String> get subscriptionSourceUrls {
+    final urls = <String>{};
+    for (final profile in profiles) {
+      final sourceUrl = profile.sourceUrl.trim();
+      if (sourceUrl.isNotEmpty) {
+        urls.add(sourceUrl);
+      }
+    }
+    return urls.toList(growable: false)..sort();
   }
 
   _CommunityProfileState upsertAll(
@@ -1032,6 +1099,25 @@ class _CommunityProfileState {
       activeProfileName: activeProfileName == profileName
           ? (values.isEmpty ? '' : values.first.payload.profileName)
           : activeProfileName,
+    );
+  }
+
+  _CommunityProfileState markSubscriptionRefreshFailed(
+    String sourceUrl,
+    String message,
+  ) {
+    return _CommunityProfileState(
+      profiles: profiles
+          .map(
+            (profile) => profile.sourceUrl == sourceUrl
+                ? profile.copyWith(
+                    lastRefreshStatus: 'failed',
+                    refreshError: message,
+                  )
+                : profile,
+          )
+          .toList(growable: false),
+      activeProfileName: activeProfileName,
     );
   }
 }
@@ -1830,6 +1916,7 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
     if (state == AppLifecycleState.resumed && !_runtimeBusy) {
       unawaited(_refreshRuntimeSnapshot());
       unawaited(_checkForClientUpdate());
+      unawaited(_refreshCommunitySubscriptions(quiet: true));
     }
   }
 
@@ -2112,7 +2199,18 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
         routeMode: _selectedRouteMode,
         sourceKind: 'subscription_url',
       );
-      final records = imported.map((result) => result.record).toList();
+      final fetchedAt = DateTime.now().toUtc().toIso8601String();
+      final records = imported
+          .map(
+            (result) => result.record.copyWith(
+              sourceUrl: uri.toString(),
+              lastFetchedAt: fetchedAt,
+              lastRefreshStatus: 'ok',
+              refreshError: '',
+              entryCount: imported.length,
+            ),
+          )
+          .toList();
       final optimisticState = _communityProfileState.upsertAll(records);
       HapticFeedback.selectionClick();
       setState(() {
@@ -2153,6 +2251,110 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
         ),
       );
       return false;
+    }
+  }
+
+  Future<void> _refreshCommunitySubscriptions({bool quiet = false}) async {
+    final importer = _localProfileBootstrapper;
+    if (importer == null) {
+      return;
+    }
+    final sourceUrls = _communityProfileState.subscriptionSourceUrls;
+    if (sourceUrls.isEmpty) {
+      return;
+    }
+    final fetcher =
+        widget.communitySubscriptionFetcher ?? _fetchCommunitySubscription;
+    var nextState = _communityProfileState;
+    var refreshed = 0;
+    var failed = 0;
+    for (final sourceUrl in sourceUrls) {
+      try {
+        final uri = Uri.parse(sourceUrl);
+        final body = await fetcher(uri);
+        final imported = _CommunityProfileImporter.parseMany(
+          body,
+          routeMode: _selectedRouteMode,
+          sourceKind: 'subscription_url',
+        );
+        final fetchedAt = DateTime.now().toUtc().toIso8601String();
+        final records = imported
+            .map(
+              (result) => result.record.copyWith(
+                sourceUrl: sourceUrl,
+                lastFetchedAt: fetchedAt,
+                lastRefreshStatus: 'ok',
+                refreshError: '',
+                entryCount: imported.length,
+              ),
+            )
+            .toList();
+        nextState = nextState.upsertAll(
+          records,
+          activeProfileName: nextState.activeProfileName,
+        );
+        refreshed += records.length;
+      } catch (_) {
+        failed += 1;
+        nextState = nextState.markSubscriptionRefreshFailed(
+          sourceUrl,
+          'Refresh failed. Keeping the last local profiles.',
+        );
+      }
+    }
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _communityProfileRevision += 1;
+      _communityProfileState = nextState;
+      _managedProfileDirty = refreshed > 0 || _managedProfileDirty;
+      if (!quiet) {
+        _runtimeHeadline = failed == 0
+            ? 'Subscription refresh updated $refreshed profile${refreshed == 1 ? '' : 's'}.'
+            : 'Some subscriptions could not refresh. Last working profiles were kept.';
+      }
+    });
+    final savedState = await importer.saveState(nextState);
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _communityProfileState = savedState;
+    });
+    if (!quiet) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            failed == 0
+                ? 'Subscription refresh updated $refreshed profile(s).'
+                : 'Could not refresh this subscription URL.',
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _scanCommunityQr(BuildContext context) async {
+    final scanner = widget.communityQrScanner;
+    if (scanner == null) {
+      return;
+    }
+    try {
+      final scanned = await scanner(context);
+      if (!mounted || scanned == null || scanned.trim().isEmpty) {
+        return;
+      }
+      await _importCommunityProfile(scanned);
+    } on Object {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not read this QR code.'),
+        ),
+      );
     }
   }
 
@@ -3389,6 +3591,10 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
         communityProfileState: _communityProfileState,
         onActivateCommunityProfile: _activateCommunityProfile,
         onRemoveCommunityProfile: _removeCommunityProfile,
+        onScanCommunityQr: widget.communityQrScanner == null
+            ? null
+            : () => _scanCommunityQr(context),
+        onRefreshCommunitySubscriptions: _refreshCommunitySubscriptions,
       ),
     ];
 
@@ -5256,6 +5462,8 @@ class _ProfileSection extends StatelessWidget {
     required this.communityProfileState,
     required this.onActivateCommunityProfile,
     required this.onRemoveCommunityProfile,
+    required this.onScanCommunityQr,
+    required this.onRefreshCommunitySubscriptions,
   });
 
   final SeedAppContext appContext;
@@ -5283,6 +5491,8 @@ class _ProfileSection extends StatelessWidget {
   final _CommunityProfileState communityProfileState;
   final ValueChanged<String> onActivateCommunityProfile;
   final ValueChanged<String> onRemoveCommunityProfile;
+  final Future<void> Function()? onScanCommunityQr;
+  final Future<void> Function() onRefreshCommunitySubscriptions;
 
   List<String> _bonusSummaryLines() {
     final summary = bonusSummary;
@@ -5329,6 +5539,11 @@ class _ProfileSection extends StatelessWidget {
     final hasCheckoutUrl = appContext.checkoutUrl.trim().isNotEmpty;
     final hasCabinetUrl = appContext.cabinetUrl.trim().isNotEmpty;
     final activeCommunityProfile = communityProfileState.activeProfile;
+    final hasSubscriptionRefreshFailure = communityProfileState.profiles.any(
+      (profile) =>
+          profile.sourceUrl.trim().isNotEmpty &&
+          profile.lastRefreshStatus == 'failed',
+    );
     return _SeedContentList(
       top: 24,
       children: [
@@ -5456,19 +5671,23 @@ class _ProfileSection extends StatelessWidget {
                       _SettingsRow(
                         key: const ValueKey('profile-qr-import-action'),
                         icon: Icons.qr_code_scanner_rounded,
-                        title: 'Import QR text',
-                        value: 'Paste',
-                        onTap: () => _showRedeemSheet(
-                          context,
-                          hintCode: '',
-                          hintPlaceholder:
-                              'vless://, ss://, trojan:// or vmess://',
-                          title: 'Import QR text',
-                          body:
-                              'Paste the decoded QR payload. Camera scanning can be wired by platform hosts without changing the local profile contract.',
-                          submitLabel: 'Import QR',
-                          onRedeem: (code) => onOpenHandoff('redeem', code),
-                        ),
+                        title: onScanCommunityQr == null
+                            ? 'Import QR text'
+                            : 'Scan QR code',
+                        value: onScanCommunityQr == null ? 'Paste' : 'Camera',
+                        onTap: onScanCommunityQr ??
+                            () => _showRedeemSheet(
+                                  context,
+                                  hintCode: '',
+                                  hintPlaceholder:
+                                      'vless://, ss://, trojan:// or vmess://',
+                                  title: 'Import QR text',
+                                  body:
+                                      'Paste the decoded QR payload. Camera scanning stays local and uses the same profile parser.',
+                                  submitLabel: 'Import QR',
+                                  onRedeem: (code) =>
+                                      onOpenHandoff('redeem', code),
+                                ),
                       ),
                       _SettingsRow(
                         key: const ValueKey('profile-active-local-profile'),
@@ -5488,6 +5707,18 @@ class _ProfileSection extends StatelessWidget {
                                   ],
                                 ),
                       ),
+                      if (communityProfileState.subscriptionSourceUrls.isNotEmpty)
+                        _SettingsRow(
+                          key: const ValueKey(
+                            'profile-refresh-subscriptions-action',
+                          ),
+                          icon: Icons.refresh_rounded,
+                          title: 'Refresh subscriptions',
+                          value: hasSubscriptionRefreshFailure
+                              ? 'Error'
+                              : '${communityProfileState.subscriptionSourceUrls.length}',
+                          onTap: onRefreshCommunitySubscriptions,
+                        ),
                       _SettingsRow(
                         key: const ValueKey('profile-free-vpn-catalog-action'),
                         icon: Icons.public_rounded,

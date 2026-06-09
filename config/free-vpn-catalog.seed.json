@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "enabled_by_default": false,
+  "requires_user_opt_in": true,
+  "official_pokrov_nodes": false,
+  "refresh_policy": {
+    "mode": "manual",
+    "cache_locally": true,
+    "clear_action_required": true
+  },
+  "sources": [
+    {
+      "id": "avencores-goida-vpn-configs",
+      "label": "Third-party public configs",
+      "repository": "https://github.com/AvenCores/goida-vpn-configs",
+      "license": "GPL-3.0",
+      "attribution": "AvenCores/goida-vpn-configs",
+      "review_status": "reviewed_candidate_disabled",
+      "observed_on": "2026-06-09",
+      "notes": [
+        "README describes public V2Ray, VLESS, Trojan, VMess, Reality, and Shadowsocks subscription feeds.",
+        "README describes frequent GitHub Actions updates.",
+        "Do not call these official POKROV nodes."
+      ],
+      "feeds": [
+        {
+          "id": "githubmirror-1",
+          "url": "https://github.com/AvenCores/goida-vpn-configs/raw/refs/heads/main/githubmirror/1.txt",
+          "format": "subscription_text"
+        },
+        {
+          "id": "githubmirror-6",
+          "url": "https://github.com/AvenCores/goida-vpn-configs/raw/refs/heads/main/githubmirror/6.txt",
+          "format": "subscription_text"
+        },
+        {
+          "id": "githubmirror-22",
+          "url": "https://github.com/AvenCores/goida-vpn-configs/raw/refs/heads/main/githubmirror/22.txt",
+          "format": "subscription_text"
+        }
+      ]
+    }
+  ],
+  "ui_copy": [
+    "Third-party public configs are not official POKROV nodes.",
+    "Import only if you trust the source.",
+    "The client stores imported entries locally and can clear them."
+  ]
+}

@@ -28,4 +28,20 @@ void main() {
     expect(content, contains('FOREGROUND_SERVICE_TYPE_SPECIAL_USE'));
     expect(content, contains('Android runtime foreground start failed:'));
   });
+
+  test('android community QR scanner declares camera permission and app wiring',
+      () async {
+    final manifest = File('android/app/src/main/AndroidManifest.xml');
+    final mainSource = File('lib/main.dart');
+    final scannerSource = File('lib/community_qr_scanner.dart');
+
+    expect(await manifest.exists(), isTrue);
+    expect(await mainSource.exists(), isTrue);
+    expect(await scannerSource.exists(), isTrue);
+
+    expect(await manifest.readAsString(),
+        contains('android.permission.CAMERA'));
+    expect(await mainSource.readAsString(), contains('scanCommunityQr'));
+    expect(await scannerSource.readAsString(), contains('MobileScanner'));
+  });
 }

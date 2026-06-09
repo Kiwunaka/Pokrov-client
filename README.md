@@ -37,7 +37,9 @@ Current repository state:
 
 - the public repository is ready for open-source collaboration
 - the first sanitized Android and Windows app source snapshot is imported
-- the community client can import a local single proxy key without POKROV API calls
+- the community client can import local keys, subscription URLs, and Android/Windows QR payloads without POKROV API calls
+- subscription refresh is manual and foreground-only, preserving old local profiles on failure
+- the optional Free VPN catalog is documented as gated third-party metadata and disabled by default
 - the operator client path is documented for companies with their own backend
 - official POKROV backend and operations remain private
 - the repository license is GNU GPLv3

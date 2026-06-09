@@ -26,8 +26,8 @@
       "ss",
       "vmess"
     ],
-    "subscription_url": "manual_refresh_mvp",
-    "qr_import": "decoded_text_import_mvp",
+    "subscription_url": "manual_and_foreground_refresh_mvp",
+    "qr_import": "android_windows_camera_mvp",
     "warp_policy": "local_user_controlled",
     "routing_modes": [
       "full_tunnel",
@@ -38,7 +38,8 @@
       "enabled_by_default": false,
       "first_candidate": "AvenCores/goida-vpn-configs",
       "requires_license_and_parser_review": true,
-      "ui_surface": "gated_placeholder"
+      "ui_surface": "gated_opt_in",
+      "catalog_file": "../free-vpn-catalog.seed.json"
     }
   },
   "build_defines": {

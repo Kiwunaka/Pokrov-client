@@ -7,8 +7,11 @@ environment:
   sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
+  camera: ^0.11.0
+  camera_windows: ^0.2.6+2
   flutter:
     sdk: flutter
+  image: ^4.5.4
   pokrov_app_shell:
     path: ../../packages/app_shell
   pokrov_core_domain:
@@ -19,6 +22,7 @@ dependencies:
     path: ../../packages/support_context
   tray_manager: ^0.5.2
   window_manager: ^0.5.1
+  zxing2: ^0.2.4
 
 flutter:
   uses-material-design: true

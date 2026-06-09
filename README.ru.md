@@ -46,15 +46,15 @@ policy, release policy, граница бренда, чеклист импорт
 - Community client: нейтральный клиент без брендинга POKROV и без обращений к
   POKROV API по умолчанию. Уже есть MVP локального импорта одиночных ключей
   `vless://`, `trojan://`, `ss://` и `vmess://`, локальный список профилей,
-  ручной импорт URL-подписки и импорт decoded QR payload.
+  импорт и refresh URL-подписки, Android/Windows QR import и gated metadata для
+  third-party catalog.
 - Operator client: white-label путь для компаний, которые хотят подключить
   приложение к своему backend, billing, support и бренду.
 - POKROV service mode: только для официальных сборок POKROV и официальных
   endpoint'ов POKROV.
 
-Camera QR scanning, автоматическое обновление подписок и опциональный каталог
-бесплатных VPN-конфигов запланированы отдельными этапами с проверкой парсеров,
-лицензий и безопасного поведения.
+Опциональный каталог бесплатных VPN-конфигов остается выключенным по умолчанию
+и должен явно маркироваться как third-party public configs.
 
 ## Статус
 
