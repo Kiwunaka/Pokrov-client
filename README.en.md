@@ -44,15 +44,15 @@ the first sanitized Android + Windows client source snapshot.
 
 - Community client: neutral, no POKROV branding, no POKROV API calls by
   default, local import for single `vless://`, `trojan://`, `ss://`, and
-  `vmess://` keys, with one active local profile that can be replaced or
-  removed.
+  `vmess://` keys, local multi-profile selection, manual subscription URL
+  import, and decoded QR payload import.
 - Operator client: a white-label path for companies that want to connect the
   app to their own backend, billing, support, and brand.
 - POKROV service mode: reserved for official POKROV builds and official
   POKROV service endpoints.
 
-Subscription URL refresh, QR import, multi-profile lists, and the optional free
-VPN catalog are planned follow-ups with parser, license, and safety gates.
+Camera QR scanning, automatic subscription refresh, and the optional free VPN
+catalog are planned follow-ups with parser, license, and safety gates.
 
 ## Status
 
@@ -64,7 +64,7 @@ VPN catalog are planned follow-ups with parser, license, and safety gates.
 | --- | --- |
 | Repository | Public foundation ready |
 | Source code | Sanitized Android + Windows snapshot imported |
-| Community mode | Local single-key import and active profile MVP |
+| Community mode | Local profiles, manual subscription import, decoded QR import |
 | Operator mode | White-label contracts documented |
 | Platforms | Android and Windows first |
 | License | GNU GPLv3 |
@@ -149,6 +149,8 @@ Before contributing, read:
 - [docs/SOURCE_IMPORT_PLAYBOOK.md](docs/SOURCE_IMPORT_PLAYBOOK.md)
 - [docs/PRODUCT_VARIANTS.md](docs/PRODUCT_VARIANTS.md)
 - [docs/OPERATOR_INTEGRATION.md](docs/OPERATOR_INTEGRATION.md)
+- [docs/FREE_VPN_CATALOG_GATE.md](docs/FREE_VPN_CATALOG_GATE.md)
+- [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)
 - [docs/GOVERNANCE.md](docs/GOVERNANCE.md)
 
 Please do not open public issues with secrets, personal connection links,

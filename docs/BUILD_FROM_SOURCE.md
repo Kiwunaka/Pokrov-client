@@ -33,8 +33,9 @@ The public client has two open-source product lines:
 
 - `community`: neutral client for ordinary users with local single-key import;
   no POKROV logo and no POKROV API calls by default. The current local importer
-  accepts `vless://`, `trojan://`, `ss://`, and `vmess://` keys. Subscription
-  URL refresh is planned separately.
+  accepts `vless://`, `trojan://`, `ss://`, and `vmess://` keys, supports local
+  multi-profile selection, manual subscription URL import, and decoded QR
+  payload import.
 - `operator`: white-label client for companies with their own API, cabinet,
   support, billing, and branding.
 

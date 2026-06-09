@@ -660,6 +660,7 @@ class PokrovSeedApp extends StatelessWidget {
     this.supportTicketService,
     this.handoffLauncher,
     this.firstLaunchStore,
+    this.communitySubscriptionFetcher,
     this.runtimeActionTimeout = const Duration(seconds: 18),
   });
 
@@ -668,6 +669,7 @@ class PokrovSeedApp extends StatelessWidget {
   final SupportTicketService? supportTicketService;
   final ExternalHandoffLauncher? handoffLauncher;
   final PokrovFirstLaunchStore? firstLaunchStore;
+  final Future<String> Function(Uri uri)? communitySubscriptionFetcher;
   final Duration runtimeActionTimeout;
 
   @override
@@ -754,6 +756,7 @@ class PokrovSeedApp extends StatelessWidget {
         supportTicketService: supportTicketService,
         handoffLauncher: handoffLauncher,
         firstLaunchStore: firstLaunchStore,
+        communitySubscriptionFetcher: communitySubscriptionFetcher,
         runtimeActionTimeout: runtimeActionTimeout,
       ),
     );
@@ -768,6 +771,7 @@ class PokrovSeedShell extends StatefulWidget {
     this.supportTicketService,
     this.handoffLauncher,
     this.firstLaunchStore,
+    this.communitySubscriptionFetcher,
     this.runtimeActionTimeout = const Duration(seconds: 18),
   });
 
@@ -776,6 +780,7 @@ class PokrovSeedShell extends StatefulWidget {
   final SupportTicketService? supportTicketService;
   final ExternalHandoffLauncher? handoffLauncher;
   final PokrovFirstLaunchStore? firstLaunchStore;
+  final Future<String> Function(Uri uri)? communitySubscriptionFetcher;
   final Duration runtimeActionTimeout;
 
   @override
@@ -808,50 +813,97 @@ class _LocalManagedProfileStore {
     return File('${directory.path}${Platform.pathSeparator}$_fileName');
   }
 
-  Future<ManagedProfilePayload?> read() async {
+  Future<_CommunityProfileState> readState() async {
     try {
       final file = await _profileFile();
       if (!await file.exists()) {
-        return null;
+        return const _CommunityProfileState.empty();
       }
       final raw = await file.readAsString();
       final decoded = jsonDecode(raw);
       if (decoded is! Map<String, Object?>) {
-        return null;
+        return const _CommunityProfileState.empty();
+      }
+      final profiles = decoded['profiles'];
+      if (profiles is List<Object?>) {
+        final records = profiles
+            .whereType<Map<String, Object?>>()
+            .map(_CommunityProfileRecord.fromJson)
+            .whereType<_CommunityProfileRecord>()
+            .toList(growable: false);
+        if (records.isEmpty) {
+          return const _CommunityProfileState.empty();
+        }
+        final activeName = decoded['active_profile_name']?.toString() ?? '';
+        return _CommunityProfileState(
+          profiles: records,
+          activeProfileName: records.any(
+            (record) => record.payload.profileName == activeName,
+          )
+              ? activeName
+              : records.first.payload.profileName,
+        );
       }
       final configPayload = decoded['config_payload']?.toString() ?? '';
       final profileName = decoded['profile_name']?.toString() ?? '';
       if (configPayload.trim().isEmpty || profileName.trim().isEmpty) {
-        return null;
+        return const _CommunityProfileState.empty();
       }
       final routeModeName = decoded['route_mode']?.toString() ?? '';
       final routeMode = RouteMode.values.firstWhere(
         (mode) => mode.name == routeModeName,
         orElse: () => RouteMode.fullTunnel,
       );
-      return ManagedProfilePayload(
-        profileName: profileName,
-        configPayload: configPayload,
-        materializedForRuntime: true,
-        routeMode: routeMode,
+      final record = _CommunityProfileRecord(
+        displayName: profileName,
+        sourceKind: 'single_key',
+        payload: ManagedProfilePayload(
+          profileName: profileName,
+          configPayload: configPayload,
+          materializedForRuntime: true,
+          routeMode: routeMode,
+        ),
+      );
+      return _CommunityProfileState(
+        profiles: [record],
+        activeProfileName: record.payload.profileName,
       );
     } on FormatException {
-      return null;
+      return const _CommunityProfileState.empty();
     }
   }
 
-  Future<void> write(ManagedProfilePayload payload) async {
+  Future<ManagedProfilePayload?> read() async {
+    return (await readState()).activeProfile?.payload;
+  }
+
+  Future<void> writeState(_CommunityProfileState state) async {
     final file = await _profileFile();
     await file.writeAsString(
       jsonEncode(<String, Object?>{
-        'schema': 1,
-        'profile_name': payload.profileName,
-        'config_payload': payload.configPayload,
-        'route_mode': payload.routeMode.name,
-        'materialized_for_runtime': true,
+        'schema': 2,
+        'active_profile_name': state.activeProfileName,
+        'profiles': state.profiles
+            .map((record) => record.toJson())
+            .toList(growable: false),
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       }),
       flush: true,
+    );
+  }
+
+  Future<void> write(ManagedProfilePayload payload) async {
+    await writeState(
+      _CommunityProfileState(
+        profiles: [
+          _CommunityProfileRecord(
+            displayName: payload.profileName,
+            sourceKind: 'single_key',
+            payload: payload,
+          ),
+        ],
+        activeProfileName: payload.profileName,
+      ),
     );
   }
 
@@ -860,6 +912,127 @@ class _LocalManagedProfileStore {
     if (await file.exists()) {
       await file.delete();
     }
+  }
+}
+
+class _CommunityProfileRecord {
+  const _CommunityProfileRecord({
+    required this.displayName,
+    required this.sourceKind,
+    required this.payload,
+  });
+
+  final String displayName;
+  final String sourceKind;
+  final ManagedProfilePayload payload;
+
+  Map<String, Object?> toJson() {
+    return <String, Object?>{
+      'profile_name': payload.profileName,
+      'display_name': displayName,
+      'source_kind': sourceKind,
+      'config_payload': payload.configPayload,
+      'route_mode': payload.routeMode.name,
+      'materialized_for_runtime': true,
+    };
+  }
+
+  static _CommunityProfileRecord? fromJson(Map<String, Object?> json) {
+    final profileName = json['profile_name']?.toString() ?? '';
+    final configPayload = json['config_payload']?.toString() ?? '';
+    if (profileName.trim().isEmpty || configPayload.trim().isEmpty) {
+      return null;
+    }
+    final routeModeName = json['route_mode']?.toString() ?? '';
+    final routeMode = RouteMode.values.firstWhere(
+      (mode) => mode.name == routeModeName,
+      orElse: () => RouteMode.fullTunnel,
+    );
+    return _CommunityProfileRecord(
+      displayName: (json['display_name']?.toString() ?? '').trim().isEmpty
+          ? profileName
+          : json['display_name'].toString().trim(),
+      sourceKind: (json['source_kind']?.toString() ?? '').trim().isEmpty
+          ? 'single_key'
+          : json['source_kind'].toString().trim(),
+      payload: ManagedProfilePayload(
+        profileName: profileName,
+        configPayload: configPayload,
+        materializedForRuntime: true,
+        routeMode: routeMode,
+      ),
+    );
+  }
+}
+
+class _CommunityProfileState {
+  const _CommunityProfileState({
+    required this.profiles,
+    required this.activeProfileName,
+  });
+
+  const _CommunityProfileState.empty()
+      : profiles = const <_CommunityProfileRecord>[],
+        activeProfileName = '';
+
+  final List<_CommunityProfileRecord> profiles;
+  final String activeProfileName;
+
+  _CommunityProfileRecord? get activeProfile {
+    for (final profile in profiles) {
+      if (profile.payload.profileName == activeProfileName) {
+        return profile;
+      }
+    }
+    return profiles.isEmpty ? null : profiles.first;
+  }
+
+  _CommunityProfileState upsertAll(
+    List<_CommunityProfileRecord> incoming, {
+    String? activeProfileName,
+  }) {
+    final byName = <String, _CommunityProfileRecord>{
+      for (final profile in profiles) profile.payload.profileName: profile,
+    };
+    for (final profile in incoming) {
+      byName[profile.payload.profileName] = profile;
+    }
+    final values = byName.values.toList(growable: false)
+      ..sort((a, b) => a.displayName.compareTo(b.displayName));
+    final active = activeProfileName ??
+        (incoming.isNotEmpty
+            ? incoming.first.payload.profileName
+            : this.activeProfileName);
+    return _CommunityProfileState(
+      profiles: values,
+      activeProfileName:
+          values.any((profile) => profile.payload.profileName == active)
+              ? active
+              : (values.isEmpty ? '' : values.first.payload.profileName),
+    );
+  }
+
+  _CommunityProfileState setActive(String profileName) {
+    if (!profiles
+        .any((profile) => profile.payload.profileName == profileName)) {
+      return this;
+    }
+    return _CommunityProfileState(
+      profiles: profiles,
+      activeProfileName: profileName,
+    );
+  }
+
+  _CommunityProfileState remove(String profileName) {
+    final values = profiles
+        .where((profile) => profile.payload.profileName != profileName)
+        .toList(growable: false);
+    return _CommunityProfileState(
+      profiles: values,
+      activeProfileName: activeProfileName == profileName
+          ? (values.isEmpty ? '' : values.first.payload.profileName)
+          : activeProfileName,
+    );
   }
 }
 
@@ -874,22 +1047,80 @@ class _LocalManagedProfileBootstrapper implements ManagedProfileBootstrapper {
   final _LocalManagedProfileStore _store;
   final ManagedProfilePayload _fallback;
   ManagedProfilePayload _payload;
+  _CommunityProfileState _state = const _CommunityProfileState.empty();
   bool _loaded = false;
 
-  Future<ManagedProfilePayload?> loadImportedProfile() async {
-    final imported = await _store.read();
-    _payload = imported ?? _fallback;
+  Future<_CommunityProfileState> loadImportedState() async {
+    final state = await _store.readState();
+    _state = state;
+    _payload = state.activeProfile?.payload ?? _fallback;
     _loaded = true;
-    return imported;
+    return state;
   }
 
-  Future<void> saveImportedProfile(ManagedProfilePayload payload) async {
-    _payload = payload;
+  Future<ManagedProfilePayload?> loadImportedProfile() async {
+    return (await loadImportedState()).activeProfile?.payload;
+  }
+
+  Future<_CommunityProfileState> saveImportedRecords(
+    List<_CommunityProfileRecord> records,
+  ) async {
+    if (!_loaded) {
+      await loadImportedState();
+    }
+    _state = _state.upsertAll(records);
+    _payload = _state.activeProfile?.payload ?? _fallback;
     _loaded = true;
-    await _store.write(payload);
+    await _store.writeState(_state);
+    return _state;
+  }
+
+  Future<_CommunityProfileState> saveState(
+    _CommunityProfileState state,
+  ) async {
+    _state = state;
+    _payload = _state.activeProfile?.payload ?? _fallback;
+    _loaded = true;
+    if (_state.profiles.isEmpty) {
+      await _store.delete();
+    } else {
+      await _store.writeState(_state);
+    }
+    return _state;
+  }
+
+  Future<_CommunityProfileState> saveImportedProfile(
+    _CommunityProfileRecord record,
+  ) async {
+    return saveImportedRecords([record]);
+  }
+
+  Future<_CommunityProfileState> setActiveProfile(String profileName) async {
+    if (!_loaded) {
+      await loadImportedState();
+    }
+    _state = _state.setActive(profileName);
+    _payload = _state.activeProfile?.payload ?? _fallback;
+    await _store.writeState(_state);
+    return _state;
+  }
+
+  Future<_CommunityProfileState> removeProfile(String profileName) async {
+    if (!_loaded) {
+      await loadImportedState();
+    }
+    _state = _state.remove(profileName);
+    _payload = _state.activeProfile?.payload ?? _fallback;
+    if (_state.profiles.isEmpty) {
+      await _store.delete();
+    } else {
+      await _store.writeState(_state);
+    }
+    return _state;
   }
 
   Future<void> clearImportedProfile() async {
+    _state = const _CommunityProfileState.empty();
     _payload = _fallback;
     _loaded = true;
     await _store.delete();
@@ -902,8 +1133,7 @@ class _LocalManagedProfileBootstrapper implements ManagedProfileBootstrapper {
     List<String> selectedApps = const <String>[],
   }) async {
     if (!_loaded) {
-      _payload = await _store.read() ?? _payload;
-      _loaded = true;
+      await loadImportedState();
     }
     return _payload.copyWith(routeMode: routeMode);
   }
@@ -911,11 +1141,11 @@ class _LocalManagedProfileBootstrapper implements ManagedProfileBootstrapper {
 
 class _CommunityProfileImportResult {
   const _CommunityProfileImportResult({
-    required this.payload,
+    required this.record,
     required this.displayName,
   });
 
-  final ManagedProfilePayload payload;
+  final _CommunityProfileRecord record;
   final String displayName;
 }
 
@@ -934,6 +1164,7 @@ class _CommunityProfileImporter {
   static _CommunityProfileImportResult parse(
     String value, {
     required RouteMode routeMode,
+    String sourceKind = 'single_key',
   }) {
     final source = value.trim();
     if (source.isEmpty) {
@@ -1001,13 +1232,76 @@ class _CommunityProfileImporter {
     };
     return _CommunityProfileImportResult(
       displayName: name,
-      payload: ManagedProfilePayload(
-        profileName: _safeProfileName(name),
-        configPayload: const JsonEncoder.withIndent('  ').convert(config),
-        materializedForRuntime: true,
-        routeMode: routeMode,
+      record: _CommunityProfileRecord(
+        displayName: name,
+        sourceKind: sourceKind,
+        payload: ManagedProfilePayload(
+          profileName: _safeProfileName(name),
+          configPayload: const JsonEncoder.withIndent('  ').convert(config),
+          materializedForRuntime: true,
+          routeMode: routeMode,
+        ),
       ),
     );
+  }
+
+  static List<_CommunityProfileImportResult> parseMany(
+    String value, {
+    required RouteMode routeMode,
+    String sourceKind = 'subscription',
+  }) {
+    final entries = _subscriptionEntries(value);
+    if (entries.isEmpty) {
+      throw const _CommunityProfileImportFailure(
+        'No supported proxy keys were found.',
+      );
+    }
+    final results = <_CommunityProfileImportResult>[];
+    final errors = <String>[];
+    for (final entry in entries.take(64)) {
+      try {
+        results.add(parse(entry, routeMode: routeMode, sourceKind: sourceKind));
+      } on _CommunityProfileImportFailure catch (error) {
+        errors.add(error.message);
+      }
+    }
+    if (results.isEmpty) {
+      throw _CommunityProfileImportFailure(
+        errors.isEmpty ? 'No supported proxy keys were found.' : errors.first,
+      );
+    }
+    return results;
+  }
+
+  static List<String> _subscriptionEntries(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      return const <String>[];
+    }
+    final direct = _extractProxyUris(trimmed);
+    if (direct.isNotEmpty) {
+      return direct;
+    }
+    final decoded = _decodeMaybeBase64(trimmed);
+    if (decoded != trimmed) {
+      return _extractProxyUris(decoded);
+    }
+    return const <String>[];
+  }
+
+  static List<String> _extractProxyUris(String value) {
+    final normalized = value
+        .replaceAll('\r', '\n')
+        .split('\n')
+        .map((line) => line.trim())
+        .where((line) => line.isNotEmpty && !line.startsWith('#'))
+        .toList(growable: false);
+    return normalized.where((line) {
+      final uri = Uri.tryParse(line);
+      return uri != null &&
+          const <String>{'vless', 'vmess', 'trojan', 'ss'}
+              .contains(uri.scheme.toLowerCase());
+    }).toList(growable: false);
   }
 
   static Map<String, Object?> _parseVless(Uri uri) {
@@ -1338,7 +1632,8 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
   late final SupportTicketService _supportTicketService;
   late final PokrovFirstLaunchStore _firstLaunchStore;
   late final _LocalManagedProfileBootstrapper? _localProfileBootstrapper;
-  ManagedProfilePayload? _communityProfile;
+  _CommunityProfileState _communityProfileState =
+      const _CommunityProfileState.empty();
   int _communityProfileRevision = 0;
 
   String _brand(String value) {
@@ -1748,22 +2043,34 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
       return false;
     }
     try {
+      final uri = Uri.tryParse(value.trim());
+      if (uri != null &&
+          (uri.scheme.toLowerCase() == 'http' ||
+              uri.scheme.toLowerCase() == 'https')) {
+        return _importCommunitySubscriptionUrl(uri);
+      }
       final imported = _CommunityProfileImporter.parse(
         value,
         routeMode: _selectedRouteMode,
       );
       HapticFeedback.selectionClick();
+      final optimisticState = _communityProfileState.upsertAll(
+        [imported.record],
+      );
       setState(() {
         _communityProfileRevision += 1;
-        _communityProfile = imported.payload;
+        _communityProfileState = optimisticState;
         _managedProfileDirty = true;
         _runtimeHeadline =
             'Profile imported: ${imported.displayName}. Tap Connect to apply it.';
       });
-      await importer.saveImportedProfile(imported.payload);
+      final savedState = await importer.saveState(optimisticState);
       if (!mounted) {
         return true;
       }
+      setState(() {
+        _communityProfileState = savedState;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Imported ${imported.displayName}. Tap Connect.'),
@@ -1791,37 +2098,160 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
     }
   }
 
+  Future<bool> _importCommunitySubscriptionUrl(Uri uri) async {
+    final importer = _localProfileBootstrapper;
+    if (importer == null) {
+      return false;
+    }
+    try {
+      final fetcher =
+          widget.communitySubscriptionFetcher ?? _fetchCommunitySubscription;
+      final body = await fetcher(uri);
+      final imported = _CommunityProfileImporter.parseMany(
+        body,
+        routeMode: _selectedRouteMode,
+        sourceKind: 'subscription_url',
+      );
+      final records = imported.map((result) => result.record).toList();
+      final optimisticState = _communityProfileState.upsertAll(records);
+      HapticFeedback.selectionClick();
+      setState(() {
+        _communityProfileRevision += 1;
+        _communityProfileState = optimisticState;
+        _managedProfileDirty = true;
+        _runtimeHeadline =
+            'Subscription imported ${records.length} profile${records.length == 1 ? '' : 's'}. Tap Connect to apply.';
+      });
+      final savedState = await importer.saveState(optimisticState);
+      if (!mounted) {
+        return true;
+      }
+      setState(() {
+        _communityProfileState = savedState;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Imported ${records.length} subscription profile(s).'),
+        ),
+      );
+      return true;
+    } on _CommunityProfileImportFailure catch (error) {
+      if (!mounted) {
+        return false;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.message)),
+      );
+      return false;
+    } catch (_) {
+      if (!mounted) {
+        return false;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not refresh this subscription URL.'),
+        ),
+      );
+      return false;
+    }
+  }
+
+  Future<String> _fetchCommunitySubscription(Uri uri) async {
+    if (uri.scheme.toLowerCase() != 'https' &&
+        uri.host != 'localhost' &&
+        uri.host != '127.0.0.1') {
+      throw const _CommunityProfileImportFailure(
+        'Use HTTPS subscription URLs, or localhost for development.',
+      );
+    }
+    final client = HttpClient()..connectionTimeout = const Duration(seconds: 8);
+    try {
+      final request = await client.getUrl(uri).timeout(
+            const Duration(seconds: 10),
+          );
+      request.headers.set(HttpHeaders.acceptHeader, 'text/plain,*/*');
+      final response = await request.close().timeout(
+            const Duration(seconds: 12),
+          );
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw _CommunityProfileImportFailure(
+          'Subscription returned HTTP ${response.statusCode}.',
+        );
+      }
+      final chunks = <int>[];
+      await for (final chunk in response) {
+        chunks.addAll(chunk);
+        if (chunks.length > 512 * 1024) {
+          throw const _CommunityProfileImportFailure(
+            'Subscription is too large for local import.',
+          );
+        }
+      }
+      return utf8.decode(chunks, allowMalformed: false);
+    } finally {
+      client.close(force: true);
+    }
+  }
+
   Future<void> _loadCommunityProfile() async {
     final importer = _localProfileBootstrapper;
     if (importer == null) {
       return;
     }
     final revision = _communityProfileRevision;
-    final profile = await importer.loadImportedProfile();
+    final state = await importer.loadImportedState();
     if (!mounted || revision != _communityProfileRevision) {
       return;
     }
     setState(() {
-      _communityProfile = profile;
+      _communityProfileState = state;
     });
   }
 
-  Future<void> _removeCommunityProfile() async {
+  Future<void> _activateCommunityProfile(String profileName) async {
     final importer = _localProfileBootstrapper;
     if (importer == null) {
       return;
     }
     HapticFeedback.selectionClick();
+    final optimisticState = _communityProfileState.setActive(profileName);
     setState(() {
       _communityProfileRevision += 1;
-      _communityProfile = null;
+      _communityProfileState = optimisticState;
       _managedProfileDirty = true;
-      _runtimeHeadline = 'Local profile removed. Add a key to connect.';
+      _runtimeHeadline = 'Profile selected. Tap Connect to apply it.';
     });
-    await importer.clearImportedProfile();
+    final savedState = await importer.saveState(optimisticState);
     if (!mounted) {
       return;
     }
+    setState(() {
+      _communityProfileState = savedState;
+    });
+  }
+
+  Future<void> _removeCommunityProfile(String profileName) async {
+    final importer = _localProfileBootstrapper;
+    if (importer == null) {
+      return;
+    }
+    HapticFeedback.selectionClick();
+    final optimisticState = _communityProfileState.remove(profileName);
+    setState(() {
+      _communityProfileRevision += 1;
+      _communityProfileState = optimisticState;
+      _managedProfileDirty = true;
+      _runtimeHeadline = optimisticState.profiles.isEmpty
+          ? 'Local profile removed. Add a key to connect.'
+          : 'Profile removed. Tap Connect to apply the active profile.';
+    });
+    final savedState = await importer.saveState(optimisticState);
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _communityProfileState = savedState;
+    });
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Local profile removed.')),
     );
@@ -2398,6 +2828,7 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
   }
 
   Future<ManagedProfilePayload> _resolveManagedProfile() async {
+    final profileRevision = _communityProfileRevision;
     final payload = await _bootstrapper.resolveManagedProfile(
       hostPlatform: widget.appContext.hostPlatform,
       routeMode: _selectedRouteMode,
@@ -2416,7 +2847,9 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
     );
     if (mounted) {
       setState(() {
-        _managedProfileDirty = false;
+        if (profileRevision == _communityProfileRevision) {
+          _managedProfileDirty = false;
+        }
         _managedWarpPolicy = displayWarpPolicy;
         _warpRuntimeConsent = warpConsentStillValid;
         _smartConnectProfile = payload.smartConnect;
@@ -2953,7 +3386,8 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
         runtimeSnapshot: _runtimeSnapshot,
         runtimeHeadline: _runtimeHeadline,
         onOpenWarp: _openWarpControl,
-        communityProfile: _communityProfile,
+        communityProfileState: _communityProfileState,
+        onActivateCommunityProfile: _activateCommunityProfile,
         onRemoveCommunityProfile: _removeCommunityProfile,
       ),
     ];
@@ -4819,7 +5253,8 @@ class _ProfileSection extends StatelessWidget {
     required this.runtimeSnapshot,
     required this.runtimeHeadline,
     required this.onOpenWarp,
-    required this.communityProfile,
+    required this.communityProfileState,
+    required this.onActivateCommunityProfile,
     required this.onRemoveCommunityProfile,
   });
 
@@ -4845,8 +5280,9 @@ class _ProfileSection extends StatelessWidget {
   final RuntimeSnapshot? runtimeSnapshot;
   final String? runtimeHeadline;
   final Future<void> Function() onOpenWarp;
-  final ManagedProfilePayload? communityProfile;
-  final VoidCallback onRemoveCommunityProfile;
+  final _CommunityProfileState communityProfileState;
+  final ValueChanged<String> onActivateCommunityProfile;
+  final ValueChanged<String> onRemoveCommunityProfile;
 
   List<String> _bonusSummaryLines() {
     final summary = bonusSummary;
@@ -4892,7 +5328,7 @@ class _ProfileSection extends StatelessWidget {
     final usesApiServices = appContext.variantProfile.usesApiServices;
     final hasCheckoutUrl = appContext.checkoutUrl.trim().isNotEmpty;
     final hasCabinetUrl = appContext.cabinetUrl.trim().isNotEmpty;
-    final activeCommunityProfile = communityProfile;
+    final activeCommunityProfile = communityProfileState.activeProfile;
     return _SeedContentList(
       top: 24,
       children: [
@@ -4969,7 +5405,7 @@ class _ProfileSection extends StatelessWidget {
                       ? 'Код из Telegram, кабинета, сайта или письма.'
                       : activeCommunityProfile == null
                           ? 'Add a single local key. Subscription refresh is planned.'
-                          : 'Active: ${activeCommunityProfile.profileName}',
+                          : 'Active: ${activeCommunityProfile.displayName}',
                 ],
                 child: Column(
                   children: [
@@ -5002,28 +5438,98 @@ class _ProfileSection extends StatelessWidget {
                     ),
                     if (!usesApiServices) ...[
                       _SettingsRow(
+                        key: const ValueKey('profile-subscription-url-action'),
+                        icon: Icons.sync_rounded,
+                        title: 'Add subscription URL',
+                        value: 'Refresh',
+                        onTap: () => _showRedeemSheet(
+                          context,
+                          hintCode: '',
+                          hintPlaceholder: 'https://example.com/sub.txt',
+                          title: 'Add subscription URL',
+                          body:
+                              'The client fetches the URL once, parses supported keys, and stores profiles locally. Manual refresh is the safe first version.',
+                          submitLabel: 'Import profiles',
+                          onRedeem: (code) => onOpenHandoff('redeem', code),
+                        ),
+                      ),
+                      _SettingsRow(
+                        key: const ValueKey('profile-qr-import-action'),
+                        icon: Icons.qr_code_scanner_rounded,
+                        title: 'Import QR text',
+                        value: 'Paste',
+                        onTap: () => _showRedeemSheet(
+                          context,
+                          hintCode: '',
+                          hintPlaceholder:
+                              'vless://, ss://, trojan:// or vmess://',
+                          title: 'Import QR text',
+                          body:
+                              'Paste the decoded QR payload. Camera scanning can be wired by platform hosts without changing the local profile contract.',
+                          submitLabel: 'Import QR',
+                          onRedeem: (code) => onOpenHandoff('redeem', code),
+                        ),
+                      ),
+                      _SettingsRow(
                         key: const ValueKey('profile-active-local-profile'),
                         icon: Icons.dns_outlined,
                         title: 'Active profile',
-                        value: activeCommunityProfile?.profileName ?? 'None',
+                        value: activeCommunityProfile?.payload.profileName ??
+                            'None',
                         onTap: activeCommunityProfile == null
                             ? null
                             : () => _showInfoSheet(
                                   context,
                                   title: 'Active profile',
                                   lines: [
-                                    activeCommunityProfile.profileName,
+                                    activeCommunityProfile.displayName,
+                                    activeCommunityProfile.payload.profileName,
                                     'Route mode: ${_routeModeShortLabel(selectedRouteMode)}',
                                   ],
                                 ),
                       ),
+                      _SettingsRow(
+                        key: const ValueKey('profile-free-vpn-catalog-action'),
+                        icon: Icons.public_rounded,
+                        title: 'Free VPN catalog',
+                        value: 'Gated',
+                        onTap: () => _showInfoSheet(
+                          context,
+                          title: 'Free VPN catalog',
+                          lines: const [
+                            'This section stays opt-in and disabled until feed license, attribution, freshness, parser tests, and safety copy are reviewed.',
+                            'Candidate feed: AvenCores/goida-vpn-configs.',
+                            'Third-party public configs are not official POKROV nodes.',
+                          ],
+                        ),
+                      ),
+                      for (final profile in communityProfileState.profiles)
+                        _SettingsRow(
+                          key: ValueKey(
+                            'profile-local-profile-${profile.payload.profileName}',
+                          ),
+                          icon: profile.payload.profileName ==
+                                  activeCommunityProfile?.payload.profileName
+                              ? Icons.radio_button_checked_rounded
+                              : Icons.radio_button_unchecked_rounded,
+                          title: profile.displayName,
+                          value: profile.payload.profileName ==
+                                  activeCommunityProfile?.payload.profileName
+                              ? 'Active'
+                              : 'Use',
+                          onTap: () => onActivateCommunityProfile(
+                            profile.payload.profileName,
+                          ),
+                        ),
                       if (activeCommunityProfile != null)
                         _SettingsRow(
                           key: const ValueKey('profile-remove-local-profile'),
                           icon: Icons.delete_outline_rounded,
-                          title: 'Remove profile',
+                          title: 'Remove active profile',
                           value: 'Clear',
-                          onTap: onRemoveCommunityProfile,
+                          onTap: () => onRemoveCommunityProfile(
+                            activeCommunityProfile.payload.profileName,
+                          ),
                         ),
                     ],
                     if (usesApiServices) ...[

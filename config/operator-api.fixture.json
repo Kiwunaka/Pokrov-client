@@ -1,0 +1,50 @@
+{
+  "name": "Operator API fixture",
+  "variant": "operator",
+  "base_url": "https://api.operator.example",
+  "endpoints": {
+    "start_trial": {
+      "method": "POST",
+      "path": "/api/client/session/start-trial",
+      "response": {
+        "session_token": "operator-session-token-placeholder",
+        "profile": {
+          "url": "/api/client/profile/managed"
+        }
+      }
+    },
+    "managed_profile": {
+      "method": "GET",
+      "path": "/api/client/profile/managed",
+      "response": {
+        "profile_name": "operator-managed",
+        "materialized_for_runtime": true,
+        "config": {
+          "outbounds": [
+            {
+              "type": "direct",
+              "tag": "direct"
+            }
+          ],
+          "route": {
+            "final": "direct"
+          }
+        }
+      }
+    },
+    "redeem": {
+      "method": "POST",
+      "path": "/api/client/redeem",
+      "optional": true
+    },
+    "apps": {
+      "method": "GET",
+      "path": "/api/client/apps",
+      "optional": true
+    }
+  },
+  "notes": [
+    "Replace all placeholder URLs, tokens, branding, signing, support, and privacy policy values before shipping.",
+    "Fork releases must not imply official POKROV operation."
+  ]
+}

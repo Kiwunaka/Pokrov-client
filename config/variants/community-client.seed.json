@@ -14,10 +14,11 @@
   },
   "user_features": {
     "paste_key": true,
-    "active_local_profile": {
+    "local_profiles": {
+      "multi_profile_list": true,
+      "select_active": true,
       "replace": true,
-      "remove": true,
-      "multi_profile_list": "planned"
+      "remove": true
     },
     "supported_single_key_schemes": [
       "vless",
@@ -25,8 +26,8 @@
       "ss",
       "vmess"
     ],
-    "subscription_url": "planned_refresh_flow",
-    "qr_import": "planned",
+    "subscription_url": "manual_refresh_mvp",
+    "qr_import": "decoded_text_import_mvp",
     "warp_policy": "local_user_controlled",
     "routing_modes": [
       "full_tunnel",
@@ -36,7 +37,8 @@
     "free_vpn_catalog": {
       "enabled_by_default": false,
       "first_candidate": "AvenCores/goida-vpn-configs",
-      "requires_license_and_parser_review": true
+      "requires_license_and_parser_review": true,
+      "ui_surface": "gated_placeholder"
     }
   },
   "build_defines": {
