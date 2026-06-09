@@ -14,6 +14,11 @@
   },
   "user_features": {
     "paste_key": true,
+    "active_local_profile": {
+      "replace": true,
+      "remove": true,
+      "multi_profile_list": "planned"
+    },
     "supported_single_key_schemes": [
       "vless",
       "trojan",

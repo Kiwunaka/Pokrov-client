@@ -44,13 +44,14 @@ the first sanitized Android + Windows client source snapshot.
 
 - Community client: neutral, no POKROV branding, no POKROV API calls by
   default, local import for single `vless://`, `trojan://`, `ss://`, and
-  `vmess://` keys.
+  `vmess://` keys, with one active local profile that can be replaced or
+  removed.
 - Operator client: a white-label path for companies that want to connect the
   app to their own backend, billing, support, and brand.
 - POKROV service mode: reserved for official POKROV builds and official
   POKROV service endpoints.
 
-Subscription URL refresh, QR import, saved profile lists, and the optional free
+Subscription URL refresh, QR import, multi-profile lists, and the optional free
 VPN catalog are planned follow-ups with parser, license, and safety gates.
 
 ## Status
@@ -63,7 +64,7 @@ VPN catalog are planned follow-ups with parser, license, and safety gates.
 | --- | --- |
 | Repository | Public foundation ready |
 | Source code | Sanitized Android + Windows snapshot imported |
-| Community mode | Local single-key import MVP |
+| Community mode | Local single-key import and active profile MVP |
 | Operator mode | White-label contracts documented |
 | Platforms | Android and Windows first |
 | License | GNU GPLv3 |
