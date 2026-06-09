@@ -8,7 +8,7 @@
   <a href="LICENSE"><img alt="License: GPLv3" src="https://img.shields.io/badge/license-GPLv3-0f766e?style=for-the-badge"></a>
   <img alt="Source status: snapshot imported" src="https://img.shields.io/badge/source-snapshot%20imported-0f766e?style=for-the-badge">
   <img alt="Platforms: Android and Windows" src="https://img.shields.io/badge/platforms-Android%20%2B%20Windows-2563eb?style=for-the-badge">
-  <img alt="Official service: POKROV operated" src="https://img.shields.io/badge/service-POKROV%20operated-111827?style=for-the-badge">
+  <img alt="Client modes: community and operator" src="https://img.shields.io/badge/modes-community%20%2B%20operator-111827?style=for-the-badge">
 </p>
 
 <p align="center">
@@ -19,13 +19,13 @@
 
 <p align="center">
   <a href="README.md">Language index</a>
-  ·
+  &middot;
   <a href="README.ru.md">Русский</a>
-  ·
+  &middot;
   <a href="docs/OPEN_SOURCE_SCOPE.md">Scope</a>
-  ·
+  &middot;
   <a href="SECURITY.md">Security</a>
-  ·
+  &middot;
   <a href="BRAND.md">Brand</a>
 </p>
 
@@ -33,22 +33,25 @@
 
 ## What This Is
 
-POKROV Client is the future public source home for the POKROV Android and
-Windows app.
+POKROV Client is the public source home for the POKROV Android and Windows
+client app.
 
 The repository contains the public project structure, contribution rules,
 security policy, release policy, brand boundary, source-import checklist, and
 the first sanitized Android + Windows client source snapshot.
 
-## What Makes The Client Different
+## Product Modes
 
-The public client is being prepared around a few product principles:
+- Community client: neutral, no POKROV branding, no POKROV API calls by
+  default, local import for single `vless://`, `trojan://`, `ss://`, and
+  `vmess://` keys.
+- Operator client: a white-label path for companies that want to connect the
+  app to their own backend, billing, support, and brand.
+- POKROV service mode: reserved for official POKROV builds and official
+  POKROV service endpoints.
 
-- app-first onboarding instead of bot-first account creation
-- Android and Windows as the current public beta target
-- a calm consumer interface over a more complex routing/runtime layer
-- open-source client code without exposing private service operations
-- release notes that do not overstate store, signing, or production readiness
+Subscription URL refresh, QR import, saved profile lists, and the optional free
+VPN catalog are planned follow-ups with parser, license, and safety gates.
 
 ## Status
 
@@ -60,6 +63,8 @@ The public client is being prepared around a few product principles:
 | --- | --- |
 | Repository | Public foundation ready |
 | Source code | Sanitized Android + Windows snapshot imported |
+| Community mode | Local single-key import MVP |
+| Operator mode | White-label contracts documented |
 | Platforms | Android and Windows first |
 | License | GNU GPLv3 |
 | Official backend | Operated separately by POKROV |
@@ -82,28 +87,30 @@ boundary.
 
 ```text
 .
-├── README.md                  Language gateway
-├── README.en.md               English project README
-├── README.ru.md               Russian project README
-├── apps/                      Android and Windows Flutter hosts
-├── packages/                  Shared Flutter packages
-├── config/                    Public seed config and runtime contracts
-├── scripts/                   Local bootstrap, runtime-fetch, and test scripts
-├── BRAND.md                   Brand and official-build boundary
-├── SECURITY.md                Private security-reporting process
-├── CONTRIBUTING.md            Contribution rules
-├── ROADMAP.md                 Public repository roadmap
-├── docs/
-│   ├── OPEN_SOURCE_SCOPE.md
-│   ├── RELEASE_POLICY.md
-│   ├── DEPENDENCY_LICENSE_AUDIT.md
-│   ├── MAINTAINER_CHECKLIST.md
-│   ├── PROJECT_PRINCIPLES.md
-│   ├── SOURCE_IMPORT_PLAYBOOK.md
-│   └── GOVERNANCE.md
-└── assets/
-    ├── brand/
-    └── diagrams/
+|-- README.md                  Language gateway
+|-- README.en.md               English project README
+|-- README.ru.md               Russian project README
+|-- apps/                      Android and Windows Flutter hosts
+|-- packages/                  Shared Flutter packages
+|-- config/                    Public seed config and runtime contracts
+|-- scripts/                   Local bootstrap, runtime-fetch, and test scripts
+|-- BRAND.md                   Brand and official-build boundary
+|-- SECURITY.md                Private security-reporting process
+|-- CONTRIBUTING.md            Contribution rules
+|-- ROADMAP.md                 Public repository roadmap
+|-- docs/
+|   |-- OPEN_SOURCE_SCOPE.md
+|   |-- RELEASE_POLICY.md
+|   |-- DEPENDENCY_LICENSE_AUDIT.md
+|   |-- MAINTAINER_CHECKLIST.md
+|   |-- PROJECT_PRINCIPLES.md
+|   |-- SOURCE_IMPORT_PLAYBOOK.md
+|   |-- PRODUCT_VARIANTS.md
+|   |-- OPERATOR_INTEGRATION.md
+|   `-- GOVERNANCE.md
+`-- assets/
+    |-- brand/
+    `-- diagrams/
 ```
 
 ## Build From Source
@@ -111,7 +118,7 @@ boundary.
 Build instructions are available in
 [docs/BUILD_FROM_SOURCE.md](docs/BUILD_FROM_SOURCE.md).
 
-Source import tooling is already available for maintainers:
+Source import tooling is available for maintainers:
 
 ```powershell
 python -m pytest tests/test_source_import.py
@@ -128,7 +135,8 @@ The acceptance bar for source work is simple:
 ## Contributing
 
 Contributions are welcome, especially around documentation, release hygiene,
-build reproducibility, and public-source readiness.
+build reproducibility, local profile import, operator integration, and
+public-source readiness.
 
 Before contributing, read:
 

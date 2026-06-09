@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -3294,6 +3294,97 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(BottomSheet), findsOneWidget);
     expect(find.textContaining('POKROV'), findsWidgets);
+  });
+
+  testWidgets('community client imports a local VLESS key for runtime staging',
+      (tester) async {
+    const channel = MethodChannel('space.pokrov/runtime_engine');
+    final messenger =
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+    final calls = <String>[];
+    final stagedPayloads = <String>[];
+
+    messenger.setMockMethodCallHandler(channel, (call) async {
+      calls.add(call.method);
+      switch (call.method) {
+        case 'runtimeEngine.snapshot':
+          return <String, Object?>{
+            'phase': 'artifactReady',
+            'artifactDirectory': '/host/runtime',
+            'coreBinaryPath': '/host/runtime/libcore.aar',
+            'supportsLiveConnect': true,
+            'canInitialize': true,
+            'canConnect': false,
+            'message': 'Host bridge ready.',
+          };
+        case 'runtimeEngine.initialize':
+          return <String, Object?>{
+            'phase': 'initialized',
+            'artifactDirectory': '/host/runtime',
+            'coreBinaryPath': '/host/runtime/libcore.aar',
+            'supportsLiveConnect': true,
+            'canInitialize': true,
+            'canConnect': false,
+            'message': 'Runtime bootstrap completed on the host bridge.',
+          };
+        case 'runtimeEngine.stageManagedProfile':
+          final arguments = Map<Object?, Object?>.from(call.arguments as Map);
+          stagedPayloads.add(arguments['configPayload'].toString());
+          return <String, Object?>{
+            'phase': 'configStaged',
+            'artifactDirectory': '/host/runtime',
+            'coreBinaryPath': '/host/runtime/libcore.aar',
+            'stagedConfigPath': '/host/runtime/open-client-imported.json',
+            'supportsLiveConnect': true,
+            'canInitialize': true,
+            'canConnect': true,
+            'message': 'Local profile staged on the host bridge.',
+          };
+        case 'runtimeEngine.connect':
+          return <String, Object?>{
+            'phase': 'running',
+            'artifactDirectory': '/host/runtime',
+            'coreBinaryPath': '/host/runtime/libcore.aar',
+            'stagedConfigPath': '/host/runtime/open-client-imported.json',
+            'supportsLiveConnect': true,
+            'canInitialize': true,
+            'canConnect': true,
+            'message': 'Android runtime service is running.',
+          };
+      }
+      return null;
+    });
+    addTearDown(() {
+      messenger.setMockMethodCallHandler(channel, null);
+    });
+
+    await tester.pumpWidget(
+      PokrovSeedApp(
+        appContext: buildSeedAppContext(hostPlatform: HostPlatform.android),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await _completeFirstLaunchIfPresent(tester);
+
+    await _tapNav(tester, 'nav-profile');
+    await _openRedeemSheetFromProfile(tester);
+    await tester.enterText(
+      find.byKey(const ValueKey('profile-redeem-code-field')),
+      'vless://11111111-1111-1111-1111-111111111111@example.com:443?security=tls&sni=example.com&type=tcp#Example',
+    );
+    await tester.tap(find.byKey(const ValueKey('profile-redeem-submit')));
+    await tester.pumpAndSettle();
+
+    await _tapNav(tester, 'nav-protection');
+    await tester.tap(find.byKey(const ValueKey('primary-connect-action')));
+    await tester.pumpAndSettle();
+
+    expect(calls, contains('runtimeEngine.stageManagedProfile'));
+    expect(calls, contains('runtimeEngine.connect'));
+    expect(stagedPayloads.single, contains('"type": "vless"'));
+    expect(stagedPayloads.single, contains('"server": "example.com"'));
+    expect(stagedPayloads.single,
+        contains('"uuid": "11111111-1111-1111-1111-111111111111"'));
   });
 
   testWidgets('primary connect action auto-prepares and starts host runtime',

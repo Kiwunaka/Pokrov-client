@@ -55,8 +55,9 @@ Goal:
 
 Expected capabilities:
 
-- paste/import key
-- paste/import subscription URL
+- paste/import single key (`vless://`, `trojan://`, `ss://`, `vmess://`) -
+  implemented as the first local-import MVP
+- paste/import subscription URL - planned as a separate refresh/cache flow
 - QR import when available
 - local profile list
 - manual subscription refresh

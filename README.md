@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="README.en.md"><strong>English</strong></a>
-  ·
+  &middot;
   <a href="README.ru.md"><strong>Русский</strong></a>
 </p>
 
@@ -12,12 +12,12 @@
   <a href="LICENSE"><img alt="License: GPLv3" src="https://img.shields.io/badge/license-GPLv3-0f766e?style=for-the-badge"></a>
   <img alt="Source status: snapshot imported" src="https://img.shields.io/badge/source-snapshot%20imported-0f766e?style=for-the-badge">
   <img alt="Platforms: Android and Windows" src="https://img.shields.io/badge/platforms-Android%20%2B%20Windows-2563eb?style=for-the-badge">
-  <img alt="Official service: POKROV operated" src="https://img.shields.io/badge/service-POKROV%20operated-111827?style=for-the-badge">
+  <img alt="Client modes: community and operator" src="https://img.shields.io/badge/modes-community%20%2B%20operator-111827?style=for-the-badge">
 </p>
 
 <p align="center">
   Public open-source home for the POKROV client app.
-  The first sanitized Android and Windows source snapshot is now imported.
+  The first sanitized Android and Windows source snapshot is imported.
 </p>
 
 ---
@@ -37,6 +37,8 @@ Current repository state:
 
 - the public repository is ready for open-source collaboration
 - the first sanitized Android and Windows app source snapshot is imported
+- the community client can import a local single proxy key without POKROV API calls
+- the operator client path is documented for companies with their own backend
 - official POKROV backend and operations remain private
 - the repository license is GNU GPLv3
 - public release claims stay beta-safe and evidence-based

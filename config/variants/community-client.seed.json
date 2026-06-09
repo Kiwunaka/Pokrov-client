@@ -14,7 +14,13 @@
   },
   "user_features": {
     "paste_key": true,
-    "subscription_url": true,
+    "supported_single_key_schemes": [
+      "vless",
+      "trojan",
+      "ss",
+      "vmess"
+    ],
+    "subscription_url": "planned_refresh_flow",
     "qr_import": "planned",
     "warp_policy": "local_user_controlled",
     "routing_modes": [

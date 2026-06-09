@@ -797,6 +797,456 @@ class _StaticManagedProfileBootstrapper implements ManagedProfileBootstrapper {
   }
 }
 
+class _LocalManagedProfileStore {
+  const _LocalManagedProfileStore();
+
+  static const _fileName = 'open-client-local-profile.json';
+
+  Future<File> _profileFile() async {
+    final directory = await getApplicationSupportDirectory();
+    await directory.create(recursive: true);
+    return File('${directory.path}${Platform.pathSeparator}$_fileName');
+  }
+
+  Future<ManagedProfilePayload?> read() async {
+    try {
+      final file = await _profileFile();
+      if (!await file.exists()) {
+        return null;
+      }
+      final raw = await file.readAsString();
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map<String, Object?>) {
+        return null;
+      }
+      final configPayload = decoded['config_payload']?.toString() ?? '';
+      final profileName = decoded['profile_name']?.toString() ?? '';
+      if (configPayload.trim().isEmpty || profileName.trim().isEmpty) {
+        return null;
+      }
+      final routeModeName = decoded['route_mode']?.toString() ?? '';
+      final routeMode = RouteMode.values.firstWhere(
+        (mode) => mode.name == routeModeName,
+        orElse: () => RouteMode.fullTunnel,
+      );
+      return ManagedProfilePayload(
+        profileName: profileName,
+        configPayload: configPayload,
+        materializedForRuntime: true,
+        routeMode: routeMode,
+      );
+    } on FormatException {
+      return null;
+    }
+  }
+
+  Future<void> write(ManagedProfilePayload payload) async {
+    final file = await _profileFile();
+    await file.writeAsString(
+      jsonEncode(<String, Object?>{
+        'schema': 1,
+        'profile_name': payload.profileName,
+        'config_payload': payload.configPayload,
+        'route_mode': payload.routeMode.name,
+        'materialized_for_runtime': true,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      }),
+      flush: true,
+    );
+  }
+}
+
+class _LocalManagedProfileBootstrapper implements ManagedProfileBootstrapper {
+  _LocalManagedProfileBootstrapper({
+    required ManagedProfilePayload fallback,
+    _LocalManagedProfileStore store = const _LocalManagedProfileStore(),
+  })  : _payload = fallback,
+        _store = store;
+
+  final _LocalManagedProfileStore _store;
+  ManagedProfilePayload _payload;
+  bool _loaded = false;
+
+  Future<void> saveImportedProfile(ManagedProfilePayload payload) async {
+    _payload = payload;
+    _loaded = true;
+    await _store.write(payload);
+  }
+
+  @override
+  Future<ManagedProfilePayload> resolveManagedProfile({
+    required HostPlatform hostPlatform,
+    required RouteMode routeMode,
+    List<String> selectedApps = const <String>[],
+  }) async {
+    if (!_loaded) {
+      _payload = await _store.read() ?? _payload;
+      _loaded = true;
+    }
+    return _payload.copyWith(routeMode: routeMode);
+  }
+}
+
+class _CommunityProfileImportResult {
+  const _CommunityProfileImportResult({
+    required this.payload,
+    required this.displayName,
+  });
+
+  final ManagedProfilePayload payload;
+  final String displayName;
+}
+
+class _CommunityProfileImportFailure implements Exception {
+  const _CommunityProfileImportFailure(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
+class _CommunityProfileImporter {
+  const _CommunityProfileImporter._();
+
+  static _CommunityProfileImportResult parse(
+    String value, {
+    required RouteMode routeMode,
+  }) {
+    final source = value.trim();
+    if (source.isEmpty) {
+      throw const _CommunityProfileImportFailure(
+        'Paste a single proxy key.',
+      );
+    }
+    final uri = Uri.tryParse(source);
+    if (uri == null || !uri.hasScheme) {
+      throw const _CommunityProfileImportFailure(
+        'This does not look like a supported proxy key.',
+      );
+    }
+    final scheme = uri.scheme.toLowerCase();
+    if (scheme == 'http' || scheme == 'https') {
+      throw const _CommunityProfileImportFailure(
+        'Subscription URL refresh is not enabled yet. Paste a single vless://, trojan://, ss://, or vmess:// key.',
+      );
+    }
+
+    final outbound = switch (scheme) {
+      'vless' => _parseVless(uri),
+      'trojan' => _parseTrojan(uri),
+      'ss' => _parseShadowsocks(source, uri),
+      'vmess' => _parseVmess(source),
+      _ => throw _CommunityProfileImportFailure(
+          'Unsupported key type: $scheme.',
+        ),
+    };
+    final name = _profileNameFromUri(uri, fallback: scheme.toUpperCase());
+    final config = <String, Object?>{
+      'log': <String, Object?>{
+        'disabled': false,
+        'level': 'info',
+      },
+      'dns': <String, Object?>{
+        'servers': <Object?>[
+          <String, Object?>{
+            'tag': 'local',
+            'address': 'local',
+          },
+          <String, Object?>{
+            'tag': 'remote',
+            'address': 'https://1.1.1.1/dns-query',
+            'detour': 'proxy',
+          },
+        ],
+        'final': 'remote',
+      },
+      'outbounds': <Object?>[
+        outbound,
+        <String, Object?>{
+          'type': 'direct',
+          'tag': 'direct',
+        },
+        <String, Object?>{
+          'type': 'block',
+          'tag': 'block',
+        },
+      ],
+      'route': <String, Object?>{
+        'final': 'proxy',
+        'auto_detect_interface': true,
+      },
+    };
+    return _CommunityProfileImportResult(
+      displayName: name,
+      payload: ManagedProfilePayload(
+        profileName: _safeProfileName(name),
+        configPayload: const JsonEncoder.withIndent('  ').convert(config),
+        materializedForRuntime: true,
+        routeMode: routeMode,
+      ),
+    );
+  }
+
+  static Map<String, Object?> _parseVless(Uri uri) {
+    final uuid = Uri.decodeComponent(uri.userInfo).trim();
+    _require(uuid.isNotEmpty, 'VLESS key has no UUID.');
+    final outbound = <String, Object?>{
+      'type': 'vless',
+      'tag': 'proxy',
+      'server': _requiredHost(uri),
+      'server_port': _requiredPort(uri),
+      'uuid': uuid,
+      'packet_encoding': uri.queryParameters['packetEncoding'] ?? 'xudp',
+    };
+    final flow = uri.queryParameters['flow']?.trim() ?? '';
+    if (flow.isNotEmpty) {
+      outbound['flow'] = flow;
+    }
+    final network = uri.queryParameters['type']?.trim() ?? '';
+    if (network.isNotEmpty && network != 'tcp') {
+      outbound['transport'] = _transportFromQuery(network, uri);
+    }
+    final tls = _tlsFromQuery(uri);
+    if (tls != null) {
+      outbound['tls'] = tls;
+    }
+    return outbound;
+  }
+
+  static Map<String, Object?> _parseTrojan(Uri uri) {
+    final password = Uri.decodeComponent(uri.userInfo).trim();
+    _require(password.isNotEmpty, 'Trojan key has no password.');
+    final outbound = <String, Object?>{
+      'type': 'trojan',
+      'tag': 'proxy',
+      'server': _requiredHost(uri),
+      'server_port': _requiredPort(uri),
+      'password': password,
+    };
+    final network = uri.queryParameters['type']?.trim() ?? '';
+    if (network.isNotEmpty && network != 'tcp') {
+      outbound['transport'] = _transportFromQuery(network, uri);
+    }
+    final tls = _tlsFromQuery(uri, defaultEnabled: true);
+    if (tls != null) {
+      outbound['tls'] = tls;
+    }
+    return outbound;
+  }
+
+  static Map<String, Object?> _parseShadowsocks(String source, Uri uri) {
+    var userInfo = uri.userInfo;
+    var host = uri.host;
+    var port = uri.hasPort ? uri.port : 0;
+    if (userInfo.isEmpty) {
+      final withoutScheme = source.substring('ss://'.length).split('#').first;
+      final decoded = _decodeMaybeBase64(withoutScheme.split('?').first);
+      final parsed = Uri.tryParse('ss://$decoded');
+      if (parsed != null) {
+        userInfo = parsed.userInfo;
+        host = parsed.host;
+        port = parsed.hasPort ? parsed.port : 0;
+      }
+    } else if (!userInfo.contains(':')) {
+      userInfo = _decodeMaybeBase64(userInfo);
+    }
+    final separator = userInfo.indexOf(':');
+    _require(separator > 0, 'Shadowsocks key has no method/password pair.');
+    final method = Uri.decodeComponent(userInfo.substring(0, separator));
+    final password = Uri.decodeComponent(userInfo.substring(separator + 1));
+    _require(host.trim().isNotEmpty, 'Shadowsocks key has no server.');
+    _require(port > 0, 'Shadowsocks key has no server port.');
+    return <String, Object?>{
+      'type': 'shadowsocks',
+      'tag': 'proxy',
+      'server': host,
+      'server_port': port,
+      'method': method,
+      'password': password,
+    };
+  }
+
+  static Map<String, Object?> _parseVmess(String source) {
+    final body = source.substring('vmess://'.length).trim();
+    final decoded = jsonDecode(_decodeMaybeBase64(body));
+    if (decoded is! Map<String, Object?>) {
+      throw const _CommunityProfileImportFailure(
+          'VMess key is not valid JSON.');
+    }
+    final host = decoded['add']?.toString().trim() ?? '';
+    final port = int.tryParse(decoded['port']?.toString() ?? '') ?? 0;
+    final uuid = decoded['id']?.toString().trim() ?? '';
+    _require(host.isNotEmpty, 'VMess key has no server.');
+    _require(port > 0, 'VMess key has no server port.');
+    _require(uuid.isNotEmpty, 'VMess key has no UUID.');
+    final outbound = <String, Object?>{
+      'type': 'vmess',
+      'tag': 'proxy',
+      'server': host,
+      'server_port': port,
+      'uuid': uuid,
+      'security': decoded['scy']?.toString().trim().isNotEmpty == true
+          ? decoded['scy'].toString().trim()
+          : 'auto',
+      'alter_id': int.tryParse(decoded['aid']?.toString() ?? '') ?? 0,
+    };
+    final network = decoded['net']?.toString().trim() ?? '';
+    if (network.isNotEmpty && network != 'tcp') {
+      outbound['transport'] = _transportFromVmess(decoded, network);
+    }
+    final tlsMode = decoded['tls']?.toString().trim().toLowerCase() ?? '';
+    if (tlsMode == 'tls') {
+      outbound['tls'] = <String, Object?>{
+        'enabled': true,
+        if ((decoded['sni']?.toString().trim() ?? '').isNotEmpty)
+          'server_name': decoded['sni'].toString().trim(),
+      };
+    }
+    return outbound;
+  }
+
+  static Map<String, Object?>? _tlsFromQuery(
+    Uri uri, {
+    bool defaultEnabled = false,
+  }) {
+    final security = uri.queryParameters['security']?.toLowerCase().trim();
+    final tlsEnabled =
+        defaultEnabled || security == 'tls' || security == 'reality';
+    if (!tlsEnabled) {
+      return null;
+    }
+    final tls = <String, Object?>{'enabled': true};
+    final sni = (uri.queryParameters['sni'] ??
+            uri.queryParameters['serverName'] ??
+            uri.queryParameters['peer'])
+        ?.trim();
+    if (sni != null && sni.isNotEmpty) {
+      tls['server_name'] = sni;
+    }
+    final fingerprint = uri.queryParameters['fp']?.trim();
+    if (fingerprint != null && fingerprint.isNotEmpty) {
+      tls['utls'] = <String, Object?>{
+        'enabled': true,
+        'fingerprint': fingerprint,
+      };
+    }
+    if (security == 'reality') {
+      final publicKey = uri.queryParameters['pbk']?.trim() ?? '';
+      _require(publicKey.isNotEmpty, 'Reality key has no public key.');
+      tls['reality'] = <String, Object?>{
+        'enabled': true,
+        'public_key': publicKey,
+        if ((uri.queryParameters['sid']?.trim() ?? '').isNotEmpty)
+          'short_id': uri.queryParameters['sid']!.trim(),
+      };
+    }
+    return tls;
+  }
+
+  static Map<String, Object?> _transportFromQuery(String network, Uri uri) {
+    return switch (network) {
+      'ws' => <String, Object?>{
+          'type': 'ws',
+          if ((uri.queryParameters['path']?.trim() ?? '').isNotEmpty)
+            'path': uri.queryParameters['path']!.trim(),
+          if ((uri.queryParameters['host']?.trim() ?? '').isNotEmpty)
+            'headers': <String, Object?>{
+              'Host': uri.queryParameters['host']!.trim(),
+            },
+        },
+      'grpc' => <String, Object?>{
+          'type': 'grpc',
+          if ((uri.queryParameters['serviceName']?.trim() ?? '').isNotEmpty)
+            'service_name': uri.queryParameters['serviceName']!.trim(),
+        },
+      _ => <String, Object?>{'type': network},
+    };
+  }
+
+  static Map<String, Object?> _transportFromVmess(
+    Map<String, Object?> decoded,
+    String network,
+  ) {
+    return switch (network) {
+      'ws' => <String, Object?>{
+          'type': 'ws',
+          if ((decoded['path']?.toString().trim() ?? '').isNotEmpty)
+            'path': decoded['path'].toString().trim(),
+          if ((decoded['host']?.toString().trim() ?? '').isNotEmpty)
+            'headers': <String, Object?>{
+              'Host': decoded['host'].toString().trim(),
+            },
+        },
+      'grpc' => <String, Object?>{
+          'type': 'grpc',
+          if ((decoded['path']?.toString().trim() ?? '').isNotEmpty)
+            'service_name': decoded['path'].toString().trim(),
+        },
+      _ => <String, Object?>{'type': network},
+    };
+  }
+
+  static String _decodeMaybeBase64(String value) {
+    final normalized = value.trim();
+    try {
+      final padded = normalized.padRight(
+        normalized.length + ((4 - normalized.length % 4) % 4),
+        '=',
+      );
+      return utf8.decode(base64Url.decode(padded));
+    } catch (_) {
+      try {
+        final padded = normalized.padRight(
+          normalized.length + ((4 - normalized.length % 4) % 4),
+          '=',
+        );
+        return utf8.decode(base64.decode(padded));
+      } catch (_) {
+        return Uri.decodeComponent(normalized);
+      }
+    }
+  }
+
+  static String _requiredHost(Uri uri) {
+    final host = uri.host.trim();
+    _require(host.isNotEmpty, 'Proxy key has no server.');
+    return host;
+  }
+
+  static int _requiredPort(Uri uri) {
+    final port = uri.hasPort ? uri.port : 0;
+    _require(port > 0, 'Proxy key has no server port.');
+    return port;
+  }
+
+  static String _profileNameFromUri(Uri uri, {required String fallback}) {
+    final fragment = Uri.decodeComponent(uri.fragment).trim();
+    if (fragment.isNotEmpty) {
+      return fragment;
+    }
+    final host = uri.host.trim();
+    return host.isEmpty ? fallback : host;
+  }
+
+  static String _safeProfileName(String name) {
+    final normalized = name
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9._-]+'), '-')
+        .replaceAll(RegExp(r'-+'), '-')
+        .replaceAll(RegExp(r'^-|-$'), '');
+    return normalized.isEmpty
+        ? 'open-client-imported'
+        : 'open-client-$normalized';
+  }
+
+  static void _require(bool condition, String message) {
+    if (!condition) {
+      throw _CommunityProfileImportFailure(message);
+    }
+  }
+}
+
 class _OfflineSupportTicketService implements SupportTicketService {
   const _OfflineSupportTicketService();
 
@@ -865,8 +1315,7 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
   late final AppFirstNodePreferenceService? _nodePreferenceService;
   late final SupportTicketService _supportTicketService;
   late final PokrovFirstLaunchStore _firstLaunchStore;
-
-  String get _brandName => widget.appContext.variantProfile.displayName;
+  late final _LocalManagedProfileBootstrapper? _localProfileBootstrapper;
 
   String _brand(String value) {
     return _brandText(value, widget.appContext.variantProfile);
@@ -908,14 +1357,22 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
     _runtimeEngine = createRuntimeEngine(
       hostPlatform: widget.appContext.hostPlatform,
     );
+    _localProfileBootstrapper =
+        !widget.appContext.variantProfile.usesApiServices &&
+                widget.bootstrapper == null
+            ? _LocalManagedProfileBootstrapper(
+                fallback: widget.appContext.managedProfileSeed,
+              )
+            : null;
     final bootstrapper = widget.bootstrapper ??
         (widget.appContext.variantProfile.usesApiServices
             ? AppFirstRuntimeBootstrapper(
                 apiBaseUrl: widget.appContext.apiBaseUrl,
               )
-            : _StaticManagedProfileBootstrapper(
-                widget.appContext.managedProfileSeed,
-              ));
+            : _localProfileBootstrapper ??
+                _StaticManagedProfileBootstrapper(
+                  widget.appContext.managedProfileSeed,
+                ));
     _bootstrapper = bootstrapper;
     _accountActionService = bootstrapper is AppFirstAccountActionService
         ? bootstrapper as AppFirstAccountActionService
@@ -1194,9 +1651,18 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
     final code = value.trim();
     if (code.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Введите код активации.')),
+        SnackBar(
+          content: Text(
+            widget.appContext.variantProfile.usesApiServices
+                ? 'Введите код активации.'
+                : 'Вставьте одиночный ключ.',
+          ),
+        ),
       );
       return false;
+    }
+    if (!widget.appContext.variantProfile.usesApiServices) {
+      return _importCommunityProfile(code);
     }
     if (_looksLikeSubscriptionOrProxyLink(code)) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1246,6 +1712,53 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Не удалось активировать код: $error')),
+      );
+      return false;
+    }
+  }
+
+  Future<bool> _importCommunityProfile(String value) async {
+    final importer = _localProfileBootstrapper;
+    if (importer == null) {
+      return false;
+    }
+    try {
+      final imported = _CommunityProfileImporter.parse(
+        value,
+        routeMode: _selectedRouteMode,
+      );
+      await importer.saveImportedProfile(imported.payload);
+      if (!mounted) {
+        return true;
+      }
+      HapticFeedback.selectionClick();
+      setState(() {
+        _managedProfileDirty = true;
+        _runtimeHeadline =
+            'Profile imported: ${imported.displayName}. Tap Connect to apply it.';
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Imported ${imported.displayName}. Tap Connect.'),
+        ),
+      );
+      return true;
+    } on _CommunityProfileImportFailure catch (error) {
+      if (!mounted) {
+        return false;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.message)),
+      );
+      return false;
+    } catch (_) {
+      if (!mounted) {
+        return false;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not import this key. Check the format.'),
+        ),
       );
       return false;
     }
@@ -1846,8 +2359,9 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
         _smartConnectProfile = payload.smartConnect;
         _preferredNodeCode =
             payload.smartConnect?.stickiness.preferredNodeCode.trim() ?? '';
-        _runtimeHeadline = 'Настройки обновлены с '
-            '${Uri.parse(widget.appContext.apiBaseUrl).host}.';
+        _runtimeHeadline = widget.appContext.variantProfile.usesApiServices
+            ? 'Настройки обновлены с ${Uri.parse(widget.appContext.apiBaseUrl).host}.'
+            : 'Local profile is ready on this device.';
       });
     }
     return runtimePayload;
@@ -4383,15 +4897,14 @@ class _ProfileSection extends StatelessWidget {
                 lines: [
                   usesApiServices
                       ? 'Код из Telegram, кабинета, сайта или письма.'
-                      : 'Вставьте ключ, subscription URL или локальный профиль.',
+                      : 'Вставьте одиночный ключ vless, ss, trojan или vmess.',
                 ],
                 child: Column(
                   children: [
                     _SettingsRow(
                       key: const ValueKey('profile-redeem-code-action'),
                       icon: Icons.key_rounded,
-                      title:
-                          usesApiServices ? 'Код активации' : 'Ключ или ссылка',
+                      title: usesApiServices ? 'Код активации' : 'Ключ профиля',
                       value: 'Ввести',
                       onTap: () => _showRedeemSheet(
                         context,
@@ -4399,7 +4912,7 @@ class _ProfileSection extends StatelessWidget {
                         hintPlaceholder:
                             appContext.variantProfile.isOfficialPokrov
                                 ? 'POKROV-XXXX-XXXX'
-                                : 'vless://, ss://, trojan:// или https://',
+                                : 'vless://, ss://, trojan:// или vmess://',
                         onRedeem: (code) => onOpenHandoff('redeem', code),
                       ),
                     ),
@@ -6515,7 +7028,7 @@ void _showRedeemSheet(
               hintCode: hintCode,
               labelText: hintPlaceholder.startsWith('POKROV-')
                   ? 'Код активации'
-                  : 'Ключ или subscription URL',
+                  : 'Ключ профиля',
               hintPlaceholder: hintPlaceholder,
               onRedeem: (code) {
                 Navigator.of(context).pop();
