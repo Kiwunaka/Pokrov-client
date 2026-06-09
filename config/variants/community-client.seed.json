@@ -1,0 +1,36 @@
+{
+  "variant": "community",
+  "display_name": "Open Client",
+  "brand_policy": {
+    "uses_pokrov_logo": false,
+    "default_brand_asset": "",
+    "forks_should_replace_brand": true
+  },
+  "service_model": {
+    "uses_managed_service_api": false,
+    "default_profile_source": "local_key_or_subscription",
+    "support_api": "disabled_by_default",
+    "billing": "none"
+  },
+  "user_features": {
+    "paste_key": true,
+    "subscription_url": true,
+    "qr_import": "planned",
+    "warp_policy": "local_user_controlled",
+    "routing_modes": [
+      "full_tunnel",
+      "selected_apps",
+      "all_except_region"
+    ],
+    "free_vpn_catalog": {
+      "enabled_by_default": false,
+      "first_candidate": "AvenCores/goida-vpn-configs",
+      "requires_license_and_parser_review": true
+    }
+  },
+  "build_defines": {
+    "OPEN_CLIENT_VARIANT": "community",
+    "OPEN_CLIENT_BRAND_NAME": "Open Client",
+    "OPEN_CLIENT_BRAND_ASSET": ""
+  }
+}

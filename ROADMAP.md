@@ -13,10 +13,13 @@ This roadmap describes the public repository path. It is not a release promise.
 
 ## Phase 2: Sanitized Source Import
 
-- Import Android and Windows client source from the private client lane.
+- Import Android and Windows client source from the private client lane. Done in
+  the first sanitized snapshot.
 - Exclude private history, secrets, signing material, and operator evidence.
-- Add build instructions and configuration examples.
-- Verify a clean clone can build without private files.
+  Done for the first snapshot.
+- Add build instructions and configuration examples. Initial docs added.
+- Verify a clean clone can build without private files. Pending CI/workstation
+  proof.
 - Preserve the operator/company client track and personal key client track.
 
 ## Phase 3: Public Build And Release Hygiene

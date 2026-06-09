@@ -1,0 +1,59 @@
+plugins {
+    id "com.android.application"
+    id "org.jetbrains.kotlin.android"
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+def libcoreAar = file("libs/libcore.aar")
+
+android {
+    namespace = "space.pokrov.pokrov_android_shell"
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        applicationId = "space.pokrov.pokrov_android_shell"
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+    }
+
+    buildTypes {
+        release {
+            // Internal beta only. Public Android remains blocked until trusted
+            // signing and the physical localhost/control-surface audit pass.
+            signingConfig = signingConfigs.debug
+        }
+    }
+}
+
+flutter {
+    source = "../.."
+}
+
+repositories {
+    if (libcoreAar.exists()) {
+        flatDir {
+            dirs "libs"
+        }
+    }
+}
+
+dependencies {
+    if (libcoreAar.exists()) {
+        implementation(name: "libcore", ext: "aar")
+    }
+
+    testImplementation "junit:junit:4.13.2"
+}

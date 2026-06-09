@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: GPLv3" src="https://img.shields.io/badge/license-GPLv3-0f766e?style=for-the-badge"></a>
-  <img alt="Source status: pending import" src="https://img.shields.io/badge/source-pending%20import-f59e0b?style=for-the-badge">
+  <img alt="Source status: snapshot imported" src="https://img.shields.io/badge/source-snapshot%20imported-0f766e?style=for-the-badge">
   <img alt="Platforms: Android and Windows" src="https://img.shields.io/badge/platforms-Android%20%2B%20Windows-2563eb?style=for-the-badge">
   <img alt="Official service: POKROV operated" src="https://img.shields.io/badge/service-POKROV%20operated-111827?style=for-the-badge">
 </p>
@@ -14,7 +14,7 @@
 <p align="center">
   <strong>An open client for a calm, app-first connection experience.</strong>
   <br>
-  Android and Windows first. GPLv3. Public source import pending.
+  Android and Windows first. GPLv3. Sanitized source snapshot imported.
 </p>
 
 <p align="center">
@@ -36,11 +36,9 @@
 POKROV Client is the future public source home for the POKROV Android and
 Windows app.
 
-The repository is currently in open-source foundation mode. It contains the
-public project structure, contribution rules, security policy, release policy,
-brand boundary, and source-import checklist. The sanitized application source
-snapshot will be added only after the private client lane passes publication
-review.
+The repository contains the public project structure, contribution rules,
+security policy, release policy, brand boundary, source-import checklist, and
+the first sanitized Android + Windows client source snapshot.
 
 ## What Makes The Client Different
 
@@ -61,7 +59,7 @@ The public client is being prepared around a few product principles:
 | Area | Current state |
 | --- | --- |
 | Repository | Public foundation ready |
-| Source code | Pending sanitized import |
+| Source code | Sanitized Android + Windows snapshot imported |
 | Platforms | Android and Windows first |
 | License | GNU GPLv3 |
 | Official backend | Operated separately by POKROV |
@@ -87,6 +85,10 @@ boundary.
 ├── README.md                  Language gateway
 ├── README.en.md               English project README
 ├── README.ru.md               Russian project README
+├── apps/                      Android and Windows Flutter hosts
+├── packages/                  Shared Flutter packages
+├── config/                    Public seed config and runtime contracts
+├── scripts/                   Local bootstrap, runtime-fetch, and test scripts
 ├── BRAND.md                   Brand and official-build boundary
 ├── SECURITY.md                Private security-reporting process
 ├── CONTRIBUTING.md            Contribution rules
@@ -106,7 +108,8 @@ boundary.
 
 ## Build From Source
 
-Build instructions will be added with the first sanitized source snapshot.
+Build instructions are available in
+[docs/BUILD_FROM_SOURCE.md](docs/BUILD_FROM_SOURCE.md).
 
 Source import tooling is already available for maintainers:
 
@@ -115,7 +118,7 @@ python -m pytest tests/test_source_import.py
 python -m tools.source_import.safe_import --source <snapshot> --staging <stage> --manifest <manifest.json>
 ```
 
-The acceptance bar for that import is simple:
+The acceptance bar for source work is simple:
 
 - a clean clone must build without private files
 - no secrets, certificates, or signing identities may be required
@@ -135,6 +138,8 @@ Before contributing, read:
 - [docs/MAINTAINER_CHECKLIST.md](docs/MAINTAINER_CHECKLIST.md)
 - [docs/PROJECT_PRINCIPLES.md](docs/PROJECT_PRINCIPLES.md)
 - [docs/SOURCE_IMPORT_PLAYBOOK.md](docs/SOURCE_IMPORT_PLAYBOOK.md)
+- [docs/PRODUCT_VARIANTS.md](docs/PRODUCT_VARIANTS.md)
+- [docs/OPERATOR_INTEGRATION.md](docs/OPERATOR_INTEGRATION.md)
 - [docs/GOVERNANCE.md](docs/GOVERNANCE.md)
 
 Please do not open public issues with secrets, personal connection links,

@@ -1,0 +1,41 @@
+{
+  "variant": "operator",
+  "display_name": "Operator Connect",
+  "brand_policy": {
+    "uses_pokrov_logo": false,
+    "operator_replaces_name_icon_colors": true,
+    "default_brand_asset": ""
+  },
+  "service_model": {
+    "uses_managed_service_api": true,
+    "api_base_url": "https://api.example.invalid/",
+    "cabinet_url": "https://app.example.invalid/",
+    "checkout_url": "",
+    "support_api": "operator_owned",
+    "billing": "operator_owned"
+  },
+  "required_api_contracts": [
+    "POST /api/client/session/start-trial",
+    "GET /api/client/profile/managed",
+    "POST /api/client/redeem",
+    "GET /api/client/apps",
+    "GET /api/client/support/tickets",
+    "POST /api/client/support/tickets",
+    "POST /api/client/support/tickets/{ticket_id}/messages"
+  ],
+  "optional_api_contracts": [
+    "POST /api/client/cabinet-token",
+    "POST /api/client/telegram/link",
+    "GET /api/client/bonus/summary",
+    "POST /api/client/warp/consent",
+    "POST /api/client/nodes/preference"
+  ],
+  "build_defines": {
+    "OPEN_CLIENT_VARIANT": "operator",
+    "OPEN_CLIENT_BRAND_NAME": "Operator Connect",
+    "OPEN_CLIENT_API_BASE_URL": "https://api.example.invalid/",
+    "OPEN_CLIENT_CABINET_URL": "https://app.example.invalid/",
+    "OPEN_CLIENT_CHECKOUT_URL": "",
+    "OPEN_CLIENT_BRAND_ASSET": ""
+  }
+}

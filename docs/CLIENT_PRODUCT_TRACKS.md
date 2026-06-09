@@ -1,10 +1,11 @@
 # Client Product Tracks
 
 This document records the intended public product split for the open-source
-POKROV client.
+client.
 
-The source import is still pending. These tracks describe the target direction
-for the public client after the sanitized snapshot lands.
+The first sanitized source snapshot is imported. Concrete build variants are
+documented in [PRODUCT_VARIANTS.md](PRODUCT_VARIANTS.md), and the operator API
+surface is documented in [OPERATOR_INTEGRATION.md](OPERATOR_INTEGRATION.md).
 
 ## Track A: Operator / Company Client
 
