@@ -112,6 +112,24 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1 -RunAndroidGrad
 
 Windows runtime smoke requires the fetched native runtime artifacts.
 
+## Clean Clone Proof
+
+Maintainers can verify that the public tree works from a fresh clone and does
+not require private files:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1
+```
+
+For a faster source-boundary-only pass:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1 -SkipFlutterTests
+```
+
+The GitHub Actions CI workflow runs the source-import tests, a clean-clone
+source-boundary pass, `flutter analyze`, and the workspace Flutter tests.
+
 ## Local Config
 
 The committed files under `config/` are seed examples and public contracts.

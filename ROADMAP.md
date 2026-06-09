@@ -18,13 +18,14 @@ This roadmap describes the public repository path. It is not a release promise.
 - Exclude private history, secrets, signing material, and operator evidence.
   Done for the first snapshot.
 - Add build instructions and configuration examples. Initial docs added.
-- Verify a clean clone can build without private files. Pending CI/workstation
-  proof.
+- Verify a clean clone can build without private files. Clean-clone proof
+  script and CI source-boundary pass added; release candidates still need a
+  full maintainer run before publishing binaries.
 - Preserve the operator/company client track and personal key client track.
 
 ## Phase 3: Public Build And Release Hygiene
 
-- Add CI for analysis and tests.
+- Add CI for analysis and tests. Initial GitHub Actions workflow added.
 - Add dependency license inventory.
 - Add source import playbook and governance docs.
 - Add product-track documentation and optional public-config catalog gates.
