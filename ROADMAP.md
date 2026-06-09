@@ -39,6 +39,15 @@ This roadmap describes the public repository path. It is not a release promise.
 - Label all third-party feeds clearly in UI.
 - Keep official POKROV service and third-party public feeds separate.
 
+## Phase 3.6: Community Client UX
+
+- Local multi-profile list with active selection. Initial MVP added.
+- Manual subscription URL import. Initial MVP added.
+- Decoded QR payload import. Initial MVP added.
+- Camera-backed QR scanning remains a platform-host follow-up.
+- Automatic subscription refresh remains behind freshness and failure-mode
+  policy.
+
 ## Phase 4: Community Contributions
 
 - Label good first issues.

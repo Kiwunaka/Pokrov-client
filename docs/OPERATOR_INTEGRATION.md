@@ -21,6 +21,11 @@ claims.
 The current imported service mode expects these endpoints when
 `OPEN_CLIENT_VARIANT=operator`.
 
+A placeholder fixture is available at
+[`config/operator-api.fixture.json`](../config/operator-api.fixture.json). It is
+not a server and must not contain real tokens, private URLs, or production
+secrets.
+
 ### `POST /api/client/session/start-trial`
 
 Creates or resumes an app session.
@@ -104,3 +109,13 @@ powershell -ExecutionPolicy Bypass -File .\scripts\fetch-libcore-assets.ps1 -Pla
 ```
 
 Review upstream runtime licenses before releasing binaries.
+
+## Operator Launch Checklist
+
+- Replace brand name, mark, package IDs, and platform metadata.
+- Point API, cabinet, checkout, support, privacy, and release URLs at your own
+  service.
+- Implement the minimal managed-profile endpoint before enabling paid flows.
+- Keep subscription/key import behavior clear: local community profiles are
+  user-owned, operator-managed profiles are service-owned.
+- Publish your own checksums, signing notes, support policy, and privacy policy.

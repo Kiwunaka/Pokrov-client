@@ -13,9 +13,9 @@ The public client should preserve two target product tracks:
 
 - operator / company client for teams that want a configurable client for their
   own VPN service
-- personal key client for users who paste a local proxy key first, with QR code
-  and subscription URL refresh planned behind separate parser/cache gates, and
-  connect without POKROV billing or account management
+- personal key client for users who paste local proxy keys, import decoded QR
+  payloads, manually refresh subscription URLs, and connect without POKROV
+  billing or account management
 
 ## Import Strategy
 
