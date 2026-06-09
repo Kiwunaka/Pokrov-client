@@ -31,8 +31,10 @@ config/
 
 The public client has two open-source product lines:
 
-- `community`: neutral client for ordinary users with local keys or
-  subscriptions; no POKROV logo and no POKROV API calls by default.
+- `community`: neutral client for ordinary users with local single-key import;
+  no POKROV logo and no POKROV API calls by default. The current local importer
+  accepts `vless://`, `trojan://`, `ss://`, and `vmess://` keys. Subscription
+  URL refresh is planned separately.
 - `operator`: white-label client for companies with their own API, cabinet,
   support, billing, and branding.
 

@@ -8,16 +8,18 @@ service build explicit.
 
 For ordinary users.
 
-Goal: install the app, paste a key or subscription URL, choose routing, enable
-optional WARP/routing features, and connect without a POKROV account, POKROV
-billing, or POKROV branding.
+Goal: install the app, paste a local proxy key, choose routing, enable optional
+WARP/routing features, and connect without a POKROV account, POKROV billing, or
+POKROV branding. Subscription URL refresh is a planned follow-up, not part of
+the current local-import MVP.
 
 Default properties:
 
 - neutral name: `Open Client`
 - no POKROV logo
 - no managed-service API calls by default
-- local/static profile bootstrap until the paste-key/subscription UI lands
+- local profile import for single `vless://`, `trojan://`, `ss://`, and
+  `vmess://` keys
 - support API disabled by default
 - routing modes kept: full tunnel, selected apps, all-except-region
 - optional public config catalogs stay disabled until parser/license/safety
@@ -87,12 +89,14 @@ Implemented now:
 - variant seed configs under `config/variants/`
 - compile-time variant profile in the shared app shell
 - community default avoids POKROV API bootstrap and POKROV support API calls
+- community redeem/import sheet can stage a local single-key profile for the
+  runtime without calling the POKROV API
 - neutral fallback brand mark when no asset is supplied
 - operator/pokrov modes can opt into managed-service API bootstrap
 
 Still planned:
 
-- first-class paste-key/subscription editor
+- saved profile list and first-class import editor
 - QR import
 - local subscription refresh UI
 - operator API fixture server
