@@ -6,6 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: GPLv3" src="https://img.shields.io/badge/license-GPLv3-0f766e?style=for-the-badge"></a>
+  <a href="https://github.com/Kiwunaka/Pokrov-client/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/Kiwunaka/Pokrov-client/ci.yml?branch=main&style=for-the-badge&label=CI"></a>
   <img alt="Source status: snapshot imported" src="https://img.shields.io/badge/source-snapshot%20imported-0f766e?style=for-the-badge">
   <img alt="Platforms: Android and Windows" src="https://img.shields.io/badge/platforms-Android%20%2B%20Windows-2563eb?style=for-the-badge">
   <img alt="Client modes: community and operator" src="https://img.shields.io/badge/modes-community%20%2B%20operator-111827?style=for-the-badge">
@@ -124,6 +125,12 @@ Source import tooling is available for maintainers:
 ```powershell
 python -m pytest tests/test_source_import.py
 python -m tools.source_import.safe_import --source <snapshot> --staging <stage> --manifest <manifest.json>
+```
+
+Clean-clone verification is available for maintainers:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1
 ```
 
 The acceptance bar for source work is simple:

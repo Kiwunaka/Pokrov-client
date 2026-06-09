@@ -6,6 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="Лицензия: GPLv3" src="https://img.shields.io/badge/license-GPLv3-0f766e?style=for-the-badge"></a>
+  <a href="https://github.com/Kiwunaka/Pokrov-client/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/Kiwunaka/Pokrov-client/ci.yml?branch=main&style=for-the-badge&label=CI"></a>
   <img alt="Статус исходников: snapshot imported" src="https://img.shields.io/badge/source-snapshot%20imported-0f766e?style=for-the-badge">
   <img alt="Платформы: Android и Windows" src="https://img.shields.io/badge/platforms-Android%20%2B%20Windows-2563eb?style=for-the-badge">
   <img alt="Режимы клиента: community и operator" src="https://img.shields.io/badge/modes-community%20%2B%20operator-111827?style=for-the-badge">
@@ -51,7 +52,7 @@ policy, release policy, граница бренда, чеклист импорт
 - POKROV service mode: только для официальных сборок POKROV и официальных
   endpoint'ов POKROV.
 
-Camera QR scan, автоматическое обновление подписок и опциональный каталог
+Camera QR scanning, автоматическое обновление подписок и опциональный каталог
 бесплатных VPN-конфигов запланированы отдельными этапами с проверкой парсеров,
 лицензий и безопасного поведения.
 
@@ -67,10 +68,10 @@ Camera QR scan, автоматическое обновление подписо
 | Исходники | Санитизированный Android + Windows snapshot импортирован |
 | Community mode | Локальные профили, ручной импорт подписки, decoded QR import |
 | Operator mode | White-label контракты задокументированы |
-| Платформы | Сначала Android и Windows |
-| Лицензия | GNU GPLv3 |
-| Официальный backend | Работает отдельно под управлением POKROV |
-| Публичные релизы | Только beta-safe и evidence-based формулировки |
+| Platforms | Сначала Android и Windows |
+| License | GNU GPLv3 |
+| Official backend | Работает отдельно под управлением POKROV |
+| Public releases | Только beta-safe и evidence-based формулировки |
 
 ## Архитектурная Граница
 
@@ -78,28 +79,27 @@ Camera QR scan, автоматическое обновление подписо
   <img src="assets/diagrams/open-source-boundary.png" alt="Open-source client and private service boundary artwork" width="100%">
 </p>
 
-Этот репозиторий предназначен для клиентского приложения. Здесь нет
-официального backend POKROV, billing-системы, admin tools, deploy scripts,
-signing material, private release evidence или operator runbooks.
+Этот репозиторий только про клиентское приложение. Здесь нет официального
+backend POKROV, billing system, admin tools, deployment scripts, signing
+material, private release evidence или operator runbooks.
 
-Полная граница описана в
-[docs/OPEN_SOURCE_SCOPE.md](docs/OPEN_SOURCE_SCOPE.md).
+Полная граница описана в [docs/OPEN_SOURCE_SCOPE.md](docs/OPEN_SOURCE_SCOPE.md).
 
 ## Карта Репозитория
 
 ```text
 .
-|-- README.md                  выбор языка
-|-- README.en.md               английская версия
-|-- README.ru.md               русская версия
-|-- apps/                      Android и Windows Flutter hosts
-|-- packages/                  shared Flutter packages
-|-- config/                    public seed config и runtime contracts
-|-- scripts/                   local bootstrap, runtime-fetch и test scripts
-|-- BRAND.md                   граница бренда и official builds
-|-- SECURITY.md                приватный security-reporting
-|-- CONTRIBUTING.md            правила контрибьюта
-|-- ROADMAP.md                 публичная roadmap репозитория
+|-- README.md                  Language gateway
+|-- README.en.md               English project README
+|-- README.ru.md               Русская версия README
+|-- apps/                      Android and Windows Flutter hosts
+|-- packages/                  Shared Flutter packages
+|-- config/                    Public seed config and runtime contracts
+|-- scripts/                   Local bootstrap, runtime-fetch, and test scripts
+|-- BRAND.md                   Brand and official-build boundary
+|-- SECURITY.md                Private security-reporting process
+|-- CONTRIBUTING.md            Contribution rules
+|-- ROADMAP.md                 Public repository roadmap
 |-- docs/
 |   |-- OPEN_SOURCE_SCOPE.md
 |   |-- RELEASE_POLICY.md
@@ -117,31 +117,36 @@ signing material, private release evidence или operator runbooks.
 
 ## Сборка Из Исходников
 
-Инструкции по сборке доступны в
+Инструкция по сборке лежит в
 [docs/BUILD_FROM_SOURCE.md](docs/BUILD_FROM_SOURCE.md).
 
-Для maintainers уже есть инструмент подготовки импорта:
+Инструменты source import для maintainers:
 
 ```powershell
 python -m pytest tests/test_source_import.py
 python -m tools.source_import.safe_import --source <snapshot> --staging <stage> --manifest <manifest.json>
 ```
 
-Планка приёмки для импорта простая:
+Clean-clone проверка:
 
-- clean clone должен собираться без приватных файлов
-- secrets, certificates и signing identities не должны требоваться для базовой
-  локальной сборки
-- config examples должны использовать placeholders
-- official release metadata не должна указывать на приватные репозитории
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1
+```
 
-## Как Помочь
+Планка приемки для исходников простая:
+
+- clean clone должен собираться без приватных файлов;
+- secrets, certificates и signing identities не должны требоваться;
+- config examples должны использовать placeholders;
+- official release metadata не должна указывать на private repositories.
+
+## Контрибьют
 
 Контрибьюты приветствуются, особенно вокруг документации, release hygiene,
-build reproducibility, локального импорта профилей, operator integration и
-подготовки публичного source snapshot.
+build reproducibility, local profile import, operator integration и public
+source readiness.
 
-Перед участием прочитай:
+Перед контрибьютом прочитай:
 
 - [CONTRIBUTING.md](CONTRIBUTING.md)
 - [SECURITY.md](SECURITY.md)
@@ -155,23 +160,23 @@ build reproducibility, локального импорта профилей, ope
 - [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)
 - [docs/GOVERNANCE.md](docs/GOVERNANCE.md)
 
-Пожалуйста, не открывай публичные issues с secrets, личными connection links,
-private backend details, account data или подробностями уязвимостей.
+Не открывай публичные issues с secrets, личными connection links, private
+backend details, account data или vulnerability reproduction details.
 
 ## Официальные Ссылки
 
-- Сайт: https://pokrov.space/
-- Кабинет: https://app.pokrov.space/
-- Публичный канал: https://t.me/pokrov_vpn
+- Website: https://pokrov.space/
+- Cabinet: https://app.pokrov.space/
+- Public channel: https://t.me/pokrov_vpn
 - Support bot: https://t.me/pokrov_supportbot
 
-Официальные binaries публикуются только через release-каналы POKROV. Форки и
-пересобранные клиенты не должны выглядеть как official POKROV builds.
+Официальные бинарники публикуются только через release channels POKROV. Forks и
+пересобранные клиенты не должны выдавать себя за официальные сборки POKROV.
 
 ## Лицензия
 
-Репозиторий распространяется под GNU General Public License v3.0. См.
+Репозиторий распространяется по GNU General Public License v3.0. См.
 [LICENSE](LICENSE).
 
-Имя POKROV, логотипы, домены, официальные каналы, signing identities и release
-distribution channels регулируются отдельно в [BRAND.md](BRAND.md).
+Название POKROV, логотипы, домены, официальные каналы, signing identities и
+release distribution channels регулируются отдельно в [BRAND.md](BRAND.md).

@@ -8,6 +8,9 @@ Use this checklist before publishing a public source or binary release.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1` passes.
 - `python -m pytest tests/test_source_import.py` passes.
 - `safe_import` dry-run reports `blocked=0` for the public tree.
+- `powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1`
+  passes before a public source release.
+- GitHub Actions CI is green on the release branch or tag.
 - No generated build folders, local platform config, signing files, or runtime
   binaries are committed.
 
