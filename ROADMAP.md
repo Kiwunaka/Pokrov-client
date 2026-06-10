@@ -54,6 +54,7 @@ This roadmap describes the public repository path. It is not a release promise.
 ## Phase 3.7: v0.2 Open Client Polish
 
 - Turn the profile import area into a clearer Open Client import hub.
+  Initial bottom-sheet hub added.
 - Make local-only privacy boundaries visible around keys, QR payloads, and
   subscription URLs.
 - Keep Free VPN catalog copy gated, third-party, and promise-free until the

@@ -3424,6 +3424,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Add profile key'), findsOneWidget);
+    expect(find.text('Import hub'), findsOneWidget);
     expect(find.text('Add subscription URL'), findsOneWidget);
     expect(find.text('Scan QR code'), findsOneWidget);
     expect(
@@ -3431,15 +3432,29 @@ void main() {
       findsNothing,
     );
 
-    final freeCatalog =
-        find.byKey(const ValueKey('profile-free-vpn-catalog-action'));
+    final importHub = find.byKey(const ValueKey('profile-import-hub-action'));
     await tester.dragUntilVisible(
-      freeCatalog,
+      importHub,
       find.byType(Scrollable).first,
       const Offset(0, -180),
       maxIteration: 8,
     );
     await tester.pumpAndSettle();
+    await tester.tap(importHub);
+    await tester.pumpAndSettle();
+
+    expect(
+        find.byKey(const ValueKey('profile-import-hub-sheet')), findsOneWidget);
+    expect(find.text('Import profiles'), findsOneWidget);
+    expect(find.text('0 local profile(s) · 0 subscription source(s)'),
+        findsOneWidget);
+    expect(find.byKey(const ValueKey('import-hub-key-action')), findsOneWidget);
+    expect(find.byKey(const ValueKey('import-hub-subscription-action')),
+        findsOneWidget);
+    expect(find.byKey(const ValueKey('import-hub-qr-action')), findsOneWidget);
+
+    final freeCatalog =
+        find.byKey(const ValueKey('import-hub-free-catalog-action'));
     await tester.tap(freeCatalog);
     await tester.pumpAndSettle();
 
@@ -3455,6 +3470,47 @@ void main() {
       find.textContaining('does not promise speed, privacy, uptime'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('community import hub routes key and QR actions', (tester) async {
+    var scannerCalls = 0;
+    await tester.pumpWidget(
+      PokrovSeedApp(
+        appContext: buildSeedAppContext(hostPlatform: HostPlatform.android),
+        communityQrScanner: (context) async {
+          scannerCalls += 1;
+          return null;
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+    await _completeFirstLaunchIfPresent(tester);
+
+    await _tapNav(tester, 'nav-profile');
+    final importHub = find.byKey(const ValueKey('profile-import-hub-action'));
+    await tester.dragUntilVisible(
+      importHub,
+      find.byType(Scrollable).first,
+      const Offset(0, -180),
+      maxIteration: 8,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(importHub);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('import-hub-qr-action')));
+    await tester.pumpAndSettle();
+    expect(scannerCalls, 1);
+    expect(
+        find.byKey(const ValueKey('profile-import-hub-sheet')), findsNothing);
+
+    await tester.tap(importHub);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('import-hub-key-action')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('profile-redeem-sheet')), findsOneWidget);
+    expect(find.text('Add profile key'), findsWidgets);
   });
 
   testWidgets('community profile screen removes a local profile',
