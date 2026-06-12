@@ -5550,6 +5550,49 @@ class _ProfileSection extends StatelessWidget {
         : subscriptionSourceCount == 0
             ? 'Active: ${activeCommunityProfile.displayName}. Local key profile.'
             : 'Active: ${activeCommunityProfile.displayName}. $subscriptionSourceCount subscription source(s).';
+    void openCommunityKeyImport() => _showRedeemSheet(
+          context,
+          hintCode: appContext.redeemHint,
+          hintPlaceholder: appContext.variantProfile.isOfficialPokrov
+              ? 'POKROV-XXXX-XXXX'
+              : 'vless://, ss://, trojan:// or vmess://',
+          title: 'Add profile key',
+          body: _communityKeyImportBody,
+          submitLabel: 'Save profile',
+          onRedeem: (code) => onOpenHandoff('redeem', code),
+        );
+    void openCommunitySubscriptionImport() => _showRedeemSheet(
+          context,
+          hintCode: '',
+          hintPlaceholder: 'https://example.com/sub.txt',
+          title: 'Add subscription URL',
+          body: _communitySubscriptionImportBody,
+          submitLabel: 'Import profiles',
+          onRedeem: (code) => onOpenHandoff('redeem', code),
+        );
+    void openCommunityQrImport() {
+      final scanner = onScanCommunityQr;
+      if (scanner != null) {
+        unawaited(scanner());
+        return;
+      }
+      _showRedeemSheet(
+        context,
+        hintCode: '',
+        hintPlaceholder: 'vless://, ss://, trojan:// or vmess://',
+        title: 'Import QR text',
+        body: _communityQrImportBody,
+        submitLabel: 'Import QR',
+        onRedeem: (code) => onOpenHandoff('redeem', code),
+      );
+    }
+
+    void openCommunityFreeCatalog() => _showInfoSheet(
+          context,
+          title: 'Free VPN catalog',
+          lines: _communityFreeCatalogLines,
+        );
+
     return _SeedContentList(
       top: 24,
       children: [
@@ -5651,7 +5694,7 @@ class _ProfileSection extends StatelessWidget {
                             : 'Add profile key',
                         body: usesApiServices
                             ? 'Введите код из приложения, кабинета, Telegram или письма.'
-                            : 'Paste one VLESS, Trojan, Shadowsocks, or VMess key. The key is parsed on this device and is not sent to POKROV.',
+                            : _communityKeyImportBody,
                         submitLabel:
                             usesApiServices ? 'Ввести код' : 'Save profile',
                         onRedeem: (code) => onOpenHandoff('redeem', code),
@@ -5659,20 +5702,27 @@ class _ProfileSection extends StatelessWidget {
                     ),
                     if (!usesApiServices) ...[
                       _SettingsRow(
+                        key: const ValueKey('profile-import-hub-action'),
+                        icon: Icons.add_link_rounded,
+                        title: 'Import hub',
+                        value: 'Open',
+                        onTap: () => _showCommunityImportHubSheet(
+                          context,
+                          profileCount: communityProfileState.profiles.length,
+                          subscriptionSourceCount: subscriptionSourceCount,
+                          hasCameraQr: onScanCommunityQr != null,
+                          onAddKey: openCommunityKeyImport,
+                          onAddSubscription: openCommunitySubscriptionImport,
+                          onImportQr: openCommunityQrImport,
+                          onOpenFreeCatalog: openCommunityFreeCatalog,
+                        ),
+                      ),
+                      _SettingsRow(
                         key: const ValueKey('profile-subscription-url-action'),
                         icon: Icons.sync_rounded,
                         title: 'Add subscription URL',
                         value: 'Refresh',
-                        onTap: () => _showRedeemSheet(
-                          context,
-                          hintCode: '',
-                          hintPlaceholder: 'https://example.com/sub.txt',
-                          title: 'Add subscription URL',
-                          body:
-                              'The client fetches the URL, parses supported keys, and stores profiles locally. Refresh runs only when you tap it or when the app returns to foreground.',
-                          submitLabel: 'Import profiles',
-                          onRedeem: (code) => onOpenHandoff('redeem', code),
-                        ),
+                        onTap: openCommunitySubscriptionImport,
                       ),
                       _SettingsRow(
                         key: const ValueKey('profile-qr-import-action'),
@@ -5681,19 +5731,7 @@ class _ProfileSection extends StatelessWidget {
                             ? 'Import QR text'
                             : 'Scan QR code',
                         value: onScanCommunityQr == null ? 'Paste' : 'Camera',
-                        onTap: onScanCommunityQr ??
-                            () => _showRedeemSheet(
-                                  context,
-                                  hintCode: '',
-                                  hintPlaceholder:
-                                      'vless://, ss://, trojan:// or vmess://',
-                                  title: 'Import QR text',
-                                  body:
-                                      'Paste the decoded QR payload. Camera scanning and pasted QR text stay local and use the same profile parser.',
-                                  submitLabel: 'Import QR',
-                                  onRedeem: (code) =>
-                                      onOpenHandoff('redeem', code),
-                                ),
+                        onTap: openCommunityQrImport,
                       ),
                       _SettingsRow(
                         key: const ValueKey('profile-active-local-profile'),
@@ -5731,16 +5769,7 @@ class _ProfileSection extends StatelessWidget {
                         icon: Icons.public_rounded,
                         title: 'Free VPN catalog',
                         value: 'Off',
-                        onTap: () => _showInfoSheet(
-                          context,
-                          title: 'Free VPN catalog',
-                          lines: const [
-                            'This section is opt-in and disabled by default.',
-                            'Candidate feed: AvenCores/goida-vpn-configs.',
-                            'Third-party public configs are not official POKROV nodes.',
-                            'The client does not promise speed, privacy, uptime, safety, legality, or availability for third-party public configs.',
-                          ],
-                        ),
+                        onTap: openCommunityFreeCatalog,
                       ),
                       for (final profile in communityProfileState.profiles)
                         _SettingsRow(
@@ -8188,6 +8217,19 @@ class _SettingsRow extends PokrovSettingsRow {
   });
 }
 
+const _communityKeyImportBody =
+    'Paste one VLESS, Trojan, Shadowsocks, or VMess key. The key is parsed on this device and is not sent to POKROV.';
+const _communitySubscriptionImportBody =
+    'The client fetches the URL, parses supported keys, and stores profiles locally. Refresh runs only when you tap it or when the app returns to foreground.';
+const _communityQrImportBody =
+    'Paste the decoded QR payload. Camera scanning and pasted QR text stay local and use the same profile parser.';
+const _communityFreeCatalogLines = <String>[
+  'This section is opt-in and disabled by default.',
+  'Candidate feed: AvenCores/goida-vpn-configs.',
+  'Third-party public configs are not official POKROV nodes.',
+  'The client does not promise speed, privacy, uptime, safety, legality, or availability for third-party public configs.',
+];
+
 void _showInfoSheet(
   BuildContext context, {
   required String title,
@@ -8199,6 +8241,137 @@ void _showInfoSheet(
     backgroundColor: _SeedPalette.surface,
     builder: (context) => _InfoSheet(title: title, lines: lines),
   );
+}
+
+void _showCommunityImportHubSheet(
+  BuildContext context, {
+  required VoidCallback onAddKey,
+  required VoidCallback onAddSubscription,
+  required VoidCallback onImportQr,
+  required VoidCallback onOpenFreeCatalog,
+  required bool hasCameraQr,
+  required int profileCount,
+  required int subscriptionSourceCount,
+}) {
+  showModalBottomSheet<void>(
+    context: context,
+    showDragHandle: true,
+    backgroundColor: _SeedPalette.surface,
+    builder: (sheetContext) => _CommunityImportHubSheet(
+      hasCameraQr: hasCameraQr,
+      profileCount: profileCount,
+      subscriptionSourceCount: subscriptionSourceCount,
+      onAddKey: () {
+        Navigator.of(sheetContext).pop();
+        WidgetsBinding.instance.addPostFrameCallback((_) => onAddKey());
+      },
+      onAddSubscription: () {
+        Navigator.of(sheetContext).pop();
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => onAddSubscription());
+      },
+      onImportQr: () {
+        Navigator.of(sheetContext).pop();
+        WidgetsBinding.instance.addPostFrameCallback((_) => onImportQr());
+      },
+      onOpenFreeCatalog: () {
+        Navigator.of(sheetContext).pop();
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => onOpenFreeCatalog());
+      },
+    ),
+  );
+}
+
+class _CommunityImportHubSheet extends StatelessWidget {
+  const _CommunityImportHubSheet({
+    required this.onAddKey,
+    required this.onAddSubscription,
+    required this.onImportQr,
+    required this.onOpenFreeCatalog,
+    required this.hasCameraQr,
+    required this.profileCount,
+    required this.subscriptionSourceCount,
+  });
+
+  final VoidCallback onAddKey;
+  final VoidCallback onAddSubscription;
+  final VoidCallback onImportQr;
+  final VoidCallback onOpenFreeCatalog;
+  final bool hasCameraQr;
+  final int profileCount;
+  final int subscriptionSourceCount;
+
+  @override
+  Widget build(BuildContext context) {
+    final qrTitle = hasCameraQr ? 'Scan QR code' : 'Import QR text';
+    final qrValue = hasCameraQr ? 'Camera' : 'Paste';
+    return SafeArea(
+      top: false,
+      child: SingleChildScrollView(
+        key: const ValueKey('profile-import-hub-sheet'),
+        padding: const EdgeInsets.fromLTRB(18, 0, 18, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Import profiles',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: _SeedPalette.ink,
+                    fontWeight: FontWeight.w800,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Choose how to add local Open Client profiles. Keys, QR payloads, and subscription URLs stay on this device.',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: _SeedPalette.muted,
+                    height: 1.35,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '$profileCount local profile(s) · $subscriptionSourceCount subscription source(s)',
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: _SeedPalette.muted,
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+            const SizedBox(height: 14),
+            _SettingsRow(
+              key: const ValueKey('import-hub-key-action'),
+              icon: Icons.key_rounded,
+              title: 'Add profile key',
+              value: 'Paste',
+              onTap: onAddKey,
+            ),
+            _SettingsRow(
+              key: const ValueKey('import-hub-subscription-action'),
+              icon: Icons.sync_rounded,
+              title: 'Add subscription URL',
+              value: 'Fetch',
+              onTap: onAddSubscription,
+            ),
+            _SettingsRow(
+              key: const ValueKey('import-hub-qr-action'),
+              icon: Icons.qr_code_scanner_rounded,
+              title: qrTitle,
+              value: qrValue,
+              onTap: onImportQr,
+            ),
+            _SettingsRow(
+              key: const ValueKey('import-hub-free-catalog-action'),
+              icon: Icons.public_rounded,
+              title: 'Free VPN catalog',
+              value: 'Off',
+              onTap: onOpenFreeCatalog,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 void _showWarpConsentSheet(
