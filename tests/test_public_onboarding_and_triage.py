@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import re
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,6 +17,11 @@ def _issue_template_names() -> list[str]:
         for path in sorted((ROOT / ".github" / "ISSUE_TEMPLATE").glob("*.yml"))
         if path.name != "config.yml"
     ]
+
+
+def _github_labels() -> set[str]:
+    text = _read(".github/labels.yml")
+    return set(re.findall(r"^- name: (.+)$", text, flags=re.MULTILINE))
 
 
 def test_readmes_explain_the_two_public_tracks_and_official_boundary() -> None:
@@ -153,6 +159,47 @@ def test_specialized_issue_templates_route_import_operator_and_security() -> Non
         assert phrase in security_template
 
     assert "https://github.com/Kiwunaka/Pokrov-client/security/policy" in config
+
+
+def test_github_label_catalog_covers_public_triage_routes() -> None:
+    labels = _github_labels()
+    triage_doc = _read("docs/GITHUB_TRIAGE.md")
+
+    required_labels = {
+        "bug",
+        "build",
+        "docs",
+        "enhancement",
+        "import",
+        "operator",
+        "community",
+        "android",
+        "windows",
+        "parser",
+        "runtime",
+        "release",
+        "source-boundary",
+        "security-private",
+        "help wanted",
+        "good first issue",
+    }
+    assert required_labels.issubset(labels)
+
+    for name in _issue_template_names():
+        text = _read(f".github/ISSUE_TEMPLATE/{name}")
+        template_labels = re.findall(r'labels: \["([^"]+)"\]', text)
+        assert template_labels, name
+        for label in template_labels:
+            assert label in labels, f"{name} uses unknown label {label}"
+
+    for phrase in (
+        "canonical label catalog",
+        "Do not use labels to imply official POKROV support",
+        "Keep `security-private` as a redirect label",
+        "Do not apply `good first issue` until the task is safe",
+        "private POKROV backend, signing, billing, deployment",
+    ):
+        assert phrase in triage_doc
 
 
 def test_pull_request_template_guards_tracks_release_claims_and_catalog() -> None:

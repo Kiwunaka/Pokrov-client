@@ -123,6 +123,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.22.0-source` | Pending stacked PR, not tagged | One-command source-release preflight is in the stacked PR queue. |
 | `v0.23.0-source` | Pending stacked PR, not tagged | CI source-release preflight smoke is in the stacked PR queue. |
 | `v0.24.0-source` | Pending stacked PR, not tagged | Specialized GitHub triage templates are in the stacked PR queue. |
+| `v0.25.0-source` | Pending stacked PR, not tagged | GitHub label catalog and triage policy are in the stacked PR queue. |
 
 ## Architecture Boundary
 
@@ -158,6 +159,7 @@ boundary.
 |   |-- DEPENDENCY_LICENSE_AUDIT.md
 |   |-- MAINTAINER_CHECKLIST.md
 |   |-- PROJECT_PRINCIPLES.md
+|   |-- GITHUB_TRIAGE.md
 |   |-- SOURCE_IMPORT_PLAYBOOK.md
 |   |-- PRODUCT_VARIANTS.md
 |   |-- OPERATOR_INTEGRATION.md
@@ -205,6 +207,7 @@ Before contributing, read:
 - [BRAND.md](BRAND.md)
 - [docs/MAINTAINER_CHECKLIST.md](docs/MAINTAINER_CHECKLIST.md)
 - [docs/PROJECT_PRINCIPLES.md](docs/PROJECT_PRINCIPLES.md)
+- [docs/GITHUB_TRIAGE.md](docs/GITHUB_TRIAGE.md)
 - [docs/SOURCE_IMPORT_PLAYBOOK.md](docs/SOURCE_IMPORT_PLAYBOOK.md)
 - [docs/PRODUCT_VARIANTS.md](docs/PRODUCT_VARIANTS.md)
 - [docs/OPERATOR_INTEGRATION.md](docs/OPERATOR_INTEGRATION.md)

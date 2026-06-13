@@ -84,6 +84,7 @@ Source release status:
 | `v0.22.0-source` | Pending stacked PR, not tagged | One-command source-release preflight is in the stacked PR queue. |
 | `v0.23.0-source` | Pending stacked PR, not tagged | CI source-release preflight smoke is in the stacked PR queue. |
 | `v0.24.0-source` | Pending stacked PR, not tagged | Specialized GitHub triage templates are in the stacked PR queue. |
+| `v0.25.0-source` | Pending stacked PR, not tagged | GitHub label catalog and triage policy are in the stacked PR queue. |
 
 ## Which App Should I Use?
 
@@ -117,6 +118,7 @@ Read the scope documents before opening issues or pull requests:
 - [Dependency license audit](docs/DEPENDENCY_LICENSE_AUDIT.md)
 - [Maintainer checklist](docs/MAINTAINER_CHECKLIST.md)
 - [Project principles](docs/PROJECT_PRINCIPLES.md)
+- [GitHub triage](docs/GITHUB_TRIAGE.md)
 - [Source import playbook](docs/SOURCE_IMPORT_PLAYBOOK.md)
 - [Product variants](docs/PRODUCT_VARIANTS.md)
 - [Operator integration](docs/OPERATOR_INTEGRATION.md)
