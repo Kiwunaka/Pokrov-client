@@ -270,6 +270,17 @@
       "ships_exe": false,
       "store_release": false,
       "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.25.0-source",
+      "status": "stacked_pr_green_not_tagged",
+      "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/45",
+      "scope": "Canonical GitHub label catalog and triage policy for community, operator, platform, parser, runtime, release, and security-private routing.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
     }
   ]
 }
