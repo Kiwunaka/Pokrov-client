@@ -20,6 +20,20 @@ Operator builds are not POKROV builds. Do not use POKROV names, logos,
 endpoints, support bots, signing identities, release channels, or official
 service claims for your users.
 
+## First-Run Path For Operators
+
+1. choose the `operator` variant
+2. run the local fixture backend with
+   `powershell -ExecutionPolicy Bypass -File .\scripts\run-operator-fixture-smoke.ps1`
+3. export white-label color tokens with
+   `powershell -ExecutionPolicy Bypass -File .\scripts\export-white-label-color-tokens.ps1`
+4. implement the minimal managed-profile contract from
+   [`docs/operator/openapi.yaml`](operator/openapi.yaml)
+5. replace placeholder API, cabinet, checkout, support, privacy, signing, and
+   release channels with operator-owned surfaces
+6. publish your own support policy, privacy policy, checksums, signing notes,
+   and release notes
+
 ## Minimal API Contract
 
 Operator mode can implement a compatible managed-profile contract for these

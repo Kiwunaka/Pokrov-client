@@ -6,7 +6,19 @@ body:
   - type: markdown
     attributes:
       value: |
-        Please do not request hidden POKROV backend access, default free VPN/service claims, official node claims for third-party configs, or public security details.
+        Please do not request hidden POKROV backend access, default free VPN/service claims, official node claims for third-party configs, store/stable/trusted-signing claims, or public security details. Do not paste secrets, QR payloads, subscription URLs, personal connection links, or private backend details. Do not report vulnerabilities here; use SECURITY.md.
+  - type: dropdown
+    id: track
+    attributes:
+      label: Track / variant
+      options:
+        - Personal Key / Community Client
+        - Operator / Company Client
+        - Official POKROV Service Mode
+        - Repository docs/process
+        - Other / not sure
+    validations:
+      required: true
   - type: textarea
     id: problem
     attributes:
