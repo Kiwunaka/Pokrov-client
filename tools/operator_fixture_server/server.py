@@ -188,7 +188,7 @@ class OperatorFixtureHandler(BaseHTTPRequestHandler):
             self._send_json(HTTPStatus.OK, {"ok": True, "applied": True})
             return
 
-        if path == "/api/client/support/tickets":
+        if path == "/api/tickets":
             if method == "GET":
                 self._send_json(
                     HTTPStatus.OK,
@@ -210,7 +210,7 @@ class OperatorFixtureHandler(BaseHTTPRequestHandler):
                 self._send_json(HTTPStatus.CREATED, {"ticket": ticket})
                 return
 
-        support_prefix = "/api/client/support/tickets/"
+        support_prefix = "/api/tickets/"
         if path.startswith(support_prefix):
             parts = path[len(support_prefix) :].split("/")
             ticket_id = parts[0] if parts else ""

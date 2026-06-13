@@ -208,10 +208,14 @@ separate evidence for those claims.
 
 Optional if you want in-app support:
 
-- `GET /api/client/support/tickets`
-- `POST /api/client/support/tickets`
-- `GET /api/client/support/tickets/{ticket_id}`
-- `POST /api/client/support/tickets/{ticket_id}/messages`
+- `GET /api/tickets`
+- `POST /api/tickets`
+- `GET /api/tickets/{ticket_id}`
+- `POST /api/tickets/{ticket_id}/messages`
+
+These paths match the current app support adapter. If an operator already uses
+different public support paths, keep that translation behind the operator API
+gateway rather than changing the client contract ad hoc.
 
 ### Optional App-First Endpoints
 

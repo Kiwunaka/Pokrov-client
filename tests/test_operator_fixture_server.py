@@ -101,7 +101,7 @@ def test_fixture_serves_bootstrap_profile_apps_and_support():
         assert status == 200
         assert apps["update_check"]["silent_update"] is False
 
-        status, tickets = client.request("GET", "/api/client/support/tickets")
+        status, tickets = client.request("GET", "/api/tickets")
         assert status == 200
         assert tickets["tickets"][0]["id"] == "demo-ticket-1"
 
@@ -157,7 +157,7 @@ def test_openapi_mentions_current_runtime_endpoints():
         "/api/client/profile/managed",
         "/api/redeem",
         "/api/client/apps",
-        "/api/client/support/tickets",
+        "/api/tickets",
     ]
     for path in required_paths:
         assert path in text
