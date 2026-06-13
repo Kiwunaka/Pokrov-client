@@ -10,6 +10,7 @@ Source-only releases, such as `v0.1.0-source`, should include:
 - commit SHA
 - source archive checksum or reproducible checksum note
 - source proof manifest from `scripts/prepare-source-release.ps1`
+- matching `CHANGELOG.md` entry or source-readiness candidate note
 - current feature status
 - known limitations
 - explicit note that no APK, EXE, store release, or trusted-signed binary is
@@ -46,6 +47,11 @@ manual edits to the GitHub Release body. It verifies that source-only releases
 still say no APK/EXE, no store release, no trusted signing claim, no official
 backend/private evidence, and no stronger binary/readiness claim without
 separate public evidence.
+
+Keep `CHANGELOG.md` synchronized with
+`config/source-release-readiness.seed.json` and
+`config/changelog-policy.seed.json`. Pending stacked PR milestones must remain
+listed as not tagged until the exact annotated source tag exists.
 
 ## Binary Release Requirements
 

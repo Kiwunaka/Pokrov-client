@@ -44,6 +44,18 @@ production readiness without matching public evidence.
   operator integration questions, and public security-report redirection.
 - Added a canonical GitHub label catalog and triage policy for community,
   operator, platform, parser, runtime, release, and security-private routing.
+- Added runtime artifact manifest review gates for local-only libcore downloads,
+  pending binary review metadata, SHA-256 verification hooks, and safe sync
+  destinations.
+- Added a source release copy-claims checker for policy, checklist, template,
+  renderer, and rendered GitHub Release drafts.
+- Added Free VPN catalog provenance gates for reviewed feed hosts, attribution,
+  license evidence, no-network CI, and required release-note boundaries.
+- Added a private security intake seed and validation gate for public issue
+  redirection, secret redaction, QR/subscription URL handling, and source-only
+  release claim safety.
+- Added a changelog policy seed and release-history gate so source readiness
+  milestones stay synchronized with public release notes.
 
 ### Changed
 
@@ -52,7 +64,42 @@ production readiness without matching public evidence.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.25.0-source` candidates.
+  `v0.30.0-source` candidates.
+
+### Source Readiness Candidates
+
+| Milestone | Changelog status | Evidence |
+| --- | --- | --- |
+| `v0.1.0-source` | Tagged | `docs/releases/v0.1.0-source.md` |
+| `v0.2.0-source` | Not tagged | `docs/releases/source-readiness-v0.2-v0.3.md` |
+| `v0.3.0-source` | Not tagged | `docs/releases/source-readiness-v0.2-v0.3.md` |
+| `v0.4.0-source` | Pending stacked PR, not tagged | PR #23 |
+| `v0.5.0-source` | Pending stacked PR, not tagged | PR #24 |
+| `v0.6.0-source` | Pending stacked PR, not tagged | PR #25 |
+| `v0.7.0-source` | Pending stacked PR, not tagged | PR #26 |
+| `v0.8.0-source` | Pending stacked PR, not tagged | PR #27 |
+| `v0.9.0-source` | Pending stacked PR, not tagged | PR #28 |
+| `v0.10.0-source` | Pending stacked PR, not tagged | PR #29 |
+| `v0.11.0-source` | Pending stacked PR, not tagged | PR #30 |
+| `v0.12.0-source` | Pending stacked PR, not tagged | PR #31 |
+| `v0.13.0-source` | Pending stacked PR, not tagged | PR #32 |
+| `v0.14.0-source` | Pending stacked PR, not tagged | PR #33 |
+| `v0.15.0-source` | Pending stacked PR, not tagged | PR #34 |
+| `v0.16.0-source` | Pending stacked PR, not tagged | PR #35 |
+| `v0.17.0-source` | Pending stacked PR, not tagged | PR #36 |
+| `v0.18.0-source` | Pending stacked PR, not tagged | PR #38 |
+| `v0.19.0-source` | Pending stacked PR, not tagged | PR #39 |
+| `v0.20.0-source` | Pending stacked PR, not tagged | PR #40 |
+| `v0.21.0-source` | Pending stacked PR, not tagged | PR #41 |
+| `v0.22.0-source` | Pending stacked PR, not tagged | PR #42 |
+| `v0.23.0-source` | Pending stacked PR, not tagged | PR #43 |
+| `v0.24.0-source` | Pending stacked PR, not tagged | PR #44 |
+| `v0.25.0-source` | Pending stacked PR, not tagged | PR #45 |
+| `v0.26.0-source` | Pending stacked PR, not tagged | PR #46 |
+| `v0.27.0-source` | Pending stacked PR, not tagged | PR #47 |
+| `v0.28.0-source` | Pending stacked PR, not tagged | PR #48 |
+| `v0.29.0-source` | Pending stacked PR, not tagged | PR #49 |
+| `v0.30.0-source` | Pending stacked PR, not tagged | PR #50 |
 
 ### Still Source-Only
 
