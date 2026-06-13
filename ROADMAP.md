@@ -40,7 +40,8 @@ This roadmap describes the public repository path. It is not a release promise.
 - Start with `AvenCores/goida-vpn-configs` as an opt-in candidate.
 - Add reviewed disabled catalog metadata and parser/license gate tests. Initial
   MVP added.
-- Label all third-party feeds clearly in UI and release notes.
+- Label all third-party feeds clearly in UI and release notes. Initial gated
+  import/cache/clear action added for the reviewed candidate feed.
 - Keep official POKROV service and third-party public feeds separate.
 
 ## Phase 3.6: Community Client UX

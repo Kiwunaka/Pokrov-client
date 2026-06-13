@@ -17,6 +17,8 @@ production readiness without matching public evidence.
   operator forks.
 - Added foreground in-app subscription refresh scheduling for community
   subscription URLs.
+- Added gated Free VPN catalog import/cache/clear actions for reviewed
+  third-party public configs, still opt-in and disabled by default.
 
 ### Changed
 
@@ -24,6 +26,8 @@ production readiness without matching public evidence.
 - Hardened source-import policy and clean-clone verification.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
+- Updated source-readiness tracking through the green stacked PR sequence up to
+  `v0.11.0-source` candidates.
 
 ### Still Source-Only
 
