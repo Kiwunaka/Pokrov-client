@@ -30,7 +30,8 @@ This roadmap describes the public repository path. It is not a release promise.
   source-release gates added.
 - Add source import playbook and governance docs.
 - Add product-track documentation and optional public-config catalog gates.
-- Publish checksums with release artifacts.
+- Publish checksums with release artifacts. Initial source-release proof helper
+  added for source-only archives.
 - Keep official release claims aligned with current evidence.
 
 ## Phase 3.5: Optional Free VPN Catalog

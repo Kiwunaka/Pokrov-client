@@ -101,6 +101,7 @@ $requiredFiles = @(
   "scripts\\bootstrap-local.ps1",
   "scripts\\fetch-libcore-assets.ps1",
   "scripts\\prepare-oss-import.ps1",
+  "scripts\\prepare-source-release.ps1",
   "scripts\\run-operator-fixture-smoke.ps1",
   "scripts\\run-tests.ps1",
   "scripts\\validate-seed.ps1",

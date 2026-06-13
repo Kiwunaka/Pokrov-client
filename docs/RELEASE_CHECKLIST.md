@@ -16,6 +16,9 @@ Use this checklist before publishing a public source or binary release.
   files when they exist and contains no `REVIEW_REQUIRED` entries.
 - `config/generated-assets.seed.json` lists every `assets/**/*.png` file with
   provenance and reuse scope.
+- `powershell -ExecutionPolicy Bypass -File .\scripts\prepare-source-release.ps1`
+  is run for the exact source reference and its proof manifest is reflected in
+  the GitHub Release body.
 - `safe_import` dry-run reports `blocked=0` for the public tree.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1`
   passes before a public source release.
@@ -29,7 +32,7 @@ Run these commands on the exact commit that will be tagged:
 
 ```powershell
 $tag = "v0.3.0-source"
-$archive = Join-Path $env:TEMP "$tag.zip"
+$proof = Join-Path $env:TEMP "$tag-proof"
 git status --short
 git rev-parse HEAD
 python -m pytest tests
@@ -38,12 +41,15 @@ powershell -ExecutionPolicy Bypass -File .\scripts\validate-seed.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1 -Source .
 powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1
 git tag -a $tag -m "$tag"
-git archive --format=zip --output=$archive $tag
-Get-FileHash -Algorithm SHA256 $archive
+powershell -ExecutionPolicy Bypass -File .\scripts\prepare-source-release.ps1 `
+  -Tag $tag `
+  -Ref "refs/tags/$tag" `
+  -OutDir $proof `
+  -RequireTag
 ```
 
-Before pushing the tag, copy the tag name, commit SHA, archive SHA-256, feature
-status, and known limitations into a release note based on
+Before pushing the tag, copy the tag name, commit SHA, archive SHA-256, proof
+manifest path, feature status, and known limitations into a release note based on
 [SOURCE_RELEASE_TEMPLATE.md](releases/SOURCE_RELEASE_TEMPLATE.md).
 
 Push only after the release note is accurate:
