@@ -79,7 +79,9 @@ git push origin $tag
 - Free VPN catalog remains disabled by default and opt-in with third-party copy.
 - Default community builds keep
   `OPEN_CLIENT_ENABLE_FREE_CATALOG=false`; turning it on requires release notes
-  that state the imported feeds are third-party and user-initiated.
+  that state the imported feeds are third-party public configs, not official
+  POKROV nodes, user-initiated, and no speed, privacy, uptime, safety,
+  legality, or availability promise is made.
 
 ## Operator Client
 
