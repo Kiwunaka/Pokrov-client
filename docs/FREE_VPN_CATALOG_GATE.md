@@ -20,7 +20,7 @@ app must keep the catalog disabled until these gates are complete.
 - [x] Record feed URLs, update cadence, and freshness expectations.
 - [x] Add parser fixtures for every enabled feed format.
 - [x] Keep malformed entries isolated from valid entries.
-- [ ] Cache fetched feeds locally with manual refresh and clear actions.
+- [x] Cache fetched feeds locally with manual refresh and clear actions.
 - [x] Show copy that says these are not official POKROV nodes.
 - [x] Avoid speed, safety, privacy, uptime, legality, or availability promises.
 
@@ -46,7 +46,12 @@ runtime staging explicitly support them.
 ## Current State
 
 The app has a gated `Free VPN catalog` profile action. It explains the safety
-boundary and does not fetch or enable third-party feeds by default. The first
-candidate catalog is recorded as a disabled opt-in source with attribution,
-manual refresh, local cache, clear-action requirements, feed freshness
-expectations, and local parser fixtures.
+boundary and does not fetch or enable third-party feeds by default. Users can
+manually import the reviewed candidate feed, which stores accepted entries as
+local profiles with `source_kind=third_party_catalog`, `sourceUrl`, refresh
+metadata, and parser output from the shared local flow. The clear action removes
+only cached third-party catalog profiles and leaves user-owned single keys,
+subscription imports, and official/service profiles alone. The first candidate
+catalog is recorded as a disabled opt-in source with attribution, manual
+refresh, local cache, clear-action scope, feed freshness expectations, and local
+parser fixtures.

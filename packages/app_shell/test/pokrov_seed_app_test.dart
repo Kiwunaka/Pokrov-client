@@ -3773,6 +3773,112 @@ void main() {
     );
   });
 
+  testWidgets('free VPN catalog opt-in imports and clears cached entries',
+      (tester) async {
+    final fixture = File(
+      '../../tests/fixtures/free_vpn_catalog/avencores_subscription_text.txt',
+    ).readAsStringSync();
+    var fetchCount = 0;
+
+    await tester.pumpWidget(
+      PokrovSeedApp(
+        appContext: buildSeedAppContext(hostPlatform: HostPlatform.android),
+        communitySubscriptionFetcher: (uri) async {
+          fetchCount += 1;
+          expect(
+            uri.toString(),
+            'https://github.com/AvenCores/goida-vpn-configs/raw/refs/heads/main/githubmirror/1.txt',
+          );
+          return fixture;
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+    await _completeFirstLaunchIfPresent(tester);
+
+    await _tapNav(tester, 'nav-profile');
+    final catalogAction =
+        find.byKey(const ValueKey('profile-free-vpn-catalog-action'));
+    await tester.dragUntilVisible(
+      catalogAction,
+      find.byType(Scrollable).first,
+      const Offset(0, -220),
+      maxIteration: 12,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(catalogAction);
+    await tester.pumpAndSettle();
+
+    expect(
+        find.byKey(const ValueKey('free-vpn-catalog-sheet')), findsOneWidget);
+    expect(
+      find.text('No cached third-party catalog profiles.'),
+      findsOneWidget,
+    );
+    expect(find.text('This section is opt-in and disabled by default.'),
+        findsOneWidget);
+
+    final importCatalog =
+        find.byKey(const ValueKey('free-vpn-catalog-import-action'));
+    await tester.dragUntilVisible(
+      importCatalog,
+      find.byKey(const ValueKey('free-vpn-catalog-sheet')),
+      const Offset(0, -120),
+      maxIteration: 6,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(importCatalog);
+    await tester.pumpAndSettle();
+
+    expect(fetchCount, 1);
+    final catalogProfile = find
+        .byKey(const ValueKey('profile-local-profile-open-client-aven-vless'));
+    await tester.dragUntilVisible(
+      catalogProfile,
+      find.byType(Scrollable).first,
+      const Offset(0, -160),
+      maxIteration: 12,
+    );
+    await tester.pumpAndSettle();
+    expect(catalogProfile, findsOneWidget);
+    expect(find.text('Free VPN catalog'), findsWidgets);
+    expect(find.text('4 cached'), findsOneWidget);
+
+    await tester.dragUntilVisible(
+      catalogAction,
+      find.byType(Scrollable).first,
+      const Offset(0, 160),
+      maxIteration: 12,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(catalogAction);
+    await tester.pumpAndSettle();
+    expect(
+      find.text('4 cached profile(s) from 1 source(s).'),
+      findsOneWidget,
+    );
+
+    final clearCatalog =
+        find.byKey(const ValueKey('free-vpn-catalog-clear-action'));
+    await tester.dragUntilVisible(
+      clearCatalog,
+      find.byKey(const ValueKey('free-vpn-catalog-sheet')),
+      const Offset(0, -120),
+      maxIteration: 6,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(clearCatalog);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(
+          const ValueKey('profile-local-profile-open-client-aven-vless')),
+      findsNothing,
+    );
+    expect(find.text('No cached third-party catalog profiles.'), findsNothing);
+    expect(find.text('None'), findsWidgets);
+  });
+
   testWidgets('community subscription refresh updates existing local profiles',
       (tester) async {
     var fetchCount = 0;

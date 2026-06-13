@@ -6,7 +6,12 @@
   "refresh_policy": {
     "mode": "manual",
     "cache_locally": true,
+    "cache_storage": "local_profile_records_with_source_kind_third_party_catalog",
+    "entry_source_kind": "third_party_catalog",
+    "manual_import_action_required": true,
     "clear_action_required": true,
+    "clear_action_scope": "third_party_catalog_profiles_only",
+    "candidate_default_feed_id": "githubmirror-1",
     "offline_behavior": "show_cached_entries_if_present_otherwise_empty",
     "raw_unavailable_behavior": "preserve_previous_imported_entries",
     "freshness_warning_after_minutes": 60

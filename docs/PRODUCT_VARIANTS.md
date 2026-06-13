@@ -137,6 +137,10 @@ Implemented now:
 - reviewed disabled Free VPN catalog seed for `AvenCores/goida-vpn-configs`
 - Free VPN catalog parser fixtures for the reviewed `subscription_text` feed
   format
+- gated Free VPN catalog action can manually import the reviewed candidate feed,
+  cache accepted entries as local third-party catalog profiles, refresh through
+  the existing subscription refresh flow, and clear only those cached catalog
+  entries
 - community WARP/enhanced-protection public copy avoids official-service
   claims while keeping technical diagnostics internal
 - neutral fallback brand mark when no asset is supplied
@@ -147,5 +151,5 @@ Implemented now:
 
 Still planned:
 
-- enabled third-party public config catalog UI, fetcher, and cache-clear flow
-  after all gates pass
+- broader reviewed feed selection and any enabled-by-default catalog experience;
+  the current catalog remains gated, manual, and opt-in

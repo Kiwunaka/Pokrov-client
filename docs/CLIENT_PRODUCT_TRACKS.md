@@ -151,6 +151,10 @@ Current implementation:
 - parser fixtures cover the current `subscription_text` feed format, base64
   subscription bodies, supported protocols, duplicate isolation, and unsupported
   upstream protocol isolation
+- the gated app action can manually import the reviewed candidate feed, cache
+  accepted entries as local `third_party_catalog` profiles, preserve `sourceUrl`
+  refresh metadata, and clear cached third-party catalog profiles without
+  removing user-owned local keys or subscription imports
 - the catalog remains disabled by default and requires explicit user opt-in
 - tests require license metadata, attribution, opt-in, and third-party boundary
   copy before release
