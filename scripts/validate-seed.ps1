@@ -49,6 +49,7 @@ $requiredFiles = @(
   "config\\free-vpn-catalog.seed.json",
   "config\\dependency-license-inventory.seed.json",
   "config\\generated-assets.seed.json",
+  "config\\source-release-readiness.seed.json",
   "config\\white-label-color-tokens.seed.json",
   "config\\white-label-color-tokens.schema.json",
   "config\\variants\\community-client.seed.json",
@@ -121,6 +122,7 @@ $jsonFiles = @(
   "config\\free-vpn-catalog.seed.json",
   "config\\dependency-license-inventory.seed.json",
   "config\\generated-assets.seed.json",
+  "config\\source-release-readiness.seed.json",
   "config\\white-label-color-tokens.seed.json",
   "config\\white-label-color-tokens.schema.json",
   "config\\variants\\community-client.seed.json",
@@ -479,6 +481,29 @@ if (Test-Path -LiteralPath $generatedAssetsPath -PathType Leaf) {
     }
     if ($officialBrandAsset.reuse -notmatch "BRAND\.md") {
       $manifestErrors.Add("config\\generated-assets.seed.json must bind official brand asset reuse to BRAND.md")
+    }
+  }
+}
+
+$sourceReadinessPath = Join-Path $root "config\\source-release-readiness.seed.json"
+if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
+  $sourceReadiness = Get-Content -Raw -LiteralPath $sourceReadinessPath | ConvertFrom-Json
+
+  if ($sourceReadiness.policy.source_only_milestones_must_not_claim_binaries -ne $true) {
+    $manifestErrors.Add("config\\source-release-readiness.seed.json must enforce source-only binary claim boundaries")
+  }
+
+  foreach ($milestone in @($sourceReadiness.milestones)) {
+    if ($milestone.source_only -ne $true) {
+      $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$($milestone.tag)' must be source_only")
+    }
+    foreach ($field in @("ships_apk", "ships_exe", "store_release", "trusted_signing_claim")) {
+      if ($milestone.$field -ne $false) {
+        $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$($milestone.tag)' must keep $field false")
+      }
+    }
+    if ($milestone.status -ne "tagged" -and $milestone.status -notmatch "not_tagged") {
+      $manifestErrors.Add("config\\source-release-readiness.seed.json pending milestone '$($milestone.tag)' must include not_tagged in status")
     }
   }
 }

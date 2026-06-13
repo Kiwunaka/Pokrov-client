@@ -92,6 +92,10 @@ speed или uptime.
 | `v0.1.0-source` | Tag создан | Первый source-only snapshot Android/Windows с локальным community import. Без APK/EXE. |
 | `v0.2.0-source` | Tag еще не создан | Community import hub polish, variant-boundary enforcement и source-import hardening уже на `main`; release tag pending. |
 | `v0.3.0-source` | Tag еще не создан | Operator fixture, Free VPN catalog gate, white-label token export и foreground subscription scheduler уже на `main`; release tag pending. |
+| `v0.4.0-source` | PR зеленый, tag еще не создан | Native Android/Windows host brand-boundary hardening находится в stacked PR queue. |
+| `v0.5.0-source` | PR зеленый, tag еще не создан | Community routing и WARP copy honesty hardening находится в stacked PR queue. |
+| `v0.6.0-source` | PR зеленый, tag еще не создан | Dependency/license и generated-asset provenance gates находятся в stacked PR queue. |
+| `v0.7.0-source` | PR зеленый, tag еще не создан | Source-release proof helper для archive SHA-256 и proof manifest находится в stacked PR queue. |
 
 ## Архитектурная Граница
 
