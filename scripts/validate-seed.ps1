@@ -49,6 +49,7 @@ $requiredFiles = @(
   "config\\windows-release.seed.json",
   "config\\operator-api.fixture.json",
   "config\\free-vpn-catalog.seed.json",
+  "config\\security-intake.seed.json",
   "config\\dependency-license-inventory.seed.json",
   "config\\generated-assets.seed.json",
   "config\\source-release-readiness.seed.json",
@@ -127,6 +128,7 @@ $jsonFiles = @(
   "config\\windows-release.seed.json",
   "config\\operator-api.fixture.json",
   "config\\free-vpn-catalog.seed.json",
+  "config\\security-intake.seed.json",
   "config\\dependency-license-inventory.seed.json",
   "config\\generated-assets.seed.json",
   "config\\source-release-readiness.seed.json",
@@ -515,6 +517,111 @@ if (Test-Path -LiteralPath $freeVpnCatalogPath -PathType Leaf) {
       }
       if (Test-PokrovEndpoint $feed.url -or $feedUri.Host -eq "kiwunaka.space") {
         $manifestErrors.Add("config\\free-vpn-catalog.seed.json feed '$($feed.id)' must not point to official POKROV or legacy hosts")
+      }
+    }
+  }
+}
+
+$securityIntakePath = Join-Path $root "config\\security-intake.seed.json"
+if (Test-Path -LiteralPath $securityIntakePath -PathType Leaf) {
+  $securityIntake = Get-Content -Raw -LiteralPath $securityIntakePath | ConvertFrom-Json
+
+  if ($securityIntake.policy.public_vulnerability_issues_allowed -ne $false) {
+    $manifestErrors.Add("config\\security-intake.seed.json must forbid public vulnerability issues")
+  }
+
+  if ($securityIntake.policy.blank_issues_enabled -ne $false) {
+    $manifestErrors.Add("config\\security-intake.seed.json must keep blank issues disabled")
+  }
+
+  if ($securityIntake.policy.private_security_policy_url -ne "https://github.com/Kiwunaka/Pokrov-client/security/policy") {
+    $manifestErrors.Add("config\\security-intake.seed.json must point to GitHub private vulnerability reporting")
+  }
+
+  if ($securityIntake.policy.telegram_support_url -ne "https://t.me/pokrov_supportbot") {
+    $manifestErrors.Add("config\\security-intake.seed.json must keep the public Telegram support fallback")
+  }
+
+  if ($securityIntake.policy.security_redirect_label -ne "security-private") {
+    $manifestErrors.Add("config\\security-intake.seed.json must use the security-private redirect label")
+  }
+
+  foreach ($requiredPath in @("github-private-vulnerability-reporting", "telegram-support")) {
+    $pathEntry = @($securityIntake.private_reporting_paths | Where-Object { $_.id -eq $requiredPath })
+    if ($pathEntry.Count -ne 1) {
+      $manifestErrors.Add("config\\security-intake.seed.json must define private reporting path '$requiredPath'")
+    }
+  }
+
+  foreach ($forbidden in @("secrets", "account tokens", "QR payloads", "subscription URLs", "private backend details", "exploit steps", "signing material")) {
+    if (@($securityIntake.forbidden_public_content) -notcontains $forbidden) {
+      $manifestErrors.Add("config\\security-intake.seed.json must forbid public '$forbidden'")
+    }
+  }
+
+  foreach ($scope in @("public client source code", "public source release process", "operator fixture and OpenAPI contracts", "Android and Windows host source")) {
+    if (@($securityIntake.supported_scope) -notcontains $scope) {
+      $manifestErrors.Add("config\\security-intake.seed.json must include supported scope '$scope'")
+    }
+  }
+
+  foreach ($outOfScope in @("official backend, billing, admin, infrastructure, and private service operations", "private operator backends and customer accounts")) {
+    if (@($securityIntake.out_of_scope) -notcontains $outOfScope) {
+      $manifestErrors.Add("config\\security-intake.seed.json must keep out-of-scope boundary '$outOfScope'")
+    }
+  }
+
+  foreach ($field in @("ships_apk", "ships_exe", "store_release", "trusted_signing_claim", "official_binary_claim")) {
+    if ($securityIntake.release_claim_boundary.$field -ne $false) {
+      $manifestErrors.Add("config\\security-intake.seed.json release_claim_boundary.$field must remain false")
+    }
+  }
+
+  if ($securityIntake.release_claim_boundary.source_only_repository -ne $true) {
+    $manifestErrors.Add("config\\security-intake.seed.json must keep source_only_repository true")
+  }
+
+  if ($securityIntake.release_claim_boundary.require_public_evidence_for_binary_claims -ne $true) {
+    $manifestErrors.Add("config\\security-intake.seed.json must require public evidence before binary claims")
+  }
+
+  $issueConfigPath = Join-Path $root ".github\\ISSUE_TEMPLATE\\config.yml"
+  if (Test-Path -LiteralPath $issueConfigPath -PathType Leaf) {
+    $issueConfig = Get-Content -Raw -LiteralPath $issueConfigPath
+    if ($issueConfig -notmatch "blank_issues_enabled:\s*false") {
+      $manifestErrors.Add(".github\\ISSUE_TEMPLATE\\config.yml must keep blank issues disabled")
+    }
+    if ($issueConfig -notmatch [System.Text.RegularExpressions.Regex]::Escape($securityIntake.policy.private_security_policy_url)) {
+      $manifestErrors.Add(".github\\ISSUE_TEMPLATE\\config.yml must link to private vulnerability reporting")
+    }
+  }
+
+  $securityRedirectPath = Join-Path $root ".github\\ISSUE_TEMPLATE\\security_redirect.yml"
+  if (Test-Path -LiteralPath $securityRedirectPath -PathType Leaf) {
+    $securityRedirect = Get-Content -Raw -LiteralPath $securityRedirectPath
+    foreach ($requiredPhrase in @("Do not open a public issue for vulnerabilities", "GitHub private vulnerability reporting", "security-private", "QR payloads", "subscription URLs", "signing material", "private backend details")) {
+      if ($securityRedirect -notmatch [System.Text.RegularExpressions.Regex]::Escape($requiredPhrase)) {
+        $manifestErrors.Add(".github\\ISSUE_TEMPLATE\\security_redirect.yml must include '$requiredPhrase'")
+      }
+    }
+  }
+
+  $labelsPath = Join-Path $root ".github\\labels.yml"
+  if (Test-Path -LiteralPath $labelsPath -PathType Leaf) {
+    $labelsText = Get-Content -Raw -LiteralPath $labelsPath
+    if (-not $labelsText.Contains("- name: security-private")) {
+      $manifestErrors.Add(".github\\labels.yml must define the security-private label")
+    }
+  }
+
+  foreach ($docPath in @("SECURITY.md", "SUPPORT.md", "docs\\GITHUB_TRIAGE.md")) {
+    $fullDocPath = Join-Path $root $docPath
+    if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
+      $docText = Get-Content -Raw -LiteralPath $fullDocPath
+      foreach ($requiredPhrase in @("secrets", "QR payloads", "subscription URLs", "private backend")) {
+        if ($docText -notmatch [System.Text.RegularExpressions.Regex]::Escape($requiredPhrase)) {
+          $manifestErrors.Add("$docPath must mention '$requiredPhrase' for public security intake redaction")
+        }
       }
     }
   }

@@ -12,6 +12,9 @@ Use this checklist before publishing a public source or binary release.
   exist, it also confirms inventory package names and versions match them.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\validate-seed.ps1`
   passes.
+- `config/security-intake.seed.json` still forbids public vulnerability issues,
+  keeps blank issues disabled, points to private reporting, and preserves the
+  source-only no-APK/no-EXE/no-store/no-trusted-signing boundary.
 - `config/dependency-license-inventory.seed.json` matches local `pubspec.lock`
   files when they exist and contains no `REVIEW_REQUIRED` entries.
 - `config/generated-assets.seed.json` lists every `assets/**/*.png` file with
