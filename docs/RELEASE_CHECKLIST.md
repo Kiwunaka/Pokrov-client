@@ -23,6 +23,9 @@ Use this checklist before publishing a public source or binary release.
   can be used as the single local gate that runs tests, clean-clone proof,
   source proof generation, release-note rendering, and preflight summary
   generation. Do not use `-SkipTestCommands` for publishing.
+- `powershell -ExecutionPolicy Bypass -File .\scripts\check-source-release-copy.ps1`
+  passes for the release policy, checklist, source release template, renderer,
+  and final rendered release note.
 - `safe_import` dry-run reports `blocked=0` for the public tree.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1`
   passes before a public source release.
@@ -56,7 +59,9 @@ reference.
 Before pushing the tag, review the rendered release note and preflight summary,
 then add the exact feature status and known limitations based on
 [SOURCE_RELEASE_TEMPLATE.md](releases/SOURCE_RELEASE_TEMPLATE.md). The rendered
-body must keep the proof manifest's source-only boundaries.
+body must keep the proof manifest's source-only boundaries. The source-release
+preflight runs `check-source-release-copy.ps1` against the rendered draft; run
+the same checker again after manual edits to the GitHub Release body.
 
 Push only after the release note is accurate:
 

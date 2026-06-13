@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.26
+# Source Readiness: v0.2-v0.27
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -490,6 +490,28 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.27.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #47: source release copy-claims gate for release policy, checklist,
+  source release template, renderer, and rendered GitHub Release drafts
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- rerun `scripts/check-source-release-copy.ps1 -ReleaseNotesPath <file>` after
+  manually editing the GitHub Release body
+- review the preflight summary, proof manifest, and rendered GitHub Release body
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
 - Free VPN catalog remains disabled by default and is not an official POKROV
@@ -541,3 +563,6 @@ Required before tagging:
 - Runtime artifact metadata now has source-only review gates and SHA-256 hooks,
   but `hiddify/hiddify-core` archives remain local-only downloads until a
   separate public binary review records exact hashes and redistribution notes.
+- Source release copy now has a dedicated checker, but maintainers still own
+  the final human review of feature status and known limitations before
+  publishing a GitHub Release.
