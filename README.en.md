@@ -77,12 +77,20 @@ uptime.
 | --- | --- |
 | Repository | Public foundation ready |
 | Source code | Sanitized Android + Windows snapshot imported |
-| Community mode | Local profiles, manual subscription import, decoded QR import |
-| Operator mode | White-label contracts documented |
+| Community mode | Local profiles, subscription import/refresh, Android/Windows QR import |
+| Operator mode | Fixture API, OpenAPI contract, and white-label token export documented |
 | Platforms | Android and Windows first |
 | License | GNU GPLv3 |
 | Official backend | Operated separately by POKROV |
 | Public releases | Beta-safe claims only |
+
+## Source Release Status
+
+| Milestone | Status | Scope |
+| --- | --- | --- |
+| `v0.1.0-source` | Tagged | First source-only Android/Windows snapshot with local community import. No APK/EXE. |
+| `v0.2.0-source` | Not tagged | Community import hub polish, variant-boundary enforcement, and source-import hardening are on `main`; release tag pending. |
+| `v0.3.0-source` | Not tagged | Operator fixture, Free VPN catalog gate, white-label token export, and foreground subscription scheduler are on `main`; release tag pending. |
 
 ## Architecture Boundary
 
