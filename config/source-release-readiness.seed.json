@@ -149,6 +149,50 @@
       "ships_exe": false,
       "store_release": false,
       "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.14.0-source",
+      "status": "stacked_pr_green_not_tagged",
+      "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/33",
+      "scope": "Source-readiness synchronization through the default-disabled Free VPN catalog feature flag slice.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.15.0-source",
+      "status": "stacked_pr_green_not_tagged",
+      "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/34",
+      "scope": "Operator support ticket path canonicalization across docs, OpenAPI, fixtures, smoke tests, and app adapter contracts.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.16.0-source",
+      "status": "stacked_pr_green_not_tagged",
+      "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/35",
+      "scope": "Community local-access wording and model guards so Open Client local profiles are not presented as free POKROV service nodes.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.17.0-source",
+      "status": "stacked_pr_green_not_tagged",
+      "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/36",
+      "scope": "Seed-backed variant command preview tooling for Android and Windows community, operator, and official POKROV build modes.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
     }
   ]
 }
