@@ -1,0 +1,62 @@
+name: Operator integration question
+description: Ask about connecting the client to an operator-owned backend.
+title: "[Operator]: "
+labels: ["operator"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for public white-label and operator API integration questions only. Do not include secrets, tokens, QR payloads, subscription URLs, personal connection links, private backend details, signing material, customer data, or private account data. Do not report vulnerabilities here; use SECURITY.md.
+  - type: dropdown
+    id: track
+    attributes:
+      label: Track / variant
+      options:
+        - Personal Key / Community Client
+        - Operator / Company Client
+        - Official POKROV Service Mode
+        - Repository docs/process
+        - Other / not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Integration area
+      options:
+        - Managed profile API
+        - Session or redeem flow
+        - Support tickets
+        - Apps/update metadata
+        - White-label branding
+        - Build variant command
+        - Privacy/support/checkout URLs
+        - Other / not sure
+    validations:
+      required: true
+  - type: input
+    id: commit
+    attributes:
+      label: Commit, source tag, or branch
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: Describe what you are trying to integrate and where the public docs are unclear.
+    validations:
+      required: true
+  - type: textarea
+    id: attempted
+    attributes:
+      label: What you tried
+      description: Include commands or fixture-server output only after redacting private URLs, tokens, and customer data.
+      render: text
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Boundary checks
+      options:
+        - label: I understand that operators bring their own backend, billing, support, privacy policy, signing, and release channels.
+          required: true
+        - label: I am not asking for private POKROV backend, billing, admin, deployment, node-management, signing, or release-evidence access.
+          required: true

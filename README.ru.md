@@ -123,6 +123,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.21.0-source` | Pending stacked PR, tag еще не создан | Self-documenting release-note verification находится в stacked PR queue. |
 | `v0.22.0-source` | Pending stacked PR, tag еще не создан | One-command source-release preflight находится в stacked PR queue. |
 | `v0.23.0-source` | Pending stacked PR, tag еще не создан | CI source-release preflight smoke находится в stacked PR queue. |
+| `v0.24.0-source` | Pending stacked PR, tag еще не создан | Specialized GitHub triage templates находятся в stacked PR queue. |
 
 ## Архитектурная Граница
 

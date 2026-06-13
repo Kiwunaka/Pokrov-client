@@ -1,0 +1,35 @@
+name: Security redirect
+description: Do not disclose vulnerabilities in public issues.
+title: "[Security]: "
+labels: ["security-private"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include secrets, tokens, or vulnerability details in this public issue. Do not report vulnerabilities here. Do not open a public issue for vulnerabilities, exploit details, private endpoint findings, leaked secrets, signing material, account data, QR payloads, subscription URLs, personal connection links, or private backend details.
+
+        Use the private reporting path in SECURITY.md instead:
+        https://github.com/Kiwunaka/Pokrov-client/security/policy
+
+        Public issues may be closed or redacted when they include sensitive details.
+  - type: dropdown
+    id: track
+    attributes:
+      label: Track / variant
+      options:
+        - Personal Key / Community Client
+        - Operator / Company Client
+        - Official POKROV Service Mode
+        - Repository docs/process
+        - Other / not sure
+    validations:
+      required: true
+  - type: checkboxes
+    id: acknowledgement
+    attributes:
+      label: Acknowledgement
+      options:
+        - label: I will not paste vulnerability details, secrets, tokens, QR payloads, subscription URLs, signing material, or private backend details in this public issue.
+          required: true
+        - label: I will use SECURITY.md / GitHub private vulnerability reporting for security details.
+          required: true

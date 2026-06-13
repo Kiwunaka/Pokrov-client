@@ -90,6 +90,17 @@ def test_support_and_security_define_public_tracks_and_private_reporting() -> No
 
 
 def test_issue_templates_collect_track_variant_and_redaction_context() -> None:
+    template_names = set(_issue_template_names())
+    assert {
+        "bug_report.yml",
+        "build_problem.yml",
+        "documentation.yml",
+        "feature_request.yml",
+        "operator_integration_question.yml",
+        "profile_import_problem.yml",
+        "security_redirect.yml",
+    }.issubset(template_names)
+
     required_track_options = (
         "Personal Key / Community Client",
         "Operator / Company Client",
@@ -109,6 +120,39 @@ def test_issue_templates_collect_track_variant_and_redaction_context() -> None:
         assert "Do not report vulnerabilities here" in text, name
         assert "QR payloads" in text, name
         assert "subscription URLs" in text, name
+
+
+def test_specialized_issue_templates_route_import_operator_and_security() -> None:
+    import_template = _read(".github/ISSUE_TEMPLATE/profile_import_problem.yml")
+    operator_template = _read(".github/ISSUE_TEMPLATE/operator_integration_question.yml")
+    security_template = _read(".github/ISSUE_TEMPLATE/security_redirect.yml")
+    config = _read(".github/ISSUE_TEMPLATE/config.yml")
+
+    for phrase in (
+        "Pasted single key",
+        "QR scan",
+        "Subscription URL",
+        "Third-party public config catalog",
+        "whether old imported profiles were preserved",
+    ):
+        assert phrase in import_template
+
+    for phrase in (
+        "Managed profile API",
+        "White-label branding",
+        "operators bring their own backend, billing, support",
+        "not asking for private POKROV backend",
+    ):
+        assert phrase in operator_template
+
+    for phrase in (
+        "Do not open a public issue for vulnerabilities",
+        "GitHub private vulnerability reporting",
+        "security-private",
+    ):
+        assert phrase in security_template
+
+    assert "https://github.com/Kiwunaka/Pokrov-client/security/policy" in config
 
 
 def test_pull_request_template_guards_tracks_release_claims_and_catalog() -> None:
