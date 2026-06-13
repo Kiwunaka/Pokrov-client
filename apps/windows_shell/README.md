@@ -2,17 +2,17 @@
 
 Current responsibility:
 
-- Windows-specific Flutter host entry point for the shared `POKROV` seed shell
+- Windows-specific Flutter host entry point for the shared open-client seed shell
 - desktop FFI runtime integration through `pokrov_runtime_engine`
 - local host-runtime sync at `windows/runner/resources/runtime`
-- prerelease Windows runner metadata that identifies the binary as `POKROV Windows Seed`
-- local release-build verification and unsigned bundle packaging through `..\\..\\scripts\\build-windows-release.ps1`
+- neutral open-source Windows runner metadata that operators can override at build time
+- local release-build verification through the shared source checks
 
 Current local truth:
 
-- `flutter build windows --release` produces a runnable beta bundle with `pokrov_windows_beta.exe` and `libcore.dll`
+- `flutter build windows --release` produces a runnable source-built bundle with `open_client_windows.exe` and `libcore.dll`
 - the shared shell keeps local runtime controls out of the first layer and uses one-tap connect from `Protection` on Windows
-- the packaged output stays inside the next-client seed lane under `build/release_bundle` and is not a public release artifact
+- generated binaries are not official public release artifacts unless a downstream maintainer completes their own review, signing, and release process
 
 Deferred responsibility:
 

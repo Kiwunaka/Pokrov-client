@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
-        android:label="POKROV"
+        android:label="${openClientAppLabel}"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -48,7 +48,7 @@
             </intent-filter>
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="pokrov_runtime_vpn" />
+                android:value="${openClientRuntimeVpnSubtype}" />
         </service>
     </application>
     <!-- Required to query activities that can process text, see:

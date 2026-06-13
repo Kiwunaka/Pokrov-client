@@ -26,6 +26,13 @@ target_compile_definitions(${BINARY_NAME} PRIVATE "FLUTTER_VERSION_MAJOR=${FLUTT
 target_compile_definitions(${BINARY_NAME} PRIVATE "FLUTTER_VERSION_MINOR=${FLUTTER_VERSION_MINOR}")
 target_compile_definitions(${BINARY_NAME} PRIVATE "FLUTTER_VERSION_PATCH=${FLUTTER_VERSION_PATCH}")
 target_compile_definitions(${BINARY_NAME} PRIVATE "FLUTTER_VERSION_BUILD=${FLUTTER_VERSION_BUILD}")
+target_compile_definitions(${BINARY_NAME} PRIVATE "OC_WIN_APP_NAME=L\"${OPEN_CLIENT_WINDOWS_APP_NAME}\"")
+target_compile_definitions(${BINARY_NAME} PRIVATE "OC_WIN_COMPANY_NAME=\"${OPEN_CLIENT_WINDOWS_COMPANY_NAME}\"")
+target_compile_definitions(${BINARY_NAME} PRIVATE "OC_WIN_FILE_DESC=\"${OPEN_CLIENT_WINDOWS_FILE_DESCRIPTION}\"")
+target_compile_definitions(${BINARY_NAME} PRIVATE "OC_WIN_INTERNAL_NAME=\"${OPEN_CLIENT_WINDOWS_BINARY_NAME}\"")
+target_compile_definitions(${BINARY_NAME} PRIVATE "OC_WIN_ORIGINAL_FILE=\"${OPEN_CLIENT_WINDOWS_BINARY_NAME}.exe\"")
+target_compile_definitions(${BINARY_NAME} PRIVATE "OC_WIN_PRODUCT_NAME=\"${OPEN_CLIENT_WINDOWS_APP_NAME}\"")
+target_compile_definitions(${BINARY_NAME} PRIVATE "OC_WIN_COPYRIGHT=\"${OPEN_CLIENT_WINDOWS_COPYRIGHT}\"")
 
 # Disable Windows macros that collide with C++ standard library functions.
 target_compile_definitions(${BINARY_NAME} PRIVATE "NOMINMAX")

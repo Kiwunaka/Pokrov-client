@@ -151,7 +151,7 @@ internal object AndroidDefaultNetworkMonitor {
         )
         AndroidRuntimeState.markDegraded(
             failureKind = "default_network_unavailable",
-            message = "Android подключил POKROV, но обычная сеть устройства еще не готова для DNS.",
+            message = NativeBranding.message("Android подключил {app}, но обычная сеть устройства еще не готова для DNS."),
         )
         throw IllegalStateException("Android default network is unavailable for DNS resolution.")
     }
@@ -217,7 +217,7 @@ internal object AndroidDefaultNetworkMonitor {
             if (resolvedCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true) {
                 Log.i(
                     LOG_TAG,
-                    "Пропускаем сеть POKROV network=${networkToken(network)} при выборе обычной сети устройства.",
+                    NativeBranding.message("Пропускаем сеть {app} network=${networkToken(network)} при выборе обычной сети устройства."),
                 )
             }
             if (currentNetwork == network) {

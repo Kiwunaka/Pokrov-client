@@ -55,4 +55,33 @@ void main() {
     expect(scannerContent, contains('No camera was found.'));
     expect(scannerContent, contains('No QR code was found in this frame.'));
   });
+
+  test('windows native runner defaults to neutral open-source metadata',
+      () async {
+    final topLevelCmake = File('windows/CMakeLists.txt');
+    final runnerCmake = File('windows/runner/CMakeLists.txt');
+    final mainSource = File('windows/runner/main.cpp');
+    final resourceSource = File('windows/runner/Runner.rc');
+
+    final topLevelContent = await topLevelCmake.readAsString();
+    final runnerContent = await runnerCmake.readAsString();
+    final mainContent = await mainSource.readAsString();
+    final resourceContent = await resourceSource.readAsString();
+
+    expect(topLevelContent, contains('OPEN_CLIENT_WINDOWS_APP_NAME'));
+    expect(topLevelContent, contains('project(open_client_windows'));
+    expect(topLevelContent, contains('"Open Client"'));
+    expect(topLevelContent, contains('"open_client_windows"'));
+    expect(topLevelContent, contains('OPEN_CLIENT_RUNTIME_DIR'));
+    expect(topLevelContent, isNot(contains('POKROV_RUNTIME_DIR')));
+    expect(topLevelContent, isNot(contains('project(pokrov_windows_beta')));
+    expect(runnerContent, contains('OC_WIN_PRODUCT_NAME'));
+    expect(mainContent, contains('OC_WIN_APP_NAME'));
+    expect(mainContent, isNot(contains('window.Create(L"POKROV"')));
+    expect(resourceContent, contains('OC_WIN_COMPANY_NAME'));
+    expect(resourceContent, contains('OC_WIN_PRODUCT_NAME'));
+    expect(resourceContent, isNot(contains('"space.pokrov"')));
+    expect(resourceContent, isNot(contains('"POKROV"')));
+    expect(resourceContent, isNot(contains('"pokrov_windows_beta"')));
+  });
 }

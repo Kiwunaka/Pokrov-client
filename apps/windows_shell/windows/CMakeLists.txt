@@ -1,10 +1,22 @@
 # Project-level configuration.
 cmake_minimum_required(VERSION 3.14)
-project(pokrov_windows_beta LANGUAGES CXX)
+project(open_client_windows LANGUAGES CXX)
 
-# The name of the executable created for the application. Change this to change
-# the on-disk name of your application.
-set(BINARY_NAME "pokrov_windows_beta")
+# Neutral open-source defaults. Operators and official builds can override
+# these with -DOPEN_CLIENT_WINDOWS_* values when configuring CMake.
+set(OPEN_CLIENT_WINDOWS_BINARY_NAME "open_client_windows" CACHE STRING
+  "Executable name for the Windows host")
+set(OPEN_CLIENT_WINDOWS_APP_NAME "Open Client" CACHE STRING
+  "User-visible Windows host name")
+set(OPEN_CLIENT_WINDOWS_COMPANY_NAME "Open Client contributors" CACHE STRING
+  "Windows version-resource company name")
+set(OPEN_CLIENT_WINDOWS_FILE_DESCRIPTION "Open Client" CACHE STRING
+  "Windows version-resource file description")
+set(OPEN_CLIENT_WINDOWS_COPYRIGHT "Copyright (C) 2026 Open Client contributors. GPLv3." CACHE STRING
+  "Windows version-resource copyright")
+
+# The name of the executable created for the application.
+set(BINARY_NAME "${OPEN_CLIENT_WINDOWS_BINARY_NAME}")
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
@@ -93,10 +105,10 @@ install(DIRECTORY "${NATIVE_ASSETS_DIR}"
    DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
    COMPONENT Runtime)
 
-set(POKROV_RUNTIME_DIR
+set(OPEN_CLIENT_RUNTIME_DIR
   "${CMAKE_CURRENT_SOURCE_DIR}/runner/resources/runtime")
-if(EXISTS "${POKROV_RUNTIME_DIR}/libcore.dll")
-  install(FILES "${POKROV_RUNTIME_DIR}/libcore.dll"
+if(EXISTS "${OPEN_CLIENT_RUNTIME_DIR}/libcore.dll")
+  install(FILES "${OPEN_CLIENT_RUNTIME_DIR}/libcore.dll"
     DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
     COMPONENT Runtime)
 endif()

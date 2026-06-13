@@ -36,7 +36,10 @@ Default properties:
 Build define shape:
 
 ```powershell
-flutter run --dart-define=OPEN_CLIENT_VARIANT=community --dart-define=OPEN_CLIENT_BRAND_NAME="Open Client"
+flutter run `
+  --dart-define=OPEN_CLIENT_VARIANT=community `
+  --dart-define=OPEN_CLIENT_BRAND_NAME="Open Client" `
+  --dart-define=OPEN_CLIENT_ANDROID_PACKAGE_NAME=org.pokrovclient.community
 ```
 
 ## 2. Operator Client
@@ -64,6 +67,7 @@ Build define shape:
 flutter run `
   --dart-define=OPEN_CLIENT_VARIANT=operator `
   --dart-define=OPEN_CLIENT_BRAND_NAME="Acme VPN" `
+  --dart-define=OPEN_CLIENT_ANDROID_PACKAGE_NAME=com.acme.vpn `
   --dart-define=OPEN_CLIENT_API_BASE_URL="https://api.acme.example/" `
   --dart-define=OPEN_CLIENT_CABINET_URL="https://app.acme.example/" `
   --dart-define=OPEN_CLIENT_SUPPORT_URL="https://support.acme.example/" `
@@ -93,6 +97,7 @@ flutter run `
   --dart-define=OPEN_CLIENT_VARIANT=pokrov `
   --dart-define=OPEN_CLIENT_OFFICIAL_BUILD=true `
   --dart-define=OPEN_CLIENT_BRAND_NAME=POKROV `
+  --dart-define=OPEN_CLIENT_ANDROID_PACKAGE_NAME=space.pokrov.app `
   --dart-define=OPEN_CLIENT_BRAND_ASSET=assets/brand/pokrov_mark.png
 ```
 
@@ -115,6 +120,7 @@ Implemented now:
 - Free VPN catalog parser fixtures for the reviewed `subscription_text` feed
   format
 - neutral fallback brand mark when no asset is supplied
+- neutral Android/Windows native host defaults for community artifacts
 - white-label color token seed, contrast checks, and export helper for operator
   forks
 - operator/pokrov modes can opt into managed-service API bootstrap

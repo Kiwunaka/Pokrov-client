@@ -311,8 +311,8 @@ $windowsReleaseConfigPath = Join-Path $root "config\\windows-release.seed.json"
 if (Test-Path -LiteralPath $windowsReleaseConfigPath -PathType Leaf) {
   $windowsReleaseConfig = Get-Content -Raw -LiteralPath $windowsReleaseConfigPath | ConvertFrom-Json
 
-  if ($windowsReleaseConfig.binary_name -ne "pokrov_windows_beta.exe") {
-    $manifestErrors.Add("config\\windows-release.seed.json must keep binary_name as pokrov_windows_beta.exe")
+  if ($windowsReleaseConfig.binary_name -ne "open_client_windows.exe") {
+    $manifestErrors.Add("config\\windows-release.seed.json must keep binary_name as open_client_windows.exe")
   }
 
   if ($windowsReleaseConfig.runtime.platform -ne "windows") {
@@ -323,7 +323,7 @@ if (Test-Path -LiteralPath $windowsReleaseConfigPath -PathType Leaf) {
     $manifestErrors.Add("config\\windows-release.seed.json must keep runtime.artifact_directory on apps/windows_shell/windows/runner/resources/runtime")
   }
 
-  foreach ($requiredPath in @("pokrov_windows_beta.exe", "libcore.dll", "data/app.so")) {
+  foreach ($requiredPath in @("open_client_windows.exe", "libcore.dll", "data/app.so")) {
     if (@($windowsReleaseConfig.required_files) -notcontains $requiredPath) {
       $manifestErrors.Add("config\\windows-release.seed.json must list required build file '$requiredPath'")
     }
@@ -486,6 +486,10 @@ if (Test-Path -LiteralPath $communityVariantPath -PathType Leaf) {
     $manifestErrors.Add("config\\variants\\community-client.seed.json must not use the POKROV logo")
   }
 
+  if ($communityVariant.build_defines.OPEN_CLIENT_ANDROID_PACKAGE_NAME -ne "org.pokrovclient.community") {
+    $manifestErrors.Add("config\\variants\\community-client.seed.json must keep OPEN_CLIENT_ANDROID_PACKAGE_NAME as org.pokrovclient.community")
+  }
+
   foreach ($value in @($communityVariant.display_name, $communityVariant.build_defines.OPEN_CLIENT_BRAND_NAME, $communityVariant.build_defines.OPEN_CLIENT_BRAND_ASSET)) {
     if (Test-PokrovBrand $value) {
       $manifestErrors.Add("config\\variants\\community-client.seed.json must keep neutral community branding")
@@ -531,6 +535,14 @@ if (Test-Path -LiteralPath $operatorVariantPath -PathType Leaf) {
     $manifestErrors.Add("config\\variants\\operator-client.seed.json must define OPEN_CLIENT_PRIVACY_URL")
   }
 
+  if ([string]::IsNullOrWhiteSpace($operatorVariant.build_defines.OPEN_CLIENT_ANDROID_PACKAGE_NAME)) {
+    $manifestErrors.Add("config\\variants\\operator-client.seed.json must define OPEN_CLIENT_ANDROID_PACKAGE_NAME")
+  }
+
+  if (Test-PokrovBrand $operatorVariant.build_defines.OPEN_CLIENT_ANDROID_PACKAGE_NAME) {
+    $manifestErrors.Add("config\\variants\\operator-client.seed.json must not use official POKROV Android package names by default")
+  }
+
   foreach ($value in @(
       $operatorVariant.build_defines.OPEN_CLIENT_API_BASE_URL,
       $operatorVariant.build_defines.OPEN_CLIENT_CABINET_URL,
@@ -558,6 +570,10 @@ if (Test-Path -LiteralPath $pokrovVariantPath -PathType Leaf) {
 
   if ($pokrovVariant.build_defines.OPEN_CLIENT_OFFICIAL_BUILD -ne "true") {
     $manifestErrors.Add("config\\variants\\pokrov-service.seed.json must set OPEN_CLIENT_OFFICIAL_BUILD true")
+  }
+
+  if ([string]::IsNullOrWhiteSpace($pokrovVariant.build_defines.OPEN_CLIENT_ANDROID_PACKAGE_NAME)) {
+    $manifestErrors.Add("config\\variants\\pokrov-service.seed.json must define OPEN_CLIENT_ANDROID_PACKAGE_NAME")
   }
 
   foreach ($value in @($pokrovVariant.display_name, $pokrovVariant.build_defines.OPEN_CLIENT_BRAND_NAME, $pokrovVariant.build_defines.OPEN_CLIENT_BRAND_ASSET)) {

@@ -39,6 +39,23 @@ powershell -ExecutionPolicy Bypass -File .\scripts\export-white-label-color-toke
 - Treat generated exports as local build artifacts until your fork wires them
   into its own branding pipeline.
 
+## Native Host Metadata
+
+The public Android and Windows hosts now default to neutral open-source native
+metadata:
+
+- Android app id: `org.pokrovclient.community`
+- Android app label: `Open Client`
+- Android runtime directory/subtype: `open-client-runtime`
+- Windows executable: `open_client_windows.exe`
+- Windows product name: `Open Client`
+
+Flutter `--dart-define` values configure the shared shell. Native app labels,
+package ids, notification channel names, executable names, and Windows version
+resources must be set in the host build pipeline too. See
+[Build From Source](BUILD_FROM_SOURCE.md#native-host-branding) for the Gradle
+and CMake override knobs.
+
 ## Token Roles
 
 The seed preserves the current shared shell roles:
