@@ -51,9 +51,10 @@ powershell -ExecutionPolicy Bypass -File .\scripts\render-source-release-notes.p
   -OutFile (Join-Path $proof "$tag-release-notes.md")
 ```
 
-Annotated source tags are expected. The proof manifest records both
-`tag_object_sha` and the peeled `commit_sha`; release notes must use the peeled
-commit SHA as the source reference.
+Annotated source tags are required. `prepare-source-release.ps1 -RequireTag`
+refuses lightweight tags. The proof manifest records both `tag_object_sha` and
+the peeled `commit_sha`; release notes must use the peeled commit SHA as the
+source reference.
 
 Before pushing the tag, review the rendered release note, then add the exact
 feature status and known limitations based on
