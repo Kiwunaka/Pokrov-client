@@ -10,6 +10,8 @@ app must keep the catalog disabled until these gates are complete.
 - License observed on 2026-06-09: `GPL-3.0`
 - Intended UI label: third-party public configs
 - Reviewed seed file: `config/free-vpn-catalog.seed.json`
+- Manual import build define: `OPEN_CLIENT_ENABLE_FREE_CATALOG=false` by
+  default
 - Parser contract: `subscription-text-v1`
 - Supported in-client protocols for this gate: `vless`, `trojan`, `ss`, and
   `vmess`
@@ -20,6 +22,7 @@ app must keep the catalog disabled until these gates are complete.
 - [x] Record feed URLs, update cadence, and freshness expectations.
 - [x] Add parser fixtures for every enabled feed format.
 - [x] Keep malformed entries isolated from valid entries.
+- [x] Keep manual feed import behind `OPEN_CLIENT_ENABLE_FREE_CATALOG=true`.
 - [x] Cache fetched feeds locally with manual refresh and clear actions.
 - [x] Show copy that says these are not official POKROV nodes.
 - [x] Avoid speed, safety, privacy, uptime, legality, or availability promises.
@@ -46,12 +49,15 @@ runtime staging explicitly support them.
 ## Current State
 
 The app has a gated `Free VPN catalog` profile action. It explains the safety
-boundary and does not fetch or enable third-party feeds by default. Users can
-manually import the reviewed candidate feed, which stores accepted entries as
-local profiles with `source_kind=third_party_catalog`, `sourceUrl`, refresh
-metadata, and parser output from the shared local flow. The clear action removes
-only cached third-party catalog profiles and leaves user-owned single keys,
-subscription imports, and official/service profiles alone. The first candidate
-catalog is recorded as a disabled opt-in source with attribution, manual
-refresh, local cache, clear-action scope, feed freshness expectations, and local
-parser fixtures.
+boundary and does not fetch or enable third-party feeds by default. Default
+community builds show the warning/attribution preview only; the import button is
+disabled unless the build is compiled with
+`OPEN_CLIENT_ENABLE_FREE_CATALOG=true`. When enabled, users can manually import
+the reviewed candidate feed, which stores accepted entries as local profiles
+with `source_kind=third_party_catalog`, `sourceUrl`, refresh metadata, and
+parser output from the shared local flow. The clear action removes only cached
+third-party catalog profiles and leaves user-owned single keys, subscription
+imports, and official/service profiles alone. The first candidate catalog is
+recorded as a disabled opt-in source with attribution, manual refresh, local
+cache, clear-action scope, feed freshness expectations, and local parser
+fixtures.

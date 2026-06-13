@@ -3480,6 +3480,66 @@ void main() {
       find.textContaining('does not promise speed, privacy, uptime'),
       findsOneWidget,
     );
+    expect(
+      find.text('Manual import requires OPEN_CLIENT_ENABLE_FREE_CATALOG=true.'),
+      findsOneWidget,
+    );
+    final importCatalog =
+        find.byKey(const ValueKey('free-vpn-catalog-import-action'));
+    await tester.dragUntilVisible(
+      importCatalog,
+      find.byKey(const ValueKey('free-vpn-catalog-sheet')),
+      const Offset(0, -120),
+      maxIteration: 6,
+    );
+    await tester.pumpAndSettle();
+    expect(tester.widget<FilledButton>(importCatalog).onPressed, isNull);
+  });
+
+  testWidgets('free VPN catalog default flag blocks import fetch',
+      (tester) async {
+    var fetchCount = 0;
+    await tester.pumpWidget(
+      PokrovSeedApp(
+        appContext: buildSeedAppContext(hostPlatform: HostPlatform.android),
+        communitySubscriptionFetcher: (uri) async {
+          fetchCount += 1;
+          return '';
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+    await _completeFirstLaunchIfPresent(tester);
+
+    await _tapNav(tester, 'nav-profile');
+    final catalogAction =
+        find.byKey(const ValueKey('profile-free-vpn-catalog-action'));
+    await tester.dragUntilVisible(
+      catalogAction,
+      find.byType(Scrollable).first,
+      const Offset(0, -220),
+      maxIteration: 12,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(catalogAction);
+    await tester.pumpAndSettle();
+
+    final importCatalog =
+        find.byKey(const ValueKey('free-vpn-catalog-import-action'));
+    await tester.dragUntilVisible(
+      importCatalog,
+      find.byKey(const ValueKey('free-vpn-catalog-sheet')),
+      const Offset(0, -120),
+      maxIteration: 6,
+    );
+    await tester.pumpAndSettle();
+    expect(tester.widget<FilledButton>(importCatalog).onPressed, isNull);
+    await tester.tap(importCatalog);
+    await tester.pumpAndSettle();
+
+    expect(fetchCount, 0);
+    expect(
+        find.byKey(const ValueKey('free-vpn-catalog-sheet')), findsOneWidget);
   });
 
   testWidgets('community import hub routes key and QR actions', (tester) async {
@@ -3783,6 +3843,7 @@ void main() {
     await tester.pumpWidget(
       PokrovSeedApp(
         appContext: buildSeedAppContext(hostPlatform: HostPlatform.android),
+        communityFreeCatalogEnabled: true,
         communitySubscriptionFetcher: (uri) async {
           fetchCount += 1;
           expect(

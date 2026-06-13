@@ -40,7 +40,8 @@ Default properties:
 - support API disabled by default
 - routing modes kept: full tunnel, selected apps, all-except-region
 - optional public config catalogs stay disabled until parser/license/safety
-  gates pass
+  gates pass; manual import also requires
+  `OPEN_CLIENT_ENABLE_FREE_CATALOG=true`
 
 Build define shape:
 
@@ -48,7 +49,8 @@ Build define shape:
 flutter run `
   --dart-define=OPEN_CLIENT_VARIANT=community `
   --dart-define=OPEN_CLIENT_BRAND_NAME="Open Client" `
-  --dart-define=OPEN_CLIENT_ANDROID_PACKAGE_NAME=org.pokrovclient.community
+  --dart-define=OPEN_CLIENT_ANDROID_PACKAGE_NAME=org.pokrovclient.community `
+  --dart-define=OPEN_CLIENT_ENABLE_FREE_CATALOG=false
 ```
 
 ## 2. Operator Client
@@ -140,7 +142,8 @@ Implemented now:
 - gated Free VPN catalog action can manually import the reviewed candidate feed,
   cache accepted entries as local third-party catalog profiles, refresh through
   the existing subscription refresh flow, and clear only those cached catalog
-  entries
+  entries when `OPEN_CLIENT_ENABLE_FREE_CATALOG=true`; default builds keep the
+  preview visible but import disabled
 - community WARP/enhanced-protection public copy avoids official-service
   claims while keeping technical diagnostics internal
 - neutral fallback brand mark when no asset is supplied

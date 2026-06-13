@@ -61,7 +61,8 @@ This roadmap describes the public repository path. It is not a release promise.
 - Make local-only privacy boundaries visible around keys, QR payloads, and
   subscription URLs.
 - Keep Free VPN catalog copy gated, third-party, and promise-free until the
-  feature is explicitly enabled.
+  feature is explicitly enabled. Manual import now stays behind
+  `OPEN_CLIENT_ENABLE_FREE_CATALOG=true`.
 - Prepare user-facing screenshots and import-flow polish before any binary
   release lane.
 

@@ -141,6 +141,10 @@ const _openClientOfficialBuild = bool.fromEnvironment(
   'OPEN_CLIENT_OFFICIAL_BUILD',
   defaultValue: false,
 );
+const _openClientEnableFreeCatalog = bool.fromEnvironment(
+  'OPEN_CLIENT_ENABLE_FREE_CATALOG',
+  defaultValue: false,
+);
 const _selectedAppsEnforcementReady = true;
 const _pokrovAppVersion = '1.0.0-beta.2';
 const _seedRulesetVersion = '2026-04-13';
@@ -853,6 +857,7 @@ class PokrovSeedApp extends StatelessWidget {
     this.runtimeActionTimeout = const Duration(seconds: 18),
     this.communitySubscriptionAutoRefreshInterval = const Duration(minutes: 30),
     this.communitySubscriptionStaleAfter = const Duration(minutes: 30),
+    this.communityFreeCatalogEnabled = _openClientEnableFreeCatalog,
   });
 
   final SeedAppContext appContext;
@@ -865,6 +870,7 @@ class PokrovSeedApp extends StatelessWidget {
   final Duration runtimeActionTimeout;
   final Duration communitySubscriptionAutoRefreshInterval;
   final Duration communitySubscriptionStaleAfter;
+  final bool communityFreeCatalogEnabled;
 
   @override
   Widget build(BuildContext context) {
@@ -956,6 +962,7 @@ class PokrovSeedApp extends StatelessWidget {
         communitySubscriptionAutoRefreshInterval:
             communitySubscriptionAutoRefreshInterval,
         communitySubscriptionStaleAfter: communitySubscriptionStaleAfter,
+        communityFreeCatalogEnabled: communityFreeCatalogEnabled,
       ),
     );
   }
@@ -974,6 +981,7 @@ class PokrovSeedShell extends StatefulWidget {
     this.runtimeActionTimeout = const Duration(seconds: 18),
     this.communitySubscriptionAutoRefreshInterval = const Duration(minutes: 30),
     this.communitySubscriptionStaleAfter = const Duration(minutes: 30),
+    this.communityFreeCatalogEnabled = _openClientEnableFreeCatalog,
   });
 
   final SeedAppContext appContext;
@@ -986,6 +994,7 @@ class PokrovSeedShell extends StatefulWidget {
   final Duration runtimeActionTimeout;
   final Duration communitySubscriptionAutoRefreshInterval;
   final Duration communitySubscriptionStaleAfter;
+  final bool communityFreeCatalogEnabled;
 
   @override
   State<PokrovSeedShell> createState() => _PokrovSeedShellState();
@@ -4044,6 +4053,7 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
             ? null
             : () => _scanCommunityQr(context),
         onRefreshCommunitySubscriptions: _refreshCommunitySubscriptions,
+        communityFreeCatalogEnabled: widget.communityFreeCatalogEnabled,
         onImportCommunityFreeCatalog: _importCommunityFreeCatalog,
         onClearCommunityFreeCatalog: _clearCommunityFreeCatalog,
       ),
@@ -5918,6 +5928,7 @@ class _ProfileSection extends StatelessWidget {
     required this.onRemoveCommunityProfile,
     required this.onScanCommunityQr,
     required this.onRefreshCommunitySubscriptions,
+    required this.communityFreeCatalogEnabled,
     required this.onImportCommunityFreeCatalog,
     required this.onClearCommunityFreeCatalog,
   });
@@ -5949,6 +5960,7 @@ class _ProfileSection extends StatelessWidget {
   final ValueChanged<String> onRemoveCommunityProfile;
   final Future<void> Function()? onScanCommunityQr;
   final Future<void> Function() onRefreshCommunitySubscriptions;
+  final bool communityFreeCatalogEnabled;
   final Future<void> Function() onImportCommunityFreeCatalog;
   final Future<void> Function() onClearCommunityFreeCatalog;
 
@@ -6052,6 +6064,7 @@ class _ProfileSection extends StatelessWidget {
 
     void openCommunityFreeCatalog() => _showCommunityFreeCatalogSheet(
           context,
+          enabled: communityFreeCatalogEnabled,
           cachedProfileCount: catalogProfileCount,
           cachedSourceCount: catalogSourceCount,
           onImport: onImportCommunityFreeCatalog,
@@ -8715,6 +8728,7 @@ void _showInfoSheet(
 
 void _showCommunityFreeCatalogSheet(
   BuildContext context, {
+  required bool enabled,
   required int cachedProfileCount,
   required int cachedSourceCount,
   required Future<void> Function() onImport,
@@ -8725,14 +8739,17 @@ void _showCommunityFreeCatalogSheet(
     showDragHandle: true,
     backgroundColor: _SeedPalette.surface,
     builder: (sheetContext) => _CommunityFreeCatalogSheet(
+      enabled: enabled,
       cachedProfileCount: cachedProfileCount,
       cachedSourceCount: cachedSourceCount,
-      onImport: () {
-        Navigator.of(sheetContext).pop();
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          unawaited(onImport());
-        });
-      },
+      onImport: enabled
+          ? () {
+              Navigator.of(sheetContext).pop();
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                unawaited(onImport());
+              });
+            }
+          : null,
       onClear: cachedProfileCount == 0
           ? null
           : () {
@@ -8747,15 +8764,17 @@ void _showCommunityFreeCatalogSheet(
 
 class _CommunityFreeCatalogSheet extends StatelessWidget {
   const _CommunityFreeCatalogSheet({
+    required this.enabled,
     required this.cachedProfileCount,
     required this.cachedSourceCount,
     required this.onImport,
     required this.onClear,
   });
 
+  final bool enabled;
   final int cachedProfileCount;
   final int cachedSourceCount;
-  final VoidCallback onImport;
+  final VoidCallback? onImport;
   final VoidCallback? onClear;
 
   @override
@@ -8790,6 +8809,20 @@ class _CommunityFreeCatalogSheet extends StatelessWidget {
                   ),
             ),
             const SizedBox(height: 8),
+            Text(
+              enabled
+                  ? 'Manual import is enabled for this build.'
+                  : 'Manual import requires OPEN_CLIENT_ENABLE_FREE_CATALOG=true.',
+              key: const ValueKey('free-vpn-catalog-flag-status'),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: enabled
+                        ? _SeedPalette.ink.withValues(alpha: 0.72)
+                        : _SeedPalette.warning,
+                    height: 1.35,
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+            const SizedBox(height: 8),
             ..._communityFreeCatalogLines.map(
               (line) => Padding(
                 padding: const EdgeInsets.only(bottom: 8),
@@ -8807,7 +8840,7 @@ class _CommunityFreeCatalogSheet extends StatelessWidget {
               key: const ValueKey('free-vpn-catalog-import-action'),
               onPressed: onImport,
               icon: const Icon(Icons.download_rounded),
-              label: const Text('Import reviewed feed'),
+              label: Text(enabled ? 'Import reviewed feed' : 'Import disabled'),
             ),
             const SizedBox(height: 8),
             OutlinedButton.icon(

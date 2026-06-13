@@ -388,6 +388,14 @@ if (Test-Path -LiteralPath $freeVpnCatalogPath -PathType Leaf) {
     $manifestErrors.Add("config\\free-vpn-catalog.seed.json must stay disabled by default")
   }
 
+  if ($freeVpnCatalog.manual_import_build_define -ne "OPEN_CLIENT_ENABLE_FREE_CATALOG") {
+    $manifestErrors.Add("config\\free-vpn-catalog.seed.json must bind manual import to OPEN_CLIENT_ENABLE_FREE_CATALOG")
+  }
+
+  if ($freeVpnCatalog.manual_import_default -ne $false) {
+    $manifestErrors.Add("config\\free-vpn-catalog.seed.json must keep manual import disabled by default")
+  }
+
   if ($freeVpnCatalog.requires_user_opt_in -ne $true) {
     $manifestErrors.Add("config\\free-vpn-catalog.seed.json must require user opt-in")
   }

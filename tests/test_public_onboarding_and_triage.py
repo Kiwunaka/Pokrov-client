@@ -125,3 +125,11 @@ def test_pull_request_template_guards_tracks_release_claims_and_catalog() -> Non
         "source-only release notes",
     ):
         assert phrase in text
+
+
+def test_community_variant_keeps_free_catalog_import_flag_disabled() -> None:
+    text = _read("config/variants/community-client.seed.json")
+
+    assert '"manual_import_build_define": "OPEN_CLIENT_ENABLE_FREE_CATALOG"' in text
+    assert '"manual_import_default": false' in text
+    assert '"OPEN_CLIENT_ENABLE_FREE_CATALOG": "false"' in text
