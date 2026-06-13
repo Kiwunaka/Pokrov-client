@@ -39,13 +39,25 @@ Current repository state:
 - the first sanitized Android and Windows app source snapshot is imported
 - the community client can import local keys, subscription URLs, and Android/Windows QR payloads without POKROV API calls
 - subscription refresh is manual and foreground-only, preserving old local profiles on failure
-- the optional Free VPN catalog is documented as gated third-party metadata and disabled by default
+- the optional third-party public config catalog is documented as gated metadata and disabled by default
 - the operator client path is documented for companies with their own backend
 - official POKROV backend and operations remain private
 - the repository license is GNU GPLv3
 - public release claims stay beta-safe and evidence-based
 
-## Official Links
+## Which App Should I Use?
+
+- Official POKROV users should use official POKROV release channels and
+  support links.
+- Community source users bring their own local keys or subscription URLs. This
+  repository does not provide POKROV nodes or a default free service.
+- Operator builds are supported by the operator that built and distributed
+  them, not by POKROV official support.
+
+## Official POKROV Service Links
+
+These links are for the official POKROV service/app only. They are not support
+or backend endpoints for community builds, forks, or operator builds.
 
 - Website: https://pokrov.space/
 - Cabinet: https://app.pokrov.space/

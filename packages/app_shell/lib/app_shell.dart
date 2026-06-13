@@ -125,9 +125,21 @@ const _openClientCabinetUrl = String.fromEnvironment(
   'OPEN_CLIENT_CABINET_URL',
   defaultValue: '',
 );
+const _openClientSupportUrl = String.fromEnvironment(
+  'OPEN_CLIENT_SUPPORT_URL',
+  defaultValue: '',
+);
+const _openClientPrivacyUrl = String.fromEnvironment(
+  'OPEN_CLIENT_PRIVACY_URL',
+  defaultValue: '',
+);
 const _openClientBrandAsset = String.fromEnvironment(
   'OPEN_CLIENT_BRAND_ASSET',
   defaultValue: '',
+);
+const _openClientOfficialBuild = bool.fromEnvironment(
+  'OPEN_CLIENT_OFFICIAL_BUILD',
+  defaultValue: false,
 );
 const _selectedAppsEnforcementReady = true;
 const _pokrovAppVersion = '1.0.0-beta.2';
@@ -217,6 +229,7 @@ class SeedAppContext {
 
 class ClientVariantProfile {
   const ClientVariantProfile({
+    required this.variant,
     required this.id,
     required this.displayName,
     required this.brandMarkAssetName,
@@ -227,10 +240,13 @@ class ClientVariantProfile {
     required this.feedbackBot,
     required this.publicChannel,
     required this.supportEmail,
+    required this.supportUrl,
+    required this.privacyPolicyUrl,
     required this.usesApiServices,
     required this.description,
   });
 
+  final ProductVariant variant;
   final String id;
   final String displayName;
   final String brandMarkAssetName;
@@ -241,6 +257,8 @@ class ClientVariantProfile {
   final String feedbackBot;
   final String publicChannel;
   final String supportEmail;
+  final String supportUrl;
+  final String privacyPolicyUrl;
   final bool usesApiServices;
   final String description;
 
@@ -253,82 +271,251 @@ class ClientVariantProfile {
 }
 
 ClientVariantProfile selectedClientVariantProfile() {
-  final variant = _openClientVariant.trim().toLowerCase();
-  if (variant == 'pokrov' || variant == 'official') {
-    return ClientVariantProfile(
-      id: 'pokrov',
-      displayName: _openClientBrandName.trim().isEmpty
-          ? 'POKROV'
-          : _openClientBrandName.trim(),
-      brandMarkAssetName: _openClientBrandAsset.trim().isEmpty
-          ? PokrovBrandAssets.mark
-          : _openClientBrandAsset.trim(),
-      apiBaseUrl: _normalizeSeedUrl(
-        _openClientApiBaseUrl.trim().isEmpty
-            ? _apiBaseUrlOverride
-            : _openClientApiBaseUrl,
-        'https://api.pokrov.space/',
-      ),
-      checkoutUrl: _openClientCheckoutUrl.trim().isEmpty
-          ? _checkoutUrlOverride
-          : _openClientCheckoutUrl.trim(),
-      cabinetUrl: _normalizeSeedUrl(
-        _openClientCabinetUrl.trim().isEmpty
-            ? _cabinetUrlOverride
-            : _openClientCabinetUrl,
-        'https://app.pokrov.space/',
-      ),
-      supportBot: '@pokrov_supportbot',
-      feedbackBot: '@pokrov_feedbackbot',
-      publicChannel: '@pokrov_vpn',
-      supportEmail: 'support@pokrov.space',
-      usesApiServices: true,
-      description: 'Official POKROV service client mode.',
-    );
-  }
-
-  if (variant == 'operator' || variant == 'company') {
-    return ClientVariantProfile(
-      id: 'operator',
-      displayName: _openClientBrandName.trim().isEmpty
-          ? 'Operator Connect'
-          : _openClientBrandName.trim(),
-      brandMarkAssetName: _openClientBrandAsset.trim(),
-      apiBaseUrl: _normalizeSeedUrl(
-        _openClientApiBaseUrl,
-        'https://api.example.invalid/',
-      ),
-      checkoutUrl: _openClientCheckoutUrl.trim(),
-      cabinetUrl: _normalizeSeedUrl(
-        _openClientCabinetUrl,
-        'https://app.example.invalid/',
-      ),
-      supportBot: '',
-      feedbackBot: '',
-      publicChannel: '',
-      supportEmail: 'support@example.invalid',
-      usesApiServices: true,
-      description: 'White-label operator mode for a custom service backend.',
-    );
-  }
-
-  return ClientVariantProfile(
-    id: 'community',
-    displayName: _openClientBrandName.trim().isEmpty
-        ? 'Open Client'
-        : _openClientBrandName.trim(),
-    brandMarkAssetName: _openClientBrandAsset.trim(),
-    apiBaseUrl: '',
-    checkoutUrl: '',
-    cabinetUrl: '',
-    supportBot: '',
-    feedbackBot: '',
-    publicChannel: '',
-    supportEmail: '',
-    usesApiServices: false,
-    description:
-        'Community client mode for local keys, subscriptions, and public catalogs.',
+  return buildClientVariantProfileFor(
+    variant: _openClientVariant,
+    brandName: _openClientBrandName,
+    apiBaseUrl: _openClientApiBaseUrl,
+    checkoutUrl: _openClientCheckoutUrl,
+    cabinetUrl: _openClientCabinetUrl,
+    supportUrl: _openClientSupportUrl,
+    privacyPolicyUrl: _openClientPrivacyUrl,
+    brandAsset: _openClientBrandAsset,
+    officialBuild: _openClientOfficialBuild,
   );
+}
+
+ClientVariantProfile buildClientVariantProfileFor({
+  String variant = 'community',
+  String brandName = '',
+  String apiBaseUrl = '',
+  String checkoutUrl = '',
+  String cabinetUrl = '',
+  String supportUrl = '',
+  String privacyPolicyUrl = '',
+  String brandAsset = '',
+  bool officialBuild = false,
+}) {
+  final productVariant = ProductVariantPresentation.parse(variant);
+  switch (productVariant) {
+    case ProductVariant.pokrov:
+      if (!officialBuild) {
+        throw StateError(
+          'OPEN_CLIENT_OFFICIAL_BUILD=true is required for the pokrov variant.',
+        );
+      }
+      final displayName =
+          brandName.trim().isEmpty ? 'POKROV' : brandName.trim();
+      final asset = brandAsset.trim().isEmpty
+          ? PokrovBrandAssets.mark
+          : brandAsset.trim();
+      final normalizedApiBaseUrl = _normalizeSeedUrl(
+        apiBaseUrl.trim().isEmpty ? _apiBaseUrlOverride : apiBaseUrl,
+        'https://api.pokrov.space/',
+      );
+      final normalizedCabinetUrl = _normalizeSeedUrl(
+        cabinetUrl.trim().isEmpty ? _cabinetUrlOverride : cabinetUrl,
+        'https://app.pokrov.space/',
+      );
+      final normalizedCheckoutUrl = checkoutUrl.trim().isEmpty
+          ? _checkoutUrlOverride
+          : checkoutUrl.trim();
+      final normalizedSupportUrl = supportUrl.trim().isEmpty
+          ? 'https://pokrov.space/'
+          : supportUrl.trim();
+      final normalizedPrivacyUrl = privacyPolicyUrl.trim().isEmpty
+          ? 'https://pokrov.space/privacy/'
+          : privacyPolicyUrl.trim();
+      _validatePokrovOfficialBoundary(
+        displayName: displayName,
+        brandAsset: asset,
+        apiBaseUrl: normalizedApiBaseUrl,
+        cabinetUrl: normalizedCabinetUrl,
+        checkoutUrl: normalizedCheckoutUrl,
+        supportUrl: normalizedSupportUrl,
+        privacyPolicyUrl: normalizedPrivacyUrl,
+      );
+      return ClientVariantProfile(
+        variant: ProductVariant.pokrov,
+        id: ProductVariant.pokrov.id,
+        displayName: displayName,
+        brandMarkAssetName: asset,
+        apiBaseUrl: normalizedApiBaseUrl,
+        checkoutUrl: normalizedCheckoutUrl,
+        cabinetUrl: normalizedCabinetUrl,
+        supportBot: '@pokrov_supportbot',
+        feedbackBot: '@pokrov_feedbackbot',
+        publicChannel: '@pokrov_vpn',
+        supportEmail: 'support@pokrov.space',
+        supportUrl: normalizedSupportUrl,
+        privacyPolicyUrl: normalizedPrivacyUrl,
+        usesApiServices: true,
+        description: 'Official POKROV service client mode.',
+      );
+    case ProductVariant.operator:
+      final displayName =
+          brandName.trim().isEmpty ? 'Operator Connect' : brandName.trim();
+      final normalizedApiBaseUrl = _normalizeSeedUrl(apiBaseUrl, '');
+      final normalizedCabinetUrl = _normalizeSeedUrl(cabinetUrl, '');
+      final normalizedCheckoutUrl = checkoutUrl.trim();
+      final normalizedSupportUrl = supportUrl.trim();
+      final normalizedPrivacyUrl = privacyPolicyUrl.trim();
+      _validateOperatorBoundary(
+        displayName: displayName,
+        brandAsset: brandAsset,
+        apiBaseUrl: normalizedApiBaseUrl,
+        cabinetUrl: normalizedCabinetUrl,
+        checkoutUrl: normalizedCheckoutUrl,
+        supportUrl: normalizedSupportUrl,
+        privacyPolicyUrl: normalizedPrivacyUrl,
+      );
+      return ClientVariantProfile(
+        variant: ProductVariant.operator,
+        id: ProductVariant.operator.id,
+        displayName: displayName,
+        brandMarkAssetName: brandAsset.trim(),
+        apiBaseUrl: normalizedApiBaseUrl,
+        checkoutUrl: normalizedCheckoutUrl,
+        cabinetUrl: normalizedCabinetUrl,
+        supportBot: '',
+        feedbackBot: '',
+        publicChannel: '',
+        supportEmail: 'support@example.invalid',
+        supportUrl: normalizedSupportUrl,
+        privacyPolicyUrl: normalizedPrivacyUrl,
+        usesApiServices: true,
+        description: 'White-label operator mode for a custom service backend.',
+      );
+    case ProductVariant.community:
+      final displayName =
+          brandName.trim().isEmpty ? 'Open Client' : brandName.trim();
+      _validateCommunityBoundary(
+        displayName: displayName,
+        brandAsset: brandAsset,
+        apiBaseUrl: apiBaseUrl,
+        cabinetUrl: cabinetUrl,
+        checkoutUrl: checkoutUrl,
+        supportUrl: supportUrl,
+        privacyPolicyUrl: privacyPolicyUrl,
+      );
+      return ClientVariantProfile(
+        variant: ProductVariant.community,
+        id: ProductVariant.community.id,
+        displayName: displayName,
+        brandMarkAssetName: brandAsset.trim(),
+        apiBaseUrl: '',
+        checkoutUrl: '',
+        cabinetUrl: '',
+        supportBot: '',
+        feedbackBot: '',
+        publicChannel: '',
+        supportEmail: '',
+        supportUrl: '',
+        privacyPolicyUrl: '',
+        usesApiServices: false,
+        description:
+            'Community client mode for local keys, subscriptions, and public catalogs.',
+      );
+  }
+}
+
+void _validateCommunityBoundary({
+  required String displayName,
+  required String brandAsset,
+  required String apiBaseUrl,
+  required String cabinetUrl,
+  required String checkoutUrl,
+  required String supportUrl,
+  required String privacyPolicyUrl,
+}) {
+  if (_looksLikePokrovBrand(displayName) || _looksLikePokrovBrand(brandAsset)) {
+    throw StateError(
+      'The community variant must use neutral branding, not POKROV branding.',
+    );
+  }
+  if (_usesPokrovEndpoint(apiBaseUrl) ||
+      _usesPokrovEndpoint(cabinetUrl) ||
+      _usesPokrovEndpoint(checkoutUrl) ||
+      _usesPokrovEndpoint(supportUrl) ||
+      _usesPokrovEndpoint(privacyPolicyUrl)) {
+    throw StateError(
+      'The community variant must not be configured with POKROV endpoints.',
+    );
+  }
+}
+
+void _validateOperatorBoundary({
+  required String displayName,
+  required String brandAsset,
+  required String apiBaseUrl,
+  required String cabinetUrl,
+  required String checkoutUrl,
+  required String supportUrl,
+  required String privacyPolicyUrl,
+}) {
+  if (apiBaseUrl.trim().isEmpty) {
+    throw StateError(
+      'OPEN_CLIENT_API_BASE_URL is required for the operator variant.',
+    );
+  }
+  if (privacyPolicyUrl.trim().isEmpty) {
+    throw StateError(
+      'OPEN_CLIENT_PRIVACY_URL is required for the operator variant.',
+    );
+  }
+  if (_looksLikePokrovBrand(displayName) || _looksLikePokrovBrand(brandAsset)) {
+    throw StateError(
+      'The operator variant must use operator-owned branding by default.',
+    );
+  }
+  if (_usesPokrovEndpoint(apiBaseUrl) ||
+      _usesPokrovEndpoint(cabinetUrl) ||
+      _usesPokrovEndpoint(checkoutUrl) ||
+      _usesPokrovEndpoint(supportUrl) ||
+      _usesPokrovEndpoint(privacyPolicyUrl)) {
+    throw StateError(
+      'The operator variant must not use official POKROV endpoints.',
+    );
+  }
+}
+
+void _validatePokrovOfficialBoundary({
+  required String displayName,
+  required String brandAsset,
+  required String apiBaseUrl,
+  required String cabinetUrl,
+  required String checkoutUrl,
+  required String supportUrl,
+  required String privacyPolicyUrl,
+}) {
+  if (!_looksLikePokrovBrand(displayName) ||
+      !_looksLikePokrovBrand(brandAsset)) {
+    throw StateError(
+      'The pokrov variant must keep official POKROV branding.',
+    );
+  }
+  if (!_usesPokrovEndpoint(apiBaseUrl) ||
+      !_usesPokrovEndpoint(cabinetUrl) ||
+      !_usesPokrovEndpoint(checkoutUrl) ||
+      !_usesPokrovEndpoint(supportUrl) ||
+      !_usesPokrovEndpoint(privacyPolicyUrl)) {
+    throw StateError(
+      'The pokrov variant must use official POKROV endpoints.',
+    );
+  }
+}
+
+bool _looksLikePokrovBrand(String value) {
+  return value.toLowerCase().contains('pokrov');
+}
+
+bool _usesPokrovEndpoint(String value) {
+  final candidate = value.trim();
+  if (candidate.isEmpty) {
+    return false;
+  }
+  final uri = Uri.tryParse(candidate);
+  final host = uri?.host.toLowerCase() ?? candidate.toLowerCase();
+  return host == 'pokrov.space' || host.endsWith('.pokrov.space');
 }
 
 enum RulesPresetState {
@@ -4239,8 +4426,10 @@ class PokrovLegacyDesktopSidebar extends StatelessWidget {
     required this.selectedIndex,
     required this.onSelected,
     required this.collapsed,
+    ClientVariantProfile? variantProfile,
     this.drawer = false,
-  }) : super(
+  })  : variantProfile = variantProfile ?? buildClientVariantProfileFor(),
+        super(
           key: collapsed
               ? const ValueKey('desktop-icon-rail')
               : const ValueKey('desktop-sidebar-expanded'),
@@ -4249,6 +4438,7 @@ class PokrovLegacyDesktopSidebar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onSelected;
   final bool collapsed;
+  final ClientVariantProfile variantProfile;
   final bool drawer;
 
   @override
@@ -4273,7 +4463,7 @@ class PokrovLegacyDesktopSidebar extends StatelessWidget {
               const _BrandMark(size: 32)
             else ...[
               _BrandLockup(
-                variantProfile: selectedClientVariantProfile(),
+                variantProfile: variantProfile,
                 markSize: 34,
               ),
               const SizedBox(height: 4),

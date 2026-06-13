@@ -4,12 +4,10 @@ $requiredDirectories = @(
   "apps",
   "apps\\android_shell",
   "apps\\android_shell\\lib",
-  "apps\\ios_shell",
-  "apps\\ios_shell\\lib",
-  "apps\\macos_shell",
-  "apps\\macos_shell\\lib",
+  "apps\\android_shell\\test",
   "apps\\windows_shell",
   "apps\\windows_shell\\lib",
+  "apps\\windows_shell\\test",
   "packages",
   "packages\\app_shell",
   "packages\\app_shell\\lib",
@@ -24,14 +22,13 @@ $requiredDirectories = @(
   "packages\\support_context",
   "packages\\support_context\\lib",
   "config",
-  "config\\local",
   "config\\templates",
+  "config\\variants",
   "docs",
-  "docs\\architecture",
-  "docs\\decisions",
-  "docs\\specs",
-  "artifacts",
+  "docs\\releases",
+  "assets\\brand",
   "assets\\branding",
+  "assets\\diagrams",
   "scripts",
   "test"
 )
@@ -47,28 +44,26 @@ $requiredFiles = @(
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
   "config\\windows-release.seed.json",
+  "config\\variants\\community-client.seed.json",
+  "config\\variants\\operator-client.seed.json",
+  "config\\variants\\pokrov-service.seed.json",
   "config\\templates\\local.env.example",
-  "config\\templates\\device-overrides.seed.json",
-  "docs\\README.md",
-  "docs\\architecture\\folder-structure.md",
-  "docs\\architecture\\package-boundaries.md",
-  "docs\\architecture\\bootstrap-workflow.md",
-  "docs\\decisions\\2026-04-18-karing-vs-clean-room-gate.md",
-  "docs\\operations\\windows-release-readiness.md",
-  "docs\\specs\\2026-04-18-wave-7-new-base-client-scaffold.md",
+  "docs\\OPEN_SOURCE_SCOPE.md",
+  "docs\\PRODUCT_VARIANTS.md",
+  "docs\\OPERATOR_INTEGRATION.md",
+  "docs\\BUILD_FROM_SOURCE.md",
+  "docs\\RELEASE_CHECKLIST.md",
   "apps\\README.md",
   "apps\\android_shell\\README.md",
   "apps\\android_shell\\pubspec.yaml",
   "apps\\android_shell\\lib\\main.dart",
-  "apps\\ios_shell\\README.md",
-  "apps\\ios_shell\\pubspec.yaml",
-  "apps\\ios_shell\\lib\\main.dart",
-  "apps\\macos_shell\\README.md",
-  "apps\\macos_shell\\pubspec.yaml",
-  "apps\\macos_shell\\lib\\main.dart",
+  "apps\\android_shell\\lib\\community_qr_scanner.dart",
+  "apps\\android_shell\\test\\widget_test.dart",
   "apps\\windows_shell\\README.md",
   "apps\\windows_shell\\pubspec.yaml",
   "apps\\windows_shell\\lib\\main.dart",
+  "apps\\windows_shell\\lib\\community_qr_scanner.dart",
+  "apps\\windows_shell\\test\\widget_test.dart",
   "packages\\README.md",
   "packages\\app_shell\\README.md",
   "packages\\app_shell\\pubspec.yaml",
@@ -86,12 +81,13 @@ $requiredFiles = @(
   "packages\\support_context\\README.md",
   "packages\\support_context\\pubspec.yaml",
   "packages\\support_context\\lib\\support_context.dart",
-  "artifacts\\README.md",
+  "assets\\README.md",
+  "assets\\brand\\pokrov-oss-hero.png",
+  "assets\\brand\\oss-status-card.png",
   "assets\\branding\\README.md",
   "scripts\\README.md",
   "scripts\\bootstrap-workspace.ps1",
   "scripts\\bootstrap-local.ps1",
-  "scripts\\build-windows-release.ps1",
   "scripts\\fetch-libcore-assets.ps1",
   "scripts\\run-tests.ps1",
   "scripts\\validate-seed.ps1",
@@ -106,7 +102,9 @@ $jsonFiles = @(
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
   "config\\windows-release.seed.json",
-  "config\\templates\\device-overrides.seed.json"
+  "config\\variants\\community-client.seed.json",
+  "config\\variants\\operator-client.seed.json",
+  "config\\variants\\pokrov-service.seed.json"
 )
 
 $missing = [System.Collections.Generic.List[string]]::new()
@@ -119,6 +117,25 @@ $expectedHostShells = @{
   ios = "apps/ios_shell"
   macos = "apps/macos_shell"
   windows = "apps/windows_shell"
+}
+
+function Test-PokrovEndpoint {
+  param([string]$Value)
+  if ([string]::IsNullOrWhiteSpace($Value)) {
+    return $false
+  }
+  try {
+    $uri = [System.Uri]::new($Value)
+    $endpointHost = $uri.Host.ToLowerInvariant()
+  } catch {
+    $endpointHost = $Value.ToLowerInvariant()
+  }
+  return ($endpointHost -eq "pokrov.space" -or $endpointHost.EndsWith(".pokrov.space"))
+}
+
+function Test-PokrovBrand {
+  param([string]$Value)
+  return (-not [string]::IsNullOrWhiteSpace($Value)) -and $Value.ToLowerInvariant().Contains("pokrov")
 }
 
 foreach ($relativePath in $requiredDirectories) {
@@ -294,6 +311,115 @@ if (Test-Path -LiteralPath $windowsReleaseConfigPath -PathType Leaf) {
   foreach ($requiredPath in @("pokrov_windows_beta.exe", "libcore.dll", "data/app.so")) {
     if (@($windowsReleaseConfig.required_files) -notcontains $requiredPath) {
       $manifestErrors.Add("config\\windows-release.seed.json must list required build file '$requiredPath'")
+    }
+  }
+}
+
+$communityVariantPath = Join-Path $root "config\\variants\\community-client.seed.json"
+if (Test-Path -LiteralPath $communityVariantPath -PathType Leaf) {
+  $communityVariant = Get-Content -Raw -LiteralPath $communityVariantPath | ConvertFrom-Json
+
+  if ($communityVariant.variant -ne "community") {
+    $manifestErrors.Add("config\\variants\\community-client.seed.json must declare variant community")
+  }
+
+  if ($communityVariant.service_model.uses_managed_service_api -ne $false) {
+    $manifestErrors.Add("config\\variants\\community-client.seed.json must keep managed service API disabled")
+  }
+
+  if ($communityVariant.brand_policy.uses_pokrov_logo -ne $false) {
+    $manifestErrors.Add("config\\variants\\community-client.seed.json must not use the POKROV logo")
+  }
+
+  foreach ($value in @($communityVariant.display_name, $communityVariant.build_defines.OPEN_CLIENT_BRAND_NAME, $communityVariant.build_defines.OPEN_CLIENT_BRAND_ASSET)) {
+    if (Test-PokrovBrand $value) {
+      $manifestErrors.Add("config\\variants\\community-client.seed.json must keep neutral community branding")
+    }
+  }
+
+  foreach ($value in @(
+      $communityVariant.build_defines.OPEN_CLIENT_API_BASE_URL,
+      $communityVariant.build_defines.OPEN_CLIENT_CABINET_URL,
+      $communityVariant.build_defines.OPEN_CLIENT_CHECKOUT_URL,
+      $communityVariant.build_defines.OPEN_CLIENT_SUPPORT_URL,
+      $communityVariant.build_defines.OPEN_CLIENT_PRIVACY_URL
+    )) {
+    if (Test-PokrovEndpoint $value) {
+      $manifestErrors.Add("config\\variants\\community-client.seed.json must not contain official POKROV endpoints")
+    }
+  }
+}
+
+$operatorVariantPath = Join-Path $root "config\\variants\\operator-client.seed.json"
+if (Test-Path -LiteralPath $operatorVariantPath -PathType Leaf) {
+  $operatorVariant = Get-Content -Raw -LiteralPath $operatorVariantPath | ConvertFrom-Json
+
+  if ($operatorVariant.variant -ne "operator") {
+    $manifestErrors.Add("config\\variants\\operator-client.seed.json must declare variant operator")
+  }
+
+  if ($operatorVariant.service_model.uses_managed_service_api -ne $true) {
+    $manifestErrors.Add("config\\variants\\operator-client.seed.json must declare managed service API usage")
+  }
+
+  foreach ($value in @($operatorVariant.display_name, $operatorVariant.build_defines.OPEN_CLIENT_BRAND_NAME, $operatorVariant.build_defines.OPEN_CLIENT_BRAND_ASSET)) {
+    if (Test-PokrovBrand $value) {
+      $manifestErrors.Add("config\\variants\\operator-client.seed.json must keep operator branding neutral by default")
+    }
+  }
+
+  if ([string]::IsNullOrWhiteSpace($operatorVariant.build_defines.OPEN_CLIENT_API_BASE_URL)) {
+    $manifestErrors.Add("config\\variants\\operator-client.seed.json must define OPEN_CLIENT_API_BASE_URL")
+  }
+
+  if ([string]::IsNullOrWhiteSpace($operatorVariant.build_defines.OPEN_CLIENT_PRIVACY_URL)) {
+    $manifestErrors.Add("config\\variants\\operator-client.seed.json must define OPEN_CLIENT_PRIVACY_URL")
+  }
+
+  foreach ($value in @(
+      $operatorVariant.build_defines.OPEN_CLIENT_API_BASE_URL,
+      $operatorVariant.build_defines.OPEN_CLIENT_CABINET_URL,
+      $operatorVariant.build_defines.OPEN_CLIENT_CHECKOUT_URL,
+      $operatorVariant.build_defines.OPEN_CLIENT_SUPPORT_URL,
+      $operatorVariant.build_defines.OPEN_CLIENT_PRIVACY_URL
+    )) {
+    if (Test-PokrovEndpoint $value) {
+      $manifestErrors.Add("config\\variants\\operator-client.seed.json must not contain official POKROV endpoints")
+    }
+  }
+}
+
+$pokrovVariantPath = Join-Path $root "config\\variants\\pokrov-service.seed.json"
+if (Test-Path -LiteralPath $pokrovVariantPath -PathType Leaf) {
+  $pokrovVariant = Get-Content -Raw -LiteralPath $pokrovVariantPath | ConvertFrom-Json
+
+  if ($pokrovVariant.variant -ne "pokrov") {
+    $manifestErrors.Add("config\\variants\\pokrov-service.seed.json must declare variant pokrov")
+  }
+
+  if ($pokrovVariant.brand_policy.official_build_only -ne $true) {
+    $manifestErrors.Add("config\\variants\\pokrov-service.seed.json must remain official-build-only")
+  }
+
+  if ($pokrovVariant.build_defines.OPEN_CLIENT_OFFICIAL_BUILD -ne "true") {
+    $manifestErrors.Add("config\\variants\\pokrov-service.seed.json must set OPEN_CLIENT_OFFICIAL_BUILD true")
+  }
+
+  foreach ($value in @($pokrovVariant.display_name, $pokrovVariant.build_defines.OPEN_CLIENT_BRAND_NAME, $pokrovVariant.build_defines.OPEN_CLIENT_BRAND_ASSET)) {
+    if (-not (Test-PokrovBrand $value)) {
+      $manifestErrors.Add("config\\variants\\pokrov-service.seed.json must keep official POKROV branding")
+    }
+  }
+
+  foreach ($value in @(
+      $pokrovVariant.build_defines.OPEN_CLIENT_API_BASE_URL,
+      $pokrovVariant.build_defines.OPEN_CLIENT_CABINET_URL,
+      $pokrovVariant.build_defines.OPEN_CLIENT_CHECKOUT_URL,
+      $pokrovVariant.build_defines.OPEN_CLIENT_SUPPORT_URL,
+      $pokrovVariant.build_defines.OPEN_CLIENT_PRIVACY_URL
+    )) {
+    if (-not (Test-PokrovEndpoint $value)) {
+      $manifestErrors.Add("config\\variants\\pokrov-service.seed.json must keep official POKROV endpoints")
     }
   }
 }

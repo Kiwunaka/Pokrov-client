@@ -9,6 +9,7 @@ import 'package:pokrov_core_domain/core_domain.dart';
 import 'package:pokrov_runtime_engine/runtime_engine.dart';
 
 const _testPokrovProfile = ClientVariantProfile(
+  variant: ProductVariant.pokrov,
   id: 'pokrov',
   displayName: 'POKROV',
   brandMarkAssetName: 'assets/brand/pokrov_mark.png',
@@ -19,6 +20,8 @@ const _testPokrovProfile = ClientVariantProfile(
   feedbackBot: '@pokrov_feedbackbot',
   publicChannel: '@pokrov_vpn',
   supportEmail: 'support@pokrov.space',
+  supportUrl: 'https://pokrov.space/',
+  privacyPolicyUrl: 'https://pokrov.space/privacy/',
   usesApiServices: true,
   description: 'Official POKROV service client mode.',
 );
@@ -4914,6 +4917,7 @@ void main() {
       final appContext = buildSeedAppContext(hostPlatform: platform);
 
       expect(appContext.hostPlatform, platform);
+      expect(appContext.variantProfile.variant, ProductVariant.community);
       expect(appContext.variantProfile.id, 'community');
       expect(appContext.variantProfile.displayName, 'Open Client');
       expect(appContext.variantProfile.usesApiServices, isFalse);
@@ -4937,5 +4941,110 @@ void main() {
       expect(appContext.redeemHint, isEmpty);
       expect(appContext.locations, hasLength(1));
     }
+  });
+
+  test('community variant rejects official POKROV brand and endpoints', () {
+    final profile = buildClientVariantProfileFor(
+      brandName: 'Open Client',
+      apiBaseUrl: 'https://api.open.example/',
+      cabinetUrl: 'https://app.open.example/',
+      checkoutUrl: 'https://pay.open.example/',
+      supportUrl: 'https://support.open.example/',
+      privacyPolicyUrl: 'https://open.example/privacy/',
+    );
+
+    expect(profile.variant, ProductVariant.community);
+    expect(profile.usesApiServices, isFalse);
+    expect(profile.apiBaseUrl, isEmpty);
+    expect(profile.cabinetUrl, isEmpty);
+    expect(profile.checkoutUrl, isEmpty);
+    expect(profile.supportUrl, isEmpty);
+    expect(profile.privacyPolicyUrl, isEmpty);
+
+    expect(
+      () => buildClientVariantProfileFor(brandName: 'POKROV'),
+      throwsStateError,
+    );
+    expect(
+      () => buildClientVariantProfileFor(
+        apiBaseUrl: 'https://api.pokrov.space/',
+      ),
+      throwsStateError,
+    );
+  });
+
+  test('operator variant requires owned API privacy and neutral brand', () {
+    final profile = buildClientVariantProfileFor(
+      variant: 'operator',
+      brandName: 'Acme Connect',
+      apiBaseUrl: 'https://api.acme.example/',
+      cabinetUrl: 'https://app.acme.example/',
+      checkoutUrl: 'https://pay.acme.example/checkout',
+      supportUrl: 'https://support.acme.example/',
+      privacyPolicyUrl: 'https://acme.example/privacy/',
+    );
+
+    expect(profile.variant, ProductVariant.operator);
+    expect(profile.id, 'operator');
+    expect(profile.displayName, 'Acme Connect');
+    expect(profile.usesApiServices, isTrue);
+    expect(profile.apiBaseUrl, 'https://api.acme.example/');
+    expect(profile.cabinetUrl, 'https://app.acme.example/');
+    expect(profile.privacyPolicyUrl, 'https://acme.example/privacy/');
+
+    expect(
+      () => buildClientVariantProfileFor(
+        variant: 'operator',
+        privacyPolicyUrl: 'https://acme.example/privacy/',
+      ),
+      throwsStateError,
+    );
+    expect(
+      () => buildClientVariantProfileFor(
+        variant: 'operator',
+        brandName: 'POKROV Operator',
+        apiBaseUrl: 'https://api.acme.example/',
+        privacyPolicyUrl: 'https://acme.example/privacy/',
+      ),
+      throwsStateError,
+    );
+    expect(
+      () => buildClientVariantProfileFor(
+        variant: 'operator',
+        brandName: 'Acme Connect',
+        apiBaseUrl: 'https://api.pokrov.space/',
+        privacyPolicyUrl: 'https://acme.example/privacy/',
+      ),
+      throwsStateError,
+    );
+  });
+
+  test('pokrov variant requires explicit official boundary', () {
+    expect(
+      () => buildClientVariantProfileFor(variant: 'pokrov'),
+      throwsStateError,
+    );
+
+    final profile = buildClientVariantProfileFor(
+      variant: 'pokrov',
+      officialBuild: true,
+    );
+
+    expect(profile.variant, ProductVariant.pokrov);
+    expect(profile.id, 'pokrov');
+    expect(profile.displayName, 'POKROV');
+    expect(profile.usesApiServices, isTrue);
+    expect(profile.apiBaseUrl, 'https://api.pokrov.space/');
+    expect(profile.cabinetUrl, 'https://app.pokrov.space/');
+    expect(profile.privacyPolicyUrl, 'https://pokrov.space/privacy/');
+
+    expect(
+      () => buildClientVariantProfileFor(
+        variant: 'pokrov',
+        officialBuild: true,
+        apiBaseUrl: 'https://api.acme.example/',
+      ),
+      throwsStateError,
+    );
   });
 }

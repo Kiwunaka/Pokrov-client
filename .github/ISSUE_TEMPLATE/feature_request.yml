@@ -3,6 +3,10 @@ description: Suggest an improvement for the public client.
 title: "[Feature]: "
 labels: ["enhancement"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Please do not request hidden POKROV backend access, default free VPN/service claims, official node claims for third-party configs, or public security details.
   - type: textarea
     id: problem
     attributes:

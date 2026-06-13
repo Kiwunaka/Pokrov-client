@@ -23,9 +23,10 @@ Read:
 - Keep changes focused and easy to review.
 - Do not commit secrets, private URLs, tokens, signing material, or personal
   connection links.
-- Do not add public claims about store availability, stable releases, trusted
-  signing, or production readiness unless the repository contains matching
-  evidence.
+- Routine PRs must not add public claims about store availability, stable
+  releases, trusted signing, production readiness, RU-origin readiness, or WARP
+  production readiness. Maintainers may update release policy only after
+  explicit public evidence and approval.
 - Do not present forks as official POKROV builds.
 - Keep community-client keys, QR payloads, subscription URLs, and public catalog
   imports local-only unless a future policy explicitly says otherwise.
