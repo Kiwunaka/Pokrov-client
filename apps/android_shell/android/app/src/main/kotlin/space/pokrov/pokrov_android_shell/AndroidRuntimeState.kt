@@ -26,7 +26,7 @@ internal object AndroidRuntimeState {
     private var environment: AndroidRuntimeEnvironment? = null
     private var phase: AndroidRuntimePhase = AndroidRuntimePhase.ARTIFACT_MISSING
     private var stagedConfigPath: String? = null
-    private var lastMessage = "POKROV has not checked this device yet."
+    private var lastMessage = NativeBranding.message("{app} has not checked this device yet.")
     private var lastRunningMessage: String? = null
     private var defaultNetworkInterface: String? = null
     private var defaultNetworkIndex: Int? = null
@@ -53,7 +53,7 @@ internal object AndroidRuntimeState {
             return null
         }
 
-        val baseDirectory = File(context.filesDir, "pokrov-runtime")
+        val baseDirectory = File(context.filesDir, NativeBranding.runtimeDirectory)
         val workingDirectory = File(baseDirectory, "working")
         val tempDirectory = File(baseDirectory, "temp")
         val configDirectory = File(workingDirectory, "configs")
@@ -74,7 +74,7 @@ internal object AndroidRuntimeState {
         environment = resolved
         if (phase == AndroidRuntimePhase.ARTIFACT_MISSING) {
             phase = AndroidRuntimePhase.ARTIFACT_READY
-            lastMessage = "POKROV found the packaged runtime and can get this device ready."
+            lastMessage = NativeBranding.message("{app} found the packaged runtime and can get this device ready.")
         }
         return resolved
     }
@@ -102,11 +102,11 @@ internal object AndroidRuntimeState {
             } else {
                 AndroidRuntimePhase.INITIALIZED
             }
-            lastMessage = "POKROV подготовил устройство."
+            lastMessage = NativeBranding.message("{app} подготовил устройство.")
             true
         } catch (error: Throwable) {
             phase = AndroidRuntimePhase.ARTIFACT_READY
-            lastMessage = "POKROV не смог подготовить устройство: ${error.message ?: error.javaClass.simpleName}"
+            lastMessage = NativeBranding.message("{app} не смог подготовить устройство: ${error.message ?: error.javaClass.simpleName}")
             false
         }
     }
@@ -117,12 +117,12 @@ internal object AndroidRuntimeState {
         phase = AndroidRuntimePhase.CONFIG_STAGED
         lastFailureKind = null
         lastStopReason = null
-        lastMessage = "POKROV подготовил профиль для этого устройства."
+        lastMessage = NativeBranding.message("{app} подготовил профиль для этого устройства.")
     }
 
     @Synchronized
     fun markPermissionRequested() {
-        lastMessage = "Android просит разрешение, чтобы POKROV мог подключить это устройство."
+        lastMessage = NativeBranding.message("Android просит разрешение, чтобы {app} мог подключить это устройство.")
     }
 
     @Synchronized
@@ -136,7 +136,7 @@ internal object AndroidRuntimeState {
 
     @Synchronized
     fun markStopRequested(
-        message: String = "Отключаем POKROV на этом устройстве...",
+        message: String = NativeBranding.message("Отключаем {app} на этом устройстве..."),
         stopReason: String = "user_requested",
     ) {
         phase = when {
@@ -159,7 +159,7 @@ internal object AndroidRuntimeState {
             else -> AndroidRuntimePhase.ARTIFACT_MISSING
         }
         lastStopReason = stopReason
-        if (message == "POKROV отключен на этом устройстве." && shouldPreserveFailureMessage()) {
+        if (message == NativeBranding.message("{app} отключен на этом устройстве.") && shouldPreserveFailureMessage()) {
             return
         }
         lastMessage = message
@@ -307,7 +307,7 @@ internal object AndroidRuntimeState {
         val resolvedMessage = when {
             !runningMessage.isNullOrBlank() -> runningMessage
             !lastRunningMessage.isNullOrBlank() -> lastRunningMessage!!
-            else -> "POKROV включен на этом устройстве."
+            else -> NativeBranding.message("{app} включен на этом устройстве.")
         }
         lastRunningMessage = resolvedMessage
         val normalizedMessage = lastMessage.lowercase()

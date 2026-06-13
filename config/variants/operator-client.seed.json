@@ -38,6 +38,7 @@
   "build_defines": {
     "OPEN_CLIENT_VARIANT": "operator",
     "OPEN_CLIENT_BRAND_NAME": "Operator Connect",
+    "OPEN_CLIENT_ANDROID_PACKAGE_NAME": "com.example.operatorconnect",
     "OPEN_CLIENT_API_BASE_URL": "https://api.example.invalid/",
     "OPEN_CLIENT_CABINET_URL": "https://app.example.invalid/",
     "OPEN_CLIENT_CHECKOUT_URL": "",

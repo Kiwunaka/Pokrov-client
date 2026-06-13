@@ -48,7 +48,10 @@ Read [PRODUCT_VARIANTS.md](PRODUCT_VARIANTS.md) and
 Example community run:
 
 ```powershell
-flutter run --dart-define=OPEN_CLIENT_VARIANT=community --dart-define=OPEN_CLIENT_BRAND_NAME="Open Client"
+flutter run `
+  --dart-define=OPEN_CLIENT_VARIANT=community `
+  --dart-define=OPEN_CLIENT_BRAND_NAME="Open Client" `
+  --dart-define=OPEN_CLIENT_ANDROID_PACKAGE_NAME=org.pokrovclient.community
 ```
 
 Example operator run:
@@ -57,6 +60,7 @@ Example operator run:
 flutter run `
   --dart-define=OPEN_CLIENT_VARIANT=operator `
   --dart-define=OPEN_CLIENT_BRAND_NAME="Acme VPN" `
+  --dart-define=OPEN_CLIENT_ANDROID_PACKAGE_NAME=com.acme.vpn `
   --dart-define=OPEN_CLIENT_API_BASE_URL="https://api.acme.example/" `
   --dart-define=OPEN_CLIENT_CABINET_URL="https://app.acme.example/" `
   --dart-define=OPEN_CLIENT_SUPPORT_URL="https://support.acme.example/" `
@@ -72,6 +76,44 @@ powershell -ExecutionPolicy Bypass -File .\scripts\export-white-label-color-toke
 
 See [White-label branding](WHITE_LABEL_BRANDING.md) for the token roles,
 contrast checks, and operator-owned branding boundary.
+
+## Native Host Branding
+
+Dart `--dart-define` values configure the shared Flutter shell. Native Android
+and Windows host metadata have their own build knobs so distributable
+community/operator artifacts do not inherit official POKROV labels.
+
+Android defaults to neutral open-source values:
+
+- `applicationId`: `org.pokrovclient.community`
+- app label: `Open Client`
+- foreground-service subtype: `open-client-runtime`
+
+Override them through Gradle project properties in an operator release
+pipeline. Keep `openClientApplicationId` aligned with the Dart
+`OPEN_CLIENT_ANDROID_PACKAGE_NAME` define so Android route bypass rules point at
+the actual app package:
+
+```powershell
+Push-Location apps/android_shell/android
+.\gradlew.bat assembleRelease `
+  -PopenClientApplicationId=com.acme.vpn `
+  -PopenClientAppLabel="Acme VPN" `
+  -PopenClientRuntimeDirectory=acme-vpn-runtime `
+  -PopenClientRuntimeNotificationChannelName="Acme VPN connection"
+Pop-Location
+```
+
+Windows defaults to `open_client_windows.exe` and neutral `Open Client`
+resource metadata. Override the CMake cache values when configuring an
+operator build in your Windows release pipeline:
+
+```powershell
+cmake -S apps/windows_shell/windows -B apps/windows_shell/build/windows/x64 `
+  -DOPEN_CLIENT_WINDOWS_BINARY_NAME=acme_vpn `
+  -DOPEN_CLIENT_WINDOWS_APP_NAME="Acme VPN" `
+  -DOPEN_CLIENT_WINDOWS_COMPANY_NAME="Acme Inc."
+```
 
 ## Resolve Dependencies
 

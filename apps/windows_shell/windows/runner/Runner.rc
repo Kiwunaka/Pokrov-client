@@ -72,6 +72,30 @@ IDI_APP_ICON            ICON                    "resources\\app_icon.ico"
 #define VERSION_AS_STRING "1.0.0"
 #endif
 
+#if !defined(OC_WIN_COMPANY_NAME)
+#define OC_WIN_COMPANY_NAME "Open Client contributors"
+#endif
+
+#if !defined(OC_WIN_FILE_DESC)
+#define OC_WIN_FILE_DESC "Open Client"
+#endif
+
+#if !defined(OC_WIN_INTERNAL_NAME)
+#define OC_WIN_INTERNAL_NAME "open_client_windows"
+#endif
+
+#if !defined(OC_WIN_ORIGINAL_FILE)
+#define OC_WIN_ORIGINAL_FILE "open_client_windows.exe"
+#endif
+
+#if !defined(OC_WIN_PRODUCT_NAME)
+#define OC_WIN_PRODUCT_NAME "Open Client"
+#endif
+
+#if !defined(OC_WIN_COPYRIGHT)
+#define OC_WIN_COPYRIGHT "Copyright (C) 2026 Open Client contributors. GPLv3."
+#endif
+
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION VERSION_AS_NUMBER
  PRODUCTVERSION VERSION_AS_NUMBER
@@ -89,13 +113,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "space.pokrov" "\0"
-            VALUE "FileDescription", "POKROV" "\0"
+            VALUE "CompanyName", OC_WIN_COMPANY_NAME "\0"
+            VALUE "FileDescription", OC_WIN_FILE_DESC "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "pokrov_windows_beta" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 space.pokrov. All rights reserved." "\0"
-            VALUE "OriginalFilename", "pokrov_windows_beta.exe" "\0"
-            VALUE "ProductName", "POKROV" "\0"
+            VALUE "InternalName", OC_WIN_INTERNAL_NAME "\0"
+            VALUE "LegalCopyright", OC_WIN_COPYRIGHT "\0"
+            VALUE "OriginalFilename", OC_WIN_ORIGINAL_FILE "\0"
+            VALUE "ProductName", OC_WIN_PRODUCT_NAME "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

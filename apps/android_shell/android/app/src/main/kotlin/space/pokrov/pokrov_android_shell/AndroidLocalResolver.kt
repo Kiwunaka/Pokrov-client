@@ -189,7 +189,7 @@ internal object AndroidLocalResolver : LocalDNSTransport {
             AndroidRuntimeState.recordFailureKind("default_network_unavailable")
             AndroidRuntimeState.markDegraded(
                 failureKind = "default_network_unavailable",
-                message = "Android подключил POKROV, но обычная сеть устройства еще не готова для DNS.",
+                message = NativeBranding.message("Android подключил {app}, но обычная сеть устройства еще не готова для DNS."),
             )
             throw error
         }

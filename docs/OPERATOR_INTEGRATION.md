@@ -155,6 +155,7 @@ first operator smoke:
 flutter build windows --release `
   --dart-define=OPEN_CLIENT_VARIANT=operator `
   --dart-define=OPEN_CLIENT_BRAND_NAME="Acme VPN" `
+  --dart-define=OPEN_CLIENT_ANDROID_PACKAGE_NAME=com.acme.vpn `
   --dart-define=OPEN_CLIENT_API_BASE_URL="https://api.acme.example/" `
   --dart-define=OPEN_CLIENT_CABINET_URL="https://app.acme.example/" `
   --dart-define=OPEN_CLIENT_CHECKOUT_URL="https://pay.acme.example/checkout" `
@@ -163,7 +164,9 @@ flutter build windows --release `
 ```
 
 For Android, pass the same defines to `flutter build apk` or your Gradle-backed
-Flutter build.
+Flutter build. Keep `OPEN_CLIENT_ANDROID_PACKAGE_NAME` aligned with the Gradle
+`openClientApplicationId` property so Android self-bypass routing uses the
+actual package name.
 
 This is a build example only. Operators still own signing, store review,
 privacy/legal review, update metadata, support, abuse handling, payment/refund
@@ -173,7 +176,8 @@ flows, checksums, and release evidence.
 
 - replace launcher icons
 - replace `OPEN_CLIENT_BRAND_ASSET` or keep the neutral text mark
-- set package/bundle identifiers
+- set package/bundle identifiers, including both `OPEN_CLIENT_ANDROID_PACKAGE_NAME`
+  and Android `openClientApplicationId`
 - set Windows runner metadata
 - update privacy policy/support links
 - remove all claims that imply official POKROV operation

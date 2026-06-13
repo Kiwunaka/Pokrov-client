@@ -6,11 +6,30 @@ plugins {
 }
 
 def libcoreAar = file("libs/libcore.aar")
+def openClientProp = { name, fallback ->
+    def value = project.findProperty(name)
+    return value == null ? fallback : value.toString()
+}
+def javaStringLiteral = { value ->
+    return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+}
+
+def openClientApplicationId = openClientProp("openClientApplicationId", "org.pokrovclient.community")
+def openClientAppLabel = openClientProp("openClientAppLabel", "Open Client")
+def openClientRuntimeDirectory = openClientProp("openClientRuntimeDirectory", "open-client-runtime")
+def openClientRuntimeNotificationChannelId = openClientProp("openClientRuntimeNotificationChannelId", "open-client-runtime")
+def openClientRuntimeNotificationChannelName = openClientProp("openClientRuntimeNotificationChannelName", "Open Client connection")
+def openClientRuntimeActionPrefix = openClientProp("openClientRuntimeActionPrefix", "org.pokrovclient.runtime")
+def openClientDebugExtraPrefix = openClientProp("openClientDebugExtraPrefix", "org.pokrovclient.debug")
 
 android {
     namespace = "space.pokrov.pokrov_android_shell"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -22,11 +41,21 @@ android {
     }
 
     defaultConfig {
-        applicationId = "space.pokrov.pokrov_android_shell"
+        applicationId = openClientApplicationId
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders += [
+            openClientAppLabel: openClientAppLabel,
+            openClientRuntimeVpnSubtype: openClientRuntimeDirectory,
+        ]
+        buildConfigField "String", "OPEN_CLIENT_APP_NAME", javaStringLiteral(openClientAppLabel)
+        buildConfigField "String", "OPEN_CLIENT_RUNTIME_DIRECTORY", javaStringLiteral(openClientRuntimeDirectory)
+        buildConfigField "String", "OPEN_CLIENT_RUNTIME_NOTIFICATION_CHANNEL_ID", javaStringLiteral(openClientRuntimeNotificationChannelId)
+        buildConfigField "String", "OPEN_CLIENT_RUNTIME_NOTIFICATION_CHANNEL_NAME", javaStringLiteral(openClientRuntimeNotificationChannelName)
+        buildConfigField "String", "OPEN_CLIENT_RUNTIME_ACTION_PREFIX", javaStringLiteral(openClientRuntimeActionPrefix)
+        buildConfigField "String", "OPEN_CLIENT_DEBUG_EXTRA_PREFIX", javaStringLiteral(openClientDebugExtraPrefix)
     }
 
     buildTypes {

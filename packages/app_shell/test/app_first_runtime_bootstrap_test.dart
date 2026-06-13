@@ -2319,7 +2319,7 @@ void main() {
         (rule) =>
             (rule['inbound'] as List?)?.contains('tun-in') == true &&
             (rule['package_name'] as List?)
-                    ?.contains('space.pokrov.pokrov_android_shell') ==
+                    ?.contains('org.pokrovclient.community') ==
                 true &&
             rule['outbound'] == 'direct',
       ),
@@ -2855,7 +2855,7 @@ void main() {
         (rule) =>
             (rule['inbound'] as List?)?.contains('tun-in') == true &&
             (rule['package_name'] as List?)
-                    ?.contains('space.pokrov.pokrov_android_shell') ==
+                    ?.contains('org.pokrovclient.community') ==
                 true &&
             rule['outbound'] == 'direct',
       ),

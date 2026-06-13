@@ -908,7 +908,10 @@ class AppFirstRuntimeBootstrapper
 
   static const _appVersion = '1.0.0-beta.2';
   static const _defaultManagedManifestPath = '/api/client/profile/managed';
-  static const _androidShellPackageName = 'space.pokrov.pokrov_android_shell';
+  static const _androidShellPackageName = String.fromEnvironment(
+    'OPEN_CLIENT_ANDROID_PACKAGE_NAME',
+    defaultValue: 'org.pokrovclient.community',
+  );
   static const _allExceptRuRuleSetCacheDirectoryName =
       'all-except-ru-rule-sets';
   static const _ruDomainWhitelistRuleSetTag = 'pokrov-ru-domain-whitelist';

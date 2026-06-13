@@ -52,7 +52,7 @@ class PokrovRuntimeVpnService : VpnService(), PlatformInterface {
                 Log.i(LOG_TAG, "Received STOP for Android runtime service.")
                 runtimeExecutor.execute {
                     stopRuntime(
-                        message = "POKROV выключен на этом устройстве.",
+                        message = NativeBranding.message("{app} выключен на этом устройстве."),
                         stopReason = "user_requested",
                     )
                     mainHandler.post { stopSelf() }
@@ -63,7 +63,7 @@ class PokrovRuntimeVpnService : VpnService(), PlatformInterface {
                 if (configPath.isNullOrBlank()) {
                     AndroidRuntimeState.markFailure(
                         kind = "missing_staged_config",
-                        message = "На этом устройстве не хватает настроек подключения POKROV.",
+                        message = NativeBranding.message("На этом устройстве не хватает настроек подключения {app}."),
                     )
                     Log.e(LOG_TAG, "Android runtime start is missing a staged config path.")
                     stopSelf()
@@ -78,7 +78,7 @@ class PokrovRuntimeVpnService : VpnService(), PlatformInterface {
                     } catch (error: Throwable) {
                         AndroidRuntimeState.markFailure(
                             kind = "foreground_start_failed",
-                            message = "POKROV не смог завершить подготовку устройства: ${error.message ?: error.javaClass.simpleName}",
+                            message = NativeBranding.message("{app} не смог завершить подготовку устройства: ${error.message ?: error.javaClass.simpleName}"),
                         )
                         Log.e(LOG_TAG, "Android runtime foreground start failed:", error)
                         stopSelf()
@@ -94,7 +94,7 @@ class PokrovRuntimeVpnService : VpnService(), PlatformInterface {
         if (boxService != null || activeTun != null) {
             runtimeExecutor.execute {
                 stopRuntime(
-                    message = "POKROV выключен на этом устройстве.",
+                    message = NativeBranding.message("{app} выключен на этом устройстве."),
                     stopReason = "service_destroyed",
                 )
             }
@@ -106,7 +106,7 @@ class PokrovRuntimeVpnService : VpnService(), PlatformInterface {
     override fun onRevoke() {
         runtimeExecutor.execute {
             stopRuntime(
-                message = "Разрешение Android было отозвано, поэтому POKROV выключен на этом устройстве.",
+                message = NativeBranding.message("Разрешение Android было отозвано, поэтому {app} выключен на этом устройстве."),
                 stopReason = "vpn_permission_revoked",
             )
             mainHandler.post { stopSelf() }
@@ -141,7 +141,7 @@ class PokrovRuntimeVpnService : VpnService(), PlatformInterface {
         } catch (error: Throwable) {
             AndroidRuntimeState.markFailure(
                 kind = "runtime_service_start_failed",
-                message = "POKROV не смог подключиться на этом устройстве: ${error.message ?: error.javaClass.simpleName}",
+                message = NativeBranding.message("{app} не смог подключиться на этом устройстве: ${error.message ?: error.javaClass.simpleName}"),
             )
             Log.e(LOG_TAG, "Android runtime service failed to start.", error)
             stopSelf()
@@ -172,13 +172,13 @@ class PokrovRuntimeVpnService : VpnService(), PlatformInterface {
         }
     }
 
-    private fun buildNotification(contentText: String, title: String = "POKROV на этом устройстве"): Notification {
+    private fun buildNotification(contentText: String, title: String = NativeBranding.message("{app} на этом устройстве")): Notification {
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,
-                "Подключение POKROV",
+                NativeBranding.notificationChannelName,
                 NotificationManager.IMPORTANCE_LOW,
             )
             notificationManager.createNotificationChannel(channel)
@@ -225,8 +225,8 @@ class PokrovRuntimeVpnService : VpnService(), PlatformInterface {
 
     private fun beginForegroundRuntime() {
         val notification = buildNotification(
-            contentText = "Готовим POKROV на этом устройстве...",
-            title = "POKROV готовит подключение",
+            contentText = NativeBranding.message("Готовим {app} на этом устройстве..."),
+            title = NativeBranding.message("{app} готовит подключение"),
         )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             startForeground(
@@ -464,8 +464,8 @@ class PokrovRuntimeVpnService : VpnService(), PlatformInterface {
         notificationManager.notify(
             NOTIFICATION_ID,
             buildNotification(
-                contentText = "POKROV работает на этом устройстве.",
-                title = "POKROV включен",
+                contentText = NativeBranding.message("{app} работает на этом устройстве."),
+                title = NativeBranding.message("{app} включен"),
             ),
         )
         return tun.fd
@@ -564,10 +564,10 @@ class PokrovRuntimeVpnService : VpnService(), PlatformInterface {
 
     companion object {
         private const val LOG_TAG = "PokrovRuntimeVpn"
-        private const val NOTIFICATION_CHANNEL_ID = "pokrov-runtime"
+        private val NOTIFICATION_CHANNEL_ID = NativeBranding.notificationChannelId
         private const val NOTIFICATION_ID = 1407
-        const val ACTION_START = "space.pokrov.runtime.START"
-        const val ACTION_STOP = "space.pokrov.runtime.STOP"
+        val ACTION_START = "${NativeBranding.runtimeActionPrefix}.START"
+        val ACTION_STOP = "${NativeBranding.runtimeActionPrefix}.STOP"
         const val EXTRA_CONFIG_PATH = "extra_config_path"
         @Volatile
         private var tunEstablished: Boolean = false
@@ -580,7 +580,7 @@ class PokrovRuntimeVpnService : VpnService(), PlatformInterface {
 
         private fun markServiceStarting() {
             tunEstablished = false
-            currentRuntimeMessage = "POKROV готовит подключение на этом устройстве."
+            currentRuntimeMessage = NativeBranding.message("{app} готовит подключение на этом устройстве.")
         }
 
         private fun markTunEstablished(message: String) {
