@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.11
+# Source Readiness: v0.2-v0.13
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -20,6 +20,28 @@ Required before tagging:
 
 - choose the exact commit SHA
 - run the full source release checklist
+- record source archive SHA-256 in the GitHub Release body
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
+## v0.3.0-source Candidate
+
+Status: not tagged.
+
+Current evidence on `main`:
+
+- operator fixture API contract and OpenAPI documentation
+- gated Free VPN catalog seed and parser fixtures
+- white-label color token seed, validation, and export helper
+- manual, app-resume, and in-app foreground subscription refresh scheduler
+
+Required before tagging:
+
+- choose the exact commit SHA
+- rerun `python -m pytest tests`
+- rerun `powershell -ExecutionPolicy Bypass -File .\scripts\validate-seed.ps1`
+- rerun `powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1 -Source .`
+- rerun `powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1`
 - record source archive SHA-256 in the GitHub Release body
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
@@ -167,25 +189,39 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
-## v0.3.0-source Candidate
+## v0.12.0-source Candidate
 
-Status: not tagged.
+Status: stacked PR green, not tagged.
 
-Current evidence on `main`:
+Current evidence:
 
-- operator fixture API contract and OpenAPI documentation
-- gated Free VPN catalog seed and parser fixtures
-- white-label color token seed, validation, and export helper
-- manual, app-resume, and in-app foreground subscription refresh scheduler
+- PR #31: source-readiness synchronization for stacked source-only milestones
+  through the Free VPN catalog cache action slice
+- GitHub CI green on the stacked PR
 
 Required before tagging:
 
+- merge the stacked PR sequence through `main`
 - choose the exact commit SHA
-- rerun `python -m pytest tests`
-- rerun `powershell -ExecutionPolicy Bypass -File .\scripts\validate-seed.ps1`
-- rerun `powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1 -Source .`
-- rerun `powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1`
-- record source archive SHA-256 in the GitHub Release body
+- run the full source release checklist on that commit
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
+## v0.13.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #32: manual Free VPN catalog import gated behind
+  `OPEN_CLIENT_ENABLE_FREE_CATALOG` with default-disabled public builds
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release checklist on that commit
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
@@ -206,3 +242,6 @@ Required before tagging:
 - Gated Free VPN catalog cache actions are still opt-in and third-party; they
   do not imply official POKROV nodes, default public config fetches, binary
   readiness, or safety/speed/privacy guarantees.
+- Manual third-party catalog import now requires
+  `OPEN_CLIENT_ENABLE_FREE_CATALOG=true`; default source builds keep the action
+  visible as a disabled preview instead of fetching public feeds.

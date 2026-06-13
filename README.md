@@ -67,6 +67,12 @@ Source release status:
 | `v0.5.0-source` | Pending stacked PR, not tagged | Community routing and WARP copy honesty hardening is in the stacked PR queue. |
 | `v0.6.0-source` | Pending stacked PR, not tagged | Dependency/license and generated-asset provenance gates are in the stacked PR queue. |
 | `v0.7.0-source` | Pending stacked PR, not tagged | Source-release proof helper for archive SHA-256 and proof manifests is in the stacked PR queue. |
+| `v0.8.0-source` | Pending stacked PR, not tagged | Source readiness matrix for tracked source-only milestones is in the stacked PR queue. |
+| `v0.9.0-source` | Pending stacked PR, not tagged | Public onboarding and triage hardening is in the stacked PR queue. |
+| `v0.10.0-source` | Pending stacked PR, not tagged | Operator API contract hardening is in the stacked PR queue. |
+| `v0.11.0-source` | Pending stacked PR, not tagged | Gated Free VPN catalog cache actions are in the stacked PR queue. |
+| `v0.12.0-source` | Pending stacked PR, not tagged | Source-readiness synchronization through the catalog cache slice is in the stacked PR queue. |
+| `v0.13.0-source` | Pending stacked PR, not tagged | Default-disabled `OPEN_CLIENT_ENABLE_FREE_CATALOG` import gate is in the stacked PR queue. |
 
 ## Which App Should I Use?
 
