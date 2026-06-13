@@ -4,6 +4,8 @@ param(
 
   [string]$OutFile = "",
 
+  [string]$ManifestLabel = "",
+
   [string[]]$Included = @(),
 
   [string[]]$KnownLimitations = @()
@@ -31,6 +33,10 @@ function Format-List {
 }
 
 $resolvedManifestPath = (Resolve-Path -LiteralPath $ManifestPath).Path
+$releaseManifestLabel = $ManifestLabel
+if ([string]::IsNullOrWhiteSpace($releaseManifestLabel)) {
+  $releaseManifestLabel = Split-Path -Leaf $resolvedManifestPath
+}
 $proof = Get-Content -Raw -LiteralPath $resolvedManifestPath | ConvertFrom-Json
 
 if ($proof.tag -notmatch '^v\d+\.\d+\.\d+-source$') {
@@ -92,7 +98,7 @@ $body = @"
 - Commit SHA: $($proof.commit_sha)
 - Commit date: $($proof.commit_date)
 - Source archive SHA-256: $($proof.source_archive_sha256)
-- Source proof manifest: $resolvedManifestPath
+- Source proof manifest: $releaseManifestLabel
 - Verification date: $($proof.verification_date)
 
 ## Included

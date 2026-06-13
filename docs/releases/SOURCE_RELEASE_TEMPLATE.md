@@ -46,6 +46,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\prepare-source-release.ps1 `
   -RequireTag
 powershell -ExecutionPolicy Bypass -File .\scripts\render-source-release-notes.ps1 `
   -ManifestPath <proof-manifest.json> `
+  -ManifestLabel <public-proof-manifest-name.json> `
   -OutFile <release-notes.md>
 ```
 

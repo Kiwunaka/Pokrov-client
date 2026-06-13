@@ -73,6 +73,8 @@ def test_render_source_release_notes_uses_proof_manifest(tmp_path: Path) -> None
     assert "- Tag object SHA: " + ("b" * 40) in result.stdout
     assert "- Commit SHA: " + ("a" * 40) in result.stdout
     assert "- Source archive SHA-256: " + ("c" * 64) in result.stdout
+    assert "- Source proof manifest: source-proof.json" in result.stdout
+    assert str(tmp_path) not in result.stdout
     assert "Manual source-only release notes test item." in result.stdout
     assert "Manual limitation item." in result.stdout
     assert "No APK or EXE binaries." in result.stdout
@@ -80,6 +82,56 @@ def test_render_source_release_notes_uses_proof_manifest(tmp_path: Path) -> None
     assert "No trusted Windows signing claim." in result.stdout
     assert "```powershell" in result.stdout
     assert "source-only release" in result.stdout
+
+
+def test_render_source_release_notes_can_use_public_manifest_label(
+    tmp_path: Path,
+) -> None:
+    manifest_path = tmp_path / "local-proof.json"
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "tag": "v9.9.5-source",
+                "ref": "refs/tags/v9.9.5-source",
+                "tag_object_sha": "b" * 40,
+                "commit_sha": "a" * 40,
+                "commit_date": "2026-06-13T00:00:00+00:00",
+                "verification_date": "2026-06-13T00:10:00.0000000Z",
+                "source_archive": "v9.9.5-source-source.zip",
+                "source_archive_sha256": "c" * 64,
+                "source_only": True,
+                "no_apk": True,
+                "no_exe": True,
+                "no_store_release": True,
+                "no_trusted_signing_claim": True,
+                "tracked_file_count": 123,
+                "forbidden_file_count": 0,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [
+            "powershell",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(ROOT / "scripts" / "render-source-release-notes.ps1"),
+            "-ManifestPath",
+            str(manifest_path),
+            "-ManifestLabel",
+            "attached-source-proof.json",
+        ],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert "- Source proof manifest: attached-source-proof.json" in result.stdout
+    assert "local-proof.json" not in result.stdout
 
 
 def test_render_source_release_notes_rejects_binary_claim_manifest(
