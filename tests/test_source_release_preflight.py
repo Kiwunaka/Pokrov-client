@@ -93,6 +93,8 @@ def test_source_release_preflight_script_documents_full_release_checks() -> None
     assert "run-tests.ps1" in script
     assert "prepare-source-release.ps1" in script
     assert "render-source-release-notes.ps1" in script
+    assert "check-source-release-copy.ps1" in script
+    assert "Check source release copy boundaries" in script
     assert "SkipTestCommands" in script
     assert "Use this only for local/CI smoke tests, not for publishing" in script
     assert "SkipFlutterTests" in script

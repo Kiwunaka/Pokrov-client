@@ -37,9 +37,15 @@ checksum, public proof manifest label, and release-honesty copy.
 Use `scripts/source-release-preflight.ps1` when you want the full source release
 gate in one command. It runs the local tests and clean-clone checks, delegates
 proof generation to `prepare-source-release.ps1`, renders the release-note draft,
-and writes a local preflight summary. The `-SkipTestCommands` switch is only for
-local or CI smoke coverage and must not be used for publishing a public source
-release.
+checks the draft with `scripts/check-source-release-copy.ps1`, and writes a
+local preflight summary. The `-SkipTestCommands` switch is only for local or CI
+smoke coverage and must not be used for publishing a public source release.
+
+Run `scripts/check-source-release-copy.ps1 -ReleaseNotesPath <file>` again after
+manual edits to the GitHub Release body. It verifies that source-only releases
+still say no APK/EXE, no store release, no trusted signing claim, no official
+backend/private evidence, and no stronger binary/readiness claim without
+separate public evidence.
 
 ## Binary Release Requirements
 

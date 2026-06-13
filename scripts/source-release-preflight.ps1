@@ -142,6 +142,12 @@ try {
     Assert-LastExitCode "render-source-release-notes.ps1 failed"
   }
 
+  Invoke-Step "Check source release copy boundaries" {
+    powershell -ExecutionPolicy Bypass -File .\scripts\check-source-release-copy.ps1 `
+      -ReleaseNotesPath $releaseNotesPath
+    Assert-LastExitCode "check-source-release-copy.ps1 failed"
+  }
+
   $proof = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
   Assert-SourceOnlyProof -Proof $proof
 
