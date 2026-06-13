@@ -113,6 +113,10 @@ does not provide POKROV nodes or a default free service.
 | `v0.11.0-source` | Pending stacked PR, tag еще не создан | Gated Free VPN catalog cache actions находятся в stacked PR queue. |
 | `v0.12.0-source` | Pending stacked PR, tag еще не создан | Source-readiness synchronization through the catalog cache slice находится в stacked PR queue. |
 | `v0.13.0-source` | Pending stacked PR, tag еще не создан | Default-disabled `OPEN_CLIENT_ENABLE_FREE_CATALOG` import gate находится в stacked PR queue. |
+| `v0.14.0-source` | Pending stacked PR, tag еще не создан | Source-readiness synchronization through the feature-flag slice находится в stacked PR queue. |
+| `v0.15.0-source` | Pending stacked PR, tag еще не создан | Operator support ticket path canonicalization находится в stacked PR queue. |
+| `v0.16.0-source` | Pending stacked PR, tag еще не создан | Community local-access wording and model guards находятся в stacked PR queue. |
+| `v0.17.0-source` | Pending stacked PR, tag еще не создан | Seed-backed variant command preview tooling находится в stacked PR queue. |
 
 ## Архитектурная Граница
 

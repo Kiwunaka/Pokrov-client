@@ -73,6 +73,10 @@ Source release status:
 | `v0.11.0-source` | Pending stacked PR, not tagged | Gated Free VPN catalog cache actions are in the stacked PR queue. |
 | `v0.12.0-source` | Pending stacked PR, not tagged | Source-readiness synchronization through the catalog cache slice is in the stacked PR queue. |
 | `v0.13.0-source` | Pending stacked PR, not tagged | Default-disabled `OPEN_CLIENT_ENABLE_FREE_CATALOG` import gate is in the stacked PR queue. |
+| `v0.14.0-source` | Pending stacked PR, not tagged | Source-readiness synchronization through the feature-flag slice is in the stacked PR queue. |
+| `v0.15.0-source` | Pending stacked PR, not tagged | Operator support ticket path canonicalization is in the stacked PR queue. |
+| `v0.16.0-source` | Pending stacked PR, not tagged | Community local-access wording and model guards are in the stacked PR queue. |
+| `v0.17.0-source` | Pending stacked PR, not tagged | Seed-backed variant command preview tooling is in the stacked PR queue. |
 
 ## Which App Should I Use?
 
