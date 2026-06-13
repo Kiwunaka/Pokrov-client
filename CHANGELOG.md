@@ -23,6 +23,8 @@ production readiness without matching public evidence.
   manual third-party catalog imports.
 - Added an operator support-contract guard so docs, OpenAPI, fixture seeds, and
   smoke tests use the same `/api/tickets` paths as the app support adapter.
+- Added community local-access wording and model guards so Open Client does not
+  present local profiles as a free POKROV node or Telegram-bonus service lane.
 
 ### Changed
 

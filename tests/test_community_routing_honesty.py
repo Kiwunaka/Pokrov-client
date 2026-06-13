@@ -34,3 +34,14 @@ def test_public_warp_copy_does_not_claim_pokrov_service_operation() -> None:
 
     assert "Расширенная защита" in app_shell
     assert "Клиент не смог включить дополнительный режим" in lifecycle
+
+
+def test_community_context_uses_local_profiles_not_service_free_node() -> None:
+    app_shell = (
+        ROOT / "packages" / "app_shell" / "lib" / "app_shell.dart"
+    ).read_text(encoding="utf-8")
+
+    assert "profile.isCommunity" in app_shell
+    assert "AccessLane.localProfiles" in app_shell
+    assert "nodePool: 'local-user-profiles'" in app_shell
+    assert "profile.isCommunity ? AccessLane.freeMonthly" not in app_shell
