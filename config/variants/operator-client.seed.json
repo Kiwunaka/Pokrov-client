@@ -11,6 +11,8 @@
     "api_base_url": "https://api.example.invalid/",
     "cabinet_url": "https://app.example.invalid/",
     "checkout_url": "",
+    "support_url": "https://support.example.invalid/",
+    "privacy_policy_url": "https://example.invalid/privacy/",
     "support_api": "operator_owned",
     "billing": "operator_owned"
   },
@@ -36,6 +38,8 @@
     "OPEN_CLIENT_API_BASE_URL": "https://api.example.invalid/",
     "OPEN_CLIENT_CABINET_URL": "https://app.example.invalid/",
     "OPEN_CLIENT_CHECKOUT_URL": "",
+    "OPEN_CLIENT_SUPPORT_URL": "https://support.example.invalid/",
+    "OPEN_CLIENT_PRIVACY_URL": "https://example.invalid/privacy/",
     "OPEN_CLIENT_BRAND_ASSET": ""
   }
 }

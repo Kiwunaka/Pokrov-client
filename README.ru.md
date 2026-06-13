@@ -50,11 +50,23 @@ policy, release policy, граница бренда, чеклист импорт
   third-party catalog.
 - Operator client: white-label путь для компаний, которые хотят подключить
   приложение к своему backend, billing, support и бренду.
-- POKROV service mode: только для официальных сборок POKROV и официальных
-  endpoint'ов POKROV.
+- POKROV service mode: описан только для официальных сборок POKROV. Forks и
+  operators не должны распространять сборки с именем, логотипом, endpoints,
+  support или release claims POKROV.
 
-Опциональный каталог бесплатных VPN-конфигов остается выключенным по умолчанию
-и должен явно маркироваться как third-party public configs.
+Опциональный каталог third-party public configs остается выключенным по
+умолчанию и должен явно маркироваться как неофициальные узлы POKROV. Это не
+default free service от POKROV и не обещание availability, safety, privacy,
+speed или uptime.
+
+## Какую Версию Использовать?
+
+- Пользователи официального POKROV используют официальные release channels и
+  support links POKROV.
+- Community source users приносят свои локальные ключи или URL-подписки. Этот
+  репозиторий не предоставляет узлы POKROV или бесплатный сервис по умолчанию.
+- Operator builds поддерживает тот оператор, который собрал и распространил
+  приложение, а не официальный support POKROV.
 
 ## Статус
 
@@ -160,10 +172,14 @@ source readiness.
 - [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)
 - [docs/GOVERNANCE.md](docs/GOVERNANCE.md)
 
-Не открывай публичные issues с secrets, личными connection links, private
-backend details, account data или vulnerability reproduction details.
+Не открывай публичные issues с secrets, QR payloads, subscription URLs, личными
+connection links, private backend details, account data или vulnerability
+reproduction details.
 
-## Официальные Ссылки
+## Ссылки Официального Сервиса POKROV
+
+Эти ссылки относятся только к официальному сервису/приложению POKROV. Это не
+support и не backend endpoints для community builds, forks или operator builds.
 
 - Website: https://pokrov.space/
 - Cabinet: https://app.pokrov.space/

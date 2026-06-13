@@ -49,11 +49,23 @@ the first sanitized Android + Windows client source snapshot.
   refresh, Android/Windows QR import, and gated third-party catalog metadata.
 - Operator client: a white-label path for companies that want to connect the
   app to their own backend, billing, support, and brand.
-- POKROV service mode: reserved for official POKROV builds and official
-  POKROV service endpoints.
+- POKROV service mode: documented for official POKROV builds only. Forks and
+  operators must not distribute builds using POKROV names, logos, endpoints,
+  support, or release claims.
 
-The optional free VPN catalog remains disabled by default and must stay clearly
-labeled as third-party public configs.
+The optional third-party public config catalog remains disabled by default and
+must stay clearly labeled as not official POKROV nodes. It is not a default free
+POKROV service and does not promise availability, safety, privacy, speed, or
+uptime.
+
+## Which App Should I Use?
+
+- Official POKROV users should use official POKROV release channels and
+  support links.
+- Community source users bring their own local keys or subscription URLs. This
+  repository does not provide POKROV nodes or a default free service.
+- Operator builds are supported by the operator that built and distributed
+  them, not by POKROV official support.
 
 ## Status
 
@@ -160,10 +172,14 @@ Before contributing, read:
 - [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)
 - [docs/GOVERNANCE.md](docs/GOVERNANCE.md)
 
-Please do not open public issues with secrets, personal connection links,
-private backend details, account data, or vulnerability reproduction details.
+Please do not open public issues with secrets, QR payloads, subscription URLs,
+personal connection links, private backend details, account data, or
+vulnerability reproduction details.
 
-## Official Links
+## Official POKROV Service Links
+
+These links are for the official POKROV service/app only. They are not support
+or backend endpoints for community builds, forks, or operator builds.
 
 - Website: https://pokrov.space/
 - Cabinet: https://app.pokrov.space/

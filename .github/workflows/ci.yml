@@ -30,6 +30,10 @@ jobs:
       - name: Run source-import tests
         run: python -m pytest tests/test_source_import.py
 
+      - name: Validate public seed contracts
+        shell: pwsh
+        run: .\scripts\validate-seed.ps1
+
       - name: Verify clean clone source boundary
         shell: pwsh
         run: .\scripts\verify-clean-clone.ps1 -Source . -SkipFlutterTests

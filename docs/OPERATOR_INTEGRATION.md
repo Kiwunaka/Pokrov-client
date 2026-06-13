@@ -16,10 +16,15 @@ public source.
 POKROV does not provide your backend, billing, support, signing, or release
 claims.
 
+Operator builds are not POKROV builds. Do not use POKROV names, logos,
+endpoints, support bots, signing identities, release channels, or official
+service claims for your users.
+
 ## Minimal API Contract
 
-The current imported service mode expects these endpoints when
-`OPEN_CLIENT_VARIANT=operator`.
+Operator mode can implement a compatible managed-profile contract for these
+seed endpoints. The names are public examples, not access to the official
+POKROV backend.
 
 A placeholder fixture is available at
 [`config/operator-api.fixture.json`](../config/operator-api.fixture.json). It is
@@ -85,11 +90,17 @@ flutter build windows --release `
   --dart-define=OPEN_CLIENT_BRAND_NAME="Acme VPN" `
   --dart-define=OPEN_CLIENT_API_BASE_URL="https://api.acme.example/" `
   --dart-define=OPEN_CLIENT_CABINET_URL="https://app.acme.example/" `
-  --dart-define=OPEN_CLIENT_CHECKOUT_URL="https://pay.acme.example/checkout"
+  --dart-define=OPEN_CLIENT_CHECKOUT_URL="https://pay.acme.example/checkout" `
+  --dart-define=OPEN_CLIENT_SUPPORT_URL="https://support.acme.example/" `
+  --dart-define=OPEN_CLIENT_PRIVACY_URL="https://acme.example/privacy/"
 ```
 
 For Android, pass the same defines to `flutter build apk` or your Gradle-backed
 Flutter build.
+
+This is a build example only. Operators still own signing, store review,
+privacy/legal review, update metadata, support, abuse handling, payment/refund
+flows, checksums, and release evidence.
 
 ## Branding Checklist
 
@@ -99,6 +110,7 @@ Flutter build.
 - set Windows runner metadata
 - update privacy policy/support links
 - remove all claims that imply official POKROV operation
+- do not route your users to POKROV support bots or POKROV security contacts
 
 ## Runtime Artifacts
 

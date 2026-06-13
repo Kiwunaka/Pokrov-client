@@ -6,12 +6,14 @@ service build explicit.
 
 ## 1. Community Client
 
-For ordinary users.
+For ordinary users who bring their own local keys or subscription URLs. This is
+not an official POKROV account flow and not a free POKROV service by default.
 
 Goal: install the app, paste a local proxy key, choose routing, enable optional
-WARP/routing features, and connect without a POKROV account, POKROV billing, or
-POKROV branding. Subscription URL refresh is local/manual and foreground-first;
-background refresh remains a planned follow-up.
+advanced routing/privacy controls where they are implemented and user-enabled,
+and connect without a POKROV account, POKROV billing, or POKROV branding.
+Subscription URL refresh is local/manual and foreground-first; background
+refresh remains a planned follow-up.
 
 Default properties:
 
@@ -60,7 +62,9 @@ flutter run `
   --dart-define=OPEN_CLIENT_VARIANT=operator `
   --dart-define=OPEN_CLIENT_BRAND_NAME="Acme VPN" `
   --dart-define=OPEN_CLIENT_API_BASE_URL="https://api.acme.example/" `
-  --dart-define=OPEN_CLIENT_CABINET_URL="https://app.acme.example/"
+  --dart-define=OPEN_CLIENT_CABINET_URL="https://app.acme.example/" `
+  --dart-define=OPEN_CLIENT_SUPPORT_URL="https://support.acme.example/" `
+  --dart-define=OPEN_CLIENT_PRIVACY_URL="https://acme.example/privacy/"
 ```
 
 ## 3. POKROV Service Mode
@@ -68,7 +72,9 @@ flutter run `
 For official POKROV builds only.
 
 This mode keeps the imported official-service flow reproducible without making
-it the default open-source fork behavior.
+it the default open-source fork behavior. Forks and operators must not
+distribute builds using the POKROV name, logo, endpoints, support, or release
+claims.
 
 Default properties:
 
@@ -82,6 +88,7 @@ Build define shape:
 ```powershell
 flutter run `
   --dart-define=OPEN_CLIENT_VARIANT=pokrov `
+  --dart-define=OPEN_CLIENT_OFFICIAL_BUILD=true `
   --dart-define=OPEN_CLIENT_BRAND_NAME=POKROV `
   --dart-define=OPEN_CLIENT_BRAND_ASSET=assets/brand/pokrov_mark.png
 ```
@@ -101,7 +108,8 @@ Implemented now:
 - manual and foreground subscription refresh stores metadata and preserves old
   profiles on failed refresh
 - Android/Windows camera QR import reuses the same safe local parser
-- reviewed disabled Free VPN catalog seed for `AvenCores/goida-vpn-configs`
+- reviewed disabled third-party public config catalog seed for
+  `AvenCores/goida-vpn-configs`
 - neutral fallback brand mark when no asset is supplied
 - operator/pokrov modes can opt into managed-service API bootstrap
 
@@ -110,4 +118,5 @@ Still planned:
 - operator API fixture server
 - white-label color token export
 - background subscription refresh scheduler
-- enabled Free VPN catalog UI, fetcher, and cache-clear flow after all gates pass
+- enabled third-party public config catalog UI, fetcher, and cache-clear flow
+  after all gates pass

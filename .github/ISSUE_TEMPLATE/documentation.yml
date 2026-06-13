@@ -10,6 +10,18 @@ body:
       placeholder: "README.en.md, README.ru.md, docs/RELEASE_POLICY.md"
     validations:
       required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Documentation area
+      options:
+        - Public boundary
+        - Brand / official build
+        - Community client
+        - Operator integration
+        - Official POKROV service
+        - Build / release
+        - Other
   - type: textarea
     id: issue
     attributes:

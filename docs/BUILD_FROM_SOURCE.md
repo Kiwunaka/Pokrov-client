@@ -57,7 +57,9 @@ flutter run `
   --dart-define=OPEN_CLIENT_VARIANT=operator `
   --dart-define=OPEN_CLIENT_BRAND_NAME="Acme VPN" `
   --dart-define=OPEN_CLIENT_API_BASE_URL="https://api.acme.example/" `
-  --dart-define=OPEN_CLIENT_CABINET_URL="https://app.acme.example/"
+  --dart-define=OPEN_CLIENT_CABINET_URL="https://app.acme.example/" `
+  --dart-define=OPEN_CLIENT_SUPPORT_URL="https://support.acme.example/" `
+  --dart-define=OPEN_CLIENT_PRIVACY_URL="https://acme.example/privacy/"
 ```
 
 ## Resolve Dependencies

@@ -18,8 +18,11 @@
     "OPEN_CLIENT_VARIANT": "pokrov",
     "OPEN_CLIENT_BRAND_NAME": "POKROV",
     "OPEN_CLIENT_BRAND_ASSET": "assets/brand/pokrov_mark.png",
+    "OPEN_CLIENT_OFFICIAL_BUILD": "true",
     "OPEN_CLIENT_API_BASE_URL": "https://api.pokrov.space/",
     "OPEN_CLIENT_CABINET_URL": "https://app.pokrov.space/",
-    "OPEN_CLIENT_CHECKOUT_URL": "https://pay.pokrov.space/checkout/?plan=1_month"
+    "OPEN_CLIENT_CHECKOUT_URL": "https://pay.pokrov.space/checkout/?plan=1_month",
+    "OPEN_CLIENT_SUPPORT_URL": "https://pokrov.space/",
+    "OPEN_CLIENT_PRIVACY_URL": "https://pokrov.space/privacy/"
   }
 }

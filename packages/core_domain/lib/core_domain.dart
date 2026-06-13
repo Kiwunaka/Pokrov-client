@@ -19,6 +19,12 @@ enum RuntimeCore {
   xray,
 }
 
+enum ProductVariant {
+  community,
+  operator,
+  pokrov,
+}
+
 enum AccessLane {
   trialPremium,
   bonusPremium,
@@ -93,6 +99,44 @@ extension RuntimeCorePresentation on RuntimeCore {
         return 'sing-box';
       case RuntimeCore.xray:
         return 'xray';
+    }
+  }
+}
+
+extension ProductVariantPresentation on ProductVariant {
+  String get id {
+    switch (this) {
+      case ProductVariant.community:
+        return 'community';
+      case ProductVariant.operator:
+        return 'operator';
+      case ProductVariant.pokrov:
+        return 'pokrov';
+    }
+  }
+
+  String get label {
+    switch (this) {
+      case ProductVariant.community:
+        return 'Community';
+      case ProductVariant.operator:
+        return 'Operator';
+      case ProductVariant.pokrov:
+        return 'Official POKROV';
+    }
+  }
+
+  static ProductVariant parse(String value) {
+    switch (value.trim().toLowerCase()) {
+      case 'operator':
+      case 'company':
+        return ProductVariant.operator;
+      case 'pokrov':
+      case 'official':
+        return ProductVariant.pokrov;
+      case 'community':
+      default:
+        return ProductVariant.community;
     }
   }
 }
