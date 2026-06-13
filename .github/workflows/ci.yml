@@ -38,11 +38,14 @@ jobs:
         shell: pwsh
         run: .\scripts\validate-seed.ps1
 
-      - name: Prepare source-release proof smoke
+      - name: Run source-release preflight smoke
         shell: pwsh
         run: |
-          $out = Join-Path $env:RUNNER_TEMP "pokrov-source-release-proof"
-          .\scripts\prepare-source-release.ps1 -Tag v9.9.9-source -OutDir $out
+          $out = Join-Path $env:RUNNER_TEMP "pokrov-source-release-preflight"
+          .\scripts\source-release-preflight.ps1 `
+            -Tag v9.9.9-source `
+            -OutDir $out `
+            -SkipTestCommands
 
       - name: Run OSS import dry-run wrapper
         shell: pwsh
