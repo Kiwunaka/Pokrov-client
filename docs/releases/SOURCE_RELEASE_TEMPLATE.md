@@ -8,6 +8,7 @@ Use this body for GitHub source-only releases.
 - Commit SHA:
 - Commit date:
 - Source archive SHA-256:
+- Source proof manifest:
 - Verification date:
 
 ## Included
@@ -33,6 +34,10 @@ python -m pytest tests
 powershell -ExecutionPolicy Bypass -File .\scripts\validate-seed.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1 -Source .
 powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\prepare-source-release.ps1 `
+  -Tag <tag> `
+  -Ref refs/tags/<tag> `
+  -RequireTag
 ```
 
 ## Release Honesty
