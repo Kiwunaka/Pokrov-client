@@ -226,8 +226,9 @@ For a faster source-boundary-only pass:
 powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1 -SkipFlutterTests
 ```
 
-The GitHub Actions CI workflow runs the source-import tests, a clean-clone
-source-boundary pass, `flutter analyze`, and the workspace Flutter tests.
+The GitHub Actions CI workflow runs the source-import tests, source-release
+preflight smoke, a clean-clone source-boundary pass, `flutter analyze`, and the
+workspace Flutter tests.
 
 ## Local Config
 

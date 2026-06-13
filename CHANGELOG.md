@@ -38,6 +38,8 @@ production readiness without matching public evidence.
 - Added a source-release preflight helper that runs the local release gate,
   prepares proof artifacts, renders source-only release notes, and writes a
   local summary without publishing binaries.
+- Added CI source-release preflight smoke coverage so pull requests exercise
+  the proof-to-notes helper path automatically.
 
 ### Changed
 
@@ -46,7 +48,7 @@ production readiness without matching public evidence.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.22.0-source` candidates.
+  `v0.23.0-source` candidates.
 
 ### Still Source-Only
 
