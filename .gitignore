@@ -40,5 +40,6 @@ tmp/
 .tmp/
 
 # Python test/tool caches
+.pytest_cache/
 __pycache__/
 *.py[cod]

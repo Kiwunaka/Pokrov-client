@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.22
+# Source Readiness: v0.2-v0.23
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -397,6 +397,29 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.23.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #43: CI source-release preflight smoke coverage so pull requests exercise
+  proof generation, release-note rendering, and summary output together
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- create an annotated source tag with `git tag -a`
+- choose the exact commit SHA
+- confirm GitHub Actions still runs the source-release preflight smoke on the
+  release branch or tag
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the preflight summary, proof manifest, and rendered GitHub Release body
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
 - Free VPN catalog remains disabled by default and is not an official POKROV
@@ -435,3 +458,6 @@ Required before tagging:
 - The source-release preflight helper ties the local gate together, but
   `-SkipTestCommands` remains smoke-only and must not be used for a public
   source release.
+- CI runs the source-release preflight in smoke mode after the Python contract
+  tests; release publication still requires the full local preflight without
+  `-SkipTestCommands`.

@@ -97,3 +97,16 @@ def test_source_release_preflight_script_documents_full_release_checks() -> None
     assert "Use this only for local/CI smoke tests, not for publishing" in script
     assert "SkipFlutterTests" in script
     assert "Source preflight refused proof manifest" in script
+
+
+def test_ci_runs_source_release_preflight_smoke() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "ci.yml").read_text(
+        encoding="utf-8"
+    )
+    gitignore = (ROOT / ".gitignore").read_text(encoding="utf-8")
+
+    assert "Run source-release preflight smoke" in workflow
+    assert "source-release-preflight.ps1" in workflow
+    assert "-SkipTestCommands" in workflow
+    assert "Prepare source-release proof smoke" not in workflow
+    assert ".pytest_cache/" in gitignore
