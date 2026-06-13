@@ -12,8 +12,9 @@ not an official POKROV account flow and not a free POKROV service by default.
 Goal: install the app, paste a local proxy key, choose routing, enable optional
 advanced routing/privacy controls where they are implemented and user-enabled,
 and connect without a POKROV account, POKROV billing, or POKROV branding.
-Subscription URL refresh is local/manual and foreground-first; background
-refresh remains a planned follow-up.
+Subscription URL refresh is local/manual, refreshes on app resume when stale,
+and can use an in-app foreground scheduler. OS background refresh is not
+claimed.
 
 Default properties:
 
@@ -23,7 +24,8 @@ Default properties:
 - local profile import for single `vless://`, `trojan://`, `ss://`, and
   `vmess://` keys
 - local multi-profile list with active selection, replace, and remove actions
-- manual and foreground subscription URL refresh for supported public key feeds
+- manual, foreground, and in-app scheduled subscription URL refresh for
+  supported public key feeds
 - Android/Windows camera QR import through platform hosts; scanned payloads
   still flow through the shared local parser
 - support API disabled by default
@@ -106,8 +108,8 @@ Implemented now:
 - community profile screen shows the active local profile and supports
   list/select/replace/remove actions
 - manual subscription URL import stores supported entries locally
-- manual and foreground subscription refresh stores metadata and preserves old
-  profiles on failed refresh
+- manual, foreground, and in-app scheduled subscription refresh stores metadata
+  and preserves old profiles on failed refresh
 - Android/Windows camera QR import reuses the same safe local parser
 - reviewed disabled Free VPN catalog seed for `AvenCores/goida-vpn-configs`
 - Free VPN catalog parser fixtures for the reviewed `subscription_text` feed
@@ -119,6 +121,5 @@ Implemented now:
 
 Still planned:
 
-- background subscription refresh scheduler
 - enabled third-party public config catalog UI, fetcher, and cache-clear flow
   after all gates pass
