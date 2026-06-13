@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "variant": "operator",
+  "policy": {
+    "operator_owned_branding": true,
+    "official_pokrov_brand_allowed": false,
+    "official_endpoint_allowed": false,
+    "requires_operator_review": true,
+    "notes": [
+      "These tokens are for independent operator forks.",
+      "Changing colors does not make a fork an official POKROV build.",
+      "Operators own their accessibility, release, support, and privacy claims."
+    ]
+  },
+  "export": {
+    "default_directory": "build/white_label_tokens",
+    "formats": [
+      "json",
+      "dart",
+      "css"
+    ],
+    "dart_class_name": "WhiteLabelPalette",
+    "css_selector": ":root"
+  },
+  "roles": {
+    "canvas": {
+      "value": "#F9FAFB",
+      "usage": "main app background",
+      "editable": true
+    },
+    "canvasAlt": {
+      "value": "#FFFFFF",
+      "usage": "alternate background bands",
+      "editable": true
+    },
+    "ink": {
+      "value": "#10131A",
+      "usage": "primary text and high-emphasis icons",
+      "editable": true
+    },
+    "accent": {
+      "value": "#0F725D",
+      "usage": "primary actions, selected navigation, active states",
+      "editable": true
+    },
+    "accentBright": {
+      "value": "#16A27B",
+      "usage": "active motion highlights and secondary accent",
+      "editable": true
+    },
+    "success": {
+      "value": "#159A68",
+      "usage": "positive runtime and confirmation states",
+      "editable": true
+    },
+    "warning": {
+      "value": "#E29A1F",
+      "usage": "recoverable warning and degraded states",
+      "editable": true
+    },
+    "surface": {
+      "value": "#FFFFFF",
+      "usage": "cards, sheets, dialogs, and primary panels",
+      "editable": true
+    },
+    "surfaceMuted": {
+      "value": "#F3F5F8",
+      "usage": "muted controls, skeletons, and low-emphasis panels",
+      "editable": true
+    },
+    "line": {
+      "value": "#1A10131A",
+      "usage": "hairlines and dividers with alpha",
+      "editable": true
+    },
+    "muted": {
+      "value": "#697080",
+      "usage": "secondary text and inactive icons",
+      "editable": true
+    }
+  },
+  "contrast_checks": [
+    {
+      "foreground": "ink",
+      "background": "canvas",
+      "minimum": 4.5
+    },
+    {
+      "foreground": "ink",
+      "background": "surface",
+      "minimum": 4.5
+    },
+    {
+      "foreground": "accent",
+      "background": "surface",
+      "minimum": 3.0
+    },
+    {
+      "foreground": "muted",
+      "background": "surface",
+      "minimum": 3.0
+    }
+  ]
+}

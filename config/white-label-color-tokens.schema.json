@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/pokrov-client/white-label-color-tokens.schema.json",
+  "title": "White-label color token export",
+  "type": "object",
+  "required": ["schema", "variant", "policy", "export", "roles"],
+  "properties": {
+    "schema": {
+      "type": "integer",
+      "const": 1
+    },
+    "variant": {
+      "type": "string",
+      "const": "operator"
+    },
+    "policy": {
+      "type": "object",
+      "required": [
+        "operator_owned_branding",
+        "official_pokrov_brand_allowed",
+        "official_endpoint_allowed",
+        "requires_operator_review"
+      ],
+      "properties": {
+        "operator_owned_branding": {
+          "type": "boolean",
+          "const": true
+        },
+        "official_pokrov_brand_allowed": {
+          "type": "boolean",
+          "const": false
+        },
+        "official_endpoint_allowed": {
+          "type": "boolean",
+          "const": false
+        },
+        "requires_operator_review": {
+          "type": "boolean",
+          "const": true
+        }
+      }
+    },
+    "export": {
+      "type": "object",
+      "required": ["default_directory", "formats", "dart_class_name", "css_selector"],
+      "properties": {
+        "default_directory": {
+          "type": "string"
+        },
+        "formats": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["json", "dart", "css"]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "dart_class_name": {
+          "type": "string"
+        },
+        "css_selector": {
+          "type": "string"
+        }
+      }
+    },
+    "roles": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["value", "usage", "editable"],
+        "properties": {
+          "value": {
+            "type": "string",
+            "pattern": "^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$|^#[0-9A-Fa-f]{8}$"
+          },
+          "usage": {
+            "type": "string"
+          },
+          "editable": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

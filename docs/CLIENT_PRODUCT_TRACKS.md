@@ -27,10 +27,12 @@ Expected capabilities:
 - configurable service base URL
 - configurable support links
 - configurable public catalog and release metadata
-- custom branding through documented build flavors
+- custom branding through documented build flavors and white-label color token
+  export
 - subscription or key import
 - managed profile endpoint examples
 - operator-owned backend contract examples
+- operator-owned color-token export with contrast checks
 
 Boundaries:
 
