@@ -36,7 +36,9 @@ The public client has two open-source product lines:
   accepts `vless://`, `trojan://`, `ss://`, and `vmess://` keys, supports local
   multi-profile selection, manual/foreground/in-app scheduled subscription URL
   refresh,
-  Android/Windows QR import, and gated third-party catalog metadata.
+  Android/Windows QR import, and gated third-party catalog metadata. Manual
+  catalog import is disabled unless
+  `OPEN_CLIENT_ENABLE_FREE_CATALOG=true` is supplied.
 - `operator`: white-label client for companies with their own API, cabinet,
   support, billing, and branding.
 
@@ -71,8 +73,14 @@ Example community run:
 flutter run `
   --dart-define=OPEN_CLIENT_VARIANT=community `
   --dart-define=OPEN_CLIENT_BRAND_NAME="Open Client" `
-  --dart-define=OPEN_CLIENT_ANDROID_PACKAGE_NAME=org.pokrovclient.community
+  --dart-define=OPEN_CLIENT_ANDROID_PACKAGE_NAME=org.pokrovclient.community `
+  --dart-define=OPEN_CLIENT_ENABLE_FREE_CATALOG=false
 ```
+
+The Free VPN catalog preview is visible in community mode so users can inspect
+the third-party boundary. Manual feed import stays disabled unless you compile
+with `--dart-define=OPEN_CLIENT_ENABLE_FREE_CATALOG=true`; even then, imports
+remain user-initiated and are not official POKROV nodes.
 
 Example operator run:
 

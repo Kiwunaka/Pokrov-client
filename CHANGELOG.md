@@ -19,6 +19,8 @@ production readiness without matching public evidence.
   subscription URLs.
 - Added gated Free VPN catalog import/cache/clear actions for reviewed
   third-party public configs, still opt-in and disabled by default.
+- Added `OPEN_CLIENT_ENABLE_FREE_CATALOG=false` as the default build gate for
+  manual third-party catalog imports.
 
 ### Changed
 

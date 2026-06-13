@@ -1,6 +1,8 @@
 {
   "schema": 1,
   "enabled_by_default": false,
+  "manual_import_build_define": "OPEN_CLIENT_ENABLE_FREE_CATALOG",
+  "manual_import_default": false,
   "requires_user_opt_in": true,
   "official_pokrov_nodes": false,
   "refresh_policy": {

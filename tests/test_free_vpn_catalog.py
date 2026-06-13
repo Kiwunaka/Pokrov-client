@@ -16,6 +16,8 @@ def test_free_vpn_catalog_candidate_is_gated_and_attributed() -> None:
     catalog = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
 
     assert catalog["enabled_by_default"] is False
+    assert catalog["manual_import_build_define"] == "OPEN_CLIENT_ENABLE_FREE_CATALOG"
+    assert catalog["manual_import_default"] is False
     assert catalog["requires_user_opt_in"] is True
     assert catalog["official_pokrov_nodes"] is False
     assert catalog["refresh_policy"]["mode"] == "manual"

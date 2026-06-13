@@ -117,6 +117,8 @@ First research candidate:
 Product rules:
 
 - the catalog must be opt-in
+- manual feed import must stay behind `OPEN_CLIENT_ENABLE_FREE_CATALOG=true`
+  and default public builds must keep it disabled
 - third-party feeds must be visibly labeled as third-party public configs
 - third-party public configs must not be called official POKROV nodes
 - the feature must not mix third-party feeds into the official POKROV node pool
@@ -154,7 +156,8 @@ Current implementation:
 - the gated app action can manually import the reviewed candidate feed, cache
   accepted entries as local `third_party_catalog` profiles, preserve `sourceUrl`
   refresh metadata, and clear cached third-party catalog profiles without
-  removing user-owned local keys or subscription imports
+  removing user-owned local keys or subscription imports when the build enables
+  `OPEN_CLIENT_ENABLE_FREE_CATALOG=true`
 - the catalog remains disabled by default and requires explicit user opt-in
 - tests require license metadata, attribution, opt-in, and third-party boundary
   copy before release

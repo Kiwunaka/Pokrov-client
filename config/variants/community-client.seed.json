@@ -45,6 +45,8 @@
     ],
     "free_vpn_catalog": {
       "enabled_by_default": false,
+      "manual_import_build_define": "OPEN_CLIENT_ENABLE_FREE_CATALOG",
+      "manual_import_default": false,
       "first_candidate": "AvenCores/goida-vpn-configs",
       "requires_license_and_parser_review": true,
       "ui_surface": "gated_opt_in",
@@ -55,6 +57,7 @@
     "OPEN_CLIENT_VARIANT": "community",
     "OPEN_CLIENT_BRAND_NAME": "Open Client",
     "OPEN_CLIENT_ANDROID_PACKAGE_NAME": "org.pokrovclient.community",
-    "OPEN_CLIENT_BRAND_ASSET": ""
+    "OPEN_CLIENT_BRAND_ASSET": "",
+    "OPEN_CLIENT_ENABLE_FREE_CATALOG": "false"
   }
 }

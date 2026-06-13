@@ -70,6 +70,9 @@ git push origin $tag
 - Android and Windows QR camera import stay local-only and reuse the safe local
   parser.
 - Free VPN catalog remains disabled by default and opt-in with third-party copy.
+- Default community builds keep
+  `OPEN_CLIENT_ENABLE_FREE_CATALOG=false`; turning it on requires release notes
+  that state the imported feeds are third-party and user-initiated.
 
 ## Operator Client
 
