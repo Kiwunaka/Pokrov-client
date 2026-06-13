@@ -6,7 +6,7 @@ Use this checklist before importing source or publishing an official release.
 
 - [ ] Export from the private client lane into a temporary staging area.
 - [ ] Run `python -m pytest tests/test_source_import.py`.
-- [ ] Run `python -m tools.source_import.safe_import` in dry-run mode.
+- [ ] Run `powershell -ExecutionPolicy Bypass -File .\scripts\prepare-oss-import.ps1` in dry-run mode.
 - [ ] Review the dry-run manifest and every blocked item.
 - [ ] Run the same tool with `--apply` into a temporary staging folder only.
 - [ ] Rescan the staging folder and confirm `blocked=0`.

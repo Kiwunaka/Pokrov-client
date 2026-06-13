@@ -27,10 +27,10 @@ Use the checked-in source import tool before any source snapshot PR:
 
 ```powershell
 python -m pytest tests/test_source_import.py
-python -m tools.source_import.safe_import `
-  --source <local-client-snapshot> `
-  --staging <temporary-oss-stage> `
-  --manifest <dry-run-manifest.json>
+powershell -ExecutionPolicy Bypass -File .\scripts\prepare-oss-import.ps1 `
+  -Source <local-client-snapshot> `
+  -Stage <temporary-oss-stage-outside-this-repo> `
+  -Manifest <dry-run-manifest.json>
 ```
 
 The command above is a dry-run. It writes the manifest only and does not copy
@@ -40,16 +40,23 @@ When the dry-run result is reviewed, copy the allowlisted files into a temporary
 staging folder:
 
 ```powershell
-python -m tools.source_import.safe_import `
-  --source <local-client-snapshot> `
-  --staging <temporary-oss-stage> `
-  --manifest <stage-manifest.json> `
-  --apply
+powershell -ExecutionPolicy Bypass -File .\scripts\prepare-oss-import.ps1 `
+  -Source <local-client-snapshot> `
+  -Stage <temporary-oss-stage-outside-this-repo> `
+  -Manifest <stage-manifest.json> `
+  -Apply
 ```
 
-The tool must not be pointed at the public repository root as `--staging`.
+The wrapper and importer reject staging inside the source tree, staging at a git
+repository root, and non-empty staging when `-Apply` is used. The stage must not
+be the public repository root or a folder inside this checkout.
 Review the temporary staging folder first, then open a separate source import
 PR.
+
+The manifest is machine-readable and includes manifest/tool versions, the
+policy hash, source/target repository labels, included file paths with sizes and
+SHA-256 hashes, blocked files with reasons and findings, manual-review notes,
+license notes, and a `secret_scan` pass/fail summary.
 
 ## Required Steps
 
@@ -99,8 +106,10 @@ PR.
 - operator runbooks
 
 The default import policy also blocks release handoff seed files, runtime
-binaries, signing material, env files, local platform config, private keys, and
-generated build folders.
+binaries, signing material, env files, local platform config, private keys,
+installers, release archives, logs, screenshots, reports, private release
+evidence, unknown binary blobs, private URLs, and non-placeholder proxy or
+subscription payloads.
 
 ## Local Preparation Note
 
