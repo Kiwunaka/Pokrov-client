@@ -83,6 +83,10 @@ def test_render_source_release_notes_uses_proof_manifest(tmp_path: Path) -> None
     assert "No store release." in result.stdout
     assert "No trusted Windows signing claim." in result.stdout
     assert "```powershell" in result.stdout
+    assert "render-source-release-notes.ps1" in result.stdout
+    assert '-ManifestLabel "source-proof.json"' in result.stdout
+    assert "<proof-manifest.json>" not in result.stdout
+    assert "<release-notes.md>" not in result.stdout
     assert "source-only release" in result.stdout
 
 
@@ -251,6 +255,10 @@ def test_prepare_source_release_script_writes_proof_manifest(tmp_path: Path) -> 
     assert "No store release." in rendered_notes
     assert "No trusted Windows signing claim." in rendered_notes
     assert "This is a source-only release." in rendered_notes
+    assert "render-source-release-notes.ps1" in rendered_notes
+    assert f'-ManifestLabel "{manifest_path.name}"' in rendered_notes
+    assert "<proof-manifest.json>" not in rendered_notes
+    assert "<release-notes.md>" not in rendered_notes
     assert str(out_dir) not in rendered_notes
 
 
