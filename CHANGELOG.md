@@ -31,6 +31,8 @@ production readiness without matching public evidence.
   source-only GitHub Release body and refuses binary-claim manifests.
 - Added an annotated-tag guard so source-release proof generation refuses
   lightweight source tags.
+- Added an end-to-end source-release smoke proving generated proof manifests
+  render source-only release notes without local path leakage.
 
 ### Changed
 
@@ -39,7 +41,7 @@ production readiness without matching public evidence.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.19.0-source` candidates.
+  `v0.20.0-source` candidates.
 
 ### Still Source-Only
 
