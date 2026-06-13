@@ -43,14 +43,14 @@ policy, release policy, граница бренда, чеклист импорт
 
 ## Режимы Продукта
 
-- Community client: нейтральный клиент без брендинга POKROV и без обращений к
+- Personal Key Client / Community client: нейтральный клиент без брендинга POKROV и без обращений к
   POKROV API по умолчанию. Уже есть MVP локального импорта одиночных ключей
   `vless://`, `trojan://`, `ss://` и `vmess://`, локальный список профилей,
   импорт и refresh URL-подписки, Android/Windows QR import и gated metadata для
   third-party catalog.
-- Operator client: white-label путь для компаний, которые хотят подключить
+- Operator / Company Client: white-label путь для компаний, которые хотят подключить
   приложение к своему backend, billing, support и бренду.
-- POKROV service mode: описан только для официальных сборок POKROV. Forks и
+- POKROV Service Mode: описан только для официальных сборок POKROV. Forks и
   operators не должны распространять сборки с именем, логотипом, endpoints,
   support или release claims POKROV.
 
@@ -58,6 +58,17 @@ policy, release policy, граница бренда, чеклист импорт
 умолчанию и должен явно маркироваться как неофициальные узлы POKROV. Это не
 default free service от POKROV и не обещание availability, safety, privacy,
 speed или uptime.
+
+## Первые Шаги
+
+| Track | Когда выбирать | С чего начать |
+| --- | --- | --- |
+| Personal Key Client | У тебя уже есть ключ, QR-код или subscription URL, и нужен локальный клиент. | Собери `community` variant, затем вставь `vless://`, `trojan://`, `ss://` или `vmess://` key, scan a QR code, or add a subscription URL. |
+| Operator / Company Client | У тебя компания, команда или свой сервис, и нужен клиент в своём дизайне. | Run the local fixture backend, export white-label color tokens, implement the minimal managed-profile contract, затем подключи свой API, support, billing, signing и release channels. |
+| POKROV Service Mode | Только для официальных сборок POKROV. | Используй официальные release channels POKROV. Forks и operator builds are not official POKROV builds. |
+
+Personal Key Client делает no POKROV API calls by default. Этот репозиторий
+does not provide POKROV nodes or a default free service.
 
 ## Какую Версию Использовать?
 
@@ -92,10 +103,10 @@ speed или uptime.
 | `v0.1.0-source` | Tag создан | Первый source-only snapshot Android/Windows с локальным community import. Без APK/EXE. |
 | `v0.2.0-source` | Tag еще не создан | Community import hub polish, variant-boundary enforcement и source-import hardening уже на `main`; release tag pending. |
 | `v0.3.0-source` | Tag еще не создан | Operator fixture, Free VPN catalog gate, white-label token export и foreground subscription scheduler уже на `main`; release tag pending. |
-| `v0.4.0-source` | PR зеленый, tag еще не создан | Native Android/Windows host brand-boundary hardening находится в stacked PR queue. |
-| `v0.5.0-source` | PR зеленый, tag еще не создан | Community routing и WARP copy honesty hardening находится в stacked PR queue. |
-| `v0.6.0-source` | PR зеленый, tag еще не создан | Dependency/license и generated-asset provenance gates находятся в stacked PR queue. |
-| `v0.7.0-source` | PR зеленый, tag еще не создан | Source-release proof helper для archive SHA-256 и proof manifest находится в stacked PR queue. |
+| `v0.4.0-source` | Pending stacked PR, tag еще не создан | Native Android/Windows host brand-boundary hardening находится в stacked PR queue. |
+| `v0.5.0-source` | Pending stacked PR, tag еще не создан | Community routing и WARP copy honesty hardening находится в stacked PR queue. |
+| `v0.6.0-source` | Pending stacked PR, tag еще не создан | Dependency/license и generated-asset provenance gates находятся в stacked PR queue. |
+| `v0.7.0-source` | Pending stacked PR, tag еще не создан | Source-release proof helper для archive SHA-256 и proof manifest находится в stacked PR queue. |
 
 ## Архитектурная Граница
 

@@ -16,6 +16,15 @@ Subscription URL refresh is local/manual, refreshes on app resume when stale,
 and can use an in-app foreground scheduler. OS background refresh is not
 claimed.
 
+First-run path for ordinary users:
+
+1. choose the `community` variant
+2. build from source for Android or Windows
+3. paste a `vless://`, `trojan://`, `ss://`, or `vmess://` key
+4. scan a QR code if the key is on another screen
+5. add a subscription URL when a provider gives a managed public feed
+6. choose routing locally and connect without a POKROV account
+
 Default properties:
 
 - neutral name: `Open Client`
@@ -49,6 +58,15 @@ For companies or teams with their own service.
 Goal: let an operator replace branding, point the client at their backend, use
 their own billing/support/account model, and ship a client that feels native to
 their product.
+
+First-run path for operators:
+
+1. choose the `operator` variant
+2. run the local fixture backend
+3. export white-label color tokens for your own brand review
+4. implement the minimal managed-profile contract
+5. replace API, cabinet, checkout, support, privacy, signing, and release
+   channels with operator-owned surfaces
 
 Default properties:
 

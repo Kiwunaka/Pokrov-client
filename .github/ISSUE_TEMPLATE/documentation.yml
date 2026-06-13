@@ -3,6 +3,22 @@ description: Report unclear, missing, or inaccurate documentation.
 title: "[Docs]: "
 labels: ["docs"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include secrets, tokens, QR payloads, subscription URLs, personal connection links, private backend details, private operator endpoints, or vulnerability details. Do not add unsupported store, stable, trusted-signing, default free-service, or official POKROV node claims. Do not report vulnerabilities here; use SECURITY.md.
+  - type: dropdown
+    id: track
+    attributes:
+      label: Track / variant
+      options:
+        - Personal Key / Community Client
+        - Operator / Company Client
+        - Official POKROV Service Mode
+        - Repository docs/process
+        - Other / not sure
+    validations:
+      required: true
   - type: input
     id: page
     attributes:
