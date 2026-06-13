@@ -27,6 +27,8 @@ production readiness without matching public evidence.
   present local profiles as a free POKROV node or Telegram-bonus service lane.
 - Added a variant command preview helper that prints seed-backed Android and
   Windows `flutter run` / `flutter build` commands without mutating the tree.
+- Added a source release notes renderer that turns a proof manifest into a
+  source-only GitHub Release body and refuses binary-claim manifests.
 
 ### Changed
 
@@ -35,7 +37,7 @@ production readiness without matching public evidence.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.17.0-source` candidates.
+  `v0.18.0-source` candidates.
 
 ### Still Source-Only
 
