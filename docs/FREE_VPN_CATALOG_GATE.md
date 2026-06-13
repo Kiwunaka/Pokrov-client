@@ -13,6 +13,8 @@ app must keep the catalog disabled until these gates are complete.
 - Manual import build define: `OPEN_CLIENT_ENABLE_FREE_CATALOG=false` by
   default
 - Parser contract: `subscription-text-v1`
+- Provenance policy: no network fetch in CI, no runtime fetch by default,
+  reviewed feed hosts only, attribution required
 - Supported in-client protocols for this gate: `vless`, `trojan`, `ss`, and
   `vmess`
 
@@ -26,12 +28,19 @@ app must keep the catalog disabled until these gates are complete.
 - [x] Cache fetched feeds locally with manual refresh and clear actions.
 - [x] Show copy that says these are not official POKROV nodes.
 - [x] Avoid speed, safety, privacy, uptime, legality, or availability promises.
+- [x] Require release-note copy that says: third-party public configs, not
+  official POKROV nodes, user-initiated, and no speed, privacy, uptime, safety,
+  legality, or availability promise.
 
 ## Parser Fixtures
 
 The parser gate uses local fixtures under
 `tests/fixtures/free_vpn_catalog/`. Tests do not fetch GitHub raw URLs; network
 availability must not decide CI results.
+
+Feed URLs are provenance metadata, not CI inputs. The reviewed catalog currently
+allows `github.com` feed URLs only and must not point at official POKROV hosts,
+legacy hosts, private mirrors, or unreviewed domains.
 
 Covered fixture behavior:
 
@@ -61,3 +70,8 @@ imports, and official/service profiles alone. The first candidate catalog is
 recorded as a disabled opt-in source with attribution, manual refresh, local
 cache, clear-action scope, feed freshness expectations, and local parser
 fixtures.
+
+Any release note that mentions enabling or previewing this catalog must say the
+feeds are third-party public configs, not official POKROV nodes, user-initiated,
+and no speed, privacy, uptime, safety, legality, or availability promise is
+made for them.

@@ -445,6 +445,22 @@ if (Test-Path -LiteralPath $freeVpnCatalogPath -PathType Leaf) {
     $manifestErrors.Add("config\\free-vpn-catalog.seed.json must not mark third-party entries as official POKROV nodes")
   }
 
+  if ($freeVpnCatalog.provenance_policy.network_fetch_in_ci -ne $false) {
+    $manifestErrors.Add("config\\free-vpn-catalog.seed.json must keep network_fetch_in_ci false")
+  }
+
+  if ($freeVpnCatalog.provenance_policy.runtime_fetch_default -ne $false) {
+    $manifestErrors.Add("config\\free-vpn-catalog.seed.json must keep runtime_fetch_default false")
+  }
+
+  if (@($freeVpnCatalog.provenance_policy.allowed_feed_hosts) -notcontains "github.com") {
+    $manifestErrors.Add("config\\free-vpn-catalog.seed.json must allow only reviewed public feed hosts")
+  }
+
+  if ($freeVpnCatalog.provenance_policy.forbid_official_pokrov_hosts -ne $true) {
+    $manifestErrors.Add("config\\free-vpn-catalog.seed.json must forbid official POKROV hosts in catalog feeds")
+  }
+
   if ($freeVpnCatalog.refresh_policy.clear_action_required -ne $true) {
     $manifestErrors.Add("config\\free-vpn-catalog.seed.json must require a clear action for cached public configs")
   }
@@ -469,8 +485,37 @@ if (Test-Path -LiteralPath $freeVpnCatalogPath -PathType Leaf) {
     if ([string]::IsNullOrWhiteSpace($source.attribution)) {
       $manifestErrors.Add("config\\free-vpn-catalog.seed.json first source must include attribution")
     }
+    if ($source.attribution_required -ne $true) {
+      $manifestErrors.Add("config\\free-vpn-catalog.seed.json first source must require attribution")
+    }
+    if ([string]::IsNullOrWhiteSpace($source.license_url)) {
+      $manifestErrors.Add("config\\free-vpn-catalog.seed.json first source must include a license_url")
+    }
+    if (@($source.observed_evidence).Count -lt 1) {
+      $manifestErrors.Add("config\\free-vpn-catalog.seed.json first source must include observed evidence notes")
+    }
     if ($source.review_status -ne "reviewed_candidate_disabled") {
       $manifestErrors.Add("config\\free-vpn-catalog.seed.json first source must remain reviewed_candidate_disabled")
+    }
+
+    $allowedCatalogHosts = @($freeVpnCatalog.provenance_policy.allowed_feed_hosts)
+    foreach ($feed in @($source.feeds)) {
+      try {
+        $feedUri = [System.Uri]::new($feed.url)
+      } catch {
+        $manifestErrors.Add("config\\free-vpn-catalog.seed.json feed '$($feed.id)' must use a valid URL")
+        continue
+      }
+
+      if ($feedUri.Scheme -ne "https") {
+        $manifestErrors.Add("config\\free-vpn-catalog.seed.json feed '$($feed.id)' must use https")
+      }
+      if ($allowedCatalogHosts -notcontains $feedUri.Host) {
+        $manifestErrors.Add("config\\free-vpn-catalog.seed.json feed '$($feed.id)' must stay on reviewed allowed hosts")
+      }
+      if (Test-PokrovEndpoint $feed.url -or $feedUri.Host -eq "kiwunaka.space") {
+        $manifestErrors.Add("config\\free-vpn-catalog.seed.json feed '$($feed.id)' must not point to official POKROV or legacy hosts")
+      }
     }
   }
 }

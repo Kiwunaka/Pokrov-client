@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.27
+# Source Readiness: v0.2-v0.28
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -512,6 +512,31 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.28.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #48: Free VPN catalog provenance gate for reviewed feed hosts, attribution,
+  license evidence, no-network CI, and required release-note boundaries
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- confirm `config/free-vpn-catalog.seed.json` still keeps network fetch disabled
+  in CI and runtime fetch disabled by default
+- confirm release notes that mention the catalog say: third-party public configs,
+  not official POKROV nodes, user-initiated, and no speed, privacy, uptime,
+  safety, legality, or availability promise
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the preflight summary, proof manifest, and rendered GitHub Release body
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
 - Free VPN catalog remains disabled by default and is not an official POKROV
@@ -566,3 +591,6 @@ Required before tagging:
 - Source release copy now has a dedicated checker, but maintainers still own
   the final human review of feature status and known limitations before
   publishing a GitHub Release.
+- Free VPN catalog provenance now records reviewed feed hosts, license evidence,
+  attribution, no-network CI, and required release-note boundaries; it still
+  remains disabled by default and must not become an official POKROV node pool.
