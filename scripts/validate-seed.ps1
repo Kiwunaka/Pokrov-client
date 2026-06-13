@@ -38,6 +38,7 @@ $requiredDirectories = @(
 
 $requiredFiles = @(
   "README.md",
+  "CHANGELOG.md",
   ".gitignore",
   ".editorconfig",
   "melos.yaml",
@@ -50,6 +51,7 @@ $requiredFiles = @(
   "config\\operator-api.fixture.json",
   "config\\free-vpn-catalog.seed.json",
   "config\\security-intake.seed.json",
+  "config\\changelog-policy.seed.json",
   "config\\dependency-license-inventory.seed.json",
   "config\\generated-assets.seed.json",
   "config\\source-release-readiness.seed.json",
@@ -129,6 +131,7 @@ $jsonFiles = @(
   "config\\operator-api.fixture.json",
   "config\\free-vpn-catalog.seed.json",
   "config\\security-intake.seed.json",
+  "config\\changelog-policy.seed.json",
   "config\\dependency-license-inventory.seed.json",
   "config\\generated-assets.seed.json",
   "config\\source-release-readiness.seed.json",
@@ -517,6 +520,80 @@ if (Test-Path -LiteralPath $freeVpnCatalogPath -PathType Leaf) {
       }
       if (Test-PokrovEndpoint $feed.url -or $feedUri.Host -eq "kiwunaka.space") {
         $manifestErrors.Add("config\\free-vpn-catalog.seed.json feed '$($feed.id)' must not point to official POKROV or legacy hosts")
+      }
+    }
+  }
+}
+
+$changelogPolicyPath = Join-Path $root "config\\changelog-policy.seed.json"
+if (Test-Path -LiteralPath $changelogPolicyPath -PathType Leaf) {
+  $changelogPolicy = Get-Content -Raw -LiteralPath $changelogPolicyPath | ConvertFrom-Json
+
+  if ($changelogPolicy.changelog_path -ne "CHANGELOG.md") {
+    $manifestErrors.Add("config\\changelog-policy.seed.json must point to CHANGELOG.md")
+  }
+
+  if ($changelogPolicy.policy.keep_unreleased_section -ne $true) {
+    $manifestErrors.Add("config\\changelog-policy.seed.json must keep the Unreleased section")
+  }
+
+  if ($changelogPolicy.policy.track_source_readiness_milestones -ne $true) {
+    $manifestErrors.Add("config\\changelog-policy.seed.json must track source readiness milestones")
+  }
+
+  if ($changelogPolicy.policy.pending_prs_must_not_be_presented_as_tags -ne $true) {
+    $manifestErrors.Add("config\\changelog-policy.seed.json must forbid presenting pending PRs as tags")
+  }
+
+  if ($changelogPolicy.policy.source_only_boundary_required -ne $true) {
+    $manifestErrors.Add("config\\changelog-policy.seed.json must require source-only boundary copy")
+  }
+
+  if ($changelogPolicy.source_readiness_inventory -ne "config/source-release-readiness.seed.json") {
+    $manifestErrors.Add("config\\changelog-policy.seed.json must point to config/source-release-readiness.seed.json")
+  }
+
+  $changelogPath = Join-Path $root "CHANGELOG.md"
+  if (Test-Path -LiteralPath $changelogPath -PathType Leaf) {
+    $changelogText = Get-Content -Raw -LiteralPath $changelogPath
+
+    foreach ($section in @($changelogPolicy.required_sections)) {
+      if ($changelogText.IndexOf($section, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add("CHANGELOG.md must include section '$section'")
+      }
+    }
+
+    foreach ($phrase in @($changelogPolicy.required_source_only_phrases)) {
+      if ($changelogText.IndexOf($phrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add("CHANGELOG.md must include source-only phrase '$phrase'")
+      }
+    }
+
+    foreach ($claim in @($changelogPolicy.forbidden_unreleased_claims)) {
+      if ($changelogText.IndexOf($claim, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+        $manifestErrors.Add("CHANGELOG.md must not include unsupported claim '$claim'")
+      }
+    }
+
+    $changelogReadinessPath = Join-Path $root "config\\source-release-readiness.seed.json"
+    if (Test-Path -LiteralPath $changelogReadinessPath -PathType Leaf) {
+      $changelogReadiness = Get-Content -Raw -LiteralPath $changelogReadinessPath | ConvertFrom-Json
+      foreach ($milestone in @($changelogReadiness.milestones)) {
+        if ($changelogText.IndexOf($milestone.tag, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+          $manifestErrors.Add("CHANGELOG.md must mention source readiness milestone '$($milestone.tag)'")
+        }
+
+        if ($milestone.status -eq "stacked_pr_green_not_tagged") {
+          $expectedStatus = "$($milestone.tag)`` | Pending stacked PR, not tagged"
+          if ($changelogText.IndexOf($expectedStatus, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+            $manifestErrors.Add("CHANGELOG.md must list '$($milestone.tag)' as Pending stacked PR, not tagged")
+          }
+        } elseif ($milestone.status -eq "not_tagged") {
+          $expectedStatus = "$($milestone.tag)`` | Not tagged"
+          if ($changelogText.IndexOf($expectedStatus, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+            $manifestErrors.Add("CHANGELOG.md must list '$($milestone.tag)' as Not tagged")
+          }
+        }
       }
     }
   }

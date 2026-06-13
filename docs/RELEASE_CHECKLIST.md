@@ -15,6 +15,8 @@ Use this checklist before publishing a public source or binary release.
 - `config/security-intake.seed.json` still forbids public vulnerability issues,
   keeps blank issues disabled, points to private reporting, and preserves the
   source-only no-APK/no-EXE/no-store/no-trusted-signing boundary.
+- `CHANGELOG.md` is updated for the exact source milestone and still matches
+  `config/changelog-policy.seed.json` without presenting pending PRs as tags.
 - `config/dependency-license-inventory.seed.json` matches local `pubspec.lock`
   files when they exist and contains no `REVIEW_REQUIRED` entries.
 - `config/generated-assets.seed.json` lists every `assets/**/*.png` file with

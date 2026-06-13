@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.29
+# Source Readiness: v0.2-v0.30
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -562,6 +562,32 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.30.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #50: changelog and release-history gate for source readiness milestone
+  synchronization, evidence-honest public release notes, and source-only
+  boundary copy
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- confirm `CHANGELOG.md` lists every source readiness milestone without
+  presenting pending PRs as published tags
+- confirm `config/changelog-policy.seed.json` still requires source-only
+  boundary copy and forbids unsupported release claims
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the preflight summary, proof manifest, rendered GitHub Release body,
+  and changelog section for the exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
 - Free VPN catalog remains disabled by default and is not an official POKROV
@@ -623,3 +649,6 @@ Required before tagging:
   must close, redact, or redirect accidental public vulnerability details,
   secrets, QR payloads, subscription URLs, signing material, and private
   backend details.
+- Changelog and release-history policy is now seed-backed, but maintainers
+  still own exact release-date and final feature-status edits when a real
+  source tag is published.
