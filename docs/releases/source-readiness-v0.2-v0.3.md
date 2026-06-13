@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.25
+# Source Readiness: v0.2-v0.26
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -465,6 +465,31 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.26.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #46: runtime artifact manifest gate for local-only libcore downloads,
+  pending binary review metadata, SHA-256 verification hooks, and safe sync
+  destinations
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- confirm `config/runtime-artifacts.seed.json` still records pending or
+  approved license/binary review for each runtime archive
+- keep `PENDING_PUBLIC_BINARY_REVIEW` until a public binary release review
+  records real archive SHA-256 values
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the preflight summary, proof manifest, and rendered GitHub Release body
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
 - Free VPN catalog remains disabled by default and is not an official POKROV
@@ -513,3 +538,6 @@ Required before tagging:
 - GitHub labels now have a canonical catalog, but maintainers still apply
   `good first issue` only after checking the task is small, public, and does not
   require private POKROV access.
+- Runtime artifact metadata now has source-only review gates and SHA-256 hooks,
+  but `hiddify/hiddify-core` archives remain local-only downloads until a
+  separate public binary review records exact hashes and redistribution notes.
