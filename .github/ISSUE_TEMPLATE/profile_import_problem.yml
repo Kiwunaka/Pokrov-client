@@ -1,0 +1,73 @@
+name: Profile import problem
+description: Report a local key, QR, subscription, or file import problem.
+title: "[Import]: "
+labels: ["import"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include secrets, tokens, QR payloads, subscription URLs, personal connection links, private backend details, or private account data. Redact imported configs before sharing logs. Do not report vulnerabilities here; use SECURITY.md.
+  - type: dropdown
+    id: track
+    attributes:
+      label: Track / variant
+      options:
+        - Personal Key / Community Client
+        - Operator / Company Client
+        - Official POKROV Service Mode
+        - Repository docs/process
+        - Other / not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: import_type
+    attributes:
+      label: Import type
+      options:
+        - Pasted single key
+        - QR scan
+        - Subscription URL
+        - Local file
+        - Third-party public config catalog
+        - Other / not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Android
+        - Windows
+        - Both
+        - Repository tests only
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version, commit, or source tag
+      placeholder: "v0.x.0-source, commit SHA, or local branch"
+  - type: textarea
+    id: sanitized_sample
+    attributes:
+      label: Sanitized format sample
+      description: Describe the scheme or format only. Do not paste the actual key, QR payload, or subscription URL.
+      placeholder: "Example: vless:// with ws+tls, vmess base64 subscription, mixed plain-text subscription."
+  - type: textarea
+    id: behavior
+    attributes:
+      label: What happened?
+      description: Include the user-visible error and whether old imported profiles were preserved.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+  - type: textarea
+    id: logs
+    attributes:
+      label: Redacted logs or screenshots
+      description: Remove keys, QR payloads, URLs, account data, IPs you consider private, and private backend details before attaching.
+      render: text
