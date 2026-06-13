@@ -7,8 +7,15 @@ Use this checklist before publishing a public source or binary release.
 - `flutter analyze` passes for changed packages.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1` passes.
 - `python -m pytest tests` passes.
+- `python -m pytest tests/test_release_provenance.py` confirms dependency and
+  generated-asset inventories are publishable; when local `pubspec.lock` files
+  exist, it also confirms inventory package names and versions match them.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\validate-seed.ps1`
   passes.
+- `config/dependency-license-inventory.seed.json` matches local `pubspec.lock`
+  files when they exist and contains no `REVIEW_REQUIRED` entries.
+- `config/generated-assets.seed.json` lists every `assets/**/*.png` file with
+  provenance and reuse scope.
 - `safe_import` dry-run reports `blocked=0` for the public tree.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1`
   passes before a public source release.
@@ -26,6 +33,7 @@ $archive = Join-Path $env:TEMP "$tag.zip"
 git status --short
 git rev-parse HEAD
 python -m pytest tests
+python -m pytest tests/test_release_provenance.py
 powershell -ExecutionPolicy Bypass -File .\scripts\validate-seed.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1 -Source .
 powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1

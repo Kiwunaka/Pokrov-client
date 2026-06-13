@@ -47,6 +47,8 @@ $requiredFiles = @(
   "config\\windows-release.seed.json",
   "config\\operator-api.fixture.json",
   "config\\free-vpn-catalog.seed.json",
+  "config\\dependency-license-inventory.seed.json",
+  "config\\generated-assets.seed.json",
   "config\\white-label-color-tokens.seed.json",
   "config\\white-label-color-tokens.schema.json",
   "config\\variants\\community-client.seed.json",
@@ -59,6 +61,7 @@ $requiredFiles = @(
   "docs\\FREE_VPN_CATALOG_GATE.md",
   "docs\\WHITE_LABEL_BRANDING.md",
   "docs\\BUILD_FROM_SOURCE.md",
+  "docs\\DEPENDENCY_LICENSE_AUDIT.md",
   "docs\\RELEASE_CHECKLIST.md",
   "docs\\operator\\openapi.yaml",
   "apps\\README.md",
@@ -115,6 +118,8 @@ $jsonFiles = @(
   "config\\windows-release.seed.json",
   "config\\operator-api.fixture.json",
   "config\\free-vpn-catalog.seed.json",
+  "config\\dependency-license-inventory.seed.json",
+  "config\\generated-assets.seed.json",
   "config\\white-label-color-tokens.seed.json",
   "config\\white-label-color-tokens.schema.json",
   "config\\variants\\community-client.seed.json",
@@ -414,6 +419,65 @@ if (Test-Path -LiteralPath $freeVpnCatalogPath -PathType Leaf) {
     }
     if ($source.review_status -ne "reviewed_candidate_disabled") {
       $manifestErrors.Add("config\\free-vpn-catalog.seed.json first source must remain reviewed_candidate_disabled")
+    }
+  }
+}
+
+$dependencyInventoryPath = Join-Path $root "config\\dependency-license-inventory.seed.json"
+if (Test-Path -LiteralPath $dependencyInventoryPath -PathType Leaf) {
+  $dependencyInventory = Get-Content -Raw -LiteralPath $dependencyInventoryPath | ConvertFrom-Json
+
+  if ($dependencyInventory.policy.fail_on_missing_package_review -ne $true) {
+    $manifestErrors.Add("config\\dependency-license-inventory.seed.json must fail on missing package review")
+  }
+
+  if (@($dependencyInventory.packages).Count -lt 1) {
+    $manifestErrors.Add("config\\dependency-license-inventory.seed.json must contain reviewed packages")
+  }
+
+  $reviewRequiredPackages = @($dependencyInventory.packages | Where-Object { $_.review -eq "REVIEW_REQUIRED" -or [string]::IsNullOrWhiteSpace($_.review) })
+  if ($reviewRequiredPackages.Count -gt 0) {
+    $manifestErrors.Add("config\\dependency-license-inventory.seed.json must not contain REVIEW_REQUIRED or empty package reviews")
+  }
+
+  foreach ($packageName in @("mobile_scanner", "zxing2", "camera_windows", "pokrov_app_shell")) {
+    $packageEntry = @($dependencyInventory.packages | Where-Object { $_.name -eq $packageName })
+    if ($packageEntry.Count -ne 1) {
+      $manifestErrors.Add("config\\dependency-license-inventory.seed.json must include reviewed package '$packageName'")
+    }
+  }
+}
+
+$generatedAssetsPath = Join-Path $root "config\\generated-assets.seed.json"
+if (Test-Path -LiteralPath $generatedAssetsPath -PathType Leaf) {
+  $generatedAssets = Get-Content -Raw -LiteralPath $generatedAssetsPath | ConvertFrom-Json
+
+  if ($generatedAssets.policy.all_png_assets_must_be_listed -ne $true) {
+    $manifestErrors.Add("config\\generated-assets.seed.json must require all PNG assets to be listed")
+  }
+
+  foreach ($assetPath in @(
+      "assets/brand/pokrov-oss-hero.png",
+      "assets/brand/oss-status-card.png",
+      "assets/branding/pokrov-mark.png",
+      "assets/diagrams/open-source-boundary.png"
+    )) {
+    $assetEntry = @($generatedAssets.assets | Where-Object { $_.path -eq $assetPath })
+    if ($assetEntry.Count -ne 1) {
+      $manifestErrors.Add("config\\generated-assets.seed.json must include '$assetPath'")
+    }
+  }
+
+  $officialBrandAsset = @($generatedAssets.assets | Where-Object { $_.path -eq "assets/branding/pokrov-mark.png" }) | Select-Object -First 1
+  if ($officialBrandAsset) {
+    if ($officialBrandAsset.official_brand_asset -ne $true) {
+      $manifestErrors.Add("config\\generated-assets.seed.json must mark assets/branding/pokrov-mark.png as an official brand asset")
+    }
+    if ($officialBrandAsset.fork_reuse_allowed -ne $false) {
+      $manifestErrors.Add("config\\generated-assets.seed.json must forbid fork reuse of assets/branding/pokrov-mark.png")
+    }
+    if ($officialBrandAsset.reuse -notmatch "BRAND\.md") {
+      $manifestErrors.Add("config\\generated-assets.seed.json must bind official brand asset reuse to BRAND.md")
     }
   }
 }

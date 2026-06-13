@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-06-13",
+  "policy": {
+    "all_png_assets_must_be_listed": true,
+    "imagegen_assets_require_provenance_doc": true,
+    "official_brand_assets_require_restricted_reuse": true
+  },
+  "assets": [
+    {
+      "path": "assets/brand/pokrov-oss-hero.png",
+      "kind": "imagegen-raster",
+      "provenance_doc": "assets/IMAGEGEN_PROMPTS.md",
+      "source_scope": "generated from repository-safe prompt, no private service data",
+      "intended_surface": "README hero artwork",
+      "reuse": "repository-docs-only",
+      "official_brand_asset": false,
+      "fork_reuse_allowed": true,
+      "public_release_ok": true
+    },
+    {
+      "path": "assets/brand/oss-status-card.png",
+      "kind": "imagegen-raster",
+      "provenance_doc": "assets/IMAGEGEN_PROMPTS.md",
+      "source_scope": "generated from repository-safe prompt, no private service data",
+      "intended_surface": "README status artwork",
+      "reuse": "repository-docs-only",
+      "official_brand_asset": false,
+      "fork_reuse_allowed": true,
+      "public_release_ok": true
+    },
+    {
+      "path": "assets/branding/pokrov-mark.png",
+      "kind": "official-brand-mark",
+      "provenance_doc": "assets/branding/README.md",
+      "source_scope": "private official brand references retained as provenance notes only",
+      "intended_surface": "official POKROV launcher and host icon master",
+      "reuse": "restricted by BRAND.md",
+      "official_brand_asset": true,
+      "fork_reuse_allowed": false,
+      "public_release_ok": true
+    },
+    {
+      "path": "assets/diagrams/open-source-boundary.png",
+      "kind": "imagegen-raster",
+      "provenance_doc": "assets/IMAGEGEN_PROMPTS.md",
+      "source_scope": "generated from repository-safe prompt, no private service data",
+      "intended_surface": "README open-source/private-service boundary diagram",
+      "reuse": "repository-docs-only",
+      "official_brand_asset": false,
+      "fork_reuse_allowed": true,
+      "public_release_ok": true
+    }
+  ]
+}
