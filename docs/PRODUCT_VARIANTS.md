@@ -108,14 +108,14 @@ Implemented now:
 - manual and foreground subscription refresh stores metadata and preserves old
   profiles on failed refresh
 - Android/Windows camera QR import reuses the same safe local parser
-- reviewed disabled third-party public config catalog seed for
-  `AvenCores/goida-vpn-configs`
+- reviewed disabled Free VPN catalog seed for `AvenCores/goida-vpn-configs`
+- Free VPN catalog parser fixtures for the reviewed `subscription_text` feed
+  format
 - neutral fallback brand mark when no asset is supplied
 - operator/pokrov modes can opt into managed-service API bootstrap
 
 Still planned:
 
-- operator API fixture server
 - white-label color token export
 - background subscription refresh scheduler
 - enabled third-party public config catalog UI, fetcher, and cache-clear flow

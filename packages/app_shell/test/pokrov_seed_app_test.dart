@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -3697,6 +3698,73 @@ void main() {
 
     expect(stagedPayloads.single, contains('"type": "shadowsocks"'));
     expect(stagedPayloads.single, contains('"server": "ss.example"'));
+  });
+
+  testWidgets('community catalog fixture imports supported entries only',
+      (tester) async {
+    final fixture = File(
+      '../../tests/fixtures/free_vpn_catalog/avencores_subscription_text.txt',
+    ).readAsStringSync();
+
+    await tester.pumpWidget(
+      PokrovSeedApp(
+        appContext: buildSeedAppContext(hostPlatform: HostPlatform.android),
+        communitySubscriptionFetcher: (uri) async {
+          expect(uri.toString(), 'https://example.invalid/catalog.txt');
+          return fixture;
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+    await _completeFirstLaunchIfPresent(tester);
+
+    await _tapNav(tester, 'nav-profile');
+    final subscription =
+        find.byKey(const ValueKey('profile-subscription-url-action'));
+    await tester.dragUntilVisible(
+      subscription,
+      find.byType(Scrollable).first,
+      const Offset(0, -220),
+      maxIteration: 12,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(subscription);
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('profile-redeem-code-field')),
+      'https://example.invalid/catalog.txt',
+    );
+    await tester.tap(find.byKey(const ValueKey('profile-redeem-submit')));
+    await tester.pumpAndSettle();
+
+    final vlessProfile = find
+        .byKey(const ValueKey('profile-local-profile-open-client-aven-vless'));
+    await tester.dragUntilVisible(
+      vlessProfile,
+      find.byType(Scrollable).first,
+      const Offset(0, -120),
+      maxIteration: 8,
+    );
+    await tester.pumpAndSettle();
+    expect(vlessProfile, findsOneWidget);
+
+    final vmessProfile = find
+        .byKey(const ValueKey('profile-local-profile-open-client-aven-vmess'));
+    await tester.dragUntilVisible(
+      vmessProfile,
+      find.byType(Scrollable).first,
+      const Offset(0, -160),
+      maxIteration: 12,
+    );
+    await tester.pumpAndSettle();
+
+    expect(vmessProfile, findsOneWidget);
+    expect(
+      find.byKey(
+        const ValueKey('profile-local-profile-open-client-unsupported'),
+      ),
+      findsNothing,
+    );
   });
 
   testWidgets('community subscription refresh updates existing local profiles',

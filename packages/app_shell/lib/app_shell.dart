@@ -1466,7 +1466,11 @@ class _CommunityProfileImporter {
           'Unsupported key type: $scheme.',
         ),
     };
-    final name = _profileNameFromUri(uri, fallback: scheme.toUpperCase());
+    final name = _profileNameFromSource(
+      source: source,
+      uri: uri,
+      fallback: scheme.toUpperCase(),
+    );
     final config = <String, Object?>{
       'log': <String, Object?>{
         'disabled': false,
@@ -1815,6 +1819,28 @@ class _CommunityProfileImporter {
     }
     final host = uri.host.trim();
     return host.isEmpty ? fallback : host;
+  }
+
+  static String _profileNameFromSource({
+    required String source,
+    required Uri uri,
+    required String fallback,
+  }) {
+    if (uri.scheme.toLowerCase() == 'vmess') {
+      try {
+        final body = source.substring('vmess://'.length).trim();
+        final decoded = jsonDecode(_decodeMaybeBase64(body));
+        if (decoded is Map<String, Object?>) {
+          final ps = decoded['ps']?.toString().trim() ?? '';
+          if (ps.isNotEmpty) {
+            return ps;
+          }
+        }
+      } on Object {
+        // Fall back to the generic URI label; parse() reports invalid VMess.
+      }
+    }
+    return _profileNameFromUri(uri, fallback: fallback);
   }
 
   static String _safeProfileName(String name) {
