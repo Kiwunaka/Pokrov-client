@@ -3496,6 +3496,32 @@ void main() {
     expect(tester.widget<FilledButton>(importCatalog).onPressed, isNull);
   });
 
+  testWidgets('community access copy stays local and does not imply free nodes',
+      (tester) async {
+    await tester.pumpWidget(
+      PokrovSeedApp(
+        appContext: buildSeedAppContext(hostPlatform: HostPlatform.android),
+        communityQrScanner: (context) async => null,
+      ),
+    );
+    await tester.pumpAndSettle();
+    await _completeFirstLaunchIfPresent(tester);
+
+    expect(find.text('Локальные профили'), findsOneWidget);
+    expect(find.text('Свои ключи'), findsOneWidget);
+    expect(find.text('Без аккаунта'), findsOneWidget);
+    expect(find.text('Локально'), findsOneWidget);
+    expect(find.text('Бесплатный узел'), findsNothing);
+    expect(find.text('Базовый режим'), findsNothing);
+    expect(find.textContaining('+0 дней за Telegram'), findsNothing);
+
+    await _tapNav(tester, 'nav-profile');
+    expect(find.text('Локальные профили · Свои ключи'), findsOneWidget);
+    expect(find.text('Бесплатный узел'), findsNothing);
+    expect(find.text('Базовый режим'), findsNothing);
+    expect(find.textContaining('Telegram +0'), findsNothing);
+  });
+
   testWidgets('free VPN catalog default flag blocks import fetch',
       (tester) async {
     var fetchCount = 0;
@@ -5276,6 +5302,7 @@ void main() {
       expect(appContext.variantProfile.displayName, 'Open Client');
       expect(appContext.variantProfile.usesApiServices, isFalse);
       expect(appContext.apiBaseUrl, isEmpty);
+      expect(appContext.accessLane, AccessLane.localProfiles);
       expect(appContext.bootstrapContract.hostPlatform, platform);
       expect(
         appContext.scope.publicReleaseTargets,
@@ -5291,7 +5318,12 @@ void main() {
           ClientPlatform.macos,
         ]),
       );
-      expect(appContext.runtimeProfile.freeTier.speedMbps, 50);
+      expect(appContext.runtimeProfile.freeTier.speedMbps, 0);
+      expect(
+          appContext.runtimeProfile.freeTier.nodePool, 'local-user-profiles');
+      expect(appContext.runtimeProfile.freeTier.nodePoolLabel, 'Свои ключи');
+      expect(appContext.runtimeProfile.trialDays, 0);
+      expect(appContext.runtimeProfile.telegramBonusDays, 0);
       expect(appContext.redeemHint, isEmpty);
       expect(appContext.locations, hasLength(1));
     }

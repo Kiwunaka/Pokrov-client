@@ -770,8 +770,9 @@ SeedAppContext buildSeedAppContext({
   return SeedAppContext(
     hostPlatform: hostPlatform,
     variantProfile: profile,
-    accessLane:
-        profile.isCommunity ? AccessLane.freeMonthly : AccessLane.trialPremium,
+    accessLane: profile.isCommunity
+        ? AccessLane.localProfiles
+        : AccessLane.trialPremium,
     scope: const ProgramScope(
       publicReleaseTargets: [
         ClientPlatform.android,
@@ -795,13 +796,21 @@ SeedAppContext buildSeedAppContext({
       ],
       trialDays: profile.isCommunity ? 0 : 5,
       telegramBonusDays: profile.isCommunity ? 0 : 10,
-      freeTier: const FreeTierPolicy(
-        trafficGb: 5,
-        periodDays: 30,
-        speedMbps: 50,
-        deviceLimit: 1,
-        nodePool: 'NL-free',
-      ),
+      freeTier: profile.isCommunity
+          ? const FreeTierPolicy(
+              trafficGb: 0,
+              periodDays: 0,
+              speedMbps: 0,
+              deviceLimit: 0,
+              nodePool: 'local-user-profiles',
+            )
+          : const FreeTierPolicy(
+              trafficGb: 5,
+              periodDays: 30,
+              speedMbps: 50,
+              deviceLimit: 1,
+              nodePool: 'NL-free',
+            ),
       allowsExternalCheckoutOnly: true,
       firstPartyPromosOnly: true,
     ),
@@ -3991,7 +4000,8 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
         warpRuntimeConsent: _warpRuntimeConsent,
         warpBusy: _warpPolicyBusy,
         onToggleRuntime: _toggleRuntimeFromHome,
-        onTelegramBonus: _telegramBonusBusy
+        onTelegramBonus: _telegramBonusBusy ||
+                !widget.appContext.variantProfile.usesApiServices
             ? null
             : () {
                 if (_telegramBonusCanClaim) {
@@ -5343,13 +5353,21 @@ class _HomeAccessStrip extends StatelessWidget {
         ),
         _HomeAccessPill(
           key: const ValueKey('home-telegram-bonus-pill'),
-          icon: telegramBonusClaimed
-              ? Icons.check_circle_outline_rounded
-              : Icons.send_outlined,
+          icon: telegramBonusLabel == 'Без аккаунта'
+              ? Icons.key_outlined
+              : telegramBonusClaimed
+                  ? Icons.check_circle_outline_rounded
+                  : Icons.send_outlined,
           label: telegramBonusLabel,
-          sublabel: telegramBonusClaimed ? 'Готово' : 'Бонус',
+          sublabel: telegramBonusLabel == 'Без аккаунта'
+              ? 'Локально'
+              : telegramBonusClaimed
+                  ? 'Готово'
+                  : 'Бонус',
           tone: _SectionTone.reward,
-          onTap: telegramBonusClaimed ? null : onTelegramBonus,
+          onTap: telegramBonusClaimed || telegramBonusLabel == 'Без аккаунта'
+              ? null
+              : onTelegramBonus,
         ),
       ],
     );
@@ -8598,6 +8616,7 @@ String _accessPoolLabel(AccessLane lane) {
     AccessLane.bonusPremium ||
     AccessLane.paidUnlimited =>
       'Премиум-пул',
+    AccessLane.localProfiles => 'Свои ключи',
     AccessLane.freeMonthly || AccessLane.freeSoftMode => 'Бесплатный узел',
   };
 }
@@ -8613,6 +8632,7 @@ String _accessMainLabel(
       claimed ? '$totalDays дней доступа' : '$baseDays дней пробного доступа',
     AccessLane.bonusPremium => '$totalDays дней доступа',
     AccessLane.paidUnlimited => 'Премиум активен',
+    AccessLane.localProfiles => 'Локальные профили',
     AccessLane.freeMonthly => 'Базовый режим',
     AccessLane.freeSoftMode => 'Лимит закончился',
   };
@@ -8630,6 +8650,7 @@ String _accessShortValue(
     AccessLane.trialPremium => claimed ? '$totalDays дней' : '$baseDays дней',
     AccessLane.bonusPremium => '$totalDays дней',
     AccessLane.paidUnlimited => 'Премиум',
+    AccessLane.localProfiles => 'Локально',
     AccessLane.freeMonthly => 'Базовый',
     AccessLane.freeSoftMode => 'Лимит',
   };
@@ -8639,6 +8660,9 @@ String _telegramBonusHomeLabel(
   SeedAppContext appContext,
   AppFirstBonusSummary? bonus,
 ) {
+  if (appContext.accessLane == AccessLane.localProfiles) {
+    return 'Без аккаунта';
+  }
   final claimed = (bonus?.channelBonusClaimedAt ?? '').trim().isNotEmpty;
   if (claimed) {
     return 'Telegram-бонус активен';
