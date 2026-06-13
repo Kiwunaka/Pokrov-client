@@ -88,6 +88,7 @@ Source release status:
 | `v0.26.0-source` | Pending stacked PR, not tagged | Runtime artifact manifest gate and local-only libcore review metadata are in the stacked PR queue. |
 | `v0.27.0-source` | Pending stacked PR, not tagged | Source release copy-claims gate is in the stacked PR queue. |
 | `v0.28.0-source` | Pending stacked PR, not tagged | Free VPN catalog provenance gate is in the stacked PR queue. |
+| `v0.29.0-source` | Pending stacked PR, not tagged | Private security intake gate is in the stacked PR queue. |
 
 ## Which App Should I Use?
 

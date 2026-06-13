@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-06-14",
+  "policy": {
+    "public_vulnerability_issues_allowed": false,
+    "blank_issues_enabled": false,
+    "private_security_policy_url": "https://github.com/Kiwunaka/Pokrov-client/security/policy",
+    "telegram_support_url": "https://t.me/pokrov_supportbot",
+    "security_redirect_label": "security-private",
+    "public_issue_action": "close_or_redact_and_redirect"
+  },
+  "private_reporting_paths": [
+    {
+      "id": "github-private-vulnerability-reporting",
+      "url": "https://github.com/Kiwunaka/Pokrov-client/security/policy",
+      "preferred": true
+    },
+    {
+      "id": "telegram-support",
+      "url": "https://t.me/pokrov_supportbot",
+      "preferred": false
+    }
+  ],
+  "forbidden_public_content": [
+    "secrets",
+    "account tokens",
+    "QR payloads",
+    "subscription URLs",
+    "personal connection links",
+    "private backend details",
+    "exploit steps",
+    "signing material",
+    "unredacted logs containing user data"
+  ],
+  "supported_scope": [
+    "public client source code",
+    "public source release process",
+    "operator fixture and OpenAPI contracts",
+    "Android and Windows host source"
+  ],
+  "out_of_scope": [
+    "official backend, billing, admin, infrastructure, and private service operations",
+    "private operator backends and customer accounts",
+    "third-party public config feed speed, privacy, uptime, safety, legality, or availability claims",
+    "public requests that require secrets, account tokens, QR payloads, subscription URLs, private backend details, or exploit steps"
+  ],
+  "release_claim_boundary": {
+    "source_only_repository": true,
+    "ships_apk": false,
+    "ships_exe": false,
+    "store_release": false,
+    "trusted_signing_claim": false,
+    "official_binary_claim": false,
+    "require_public_evidence_for_binary_claims": true
+  }
+}

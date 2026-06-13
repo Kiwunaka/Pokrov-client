@@ -13,6 +13,11 @@ readiness PRs. Security reports should identify one of:
 No APK/EXE, store, trusted-signing, or official binary security claim is made by
 this source-only repository unless a future release note says so with evidence.
 
+The machine-readable intake gate is
+[`config/security-intake.seed.json`](config/security-intake.seed.json). It keeps
+blank public issues disabled for vulnerability reports, records private
+reporting paths, and preserves the source-only release claim boundary.
+
 ## Supported Scope
 
 Security reports are accepted for the public POKROV client code and public
