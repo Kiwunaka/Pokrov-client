@@ -17,7 +17,7 @@ def test_source_release_readiness_milestones_are_source_only() -> None:
 
     assert readiness["policy"]["source_only_milestones_must_not_claim_binaries"] is True
     assert readiness["policy"]["pending_milestones_must_not_claim_tags"] is True
-    assert len(milestones) >= 7
+    assert len(milestones) >= 11
 
     for milestone in milestones:
         assert milestone["tag"].startswith("v")
@@ -34,6 +34,30 @@ def test_source_release_readiness_milestones_are_source_only() -> None:
         assert milestone["trusted_signing_claim"] is False
         assert milestone["scope"]
         assert milestone["evidence"]
+
+
+def test_current_stacked_pr_milestones_are_recorded() -> None:
+    readiness = _read_json("config/source-release-readiness.seed.json")
+    by_tag = {milestone["tag"]: milestone for milestone in readiness["milestones"]}
+
+    expected = {
+        "v0.4.0-source": "https://github.com/Kiwunaka/Pokrov-client/pull/23",
+        "v0.5.0-source": "https://github.com/Kiwunaka/Pokrov-client/pull/24",
+        "v0.6.0-source": "https://github.com/Kiwunaka/Pokrov-client/pull/25",
+        "v0.7.0-source": "https://github.com/Kiwunaka/Pokrov-client/pull/26",
+        "v0.8.0-source": "https://github.com/Kiwunaka/Pokrov-client/pull/27",
+        "v0.9.0-source": "https://github.com/Kiwunaka/Pokrov-client/pull/28",
+        "v0.10.0-source": "https://github.com/Kiwunaka/Pokrov-client/pull/29",
+        "v0.11.0-source": "https://github.com/Kiwunaka/Pokrov-client/pull/30",
+    }
+
+    for tag, evidence in expected.items():
+        milestone = by_tag[tag]
+        assert milestone["status"] == "stacked_pr_green_not_tagged"
+        assert milestone["evidence"] == evidence
+        assert milestone["source_only"] is True
+        assert milestone["ships_apk"] is False
+        assert milestone["ships_exe"] is False
 
 
 def test_readiness_docs_and_readmes_mention_every_source_milestone() -> None:
