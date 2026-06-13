@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.19
+# Source Readiness: v0.2-v0.20
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -335,6 +335,26 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.20.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #40: end-to-end source-release smoke proving the generated proof manifest
+  can render source-only GitHub Release notes without local path leakage
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- create an annotated source tag with `git tag -a`
+- choose the exact commit SHA
+- run the full source release checklist on that commit
+- render and review the GitHub Release body from the generated proof manifest
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
 - Free VPN catalog remains disabled by default and is not an official POKROV
@@ -364,3 +384,6 @@ Required before tagging:
   before publishing a GitHub Release.
 - Source release proof generation now refuses lightweight tags; maintainers must
   create annotated source tags before running the final proof command.
+- The proof-to-notes smoke validates the generated source release manifest and
+  rendered release body shape; maintainers still own final feature-status and
+  limitation wording before publication.

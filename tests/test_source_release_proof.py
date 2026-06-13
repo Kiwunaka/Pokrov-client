@@ -217,6 +217,42 @@ def test_prepare_source_release_script_writes_proof_manifest(tmp_path: Path) -> 
     assert manifest["no_trusted_signing_claim"] is True
     assert manifest["forbidden_file_count"] == 0
 
+    notes_path = out_dir / "v9.9.9-source-release-notes.md"
+    render_result = subprocess.run(
+        [
+            "powershell",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(ROOT / "scripts" / "render-source-release-notes.ps1"),
+            "-ManifestPath",
+            str(manifest_path),
+            "-ManifestLabel",
+            manifest_path.name,
+            "-OutFile",
+            str(notes_path),
+        ],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert "Source release notes written" in render_result.stdout
+    rendered_notes = notes_path.read_text(encoding="utf-8-sig")
+    assert "# v9.9.9-source" in rendered_notes
+    assert f"- Commit SHA: {manifest['commit_sha']}" in rendered_notes
+    assert (
+        f"- Source archive SHA-256: {manifest['source_archive_sha256']}"
+        in rendered_notes
+    )
+    assert f"- Source proof manifest: {manifest_path.name}" in rendered_notes
+    assert "No APK or EXE binaries." in rendered_notes
+    assert "No store release." in rendered_notes
+    assert "No trusted Windows signing claim." in rendered_notes
+    assert "This is a source-only release." in rendered_notes
+    assert str(out_dir) not in rendered_notes
+
 
 def test_prepare_source_release_script_peels_annotated_tags(tmp_path: Path) -> None:
     tag = "v9.9.8-source"

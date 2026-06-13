@@ -119,6 +119,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.17.0-source` | Pending stacked PR, tag еще не создан | Seed-backed variant command preview tooling находится в stacked PR queue. |
 | `v0.18.0-source` | Pending stacked PR, tag еще не создан | Proof-backed source release notes rendering находится в stacked PR queue. |
 | `v0.19.0-source` | Pending stacked PR, tag еще не создан | Annotated source tag enforcement находится в stacked PR queue. |
+| `v0.20.0-source` | Pending stacked PR, tag еще не создан | End-to-end proof-to-release-notes smoke находится в stacked PR queue. |
 
 ## Архитектурная Граница
 
