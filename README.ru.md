@@ -78,12 +78,20 @@ speed или uptime.
 | --- | --- |
 | Репозиторий | Публичная база готова |
 | Исходники | Санитизированный Android + Windows snapshot импортирован |
-| Community mode | Локальные профили, ручной импорт подписки, decoded QR import |
-| Operator mode | White-label контракты задокументированы |
+| Community mode | Локальные профили, импорт/refresh подписок, Android/Windows QR import |
+| Operator mode | Fixture API, OpenAPI contract и white-label token export задокументированы |
 | Platforms | Сначала Android и Windows |
 | License | GNU GPLv3 |
 | Official backend | Работает отдельно под управлением POKROV |
 | Public releases | Только beta-safe и evidence-based формулировки |
+
+## Статус Source Release
+
+| Milestone | Статус | Объем |
+| --- | --- | --- |
+| `v0.1.0-source` | Tag создан | Первый source-only snapshot Android/Windows с локальным community import. Без APK/EXE. |
+| `v0.2.0-source` | Tag еще не создан | Community import hub polish, variant-boundary enforcement и source-import hardening уже на `main`; release tag pending. |
+| `v0.3.0-source` | Tag еще не создан | Operator fixture, Free VPN catalog gate, white-label token export и foreground subscription scheduler уже на `main`; release tag pending. |
 
 ## Архитектурная Граница
 

@@ -14,6 +14,11 @@ Source-only releases, such as `v0.1.0-source`, should include:
 - explicit note that no APK, EXE, store release, or trusted-signed binary is
   shipped in that release
 
+Use [releases/SOURCE_RELEASE_TEMPLATE.md](releases/SOURCE_RELEASE_TEMPLATE.md)
+for GitHub Release bodies. Milestones that are implemented on `main` but not
+tagged yet must be labeled `not tagged` or `pending tag`; do not present them as
+published releases.
+
 ## Binary Release Requirements
 
 Every official binary release should include:

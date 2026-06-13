@@ -38,12 +38,20 @@ Current repository state:
 - the public repository is ready for open-source collaboration
 - the first sanitized Android and Windows app source snapshot is imported
 - the community client can import local keys, subscription URLs, and Android/Windows QR payloads without POKROV API calls
-- subscription refresh is manual and foreground-only, preserving old local profiles on failure
+- subscription refresh is manual, app-resume, and foreground-scheduled, preserving old local profiles on failure
 - the optional third-party public config catalog is documented as gated metadata and disabled by default
 - the operator client path is documented for companies with their own backend
 - official POKROV backend and operations remain private
 - the repository license is GNU GPLv3
 - public release claims stay beta-safe and evidence-based
+
+Source release status:
+
+| Milestone | Status | Scope |
+| --- | --- | --- |
+| `v0.1.0-source` | Tagged | First source-only Android/Windows snapshot with local community import. No APK/EXE. |
+| `v0.2.0-source` | Not tagged | Community import polish and source-import hardening are on `main`; release tag pending. |
+| `v0.3.0-source` | Not tagged | Operator fixture, Free VPN catalog gate, white-label tokens, and foreground subscription scheduler are on `main`; release tag pending. |
 
 ## Which App Should I Use?
 

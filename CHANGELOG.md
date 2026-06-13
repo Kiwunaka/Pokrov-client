@@ -8,6 +8,39 @@ production readiness without matching public evidence.
 
 ## Unreleased
 
+### Added
+
+- Added operator fixture API contract, OpenAPI documentation, and smoke tests.
+- Added gated Free VPN catalog parser metadata and fixtures for reviewed
+  public feeds.
+- Added white-label color token seed, validation, and export helpers for
+  operator forks.
+- Added foreground in-app subscription refresh scheduling for community
+  subscription URLs.
+
+### Changed
+
+- Hardened community/operator/official variant boundaries.
+- Hardened source-import policy and clean-clone verification.
+- Updated source-release documentation to separate tagged releases from
+  source-readiness milestones.
+
+### Still Source-Only
+
+- No APK, EXE, store release, trusted signing, or official binary claim is made
+  by this changelog section.
+
+## v0.1.0-source - 2026-06-09
+
+- Tagged the first source-only Android and Windows snapshot.
+- Added local community profile import for supported key schemes.
+- Added subscription URL import and manual/foreground refresh foundation.
+- Added QR import foundation through shared local parser flows.
+- Added clean-clone source-boundary proof.
+- Shipped no APK, EXE, store release, trusted signing, or official binary.
+
+## Repository Foundation
+
 - Added the public open-source repository foundation.
 - Added contribution, security, support, brand, release, and issue-template
   documents.
@@ -15,5 +48,3 @@ production readiness without matching public evidence.
 - Added imagegen raster repository visuals for the README and architecture
   boundary.
 - Added governance and source-import playbook documentation.
-- Kept the repository documentation-only until the sanitized client source
-  snapshot is ready.
