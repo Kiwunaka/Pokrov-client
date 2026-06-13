@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.13
+# Source Readiness: v0.2-v0.17
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -225,6 +225,78 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.14.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #33: source-readiness synchronization through the default-disabled Free VPN
+  catalog feature flag slice
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release checklist on that commit
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
+## v0.15.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #34: operator support ticket path canonicalization across docs, OpenAPI,
+  fixtures, smoke tests, and app adapter contracts
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release checklist on that commit
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
+## v0.16.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #35: community local-access wording and model guards so Open Client local
+  profiles are not presented as free POKROV service nodes
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release checklist on that commit
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
+## v0.17.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #36: seed-backed variant command preview tooling for Android and Windows
+  community, operator, and official POKROV build modes
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release checklist on that commit
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
 - Free VPN catalog remains disabled by default and is not an official POKROV
@@ -245,3 +317,7 @@ Required before tagging:
 - Manual third-party catalog import now requires
   `OPEN_CLIENT_ENABLE_FREE_CATALOG=true`; default source builds keep the action
   visible as a disabled preview instead of fetching public feeds.
+- Community access UI and seed context now present local user-owned profiles
+  instead of a free POKROV node, trial, or Telegram-bonus service lane.
+- Variant command previews are generated from public seed files only; they do
+  not build, sign, package, upload, or create release artifacts.
