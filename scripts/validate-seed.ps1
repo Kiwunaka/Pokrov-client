@@ -361,6 +361,10 @@ if (Test-Path -LiteralPath $operatorFixturePath -PathType Leaf) {
     $manifestErrors.Add("config\\operator-api.fixture.json must keep start_trial on /api/client/session/start-trial")
   }
 
+  if ($operatorFixture.endpoints.support_tickets.path -ne "/api/tickets") {
+    $manifestErrors.Add("config\\operator-api.fixture.json must keep support_tickets on /api/tickets to match the app adapter")
+  }
+
   if ($operatorFixture.endpoints.managed_profile.response.materialized_for_runtime -ne $true) {
     $manifestErrors.Add("config\\operator-api.fixture.json managed_profile must be materialized_for_runtime")
   }
@@ -561,7 +565,7 @@ if (Test-Path -LiteralPath $whiteLabelSchemaPath -PathType Leaf) {
 $operatorOpenApiPath = Join-Path $root "docs\\operator\\openapi.yaml"
 if (Test-Path -LiteralPath $operatorOpenApiPath -PathType Leaf) {
   $operatorOpenApi = Get-Content -Raw -LiteralPath $operatorOpenApiPath
-  foreach ($requiredPath in @("/api/client/session/start-trial", "/api/client/route-policy", "/api/client/profile/managed", "/api/client/apps", "/api/client/support/tickets")) {
+  foreach ($requiredPath in @("/api/client/session/start-trial", "/api/client/route-policy", "/api/client/profile/managed", "/api/client/apps", "/api/tickets")) {
     if ($operatorOpenApi -notmatch [System.Text.RegularExpressions.Regex]::Escape($requiredPath)) {
       $manifestErrors.Add("docs\\operator\\openapi.yaml must document '$requiredPath'")
     }

@@ -146,7 +146,7 @@
     },
     "support_tickets": {
       "method": "GET",
-      "path": "/api/client/support/tickets",
+      "path": "/api/tickets",
       "optional": true,
       "response": {
         "tickets": [

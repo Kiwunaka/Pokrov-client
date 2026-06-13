@@ -22,9 +22,10 @@
     "GET /api/client/profile/managed",
     "POST /api/redeem",
     "GET /api/client/apps",
-    "GET /api/client/support/tickets",
-    "POST /api/client/support/tickets",
-    "POST /api/client/support/tickets/{ticket_id}/messages"
+    "GET /api/tickets",
+    "POST /api/tickets",
+    "GET /api/tickets/{ticket_id}",
+    "POST /api/tickets/{ticket_id}/messages"
   ],
   "optional_api_contracts": [
     "POST /api/client/cabinet-token",
