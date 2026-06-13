@@ -7,7 +7,7 @@ Current helpers:
 - `validate-seed.ps1`: checks the public Android/Windows scaffold, shared packages, and JSON config seeds
 - `bootstrap-workspace.ps1`: runs `flutter pub get` across the clean-room packages and available host entrypoints; pass `-OfflinePubGet` when an old Flutter/Dart pub advisory fetch breaks online dependency resolution but the local package cache is already populated
 - `run-tests.ps1`: bootstraps the workspace and runs the shared shell widget tests; accepts `-OfflinePubGet` and forwards it to bootstrap
-- `run-operator-fixture-smoke.ps1`: starts the local operator API fixture on a smoke-only port, checks session/profile/apps/support/error-mode responses, then stops the fixture
+- `run-operator-fixture-smoke.ps1`: starts the local operator API fixture on a smoke-only port, checks session/profile/apps/support/error-mode responses, then stops the fixture; pass `-Port` to avoid local or CI collisions
 - `bootstrap-local.ps1`: copies example config seeds into `config/local/` without touching production paths unless explicitly forced
 - `prepare-oss-import.ps1`: runs the source-import tests and safe importer against a temporary snapshot/stage pair; rejects staging inside this public repo
 - `export-white-label-color-tokens.ps1`: validates `config/white-label-color-tokens.seed.json` and writes local JSON, Dart, and CSS color-token exports under ignored `build/white_label_tokens/`
