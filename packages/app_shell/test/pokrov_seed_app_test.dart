@@ -1044,6 +1044,12 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(appSection, findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('profile-enhanced-protection-action')),
+      findsOneWidget,
+    );
+    expect(find.text('Расширенная защита'), findsOneWidget);
+    expect(find.text('WARP-защита'), findsNothing);
     final supportSection =
         find.byKey(const ValueKey('profile-section-support'));
     await tester.dragUntilVisible(
