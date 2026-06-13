@@ -20,6 +20,9 @@ if ($Out.Trim().Length -gt 0) {
 Push-Location $repoRoot
 try {
   & $Python @argsList
+  if ($LASTEXITCODE -ne 0) {
+    throw "white-label color token export failed with exit code $LASTEXITCODE"
+  }
 } finally {
   Pop-Location
 }

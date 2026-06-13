@@ -25,6 +25,7 @@ $requiredDirectories = @(
   "config\\templates",
   "config\\variants",
   "docs",
+  "docs\\operator",
   "docs\\releases",
   "assets\\brand",
   "assets\\branding",
@@ -44,6 +45,10 @@ $requiredFiles = @(
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
   "config\\windows-release.seed.json",
+  "config\\operator-api.fixture.json",
+  "config\\free-vpn-catalog.seed.json",
+  "config\\white-label-color-tokens.seed.json",
+  "config\\white-label-color-tokens.schema.json",
   "config\\variants\\community-client.seed.json",
   "config\\variants\\operator-client.seed.json",
   "config\\variants\\pokrov-service.seed.json",
@@ -51,8 +56,11 @@ $requiredFiles = @(
   "docs\\OPEN_SOURCE_SCOPE.md",
   "docs\\PRODUCT_VARIANTS.md",
   "docs\\OPERATOR_INTEGRATION.md",
+  "docs\\FREE_VPN_CATALOG_GATE.md",
+  "docs\\WHITE_LABEL_BRANDING.md",
   "docs\\BUILD_FROM_SOURCE.md",
   "docs\\RELEASE_CHECKLIST.md",
+  "docs\\operator\\openapi.yaml",
   "apps\\README.md",
   "apps\\android_shell\\README.md",
   "apps\\android_shell\\pubspec.yaml",
@@ -89,8 +97,11 @@ $requiredFiles = @(
   "scripts\\bootstrap-workspace.ps1",
   "scripts\\bootstrap-local.ps1",
   "scripts\\fetch-libcore-assets.ps1",
+  "scripts\\prepare-oss-import.ps1",
+  "scripts\\run-operator-fixture-smoke.ps1",
   "scripts\\run-tests.ps1",
   "scripts\\validate-seed.ps1",
+  "scripts\\export-white-label-color-tokens.ps1",
   "test\\README.md",
   "test\\seed-layout.ps1",
   "packages\\app_shell\\test\\pokrov_seed_app_test.dart"
@@ -102,6 +113,10 @@ $jsonFiles = @(
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
   "config\\windows-release.seed.json",
+  "config\\operator-api.fixture.json",
+  "config\\free-vpn-catalog.seed.json",
+  "config\\white-label-color-tokens.seed.json",
+  "config\\white-label-color-tokens.schema.json",
   "config\\variants\\community-client.seed.json",
   "config\\variants\\operator-client.seed.json",
   "config\\variants\\pokrov-service.seed.json"
@@ -311,6 +326,146 @@ if (Test-Path -LiteralPath $windowsReleaseConfigPath -PathType Leaf) {
   foreach ($requiredPath in @("pokrov_windows_beta.exe", "libcore.dll", "data/app.so")) {
     if (@($windowsReleaseConfig.required_files) -notcontains $requiredPath) {
       $manifestErrors.Add("config\\windows-release.seed.json must list required build file '$requiredPath'")
+    }
+  }
+}
+
+$operatorFixturePath = Join-Path $root "config\\operator-api.fixture.json"
+if (Test-Path -LiteralPath $operatorFixturePath -PathType Leaf) {
+  $operatorFixture = Get-Content -Raw -LiteralPath $operatorFixturePath | ConvertFrom-Json
+
+  if ($operatorFixture.variant -ne "operator") {
+    $manifestErrors.Add("config\\operator-api.fixture.json must declare variant operator")
+  }
+
+  $localhostFixturePrefix = "http" + "://127.0.0.1:"
+  if (-not $operatorFixture.base_url.StartsWith($localhostFixturePrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+    $manifestErrors.Add("config\\operator-api.fixture.json must use a localhost fixture base_url")
+  }
+
+  foreach ($endpointName in @("start_trial", "route_policy", "managed_profile", "apps", "cabinet_token", "support_tickets")) {
+    if (-not $operatorFixture.endpoints.$endpointName) {
+      $manifestErrors.Add("config\\operator-api.fixture.json must define endpoint '$endpointName'")
+    }
+  }
+
+  if ($operatorFixture.endpoints.start_trial.path -ne "/api/client/session/start-trial") {
+    $manifestErrors.Add("config\\operator-api.fixture.json must keep start_trial on /api/client/session/start-trial")
+  }
+
+  if ($operatorFixture.endpoints.managed_profile.response.materialized_for_runtime -ne $true) {
+    $manifestErrors.Add("config\\operator-api.fixture.json managed_profile must be materialized_for_runtime")
+  }
+
+  $serializedOperatorFixture = $operatorFixture | ConvertTo-Json -Depth 50
+  $forbiddenServiceHosts = @(
+    "api" + ".pokrov.space",
+    "app" + ".pokrov.space",
+    "pay" + ".pokrov.space",
+    "connect" + ".pokrov.space",
+    "kiwunaka" + ".space"
+  )
+  foreach ($value in $forbiddenServiceHosts) {
+    if ($serializedOperatorFixture.Contains($value)) {
+      $manifestErrors.Add("config\\operator-api.fixture.json must not contain official POKROV or legacy service endpoints")
+    }
+  }
+}
+
+$freeVpnCatalogPath = Join-Path $root "config\\free-vpn-catalog.seed.json"
+if (Test-Path -LiteralPath $freeVpnCatalogPath -PathType Leaf) {
+  $freeVpnCatalog = Get-Content -Raw -LiteralPath $freeVpnCatalogPath | ConvertFrom-Json
+
+  if ($freeVpnCatalog.enabled_by_default -ne $false) {
+    $manifestErrors.Add("config\\free-vpn-catalog.seed.json must stay disabled by default")
+  }
+
+  if ($freeVpnCatalog.requires_user_opt_in -ne $true) {
+    $manifestErrors.Add("config\\free-vpn-catalog.seed.json must require user opt-in")
+  }
+
+  if ($freeVpnCatalog.official_pokrov_nodes -ne $false) {
+    $manifestErrors.Add("config\\free-vpn-catalog.seed.json must not mark third-party entries as official POKROV nodes")
+  }
+
+  if ($freeVpnCatalog.refresh_policy.clear_action_required -ne $true) {
+    $manifestErrors.Add("config\\free-vpn-catalog.seed.json must require a clear action for cached public configs")
+  }
+
+  if ($freeVpnCatalog.parser_contract.version -ne "subscription-text-v1") {
+    $manifestErrors.Add("config\\free-vpn-catalog.seed.json must keep parser_contract.version subscription-text-v1")
+  }
+
+  foreach ($protocol in @("vless", "trojan", "ss", "vmess")) {
+    if (@($freeVpnCatalog.parser_contract.supported_protocols) -notcontains $protocol) {
+      $manifestErrors.Add("config\\free-vpn-catalog.seed.json must support parser protocol '$protocol'")
+    }
+  }
+
+  if (@($freeVpnCatalog.sources).Count -lt 1) {
+    $manifestErrors.Add("config\\free-vpn-catalog.seed.json must contain at least one reviewed source candidate")
+  } else {
+    $source = @($freeVpnCatalog.sources)[0]
+    if ($source.license -ne "GPL-3.0") {
+      $manifestErrors.Add("config\\free-vpn-catalog.seed.json first source must keep GPL-3.0 license metadata")
+    }
+    if ([string]::IsNullOrWhiteSpace($source.attribution)) {
+      $manifestErrors.Add("config\\free-vpn-catalog.seed.json first source must include attribution")
+    }
+    if ($source.review_status -ne "reviewed_candidate_disabled") {
+      $manifestErrors.Add("config\\free-vpn-catalog.seed.json first source must remain reviewed_candidate_disabled")
+    }
+  }
+}
+
+$whiteLabelSeedPath = Join-Path $root "config\\white-label-color-tokens.seed.json"
+if (Test-Path -LiteralPath $whiteLabelSeedPath -PathType Leaf) {
+  $whiteLabelSeed = Get-Content -Raw -LiteralPath $whiteLabelSeedPath | ConvertFrom-Json
+
+  if ($whiteLabelSeed.variant -ne "operator") {
+    $manifestErrors.Add("config\\white-label-color-tokens.seed.json must declare variant operator")
+  }
+
+  if ($whiteLabelSeed.policy.operator_owned_branding -ne $true) {
+    $manifestErrors.Add("config\\white-label-color-tokens.seed.json must require operator-owned branding")
+  }
+
+  if ($whiteLabelSeed.policy.official_pokrov_brand_allowed -ne $false) {
+    $manifestErrors.Add("config\\white-label-color-tokens.seed.json must forbid official POKROV branding")
+  }
+
+  if ($whiteLabelSeed.policy.official_endpoint_allowed -ne $false) {
+    $manifestErrors.Add("config\\white-label-color-tokens.seed.json must forbid official POKROV endpoints")
+  }
+
+  foreach ($role in @("canvas", "canvasAlt", "ink", "accent", "accentBright", "success", "warning", "surface", "surfaceMuted", "line", "muted")) {
+    if (-not $whiteLabelSeed.roles.$role) {
+      $manifestErrors.Add("config\\white-label-color-tokens.seed.json must define role '$role'")
+    }
+  }
+}
+
+$whiteLabelSchemaPath = Join-Path $root "config\\white-label-color-tokens.schema.json"
+if (Test-Path -LiteralPath $whiteLabelSchemaPath -PathType Leaf) {
+  $whiteLabelSchema = Get-Content -Raw -LiteralPath $whiteLabelSchemaPath | ConvertFrom-Json
+
+  if ($whiteLabelSchema.title -ne "White-label color token export") {
+    $manifestErrors.Add("config\\white-label-color-tokens.schema.json must keep the white-label token title")
+  }
+
+  foreach ($requiredKey in @("schema", "variant", "policy", "export", "roles")) {
+    if (@($whiteLabelSchema.required) -notcontains $requiredKey) {
+      $manifestErrors.Add("config\\white-label-color-tokens.schema.json must require '$requiredKey'")
+    }
+  }
+}
+
+$operatorOpenApiPath = Join-Path $root "docs\\operator\\openapi.yaml"
+if (Test-Path -LiteralPath $operatorOpenApiPath -PathType Leaf) {
+  $operatorOpenApi = Get-Content -Raw -LiteralPath $operatorOpenApiPath
+  foreach ($requiredPath in @("/api/client/session/start-trial", "/api/client/route-policy", "/api/client/profile/managed", "/api/client/apps", "/api/client/support/tickets")) {
+    if ($operatorOpenApi -notmatch [System.Text.RegularExpressions.Regex]::Escape($requiredPath)) {
+      $manifestErrors.Add("docs\\operator\\openapi.yaml must document '$requiredPath'")
     }
   }
 }

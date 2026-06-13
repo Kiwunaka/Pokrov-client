@@ -32,11 +32,28 @@ jobs:
 
       - name: Run operator fixture smoke
         shell: pwsh
-        run: .\scripts\run-operator-fixture-smoke.ps1
+        run: .\scripts\run-operator-fixture-smoke.ps1 -Port 18766
 
       - name: Validate public seed contracts
         shell: pwsh
         run: .\scripts\validate-seed.ps1
+
+      - name: Run OSS import dry-run wrapper
+        shell: pwsh
+        run: |
+          $snapshotArchive = Join-Path $env:RUNNER_TEMP "pokrov-public-snapshot.zip"
+          $snapshot = Join-Path $env:RUNNER_TEMP "pokrov-public-snapshot"
+          $stage = Join-Path $env:RUNNER_TEMP "pokrov-oss-stage"
+          $manifest = Join-Path $env:RUNNER_TEMP "pokrov-oss-manifest.json"
+          git archive --format=zip --output=$snapshotArchive HEAD
+          Expand-Archive -LiteralPath $snapshotArchive -DestinationPath $snapshot
+          .\scripts\prepare-oss-import.ps1 -Source $snapshot -Stage $stage -Manifest $manifest
+
+      - name: Export white-label token smoke
+        shell: pwsh
+        run: |
+          $out = Join-Path $env:RUNNER_TEMP "pokrov-white-label-tokens"
+          .\scripts\export-white-label-color-tokens.ps1 -Out $out
 
       - name: Verify clean clone source boundary
         shell: pwsh
