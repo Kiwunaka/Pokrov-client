@@ -124,6 +124,9 @@ powershell -ExecutionPolicy Bypass -File .\scripts\validate-seed.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1 -Source .
 powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\prepare-source-release.ps1 -Tag $($proof.tag) -Ref refs/tags/$($proof.tag) -RequireTag
+`$proofManifest = ".\$releaseManifestLabel"
+`$releaseNotes = ".\$($proof.tag)-release-notes.md"
+powershell -ExecutionPolicy Bypass -File .\scripts\render-source-release-notes.ps1 -ManifestPath `$proofManifest -ManifestLabel "$releaseManifestLabel" -OutFile `$releaseNotes
 $codeFence
 
 ## Release Honesty
