@@ -81,6 +81,7 @@ Source release status:
 | `v0.19.0-source` | Pending stacked PR, not tagged | Annotated source tag enforcement is in the stacked PR queue. |
 | `v0.20.0-source` | Pending stacked PR, not tagged | End-to-end proof-to-release-notes smoke is in the stacked PR queue. |
 | `v0.21.0-source` | Pending stacked PR, not tagged | Self-documenting release-note verification is in the stacked PR queue. |
+| `v0.22.0-source` | Pending stacked PR, not tagged | One-command source-release preflight is in the stacked PR queue. |
 
 ## Which App Should I Use?
 
