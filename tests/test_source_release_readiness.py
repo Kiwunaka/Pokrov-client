@@ -17,7 +17,7 @@ def test_source_release_readiness_milestones_are_source_only() -> None:
 
     assert readiness["policy"]["source_only_milestones_must_not_claim_binaries"] is True
     assert readiness["policy"]["pending_milestones_must_not_claim_tags"] is True
-    assert len(milestones) >= 19
+    assert len(milestones) >= 20
 
     for milestone in milestones:
         assert milestone["tag"].startswith("v")
@@ -57,6 +57,7 @@ def test_current_stacked_pr_milestones_are_recorded() -> None:
         "v0.17.0-source": "https://github.com/Kiwunaka/Pokrov-client/pull/36",
         "v0.18.0-source": "https://github.com/Kiwunaka/Pokrov-client/pull/38",
         "v0.19.0-source": "https://github.com/Kiwunaka/Pokrov-client/pull/39",
+        "v0.20.0-source": "https://github.com/Kiwunaka/Pokrov-client/pull/40",
     }
 
     for tag, evidence in expected.items():
