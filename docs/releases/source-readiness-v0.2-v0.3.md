@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.7
+# Source Readiness: v0.2-v0.11
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -95,6 +95,78 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.8.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #27: source readiness matrix for tracked source-only milestones, gates, and
+  limitations
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release checklist on that commit
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
+## v0.9.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #28: public onboarding and triage hardening for community users,
+  operators, PRs, and issue templates
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release checklist on that commit
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
+## v0.10.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #29: operator API contract hardening with request IDs, versioning,
+  standard errors, retry headers, and fixture smoke coverage
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release checklist on that commit
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
+## v0.11.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #30: gated Free VPN catalog cache actions for manual opt-in import, local
+  third-party catalog profiles, refresh metadata, and clear scope
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release checklist on that commit
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## v0.3.0-source Candidate
 
 Status: not tagged.
@@ -131,3 +203,6 @@ Required before tagging:
 - Dependency/license inventory and generated asset provenance are now covered
   for the public source tree; runtime binary, native-store, installer, signing,
   and platform metadata review remain binary release gates.
+- Gated Free VPN catalog cache actions are still opt-in and third-party; they
+  do not imply official POKROV nodes, default public config fetches, binary
+  readiness, or safety/speed/privacy guarantees.
