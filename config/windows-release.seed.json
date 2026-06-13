@@ -1,26 +1,26 @@
 {
-  "display_name": "POKROV",
+  "display_name": "Open Client",
   "channel": "gated_beta",
   "artifact_status": "unsigned_beta",
   "public_approved": false,
-  "binary_name": "pokrov_windows_beta.exe",
+  "binary_name": "open_client_windows.exe",
   "bundle_root": "apps/windows_shell/build/windows/x64/runner/Release",
   "artifact_root": "apps/windows_shell/build/release_bundle",
-  "bundle_folder_template": "pokrov-windows-beta-x64-{version}",
-  "zip_name_template": "pokrov-windows-beta-x64-{version}.zip",
-  "installer_name_template": "pokrov-windows-beta-x64-{version}-setup.exe",
-  "manifest_name_template": "pokrov-windows-beta-x64-{version}.manifest.json",
+  "bundle_folder_template": "open-client-windows-x64-{version}",
+  "zip_name_template": "open-client-windows-x64-{version}.zip",
+  "installer_name_template": "open-client-windows-x64-{version}-setup.exe",
+  "manifest_name_template": "open-client-windows-x64-{version}.manifest.json",
   "required_files": [
-    "pokrov_windows_beta.exe",
+    "open_client_windows.exe",
     "flutter_windows.dll",
     "libcore.dll",
     "data/app.so",
     "data/icudtl.dat"
   ],
   "metadata": {
-    "company_name": "space.pokrov",
-    "file_description": "POKROV",
-    "product_name": "POKROV"
+    "company_name": "Open Client contributors",
+    "file_description": "Open Client",
+    "product_name": "Open Client"
   },
   "runtime": {
     "platform": "windows",
@@ -29,7 +29,7 @@
   },
   "signing": {
     "status": "unsigned_beta_blocker",
-    "user_warning": "Windows may show a Microsoft Defender SmartScreen or unknown-publisher warning because this beta bundle is not trusted-signed yet. Distribute only through the gated beta cabinet.",
+    "user_warning": "Windows may show a Microsoft Defender SmartScreen or unknown-publisher warning because this source-built bundle is not trusted-signed yet. Distribute only after your own review, signing, and release process.",
     "expected_inputs": [
       "trusted Windows code-signing certificate",
       "timestamping service URL",
@@ -39,11 +39,11 @@
   "safe_claims": [
     "The Windows beta shell uses the desktop FFI runtime lane.",
     "The local release build bundles libcore.dll next to the Flutter runner.",
-    "Local packaging produces an unsigned beta installer EXE and portable ZIP; share only through gated beta access with the SmartScreen warning above."
+    "Local packaging can produce an unsigned installer EXE and portable ZIP; do not present them as official or trusted-signed binaries without a separate release process."
   ],
   "blocked_on": [
     "trusted Windows signing material is not wired into this lane",
     "trusted installer signing is not implemented",
-    "public download hosting and product cutover remain external"
+    "public binary distribution and product cutover remain external"
   ]
 }

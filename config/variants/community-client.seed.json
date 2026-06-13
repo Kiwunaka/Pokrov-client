@@ -54,6 +54,7 @@
   "build_defines": {
     "OPEN_CLIENT_VARIANT": "community",
     "OPEN_CLIENT_BRAND_NAME": "Open Client",
+    "OPEN_CLIENT_ANDROID_PACKAGE_NAME": "org.pokrovclient.community",
     "OPEN_CLIENT_BRAND_ASSET": ""
   }
 }

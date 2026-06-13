@@ -45,7 +45,7 @@ class RuntimeHostBridge(
             }.onFailure { error ->
                 AndroidRuntimeState.markFailure(
                     kind = "runtime_start_after_permission_failed",
-                    message = "POKROV не смог завершить подключение после разрешения: ${error.message ?: error.javaClass.simpleName}",
+                    message = NativeBranding.message("{app} не смог завершить подключение после разрешения: ${error.message ?: error.javaClass.simpleName}"),
                 )
             }
             return
@@ -53,7 +53,7 @@ class RuntimeHostBridge(
 
         AndroidRuntimeState.markFailure(
             kind = "vpn_permission_denied",
-            message = "Разрешение отклонено, поэтому POKROV не смог подключиться на этом устройстве.",
+            message = NativeBranding.message("Разрешение отклонено, поэтому {app} не смог подключиться на этом устройстве."),
         )
     }
 
@@ -121,7 +121,7 @@ class RuntimeHostBridge(
             ?: run {
                 AndroidRuntimeState.markFailure(
                     kind = "missing_profile_name",
-                    message = "Для этого шага настройки не хватает имени профиля POKROV.",
+                    message = NativeBranding.message("Для этого шага настройки не хватает имени профиля {app}."),
                 )
                 return AndroidRuntimeState.snapshot()
             }
@@ -129,7 +129,7 @@ class RuntimeHostBridge(
             ?: run {
                 AndroidRuntimeState.markFailure(
                     kind = "missing_config_payload",
-                    message = "Для этого шага настройки не хватает данных подключения POKROV.",
+                    message = NativeBranding.message("Для этого шага настройки не хватает данных подключения {app}."),
                 )
                 return AndroidRuntimeState.snapshot()
             }
@@ -151,7 +151,7 @@ class RuntimeHostBridge(
         } catch (error: Throwable) {
             AndroidRuntimeState.markFailure(
                 kind = "profile_staging_failed",
-                message = "POKROV не смог завершить подготовку устройства: ${error.message ?: error.javaClass.simpleName}",
+                message = NativeBranding.message("{app} не смог завершить подготовку устройства: ${error.message ?: error.javaClass.simpleName}"),
             )
             AndroidRuntimeState.snapshot()
         }
@@ -188,7 +188,7 @@ class RuntimeHostBridge(
         }.onFailure { error ->
             AndroidRuntimeState.markFailure(
                 kind = "runtime_start_failed",
-                message = "POKROV не смог подключиться на этом устройстве: ${error.message ?: error.javaClass.simpleName}",
+                message = NativeBranding.message("{app} не смог подключиться на этом устройстве: ${error.message ?: error.javaClass.simpleName}"),
             )
         }
         return AndroidRuntimeState.snapshot()
@@ -201,7 +201,7 @@ class RuntimeHostBridge(
         }.onFailure { error ->
             AndroidRuntimeState.markFailure(
                 kind = "runtime_stop_failed",
-                message = "POKROV не смог корректно отключиться: ${error.message ?: error.javaClass.simpleName}",
+                message = NativeBranding.message("{app} не смог корректно отключиться: ${error.message ?: error.javaClass.simpleName}"),
             )
         }
         return AndroidRuntimeState.snapshot()
@@ -235,8 +235,8 @@ class RuntimeHostBridge(
     companion object {
         const val CHANNEL_NAME = "space.pokrov/runtime_engine"
         const val REQUEST_VPN_PERMISSION = 14071
-        const val EXTRA_DEBUG_RUNTIME_PATH = "space.pokrov.debug.RUNTIME_PATH"
-        const val EXTRA_DEBUG_AUTO_CONNECT = "space.pokrov.debug.AUTO_CONNECT"
+        val EXTRA_DEBUG_RUNTIME_PATH = "${NativeBranding.debugExtraPrefix}.RUNTIME_PATH"
+        val EXTRA_DEBUG_AUTO_CONNECT = "${NativeBranding.debugExtraPrefix}.AUTO_CONNECT"
         private const val METHOD_SNAPSHOT = "runtimeEngine.snapshot"
         private const val METHOD_INITIALIZE = "runtimeEngine.initialize"
         private const val METHOD_STAGE_MANAGED_PROFILE = "runtimeEngine.stageManagedProfile"

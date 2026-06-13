@@ -9,7 +9,7 @@ Current responsibility:
 - supporting one-tap `connect` from the shared shell by auto-initializing libcore, syncing a live managed profile, and staging that profile before runtime start
 - keeping the Android consumer lane `tun`-first, with desktop loopback listener surfaces stripped from the staged mobile runtime config and only present address families receiving default routes
 - preserving backend-managed mobile-safe `dns` and `route` semantics instead of collapsing Android into a seed-only universal DNS profile
-- keeping Android route ownership explicit with `auto_detect_interface`, `override_android_vpn`, and a self-package bypass rule for `space.pokrov.pokrov_android_shell`, so live control traffic does not fold back into the TUN
+- keeping Android route ownership explicit with `auto_detect_interface`, `override_android_vpn`, and a self-package bypass rule from `OPEN_CLIENT_ANDROID_PACKAGE_NAME`, so live control traffic does not fold back into the TUN
 - letting `All except RU` classify RU traffic on-device before connect by consuming cached local sing-box `.srs` rule-sets from the shared bootstrapper, while still keeping the older `.ru`, `.xn--p1ai`, and `.su` suffix bypass rules as a fallback if the cache cannot refresh
 - keeping raw runtime diagnostics and local smoke-profile controls out of the first-layer shell; release diagnostics remain support/internal
 - exporting structured Android host diagnostics into the shared runtime snapshot, including uplink interface and index, DNS readiness, route counts, package-filter counts, and the last failure or stop reason

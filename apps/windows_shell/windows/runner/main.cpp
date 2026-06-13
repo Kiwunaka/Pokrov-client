@@ -5,6 +5,10 @@
 #include "flutter_window.h"
 #include "utils.h"
 
+#ifndef OC_WIN_APP_NAME
+#define OC_WIN_APP_NAME L"Open Client"
+#endif
+
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
                       _In_ wchar_t *command_line, _In_ int show_command) {
   // Attach to console when present (e.g., 'flutter run') or create a
@@ -27,7 +31,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   FlutterWindow window(project);
   Win32Window::Point origin(10, 10);
   Win32Window::Size size(1280, 720);
-  if (!window.Create(L"POKROV", origin, size)) {
+  if (!window.Create(OC_WIN_APP_NAME, origin, size)) {
     return EXIT_FAILURE;
   }
   window.SetQuitOnClose(true);
