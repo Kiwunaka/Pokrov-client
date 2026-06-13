@@ -107,6 +107,12 @@ does not provide POKROV nodes or a default free service.
 | `v0.5.0-source` | Pending stacked PR, tag еще не создан | Community routing и WARP copy honesty hardening находится в stacked PR queue. |
 | `v0.6.0-source` | Pending stacked PR, tag еще не создан | Dependency/license и generated-asset provenance gates находятся в stacked PR queue. |
 | `v0.7.0-source` | Pending stacked PR, tag еще не создан | Source-release proof helper для archive SHA-256 и proof manifest находится в stacked PR queue. |
+| `v0.8.0-source` | Pending stacked PR, tag еще не создан | Source readiness matrix for tracked source-only milestones находится в stacked PR queue. |
+| `v0.9.0-source` | Pending stacked PR, tag еще не создан | Public onboarding and triage hardening находится в stacked PR queue. |
+| `v0.10.0-source` | Pending stacked PR, tag еще не создан | Operator API contract hardening находится в stacked PR queue. |
+| `v0.11.0-source` | Pending stacked PR, tag еще не создан | Gated Free VPN catalog cache actions находятся в stacked PR queue. |
+| `v0.12.0-source` | Pending stacked PR, tag еще не создан | Source-readiness synchronization through the catalog cache slice находится в stacked PR queue. |
+| `v0.13.0-source` | Pending stacked PR, tag еще не создан | Default-disabled `OPEN_CLIENT_ENABLE_FREE_CATALOG` import gate находится в stacked PR queue. |
 
 ## Архитектурная Граница
 
