@@ -42,6 +42,8 @@ production readiness without matching public evidence.
   the proof-to-notes helper path automatically.
 - Added specialized GitHub issue templates for profile import problems,
   operator integration questions, and public security-report redirection.
+- Added a canonical GitHub label catalog and triage policy for community,
+  operator, platform, parser, runtime, release, and security-private routing.
 
 ### Changed
 
@@ -50,7 +52,7 @@ production readiness without matching public evidence.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.24.0-source` candidates.
+  `v0.25.0-source` candidates.
 
 ### Still Source-Only
 
