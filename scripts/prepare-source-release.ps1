@@ -58,9 +58,10 @@ try {
     throw "Script must run from the repository root. Found git root: $resolvedGitRoot"
   }
 
+  $tagObjectSha = ""
   if ($RequireTag) {
     $tagRef = "refs/tags/$Tag"
-    Invoke-Git @("rev-parse", "--verify", $tagRef) | Out-Null
+    $tagObjectSha = (Invoke-Git @("rev-parse", "--verify", $tagRef) | Select-Object -First 1)
     $Ref = $tagRef
   }
 
@@ -70,7 +71,7 @@ try {
     throw "Working tree must be clean before preparing source release proof. Pass -AllowDirty only for local/CI smoke tests."
   }
 
-  $commitSha = (Invoke-Git @("rev-parse", $Ref) | Select-Object -First 1)
+  $commitSha = (Invoke-Git @("rev-parse", "$Ref^{}") | Select-Object -First 1)
   $commitDate = (Invoke-Git @("show", "-s", "--format=%cI", $commitSha) | Select-Object -First 1)
   $trackedFiles = @(Invoke-Git @("ls-tree", "-r", "--name-only", $commitSha))
   $forbiddenPathPattern = '(^|/)(build|dist|out|artifacts|coverage|reports|logs|screenshots|screen-shots|tmp|\.tmp|\.dart_tool|\.gradle|ephemeral|node_modules|config/local|private-release-evidence)(/|$)'
@@ -101,6 +102,7 @@ try {
     schema_version = 1
     tag = $Tag
     ref = $Ref
+    tag_object_sha = $tagObjectSha
     commit_sha = $commitSha
     commit_date = $commitDate
     verification_date = (Get-Date).ToUniversalTime().ToString("o")

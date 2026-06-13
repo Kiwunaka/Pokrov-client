@@ -5,6 +5,7 @@ Use this body for GitHub source-only releases.
 ## Source Reference
 
 - Tag:
+- Tag object SHA:
 - Commit SHA:
 - Commit date:
 - Source archive SHA-256:

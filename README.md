@@ -52,6 +52,10 @@ Source release status:
 | `v0.1.0-source` | Tagged | First source-only Android/Windows snapshot with local community import. No APK/EXE. |
 | `v0.2.0-source` | Not tagged | Community import polish and source-import hardening are on `main`; release tag pending. |
 | `v0.3.0-source` | Not tagged | Operator fixture, Free VPN catalog gate, white-label tokens, and foreground subscription scheduler are on `main`; release tag pending. |
+| `v0.4.0-source` | PR green, not tagged | Native Android/Windows host brand-boundary hardening is in the stacked PR queue. |
+| `v0.5.0-source` | PR green, not tagged | Community routing and WARP copy honesty hardening is in the stacked PR queue. |
+| `v0.6.0-source` | PR green, not tagged | Dependency/license and generated-asset provenance gates are in the stacked PR queue. |
+| `v0.7.0-source` | PR green, not tagged | Source-release proof helper for archive SHA-256 and proof manifests is in the stacked PR queue. |
 
 ## Which App Should I Use?
 

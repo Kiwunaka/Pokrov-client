@@ -1,8 +1,10 @@
-# Source Readiness: v0.2 and v0.3
+# Source Readiness: v0.2-v0.7
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
-checklist is run on the exact commit.
+checklist is run on the exact commit. The machine-readable readiness inventory
+lives in
+[`config/source-release-readiness.seed.json`](../../config/source-release-readiness.seed.json).
 
 ## v0.2.0-source Candidate
 
@@ -19,6 +21,77 @@ Required before tagging:
 - choose the exact commit SHA
 - run the full source release checklist
 - record source archive SHA-256 in the GitHub Release body
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
+## v0.4.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #23: native Android/Windows host brand-boundary hardening
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release checklist on that commit
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
+## v0.5.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #24: community routing and WARP copy honesty hardening
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release checklist on that commit
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
+## v0.6.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #25: dependency/license and generated-asset provenance inventory gates
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release checklist on that commit
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
+## v0.7.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #26: source-release proof helper for archive SHA-256 and proof manifests
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release checklist on that commit
+- generate source proof with `scripts/prepare-source-release.ps1`; annotated
+  tags are expected, and the proof records both the tag object SHA and peeled
+  commit SHA
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
