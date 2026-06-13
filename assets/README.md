@@ -10,6 +10,8 @@ This folder contains public repository visuals used by the README and docs.
   artwork.
 - `IMAGEGEN_PROMPTS.md`: generation prompts and provenance notes for the
   raster artwork.
+- `../config/generated-assets.seed.json`: machine-readable source-release
+  inventory for every PNG asset and its reuse scope.
 
 ## Asset Rules
 

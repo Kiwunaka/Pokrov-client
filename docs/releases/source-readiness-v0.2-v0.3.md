@@ -55,5 +55,6 @@ Required before tagging:
 - WARP public copy for community local profiles now stays product-first and
   avoids official-service wording; route-mode copy still does not prove
   network-level routing quality, speed, privacy, or availability.
-- Transitive dependency/license inventory and generated asset provenance are
-  not yet complete enough for official binary release claims.
+- Dependency/license inventory and generated asset provenance are now covered
+  for the public source tree; runtime binary, native-store, installer, signing,
+  and platform metadata review remain binary release gates.

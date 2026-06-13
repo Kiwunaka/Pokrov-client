@@ -68,8 +68,10 @@ license notes, and a `secret_scan` pass/fail summary.
 5. Remove secrets, certificates, signing configs, private URLs, and tokens.
 6. Replace private configuration with examples and placeholders.
 7. Remove private logs, screenshots, release evidence, and operator notes.
-8. Confirm assets have source and license notes.
-9. Complete the dependency license audit.
+8. Confirm assets have source and license notes in
+   `config/generated-assets.seed.json`.
+9. Complete the dependency license audit in
+   `config/dependency-license-inventory.seed.json`.
 10. Document which code paths belong to the operator/company track and which
    belong to the personal key track.
 11. Keep optional third-party public config catalogs disabled unless their
@@ -136,7 +138,8 @@ freshness, failure-mode, and safety-copy checks are complete.
 - [ ] Source snapshot added.
 - [ ] Build docs added.
 - [ ] Configuration examples added.
-- [ ] Dependency license audit updated.
+- [ ] Dependency license audit updated and
+  `python -m pytest tests/test_release_provenance.py` passed.
 - [ ] Product tracks documented.
 - [ ] Optional third-party config feeds documented or disabled.
 - [ ] Secret scan completed.
