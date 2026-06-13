@@ -29,7 +29,7 @@ production readiness without matching public evidence.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.11.0-source` candidates.
+  `v0.13.0-source` candidates.
 
 ### Still Source-Only
 

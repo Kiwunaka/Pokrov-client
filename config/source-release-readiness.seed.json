@@ -127,6 +127,28 @@
       "ships_exe": false,
       "store_release": false,
       "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.12.0-source",
+      "status": "stacked_pr_green_not_tagged",
+      "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/31",
+      "scope": "Source-readiness synchronization for stacked source-only milestones through the Free VPN catalog cache action slice.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.13.0-source",
+      "status": "stacked_pr_green_not_tagged",
+      "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/32",
+      "scope": "Manual Free VPN catalog import gated behind OPEN_CLIENT_ENABLE_FREE_CATALOG with default-disabled public builds.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
     }
   ]
 }
