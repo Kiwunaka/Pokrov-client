@@ -1,16 +1,31 @@
 {
   "name": "Operator API fixture",
   "variant": "operator",
-  "base_url": "https://api.operator.example",
+  "base_url": "http://127.0.0.1:8765",
   "endpoints": {
     "start_trial": {
       "method": "POST",
       "path": "/api/client/session/start-trial",
       "response": {
-        "session_token": "operator-session-token-placeholder",
-        "profile": {
-          "url": "/api/client/profile/managed"
+        "session": {
+          "session_token": "operator-session-token-placeholder",
+          "account_id": "operator-demo-account"
+        },
+        "provisioning": {
+          "status": "ready",
+          "sync_ok": true,
+          "managed_manifest": {
+            "url": "/api/client/profile/managed"
+          }
         }
+      }
+    },
+    "route_policy": {
+      "method": "POST",
+      "path": "/api/client/route-policy",
+      "response": {
+        "ok": true,
+        "applied": true
       }
     },
     "managed_profile": {
@@ -18,7 +33,12 @@
       "path": "/api/client/profile/managed",
       "response": {
         "profile_name": "operator-managed",
+        "profile_revision": "operator-demo-rev-1",
         "materialized_for_runtime": true,
+        "provisioning": {
+          "status": "ready",
+          "sync_ok": true
+        },
         "config": {
           "outbounds": [
             {
@@ -34,17 +54,84 @@
     },
     "redeem": {
       "method": "POST",
+      "path": "/api/redeem",
+      "response": {
+        "ok": true,
+        "kind": "operator-demo-code",
+        "code_preview": "DEMO",
+        "result": {
+          "access_updated": true
+        }
+      }
+    },
+    "redeem_client_alias": {
+      "method": "POST",
       "path": "/api/client/redeem",
-      "optional": true
+      "optional": true,
+      "response": {
+        "ok": true,
+        "kind": "operator-demo-code",
+        "code_preview": "DEMO",
+        "result": {
+          "access_updated": true
+        }
+      }
     },
     "apps": {
       "method": "GET",
       "path": "/api/client/apps",
-      "optional": true
+      "optional": true,
+      "response": {
+        "android": {
+          "version": "0.1.0-source",
+          "download_url": "https://downloads.operator.example/android.apk",
+          "checksum_sha256": "replace-with-operator-checksum"
+        },
+        "windows": {
+          "version": "0.1.0-source",
+          "download_url": "https://downloads.operator.example/windows.zip",
+          "checksum_sha256": "replace-with-operator-checksum"
+        },
+        "docs_url": "https://docs.operator.example/client",
+        "updated_at": "2026-06-13T00:00:00Z",
+        "update_check": {
+          "mode": "prompt",
+          "silent_update": false
+        }
+      }
+    },
+    "cabinet_token": {
+      "method": "POST",
+      "path": "/api/client/cabinet-token",
+      "optional": true,
+      "response": {
+        "token": "operator-cabinet-token-placeholder",
+        "handoff_token": "operator-cabinet-token-placeholder",
+        "handoff_url": "https://app.operator.example/profile?handoff_token=operator-cabinet-token-placeholder",
+        "expires_in": 300,
+        "target_path": "/",
+        "scope": "client-cabinet"
+      }
+    },
+    "support_tickets": {
+      "method": "GET",
+      "path": "/api/client/support/tickets",
+      "optional": true,
+      "response": {
+        "tickets": [
+          {
+            "id": "demo-ticket-1",
+            "subject": "Demo ticket",
+            "status": "open",
+            "updated_at": "2026-06-13T00:00:00Z"
+          }
+        ]
+      }
     }
   },
   "notes": [
+    "This local fixture is for contract development only.",
     "Replace all placeholder URLs, tokens, branding, signing, support, and privacy policy values before shipping.",
-    "Fork releases must not imply official POKROV operation."
+    "Fork releases must not imply official POKROV operation or use official POKROV infrastructure."
   ]
 }

@@ -27,8 +27,12 @@ jobs:
       - name: Install Python test dependencies
         run: python -m pip install pytest
 
-      - name: Run source-import tests
-        run: python -m pytest tests/test_source_import.py
+      - name: Run Python contract tests
+        run: python -m pytest tests
+
+      - name: Run operator fixture smoke
+        shell: pwsh
+        run: .\scripts\run-operator-fixture-smoke.ps1
 
       - name: Verify clean clone source boundary
         shell: pwsh

@@ -1,0 +1,544 @@
+openapi: 3.1.0
+info:
+  title: Pokrov Client Operator API
+  version: 0.1.0-source
+  description: >
+    Minimal operator-owned API contract for branded forks of the open-source
+    client. Operators provide their own backend, billing, support, signing, and
+    privacy policy. This contract does not grant access to official POKROV
+    infrastructure.
+servers:
+  - url: http://127.0.0.1:8765
+    description: Local fixture server
+  - url: https://api.operator.example
+    description: Replace with your operator-owned API origin
+security:
+  - bearerAuth: []
+paths:
+  /health:
+    get:
+      summary: Fixture health check
+      security: []
+      responses:
+        "200":
+          description: Fixture is alive.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+  /api/client/session/start-trial:
+    post:
+      summary: Create or resume a client session
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StartTrialRequest"
+      responses:
+        "200":
+          description: Session and managed profile provisioning metadata.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StartTrialResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /api/client/route-policy:
+    post:
+      summary: Store the route mode selected by the client
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoutePolicyRequest"
+      responses:
+        "200":
+          description: Route policy was accepted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /api/client/profile/managed:
+    get:
+      summary: Return a runtime managed profile
+      responses:
+        "200":
+          description: sing-box-compatible profile material for the client.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagedProfileResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /api/redeem:
+    post:
+      summary: Redeem an activation code through the current client adapter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RedeemRequest"
+      responses:
+        "200":
+          description: Code was accepted by the operator service.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RedeemResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /api/client/redeem:
+    post:
+      summary: Optional future/compatibility redeem alias
+      description: >
+        The current open client calls /api/redeem. Operators may expose this
+        alias if they want a client-scoped route for future forks.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RedeemRequest"
+      responses:
+        "200":
+          description: Code was accepted by the operator service.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RedeemResponse"
+  /api/client/apps:
+    get:
+      summary: Return operator-owned app release metadata
+      parameters:
+        - name: platform
+          in: query
+          schema:
+            type: string
+            enum: [android, windows, ios, macos]
+        - name: current_version
+          in: query
+          schema:
+            type: string
+        - name: channel
+          in: query
+          schema:
+            type: string
+            default: beta
+      responses:
+        "200":
+          description: App metadata and prompt-style update status.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppsResponse"
+  /api/client/cabinet-token:
+    post:
+      summary: Create a short-lived cabinet handoff token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CabinetTokenRequest"
+      responses:
+        "200":
+          description: Short-lived handoff metadata.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CabinetTokenResponse"
+  /api/client/telegram/link:
+    post:
+      summary: Optional Telegram account-link endpoint
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Link state accepted or already linked.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+  /api/client/bonus/summary:
+    get:
+      summary: Optional bonus summary endpoint
+      responses:
+        "200":
+          description: Operator-defined bonus state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BonusSummaryResponse"
+  /api/client/warp/consent:
+    post:
+      summary: Optional extended-protection consent endpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Consent state accepted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WarpConsentResponse"
+  /api/client/warp/revoke:
+    post:
+      summary: Optional extended-protection revoke endpoint
+      responses:
+        "200":
+          description: Consent state revoked.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WarpConsentResponse"
+  /api/client/nodes/preference:
+    post:
+      summary: Optional node preference endpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Preference accepted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+  /api/client/support/tickets:
+    get:
+      summary: List support tickets
+      responses:
+        "200":
+          description: Operator support ticket list.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketsResponse"
+    post:
+      summary: Create a support ticket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTicketRequest"
+      responses:
+        "201":
+          description: Ticket created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketResponse"
+  /api/client/support/tickets/{ticket_id}:
+    get:
+      summary: Get a support ticket
+      parameters:
+        - $ref: "#/components/parameters/TicketId"
+      responses:
+        "200":
+          description: Ticket metadata.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketResponse"
+  /api/client/support/tickets/{ticket_id}/messages:
+    post:
+      summary: Add a support ticket message
+      parameters:
+        - $ref: "#/components/parameters/TicketId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTicketMessageRequest"
+      responses:
+        "201":
+          description: Message accepted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketMessageResponse"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    TicketId:
+      name: ticket_id
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    Unauthorized:
+      description: Session is missing or rejected.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    ServerError:
+      description: Operator service error.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+  schemas:
+    HealthResponse:
+      type: object
+      required: [ok, service]
+      properties:
+        ok:
+          type: boolean
+        service:
+          type: string
+    OkResponse:
+      type: object
+      required: [ok]
+      properties:
+        ok:
+          type: boolean
+    ErrorResponse:
+      type: object
+      required: [ok, error]
+      properties:
+        ok:
+          type: boolean
+          const: false
+        error:
+          type: string
+    StartTrialRequest:
+      type: object
+      required: [install_id, platform]
+      properties:
+        install_id:
+          type: string
+        device_name:
+          type: string
+        platform:
+          type: string
+        os_version:
+          type: string
+        app_version:
+          type: string
+        locale:
+          type: string
+        time_zone:
+          type: string
+    StartTrialResponse:
+      type: object
+      required: [session, provisioning]
+      properties:
+        session:
+          type: object
+          required: [session_token]
+          properties:
+            session_token:
+              type: string
+            account_id:
+              type: string
+        provisioning:
+          type: object
+          required: [status, sync_ok, managed_manifest]
+          properties:
+            status:
+              type: string
+              enum: [ready, pending]
+            sync_ok:
+              type: boolean
+            managed_manifest:
+              type: object
+              required: [url]
+              properties:
+                url:
+                  type: string
+                  example: /api/client/profile/managed
+    RoutePolicyRequest:
+      type: object
+      properties:
+        route_mode:
+          type: string
+        selected_apps:
+          type: array
+          items:
+            type: string
+        requires_elevated_privileges:
+          type: boolean
+    ManagedProfileResponse:
+      type: object
+      required: [profile_name, materialized_for_runtime, config]
+      properties:
+        profile_name:
+          type: string
+        profile_revision:
+          type: string
+        materialized_for_runtime:
+          type: boolean
+        provisioning:
+          type: object
+        config:
+          type: object
+          description: sing-box-compatible runtime config.
+    RedeemRequest:
+      type: object
+      required: [code]
+      properties:
+        code:
+          type: string
+    RedeemResponse:
+      type: object
+      required: [ok]
+      properties:
+        ok:
+          type: boolean
+        kind:
+          type: string
+        code_preview:
+          type: string
+        result:
+          type: object
+    AppsResponse:
+      type: object
+      properties:
+        android:
+          $ref: "#/components/schemas/AppPlatformMetadata"
+        windows:
+          $ref: "#/components/schemas/AppPlatformMetadata"
+        docs_url:
+          type: string
+        updated_at:
+          type: string
+        update_check:
+          type: object
+          properties:
+            mode:
+              type: string
+              enum: [prompt, none]
+            silent_update:
+              type: boolean
+              const: false
+    AppPlatformMetadata:
+      type: object
+      properties:
+        version:
+          type: string
+        download_url:
+          type: string
+        checksum_sha256:
+          type: string
+    CabinetTokenRequest:
+      type: object
+      properties:
+        target_path:
+          type: string
+    CabinetTokenResponse:
+      type: object
+      required: [token, handoff_url]
+      properties:
+        token:
+          type: string
+        handoff_token:
+          type: string
+        handoff_url:
+          type: string
+        expires_in:
+          type: integer
+        target_path:
+          type: string
+        scope:
+          type: string
+    BonusSummaryResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        bonuses:
+          type: array
+          items:
+            type: object
+    WarpConsentResponse:
+      type: object
+      properties:
+        consented:
+          type: boolean
+        state:
+          type: string
+        public_label:
+          type: string
+    TicketsResponse:
+      type: object
+      required: [tickets]
+      properties:
+        tickets:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ticket"
+    TicketResponse:
+      type: object
+      required: [ticket]
+      properties:
+        ticket:
+          $ref: "#/components/schemas/Ticket"
+    Ticket:
+      type: object
+      required: [id, subject, status]
+      properties:
+        id:
+          type: string
+        subject:
+          type: string
+        status:
+          type: string
+        updated_at:
+          type: string
+    CreateTicketRequest:
+      type: object
+      required: [subject]
+      properties:
+        subject:
+          type: string
+        message:
+          type: string
+    CreateTicketMessageRequest:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+    TicketMessageResponse:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: object
+          properties:
+            id:
+              type: string
+            ticket_id:
+              type: string
+            body:
+              type: string
+            created_at:
+              type: string

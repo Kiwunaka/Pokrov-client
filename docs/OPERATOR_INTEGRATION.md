@@ -21,10 +21,33 @@ claims.
 The current imported service mode expects these endpoints when
 `OPEN_CLIENT_VARIANT=operator`.
 
-A placeholder fixture is available at
-[`config/operator-api.fixture.json`](../config/operator-api.fixture.json). It is
-not a server and must not contain real tokens, private URLs, or production
-secrets.
+The machine-readable contract lives in
+[`docs/operator/openapi.yaml`](operator/openapi.yaml). A local fixture backend
+is available through
+[`tools/operator_fixture_server`](../tools/operator_fixture_server) and
+[`config/operator-api.fixture.json`](../config/operator-api.fixture.json). The
+fixture is only for local contract development and must not contain real tokens,
+private URLs, production endpoints, or official POKROV infrastructure.
+
+Run a local smoke:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\run-operator-fixture-smoke.ps1
+```
+
+Or start the server manually:
+
+```powershell
+python -m tools.operator_fixture_server --port 8765
+```
+
+The fixture supports error modes for client testing:
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:8765/api/client/profile/managed?mode=401
+Invoke-RestMethod http://127.0.0.1:8765/api/client/profile/managed?mode=500
+Invoke-RestMethod http://127.0.0.1:8765/api/client/profile/managed?mode=malformed-profile
+```
 
 ### `POST /api/client/session/start-trial`
 
@@ -34,10 +57,30 @@ Expected response shape:
 
 ```json
 {
-  "session_token": "short-lived-or-refreshable-client-token",
-  "profile": {
-    "url": "/api/client/profile/managed"
+  "session": {
+    "session_token": "short-lived-or-refreshable-client-token",
+    "account_id": "operator-account-id"
+  },
+  "provisioning": {
+    "status": "ready",
+    "sync_ok": true,
+    "managed_manifest": {
+      "url": "/api/client/profile/managed"
+    }
   }
+}
+```
+
+### `POST /api/client/route-policy`
+
+Stores the current route mode before the client fetches a managed profile.
+
+Expected response shape:
+
+```json
+{
+  "ok": true,
+  "applied": true
 }
 ```
 
@@ -50,6 +93,11 @@ Expected response shape:
 ```json
 {
   "profile_name": "operator-managed",
+  "profile_revision": "operator-demo-rev-1",
+  "provisioning": {
+    "status": "ready",
+    "sync_ok": true
+  },
   "config": {
     "outbounds": [],
     "route": {
@@ -60,13 +108,20 @@ Expected response shape:
 }
 ```
 
-### `POST /api/client/redeem`
+### `POST /api/redeem`
 
 Optional code/key activation endpoint.
+
+`POST /api/client/redeem` may be exposed as a compatibility alias, but the
+current open client adapter calls `/api/redeem`.
 
 ### `GET /api/client/apps`
 
 Optional app metadata and update prompt endpoint.
+
+Return prompt-style metadata only. Do not claim silent updates, store
+availability, trusted signing, or official POKROV binaries unless your fork has
+separate evidence for those claims.
 
 ### Support Endpoints
 
@@ -76,6 +131,18 @@ Optional if you want in-app support:
 - `POST /api/client/support/tickets`
 - `GET /api/client/support/tickets/{ticket_id}`
 - `POST /api/client/support/tickets/{ticket_id}/messages`
+
+### Optional App-First Endpoints
+
+These endpoints are useful for richer branded forks, but not required for the
+first operator smoke:
+
+- `POST /api/client/cabinet-token`
+- `POST /api/client/telegram/link`
+- `GET /api/client/bonus/summary`
+- `POST /api/client/warp/consent`
+- `POST /api/client/warp/revoke`
+- `POST /api/client/nodes/preference`
 
 ## Build Defines
 

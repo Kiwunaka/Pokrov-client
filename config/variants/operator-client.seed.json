@@ -16,8 +16,9 @@
   },
   "required_api_contracts": [
     "POST /api/client/session/start-trial",
+    "POST /api/client/route-policy",
     "GET /api/client/profile/managed",
-    "POST /api/client/redeem",
+    "POST /api/redeem",
     "GET /api/client/apps",
     "GET /api/client/support/tickets",
     "POST /api/client/support/tickets",
@@ -25,9 +26,11 @@
   ],
   "optional_api_contracts": [
     "POST /api/client/cabinet-token",
+    "POST /api/client/redeem",
     "POST /api/client/telegram/link",
     "GET /api/client/bonus/summary",
     "POST /api/client/warp/consent",
+    "POST /api/client/warp/revoke",
     "POST /api/client/nodes/preference"
   ],
   "build_defines": {
