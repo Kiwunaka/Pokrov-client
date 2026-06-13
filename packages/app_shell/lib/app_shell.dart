@@ -851,6 +851,8 @@ class PokrovSeedApp extends StatelessWidget {
     this.communitySubscriptionFetcher,
     this.communityQrScanner,
     this.runtimeActionTimeout = const Duration(seconds: 18),
+    this.communitySubscriptionAutoRefreshInterval = const Duration(minutes: 30),
+    this.communitySubscriptionStaleAfter = const Duration(minutes: 30),
   });
 
   final SeedAppContext appContext;
@@ -861,6 +863,8 @@ class PokrovSeedApp extends StatelessWidget {
   final Future<String> Function(Uri uri)? communitySubscriptionFetcher;
   final CommunityQrScanner? communityQrScanner;
   final Duration runtimeActionTimeout;
+  final Duration communitySubscriptionAutoRefreshInterval;
+  final Duration communitySubscriptionStaleAfter;
 
   @override
   Widget build(BuildContext context) {
@@ -949,6 +953,9 @@ class PokrovSeedApp extends StatelessWidget {
         communitySubscriptionFetcher: communitySubscriptionFetcher,
         communityQrScanner: communityQrScanner,
         runtimeActionTimeout: runtimeActionTimeout,
+        communitySubscriptionAutoRefreshInterval:
+            communitySubscriptionAutoRefreshInterval,
+        communitySubscriptionStaleAfter: communitySubscriptionStaleAfter,
       ),
     );
   }
@@ -965,6 +972,8 @@ class PokrovSeedShell extends StatefulWidget {
     this.communitySubscriptionFetcher,
     this.communityQrScanner,
     this.runtimeActionTimeout = const Duration(seconds: 18),
+    this.communitySubscriptionAutoRefreshInterval = const Duration(minutes: 30),
+    this.communitySubscriptionStaleAfter = const Duration(minutes: 30),
   });
 
   final SeedAppContext appContext;
@@ -975,6 +984,8 @@ class PokrovSeedShell extends StatefulWidget {
   final Future<String> Function(Uri uri)? communitySubscriptionFetcher;
   final CommunityQrScanner? communityQrScanner;
   final Duration runtimeActionTimeout;
+  final Duration communitySubscriptionAutoRefreshInterval;
+  final Duration communitySubscriptionStaleAfter;
 
   @override
   State<PokrovSeedShell> createState() => _PokrovSeedShellState();
@@ -1933,6 +1944,8 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
   _CommunityProfileState _communityProfileState =
       const _CommunityProfileState.empty();
   int _communityProfileRevision = 0;
+  Timer? _communitySubscriptionRefreshTimer;
+  bool _communitySubscriptionRefreshInFlight = false;
 
   String _brand(String value) {
     return _brandText(value, widget.appContext.variantProfile);
@@ -2017,6 +2030,7 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
     unawaited(_loadCommunityProfile());
     unawaited(_loadFirstLaunchState());
     _refreshRuntimeSnapshot();
+    _ensureCommunitySubscriptionRefreshTimer();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       unawaited(_checkForClientUpdate());
     });
@@ -2119,6 +2133,7 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _communitySubscriptionRefreshTimer?.cancel();
     _firstLaunchRestoreCodeController.dispose();
     super.dispose();
   }
@@ -2126,10 +2141,34 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed && !_runtimeBusy) {
+      _ensureCommunitySubscriptionRefreshTimer();
       unawaited(_refreshRuntimeSnapshot());
       unawaited(_checkForClientUpdate());
-      unawaited(_refreshCommunitySubscriptions(quiet: true));
+      unawaited(_refreshCommunitySubscriptionsIfDue(quiet: true));
+      return;
     }
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      _communitySubscriptionRefreshTimer?.cancel();
+      _communitySubscriptionRefreshTimer = null;
+    }
+  }
+
+  bool get _communitySubscriptionAutoRefreshEnabled =>
+      !widget.appContext.variantProfile.usesApiServices &&
+      widget.communitySubscriptionAutoRefreshInterval > Duration.zero &&
+      widget.communitySubscriptionStaleAfter >= Duration.zero;
+
+  void _ensureCommunitySubscriptionRefreshTimer() {
+    if (!_communitySubscriptionAutoRefreshEnabled ||
+        _communitySubscriptionRefreshTimer != null) {
+      return;
+    }
+    _communitySubscriptionRefreshTimer = Timer.periodic(
+      widget.communitySubscriptionAutoRefreshInterval,
+      (_) => unawaited(_refreshCommunitySubscriptionsIfDue(quiet: true)),
+    );
   }
 
   Future<bool> _launchExternalHandoff(Uri uri) {
@@ -2439,6 +2478,7 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
       setState(() {
         _communityProfileState = savedState;
       });
+      _ensureCommunitySubscriptionRefreshTimer();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Imported ${records.length} subscription profile(s).'),
@@ -2466,84 +2506,134 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
     }
   }
 
+  Future<void> _refreshCommunitySubscriptionsIfDue({
+    bool quiet = false,
+  }) async {
+    if (!_communitySubscriptionRefreshDue(DateTime.now().toUtc())) {
+      return;
+    }
+    await _refreshCommunitySubscriptions(quiet: quiet);
+  }
+
+  bool _communitySubscriptionRefreshDue(DateTime now) {
+    final sourceUrls = _communityProfileState.subscriptionSourceUrls;
+    if (sourceUrls.isEmpty) {
+      return false;
+    }
+    if (widget.communitySubscriptionStaleAfter <= Duration.zero) {
+      return true;
+    }
+    for (final sourceUrl in sourceUrls) {
+      final profiles = _communityProfileState.profiles
+          .where((profile) => profile.sourceUrl == sourceUrl)
+          .toList(growable: false);
+      if (profiles.isEmpty) {
+        return true;
+      }
+      if (profiles.any((profile) => profile.lastRefreshStatus == 'failed')) {
+        return true;
+      }
+      final fetchedAt = profiles
+          .map((profile) => DateTime.tryParse(profile.lastFetchedAt))
+          .whereType<DateTime>()
+          .fold<DateTime?>(null, (latest, value) {
+        final utc = value.toUtc();
+        return latest == null || utc.isAfter(latest) ? utc : latest;
+      });
+      if (fetchedAt == null) {
+        return true;
+      }
+      final age = now.difference(fetchedAt);
+      if (!age.isNegative && age >= widget.communitySubscriptionStaleAfter) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   Future<void> _refreshCommunitySubscriptions({bool quiet = false}) async {
     final importer = _localProfileBootstrapper;
-    if (importer == null) {
+    if (importer == null || _communitySubscriptionRefreshInFlight) {
       return;
     }
     final sourceUrls = _communityProfileState.subscriptionSourceUrls;
     if (sourceUrls.isEmpty) {
       return;
     }
+    _communitySubscriptionRefreshInFlight = true;
     final fetcher =
         widget.communitySubscriptionFetcher ?? _fetchCommunitySubscription;
-    var nextState = _communityProfileState;
-    var refreshed = 0;
-    var failed = 0;
-    for (final sourceUrl in sourceUrls) {
-      try {
-        final uri = Uri.parse(sourceUrl);
-        final body = await fetcher(uri);
-        final imported = _CommunityProfileImporter.parseMany(
-          body,
-          routeMode: _selectedRouteMode,
-          sourceKind: 'subscription_url',
-        );
-        final fetchedAt = DateTime.now().toUtc().toIso8601String();
-        final records = imported
-            .map(
-              (result) => result.record.copyWith(
-                sourceUrl: sourceUrl,
-                lastFetchedAt: fetchedAt,
-                lastRefreshStatus: 'ok',
-                refreshError: '',
-                entryCount: imported.length,
-              ),
-            )
-            .toList();
-        nextState = nextState.upsertAll(
-          records,
-          activeProfileName: nextState.activeProfileName,
-        );
-        refreshed += records.length;
-      } catch (_) {
-        failed += 1;
-        nextState = nextState.markSubscriptionRefreshFailed(
-          sourceUrl,
-          'Refresh failed. Keeping the last local profiles.',
-        );
+    try {
+      var nextState = _communityProfileState;
+      var refreshed = 0;
+      var failed = 0;
+      for (final sourceUrl in sourceUrls) {
+        try {
+          final uri = Uri.parse(sourceUrl);
+          final body = await fetcher(uri);
+          final imported = _CommunityProfileImporter.parseMany(
+            body,
+            routeMode: _selectedRouteMode,
+            sourceKind: 'subscription_url',
+          );
+          final fetchedAt = DateTime.now().toUtc().toIso8601String();
+          final records = imported
+              .map(
+                (result) => result.record.copyWith(
+                  sourceUrl: sourceUrl,
+                  lastFetchedAt: fetchedAt,
+                  lastRefreshStatus: 'ok',
+                  refreshError: '',
+                  entryCount: imported.length,
+                ),
+              )
+              .toList();
+          nextState = nextState.upsertAll(
+            records,
+            activeProfileName: nextState.activeProfileName,
+          );
+          refreshed += records.length;
+        } catch (_) {
+          failed += 1;
+          nextState = nextState.markSubscriptionRefreshFailed(
+            sourceUrl,
+            'Refresh failed. Keeping the last local profiles.',
+          );
+        }
       }
-    }
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _communityProfileRevision += 1;
-      _communityProfileState = nextState;
-      _managedProfileDirty = refreshed > 0 || _managedProfileDirty;
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _communityProfileRevision += 1;
+        _communityProfileState = nextState;
+        _managedProfileDirty = refreshed > 0 || _managedProfileDirty;
+        if (!quiet) {
+          _runtimeHeadline = failed == 0
+              ? 'Subscription refresh updated $refreshed profile${refreshed == 1 ? '' : 's'}.'
+              : 'Some subscriptions could not refresh. Last working profiles were kept.';
+        }
+      });
+      final savedState = await importer.saveState(nextState);
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _communityProfileState = savedState;
+      });
       if (!quiet) {
-        _runtimeHeadline = failed == 0
-            ? 'Subscription refresh updated $refreshed profile${refreshed == 1 ? '' : 's'}.'
-            : 'Some subscriptions could not refresh. Last working profiles were kept.';
-      }
-    });
-    final savedState = await importer.saveState(nextState);
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _communityProfileState = savedState;
-    });
-    if (!quiet) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            failed == 0
-                ? 'Subscription refresh updated $refreshed profile(s).'
-                : 'Could not refresh this subscription URL.',
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              failed == 0
+                  ? 'Subscription refresh updated $refreshed profile(s).'
+                  : 'Could not refresh this subscription URL.',
+            ),
           ),
-        ),
-      );
+        );
+      }
+    } finally {
+      _communitySubscriptionRefreshInFlight = false;
     }
   }
 

@@ -26,7 +26,16 @@
       "ss",
       "vmess"
     ],
-    "subscription_url": "manual_and_foreground_refresh_mvp",
+    "subscription_url": "manual_foreground_and_in_app_scheduler",
+    "subscription_refresh_policy": {
+      "manual_refresh": true,
+      "refresh_on_resume_when_stale": true,
+      "foreground_scheduler": true,
+      "os_background_scheduler": false,
+      "default_interval_minutes": 30,
+      "default_stale_after_minutes": 30,
+      "failed_refresh_preserves_profiles": true
+    },
     "qr_import": "android_windows_camera_mvp",
     "warp_policy": "local_user_controlled",
     "routing_modes": [

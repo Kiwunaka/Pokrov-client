@@ -62,9 +62,10 @@ Expected capabilities:
 - local multi-profile list with active selection, replace, and remove actions
 - paste/import subscription URL with manual refresh and local storage
 - foreground/manual subscription refresh that preserves old profiles on failure
+- in-app foreground subscription scheduler with a freshness gate; no OS
+  background service is claimed or required
 - Android/Windows camera QR scanning through platform hosts, with scanned
   payloads handled by the shared local parser
-- background subscription refresh scheduler when freshness policy is ready
 - basic latency and connection checks
 - clear unsupported-config errors
 

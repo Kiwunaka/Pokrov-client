@@ -17,8 +17,8 @@ Use this checklist before publishing a public source or binary release.
 ## Community Client
 
 - Local profile import works for the documented key schemes.
-- Subscription URL import and foreground/manual refresh preserve old profiles
-  when refresh fails.
+- Subscription URL import, foreground/manual refresh, and the in-app scheduler
+  preserve old profiles when refresh fails.
 - Android and Windows QR camera import stay local-only and reuse the safe local
   parser.
 - Free VPN catalog remains disabled by default and opt-in with third-party copy.

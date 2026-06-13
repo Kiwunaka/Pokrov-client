@@ -3888,6 +3888,119 @@ void main() {
     expect(stagedPayloads.single, contains('"server": "new.example"'));
   });
 
+  testWidgets('community subscription scheduler refreshes stale sources',
+      (tester) async {
+    var fetchCount = 0;
+    const channel = MethodChannel('space.pokrov/runtime_engine');
+    final messenger =
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+    final stagedPayloads = <String>[];
+
+    messenger.setMockMethodCallHandler(channel, (call) async {
+      switch (call.method) {
+        case 'runtimeEngine.snapshot':
+          return <String, Object?>{
+            'phase': 'artifactReady',
+            'artifactDirectory': '/host/runtime',
+            'coreBinaryPath': '/host/runtime/libcore.aar',
+            'supportsLiveConnect': true,
+            'canInitialize': true,
+            'canConnect': false,
+            'message': 'Host bridge ready.',
+          };
+        case 'runtimeEngine.initialize':
+          return <String, Object?>{
+            'phase': 'initialized',
+            'artifactDirectory': '/host/runtime',
+            'coreBinaryPath': '/host/runtime/libcore.aar',
+            'supportsLiveConnect': true,
+            'canInitialize': true,
+            'canConnect': false,
+            'message': 'Runtime bootstrap completed.',
+          };
+        case 'runtimeEngine.stageManagedProfile':
+          final arguments = Map<Object?, Object?>.from(call.arguments as Map);
+          stagedPayloads.add(arguments['configPayload'].toString());
+          return <String, Object?>{
+            'phase': 'configStaged',
+            'artifactDirectory': '/host/runtime',
+            'coreBinaryPath': '/host/runtime/libcore.aar',
+            'stagedConfigPath': '/host/runtime/auto-refreshed.json',
+            'supportsLiveConnect': true,
+            'canInitialize': true,
+            'canConnect': true,
+            'message': 'Subscription profile staged.',
+          };
+        case 'runtimeEngine.connect':
+          return <String, Object?>{
+            'phase': 'running',
+            'artifactDirectory': '/host/runtime',
+            'coreBinaryPath': '/host/runtime/libcore.aar',
+            'stagedConfigPath': '/host/runtime/auto-refreshed.json',
+            'supportsLiveConnect': true,
+            'canInitialize': true,
+            'canConnect': true,
+            'message': 'Android runtime service is running.',
+          };
+      }
+      return null;
+    });
+    addTearDown(() {
+      messenger.setMockMethodCallHandler(channel, null);
+    });
+
+    await tester.pumpWidget(
+      PokrovSeedApp(
+        appContext: buildSeedAppContext(hostPlatform: HostPlatform.android),
+        communitySubscriptionAutoRefreshInterval:
+            const Duration(milliseconds: 25),
+        communitySubscriptionStaleAfter: Duration.zero,
+        communitySubscriptionFetcher: (uri) async {
+          fetchCount += 1;
+          if (fetchCount == 1) {
+            return 'trojan://old-secret@old.example:443?security=tls&sni=old.example#Trojan';
+          }
+          return 'trojan://new-secret@new.example:443?security=tls&sni=new.example#Trojan';
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+    await _completeFirstLaunchIfPresent(tester);
+
+    await _tapNav(tester, 'nav-profile');
+    final subscription =
+        find.byKey(const ValueKey('profile-subscription-url-action'));
+    await tester.dragUntilVisible(
+      subscription,
+      find.byType(Scrollable).first,
+      const Offset(0, -220),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(subscription);
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('profile-redeem-code-field')),
+      'https://example.invalid/sub.txt',
+    );
+    await tester.tap(find.byKey(const ValueKey('profile-redeem-submit')));
+    await tester.pumpAndSettle();
+
+    await tester.pump(const Duration(milliseconds: 80));
+    await tester.pumpAndSettle();
+
+    expect(fetchCount, greaterThanOrEqualTo(2));
+    expect(
+      find.byKey(const ValueKey('profile-local-profile-open-client-trojan')),
+      findsOneWidget,
+    );
+
+    await _tapNav(tester, 'nav-protection');
+    await tester.tap(find.byKey(const ValueKey('primary-connect-action')));
+    await tester.pumpAndSettle();
+
+    expect(stagedPayloads.single, contains('"server": "new.example"'));
+  });
+
   testWidgets('community subscription refresh failure preserves old profiles',
       (tester) async {
     var fetchCount = 0;
