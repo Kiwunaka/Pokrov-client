@@ -158,3 +158,31 @@ def test_operator_fixture_seed_records_contract_policy() -> None:
     assert {"unauthorized", "rate_limited", "server_error"}.issubset(
         set(contract["errors"]["codes"])
     )
+
+
+def test_operator_support_contract_matches_app_adapter_paths() -> None:
+    docs = "\n".join(
+        [
+            (ROOT / "docs" / "OPERATOR_INTEGRATION.md").read_text(encoding="utf-8"),
+            (ROOT / "docs" / "operator" / "openapi.yaml").read_text(
+                encoding="utf-8"
+            ),
+        ]
+    )
+    fixture = json.loads(
+        (ROOT / "config" / "operator-api.fixture.json").read_text(encoding="utf-8")
+    )
+    variant = json.loads(
+        (ROOT / "config" / "variants" / "operator-client.seed.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert fixture["endpoints"]["support_tickets"]["path"] == "/api/tickets"
+    assert "GET /api/tickets" in variant["required_api_contracts"]
+    assert (
+        "POST /api/tickets/{ticket_id}/messages"
+        in variant["required_api_contracts"]
+    )
+    assert "/api/tickets" in docs
+    assert "/api/client/support/tickets" not in docs

@@ -240,7 +240,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/OkResponse"
-  /api/client/support/tickets:
+  /api/tickets:
     get:
       summary: List support tickets
       responses:
@@ -265,7 +265,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TicketResponse"
-  /api/client/support/tickets/{ticket_id}:
+  /api/tickets/{ticket_id}:
     get:
       summary: Get a support ticket
       parameters:
@@ -277,7 +277,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TicketResponse"
-  /api/client/support/tickets/{ticket_id}/messages:
+  /api/tickets/{ticket_id}/messages:
     post:
       summary: Add a support ticket message
       parameters:

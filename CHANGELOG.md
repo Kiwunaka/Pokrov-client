@@ -21,6 +21,8 @@ production readiness without matching public evidence.
   third-party public configs, still opt-in and disabled by default.
 - Added `OPEN_CLIENT_ENABLE_FREE_CATALOG=false` as the default build gate for
   manual third-party catalog imports.
+- Added an operator support-contract guard so docs, OpenAPI, fixture seeds, and
+  smoke tests use the same `/api/tickets` paths as the app support adapter.
 
 ### Changed
 

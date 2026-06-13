@@ -160,7 +160,7 @@ try {
     throw "apps metadata must use prompt updates, not silent updates"
   }
 
-  $tickets = Invoke-FixtureJson -Method GET -Path "/api/client/support/tickets"
+  $tickets = Invoke-FixtureJson -Method GET -Path "/api/tickets"
   if (-not $tickets.tickets) {
     throw "support tickets fixture returned an empty list"
   }
