@@ -52,8 +52,8 @@ try {
   Invoke-Step "Reject committed private or generated artifacts" {
     Push-Location $clonePath
     try {
-      $forbiddenPathPattern = '(^|/)(build|dist|out|artifacts|coverage|reports|tmp|\.tmp|\.dart_tool|\.gradle|ephemeral|node_modules|config/local)(/|$)'
-      $forbiddenExtensionPattern = '\.(dll|exe|pfx|p12|keystore|jks|pem|key|mobileprovision|cer|crt|env)$'
+      $forbiddenPathPattern = '(^|/)(build|dist|out|artifacts|coverage|reports|logs|screenshots|screen-shots|tmp|\.tmp|\.dart_tool|\.gradle|ephemeral|node_modules|config/local|private-release-evidence)(/|$)'
+      $forbiddenExtensionPattern = '\.(dll|exe|pfx|p12|keystore|jks|pem|key|mobileprovision|cer|crt|env|apk|aab|ipa|msi|msix|dmg|pkg|zip|log)$'
       $tracked = git ls-files
       Assert-LastExitCode "git ls-files failed"
       $forbidden = $tracked | Where-Object {
