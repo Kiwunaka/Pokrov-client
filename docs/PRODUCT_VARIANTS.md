@@ -51,6 +51,7 @@ Default properties:
 - no POKROV logo
 - operator-owned API base URL
 - operator-owned cabinet/support/billing surfaces
+- white-label color token export for operator-owned branding pipelines
 - same app shell, runtime bridge, WARP policy hooks, and routing UX
 - required API contracts documented in
   [OPERATOR_INTEGRATION.md](OPERATOR_INTEGRATION.md)
@@ -112,11 +113,12 @@ Implemented now:
 - Free VPN catalog parser fixtures for the reviewed `subscription_text` feed
   format
 - neutral fallback brand mark when no asset is supplied
+- white-label color token seed, contrast checks, and export helper for operator
+  forks
 - operator/pokrov modes can opt into managed-service API bootstrap
 
 Still planned:
 
-- white-label color token export
 - background subscription refresh scheduler
 - enabled third-party public config catalog UI, fetcher, and cache-clear flow
   after all gates pass

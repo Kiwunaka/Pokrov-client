@@ -62,6 +62,16 @@ flutter run `
   --dart-define=OPEN_CLIENT_PRIVACY_URL="https://acme.example/privacy/"
 ```
 
+Operator forks can export editable color tokens before wiring their own brand
+pipeline:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\export-white-label-color-tokens.ps1
+```
+
+See [White-label branding](WHITE_LABEL_BRANDING.md) for the token roles,
+contrast checks, and operator-owned branding boundary.
+
 ## Resolve Dependencies
 
 From the repository root:
