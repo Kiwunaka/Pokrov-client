@@ -14,9 +14,12 @@ Use this checklist before importing source or publishing an official release.
 - [ ] Remove secrets, tokens, certificates, and signing config.
 - [ ] Remove private endpoints and operator-only paths.
 - [ ] Remove private logs, screenshots, and release evidence.
-- [ ] Confirm all generated assets have source and release-scope notes.
+- [ ] Confirm all generated assets are covered by
+  `config/generated-assets.seed.json`.
 - [ ] Run secret scanning.
-- [ ] Complete dependency license review.
+- [ ] Complete dependency license review in
+  `config/dependency-license-inventory.seed.json`.
+- [ ] Run `python -m pytest tests/test_release_provenance.py`.
 - [ ] Confirm a fresh clone builds without private files.
 
 ## Before Public Binary Release

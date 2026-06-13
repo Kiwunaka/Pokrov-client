@@ -26,7 +26,8 @@ This roadmap describes the public repository path. It is not a release promise.
 ## Phase 3: Public Build And Release Hygiene
 
 - Add CI for analysis and tests. Initial GitHub Actions workflow added.
-- Add dependency license inventory.
+- Add dependency license and generated asset provenance inventories. Initial
+  source-release gates added.
 - Add source import playbook and governance docs.
 - Add product-track documentation and optional public-config catalog gates.
 - Publish checksums with release artifacts.
