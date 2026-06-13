@@ -49,10 +49,11 @@ Required before tagging:
 - Free VPN catalog remains disabled by default and is not an official POKROV
   service.
 - No OS background subscription refresh is claimed.
-- Native Android/Windows host artifact metadata still needs a dedicated
-  operator/community brand-boundary hardening pass before distributable fork
-  binaries.
-- WARP and route-mode copy for community local profiles needs another honesty
-  pass before broader user-facing claims.
+- Native Android/Windows host artifact metadata now has neutral source defaults
+  and brand-boundary tests; downstream binary releases still own signing,
+  package identifiers, store metadata, and operator review.
+- WARP public copy for community local profiles now stays product-first and
+  avoids official-service wording; route-mode copy still does not prove
+  network-level routing quality, speed, privacy, or availability.
 - Transitive dependency/license inventory and generated asset provenance are
   not yet complete enough for official binary release claims.

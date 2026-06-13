@@ -119,6 +119,8 @@ Implemented now:
 - reviewed disabled Free VPN catalog seed for `AvenCores/goida-vpn-configs`
 - Free VPN catalog parser fixtures for the reviewed `subscription_text` feed
   format
+- community WARP/enhanced-protection public copy avoids official-service
+  claims while keeping technical diagnostics internal
 - neutral fallback brand mark when no asset is supplied
 - neutral Android/Windows native host defaults for community artifacts
 - white-label color token seed, contrast checks, and export helper for operator

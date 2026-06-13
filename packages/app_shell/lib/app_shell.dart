@@ -5408,7 +5408,7 @@ class _HomeWarpTileLegacy extends StatelessWidget {
         title: 'Расширенная приватность',
         lines: const [
           'Дополнительный режим готовится и не активен в этой сборке.',
-          'Когда режим будет проверен, POKROV покажет простой тумблер и честное предупреждение о скорости.',
+          'Когда режим будет проверен, клиент покажет простой тумблер и честное предупреждение о скорости.',
         ],
       ),
       child: Container(
@@ -6220,7 +6220,7 @@ class _ProfileSection extends StatelessWidget {
                         'profile-enhanced-protection-action',
                       ),
                       icon: Icons.privacy_tip_outlined,
-                      title: 'WARP-защита',
+                      title: 'Расширенная защита',
                       value: 'Скоро',
                       onTap: () {
                         unawaited(onOpenWarp());
