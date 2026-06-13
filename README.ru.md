@@ -117,6 +117,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.15.0-source` | Pending stacked PR, tag еще не создан | Operator support ticket path canonicalization находится в stacked PR queue. |
 | `v0.16.0-source` | Pending stacked PR, tag еще не создан | Community local-access wording and model guards находятся в stacked PR queue. |
 | `v0.17.0-source` | Pending stacked PR, tag еще не создан | Seed-backed variant command preview tooling находится в stacked PR queue. |
+| `v0.18.0-source` | Pending stacked PR, tag еще не создан | Proof-backed source release notes rendering находится в stacked PR queue. |
 
 ## Архитектурная Граница
 

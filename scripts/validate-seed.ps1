@@ -105,6 +105,7 @@ $requiredFiles = @(
   "scripts\\fetch-libcore-assets.ps1",
   "scripts\\prepare-oss-import.ps1",
   "scripts\\prepare-source-release.ps1",
+  "scripts\\render-source-release-notes.ps1",
   "scripts\\print-build-variant-command.ps1",
   "scripts\\run-operator-fixture-smoke.ps1",
   "scripts\\run-tests.ps1",

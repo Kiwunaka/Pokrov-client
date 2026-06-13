@@ -46,15 +46,19 @@ powershell -ExecutionPolicy Bypass -File .\scripts\prepare-source-release.ps1 `
   -Ref "refs/tags/$tag" `
   -OutDir $proof `
   -RequireTag
+powershell -ExecutionPolicy Bypass -File .\scripts\render-source-release-notes.ps1 `
+  -ManifestPath (Join-Path $proof "$tag-source-proof.json") `
+  -OutFile (Join-Path $proof "$tag-release-notes.md")
 ```
 
 Annotated source tags are expected. The proof manifest records both
 `tag_object_sha` and the peeled `commit_sha`; release notes must use the peeled
 commit SHA as the source reference.
 
-Before pushing the tag, copy the tag name, commit SHA, archive SHA-256, proof
-manifest path, feature status, and known limitations into a release note based on
-[SOURCE_RELEASE_TEMPLATE.md](releases/SOURCE_RELEASE_TEMPLATE.md).
+Before pushing the tag, review the rendered release note, then add the exact
+feature status and known limitations based on
+[SOURCE_RELEASE_TEMPLATE.md](releases/SOURCE_RELEASE_TEMPLATE.md). The rendered
+body must keep the proof manifest's source-only boundaries.
 
 Push only after the release note is accurate:
 
