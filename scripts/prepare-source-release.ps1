@@ -61,6 +61,10 @@ try {
   $tagObjectSha = ""
   if ($RequireTag) {
     $tagRef = "refs/tags/$Tag"
+    $tagObjectType = (Invoke-Git @("cat-file", "-t", $tagRef) | Select-Object -First 1)
+    if ($tagObjectType -ne "tag") {
+      throw "Source release tags must be annotated tags. Create $Tag with: git tag -a $Tag -m `"$Tag`""
+    }
     $tagObjectSha = (Invoke-Git @("rev-parse", "--verify", $tagRef) | Select-Object -First 1)
     $Ref = $tagRef
   }

@@ -117,6 +117,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.16.0-source` | Pending stacked PR, not tagged | Community local-access wording and model guards are in the stacked PR queue. |
 | `v0.17.0-source` | Pending stacked PR, not tagged | Seed-backed variant command preview tooling is in the stacked PR queue. |
 | `v0.18.0-source` | Pending stacked PR, not tagged | Proof-backed source release notes rendering is in the stacked PR queue. |
+| `v0.19.0-source` | Pending stacked PR, not tagged | Annotated source tag enforcement is in the stacked PR queue. |
 
 ## Architecture Boundary
 

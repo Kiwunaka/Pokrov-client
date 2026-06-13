@@ -20,6 +20,8 @@ def test_prepare_source_release_script_has_release_honesty_guards() -> None:
     assert "no_trusted_signing_claim" in script
     assert "forbiddenExtensionPattern" in script
     assert "tag_object_sha" in script
+    assert "cat-file" in script
+    assert "Source release tags must be annotated tags" in script
     assert "$Ref^{}" in script
 
 
@@ -279,5 +281,46 @@ def test_prepare_source_release_script_peels_annotated_tags(tmp_path: Path) -> N
         assert manifest["tag_object_sha"] == tag_object
         assert manifest["tag_object_sha"] != manifest["commit_sha"]
         assert manifest["commit_date"].startswith("20")
+    finally:
+        subprocess.run(["git", "tag", "-d", tag], cwd=ROOT, check=False, capture_output=True)
+
+
+def test_prepare_source_release_script_rejects_lightweight_tags(tmp_path: Path) -> None:
+    tag = "v9.9.3-source"
+    out_dir = tmp_path / "lightweight-proof"
+
+    subprocess.run(["git", "tag", "-d", tag], cwd=ROOT, check=False, capture_output=True)
+    try:
+        subprocess.run(
+            ["git", "tag", tag],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "prepare-source-release.ps1"),
+                "-Tag",
+                tag,
+                "-OutDir",
+                str(out_dir),
+                "-RequireTag",
+                "-AllowDirty",
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+
+        combined_output = result.stdout + result.stderr
+        assert result.returncode != 0
+        assert "Source release tags must be annotated tags" in combined_output
+        assert not (out_dir / f"{tag}-source-proof.json").exists()
     finally:
         subprocess.run(["git", "tag", "-d", tag], cwd=ROOT, check=False, capture_output=True)
