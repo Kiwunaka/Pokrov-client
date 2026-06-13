@@ -19,6 +19,10 @@ Use this checklist before publishing a public source or binary release.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\prepare-source-release.ps1`
   is run for the exact source reference and its proof manifest is reflected in
   the GitHub Release body.
+- `powershell -ExecutionPolicy Bypass -File .\scripts\source-release-preflight.ps1`
+  can be used as the single local gate that runs tests, clean-clone proof,
+  source proof generation, release-note rendering, and preflight summary
+  generation. Do not use `-SkipTestCommands` for publishing.
 - `safe_import` dry-run reports `blocked=0` for the public tree.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1`
   passes before a public source release.
@@ -32,32 +36,25 @@ Run these commands on the exact commit that will be tagged:
 
 ```powershell
 $tag = "v0.3.0-source"
-$proof = Join-Path $env:TEMP "$tag-proof"
+$preflight = Join-Path $env:TEMP "$tag-preflight"
 git status --short
 git rev-parse HEAD
-python -m pytest tests
-python -m pytest tests/test_release_provenance.py
-powershell -ExecutionPolicy Bypass -File .\scripts\validate-seed.ps1
-powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1 -Source .
-powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1
 git tag -a $tag -m "$tag"
-powershell -ExecutionPolicy Bypass -File .\scripts\prepare-source-release.ps1 `
+powershell -ExecutionPolicy Bypass -File .\scripts\source-release-preflight.ps1 `
   -Tag $tag `
   -Ref "refs/tags/$tag" `
-  -OutDir $proof `
+  -OutDir $preflight `
   -RequireTag
-powershell -ExecutionPolicy Bypass -File .\scripts\render-source-release-notes.ps1 `
-  -ManifestPath (Join-Path $proof "$tag-source-proof.json") `
-  -OutFile (Join-Path $proof "$tag-release-notes.md")
 ```
 
-Annotated source tags are required. `prepare-source-release.ps1 -RequireTag`
-refuses lightweight tags. The proof manifest records both `tag_object_sha` and
-the peeled `commit_sha`; release notes must use the peeled commit SHA as the
-source reference.
+Annotated source tags are required. `source-release-preflight.ps1 -RequireTag`
+delegates proof generation to `prepare-source-release.ps1`, which refuses
+lightweight tags. The proof manifest records both `tag_object_sha` and the
+peeled `commit_sha`; release notes must use the peeled commit SHA as the source
+reference.
 
-Before pushing the tag, review the rendered release note, then add the exact
-feature status and known limitations based on
+Before pushing the tag, review the rendered release note and preflight summary,
+then add the exact feature status and known limitations based on
 [SOURCE_RELEASE_TEMPLATE.md](releases/SOURCE_RELEASE_TEMPLATE.md). The rendered
 body must keep the proof manifest's source-only boundaries.
 

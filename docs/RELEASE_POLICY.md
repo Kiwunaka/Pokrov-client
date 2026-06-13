@@ -34,6 +34,13 @@ the first GitHub Release body draft. The renderer refuses manifests that do not
 preserve the source-only flags, then prints the tag, commit SHA, archive
 checksum, public proof manifest label, and release-honesty copy.
 
+Use `scripts/source-release-preflight.ps1` when you want the full source release
+gate in one command. It runs the local tests and clean-clone checks, delegates
+proof generation to `prepare-source-release.ps1`, renders the release-note draft,
+and writes a local preflight summary. The `-SkipTestCommands` switch is only for
+local or CI smoke coverage and must not be used for publishing a public source
+release.
+
 ## Binary Release Requirements
 
 Every official binary release should include:

@@ -35,6 +35,9 @@ production readiness without matching public evidence.
   render source-only release notes without local path leakage.
 - Added the release-note renderer command to generated source-only verification
   blocks so release bodies document their own rendering step.
+- Added a source-release preflight helper that runs the local release gate,
+  prepares proof artifacts, renders source-only release notes, and writes a
+  local summary without publishing binaries.
 
 ### Changed
 
@@ -43,7 +46,7 @@ production readiness without matching public evidence.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.21.0-source` candidates.
+  `v0.22.0-source` candidates.
 
 ### Still Source-Only
 
