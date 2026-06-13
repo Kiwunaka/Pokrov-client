@@ -314,9 +314,39 @@ if (Test-Path -LiteralPath $runtimeArtifactsPath -PathType Leaf) {
     $manifestErrors.Add("config\\runtime-artifacts.seed.json must keep libcore.repository on hiddify/hiddify-core")
   }
 
+  if ($runtimeArtifacts.libcore.license_review -notin @("pending", "approved")) {
+    $manifestErrors.Add("config\\runtime-artifacts.seed.json must record libcore.license_review as pending or approved")
+  }
+
+  if ($runtimeArtifacts.libcore.binary_review -notin @("pending", "approved")) {
+    $manifestErrors.Add("config\\runtime-artifacts.seed.json must record libcore.binary_review as pending or approved")
+  }
+
+  if ($runtimeArtifacts.libcore.source_release_scope -notmatch "not committed") {
+    $manifestErrors.Add("config\\runtime-artifacts.seed.json must state runtime artifacts are not committed for source-only releases")
+  }
+
   foreach ($target in @("android", "ios", "macos", "windows")) {
-    if (-not $runtimeArtifacts.libcore.assets.$target) {
+    $assetMetadata = $runtimeArtifacts.libcore.assets.$target
+    if (-not $assetMetadata) {
       $manifestErrors.Add("config\\runtime-artifacts.seed.json must define libcore asset metadata for $target")
+      continue
+    }
+
+    if ($assetMetadata.sha256 -ne "PENDING_PUBLIC_BINARY_REVIEW" -and $assetMetadata.sha256 -notmatch "^[a-f0-9]{64}$") {
+      $manifestErrors.Add("config\\runtime-artifacts.seed.json $target asset must use PENDING_PUBLIC_BINARY_REVIEW or a lowercase 64-hex sha256")
+    }
+
+    if ($assetMetadata.license_review -notin @("pending", "approved")) {
+      $manifestErrors.Add("config\\runtime-artifacts.seed.json $target asset must record license_review as pending or approved")
+    }
+
+    if ($assetMetadata.binary_review -notin @("pending", "approved")) {
+      $manifestErrors.Add("config\\runtime-artifacts.seed.json $target asset must record binary_review as pending or approved")
+    }
+
+    if ($assetMetadata.sync_destination -match "(^|/|\\)\.\.($|/|\\)") {
+      $manifestErrors.Add("config\\runtime-artifacts.seed.json $target sync_destination must stay repo-relative")
     }
   }
 }

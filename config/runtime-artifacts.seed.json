@@ -1,28 +1,47 @@
 {
+  "schema_version": 1,
   "libcore": {
     "repository": "hiddify/hiddify-core",
+    "source_url": "https://github.com/hiddify/hiddify-core",
     "release_tag": "v3.1.8",
+    "release_url_template": "https://github.com/hiddify/hiddify-core/releases/tag/{tag}",
+    "license_review": "pending",
+    "binary_review": "pending",
+    "source_release_scope": "Runtime artifacts are downloaded for local testing only and are not committed, bundled, or shipped by source-only releases.",
+    "sha256_policy": "Use a 64-character lowercase SHA-256 after public binary review. Keep PENDING_PUBLIC_BINARY_REVIEW before that review is complete.",
     "assets": {
       "android": {
         "asset": "hiddify-core-android.tar.gz",
         "entry": "libcore.aar",
-        "sync_destination": "apps/android_shell/android/app/libs"
+        "sync_destination": "apps/android_shell/android/app/libs",
+        "sha256": "PENDING_PUBLIC_BINARY_REVIEW",
+        "license_review": "pending",
+        "binary_review": "pending"
       },
       "ios": {
         "asset": "hiddify-core-ios.tar.gz",
         "entry": "Libcore.xcframework",
-        "sync_destination": "apps/ios_shell/ios/Frameworks"
+        "sync_destination": "apps/ios_shell/ios/Frameworks",
+        "sha256": "PENDING_PUBLIC_BINARY_REVIEW",
+        "license_review": "pending",
+        "binary_review": "pending"
       },
       "macos": {
         "asset": "hiddify-core-macos-universal.tar.gz",
         "entry": "libcore.dylib",
         "helper": "HiddifyCli",
-        "sync_destination": "apps/macos_shell/macos/Runner/Frameworks"
+        "sync_destination": "apps/macos_shell/macos/Runner/Frameworks",
+        "sha256": "PENDING_PUBLIC_BINARY_REVIEW",
+        "license_review": "pending",
+        "binary_review": "pending"
       },
       "windows": {
         "asset": "hiddify-core-windows-amd64.tar.gz",
         "entry": "libcore.dll",
-        "sync_destination": "apps/windows_shell/windows/runner/resources/runtime"
+        "sync_destination": "apps/windows_shell/windows/runner/resources/runtime",
+        "sha256": "PENDING_PUBLIC_BINARY_REVIEW",
+        "license_review": "pending",
+        "binary_review": "pending"
       }
     }
   }

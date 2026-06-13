@@ -36,7 +36,7 @@ versions.
 | `AvenCores/goida-vpn-configs` | catalog candidate | optional third-party public config feeds | GPL-3.0 | no | yes | disabled by default; attribution required |
 | Gradle wrapper | wrapper from source snapshot | Android build bootstrap | Apache-2.0 | wrapper jar committed | yes | verify checksum during CI setup |
 | POKROV client brand PNGs | source snapshot | app shell identity | governed by `BRAND.md` | yes | restricted trademark use | keep official-build boundary |
-| `hiddify/hiddify-core` runtime artifacts | `v3.1.8` seed | runtime bridge testing | see upstream project | downloaded, not committed | pending | verify before public binary release |
+| `hiddify/hiddify-core` runtime artifacts | `v3.1.8` seed | runtime bridge testing | see upstream project | downloaded, not committed | pending | manifest records pending license/binary review and `PENDING_PUBLIC_BINARY_REVIEW`; replace with exact SHA-256 values only after public binary review |
 
 ## Current Transitive Inventory Evidence
 
@@ -52,6 +52,13 @@ versions.
 This is source-release evidence only. Public binary releases still require a
 fresh native/runtime review for bundled runtime artifacts, platform build
 outputs, signing material, store metadata, and installer contents.
+
+Runtime artifact metadata lives in
+[`config/runtime-artifacts.seed.json`](../config/runtime-artifacts.seed.json).
+The source-only release lane may document local fetch instructions, but it must
+not claim archive hashes, redistribution clearance, APK/EXE delivery, or bundled
+runtime safety until that manifest is updated from pending review to recorded
+binary evidence.
 
 ## Generated Asset Provenance
 
