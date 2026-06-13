@@ -9,6 +9,7 @@ Source-only releases, such as `v0.1.0-source`, should include:
 - tag name
 - commit SHA
 - source archive checksum or reproducible checksum note
+- source proof manifest from `scripts/prepare-source-release.ps1`
 - current feature status
 - known limitations
 - explicit note that no APK, EXE, store release, or trusted-signed binary is
@@ -18,6 +19,11 @@ Use [releases/SOURCE_RELEASE_TEMPLATE.md](releases/SOURCE_RELEASE_TEMPLATE.md)
 for GitHub Release bodies. Milestones that are implemented on `main` but not
 tagged yet must be labeled `not tagged` or `pending tag`; do not present them as
 published releases.
+
+Run `scripts/prepare-source-release.ps1` on the exact source reference before
+publishing release copy. The generated proof manifest is local evidence for the
+commit SHA, archive SHA-256, source-only boundary, and absence of committed
+binary/signing artifacts in the archived tree.
 
 ## Binary Release Requirements
 
