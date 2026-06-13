@@ -15,6 +15,10 @@ Source-only releases, such as `v0.1.0-source`, should include:
 - explicit note that no APK, EXE, store release, or trusted-signed binary is
   shipped in that release
 
+Source-only release tags must be annotated tags. Lightweight tags are refused by
+the proof script because the release proof must record both the tag object SHA
+and the peeled commit SHA.
+
 Use [releases/SOURCE_RELEASE_TEMPLATE.md](releases/SOURCE_RELEASE_TEMPLATE.md)
 for GitHub Release bodies. Milestones that are implemented on `main` but not
 tagged yet must be labeled `not tagged` or `pending tag`; do not present them as

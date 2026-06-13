@@ -29,6 +29,8 @@ production readiness without matching public evidence.
   Windows `flutter run` / `flutter build` commands without mutating the tree.
 - Added a source release notes renderer that turns a proof manifest into a
   source-only GitHub Release body and refuses binary-claim manifests.
+- Added an annotated-tag guard so source-release proof generation refuses
+  lightweight source tags.
 
 ### Changed
 
@@ -37,7 +39,7 @@ production readiness without matching public evidence.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.18.0-source` candidates.
+  `v0.19.0-source` candidates.
 
 ### Still Source-Only
 
