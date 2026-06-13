@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.17
+# Source Readiness: v0.2-v0.18
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -297,6 +297,25 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.18.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #38: proof-manifest-backed source release notes renderer that preserves
+  source-only honesty flags before GitHub Release publication
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release checklist on that commit
+- render and review the GitHub Release body from the proof manifest
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
 - Free VPN catalog remains disabled by default and is not an official POKROV
@@ -321,3 +340,6 @@ Required before tagging:
   instead of a free POKROV node, trial, or Telegram-bonus service lane.
 - Variant command previews are generated from public seed files only; they do
   not build, sign, package, upload, or create release artifacts.
+- Source release notes rendering is a draft helper only; maintainers must still
+  review feature status, known limitations, and the exact source reference
+  before publishing a GitHub Release.

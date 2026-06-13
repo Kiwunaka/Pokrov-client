@@ -25,6 +25,11 @@ publishing release copy. The generated proof manifest is local evidence for the
 commit SHA, archive SHA-256, source-only boundary, and absence of committed
 binary/signing artifacts in the archived tree.
 
+Use `scripts/render-source-release-notes.ps1` with that proof manifest to render
+the first GitHub Release body draft. The renderer refuses manifests that do not
+preserve the source-only flags, then prints the tag, commit SHA, archive
+checksum, proof manifest path, and release-honesty copy.
+
 ## Binary Release Requirements
 
 Every official binary release should include:
