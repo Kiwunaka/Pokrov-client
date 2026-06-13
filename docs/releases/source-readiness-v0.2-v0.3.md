@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.28
+# Source Readiness: v0.2-v0.29
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -537,6 +537,31 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.29.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #49: private security intake gate for public issue redirection, redaction
+  boundaries, QR/subscription URL handling, and source-only security claims
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- confirm `config/security-intake.seed.json` still forbids public vulnerability
+  issues and keeps blank public issues disabled
+- confirm issue templates and docs still redirect vulnerabilities to private
+  reporting and forbid public secrets, QR payloads, subscription URLs, signing
+  material, and private backend details
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the preflight summary, proof manifest, and rendered GitHub Release body
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
 - Free VPN catalog remains disabled by default and is not an official POKROV
@@ -594,3 +619,7 @@ Required before tagging:
 - Free VPN catalog provenance now records reviewed feed hosts, license evidence,
   attribution, no-network CI, and required release-note boundaries; it still
   remains disabled by default and must not become an official POKROV node pool.
+- Private security intake now has a seed-backed gate, but maintainers still
+  must close, redact, or redirect accidental public vulnerability details,
+  secrets, QR payloads, subscription URLs, signing material, and private
+  backend details.

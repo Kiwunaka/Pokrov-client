@@ -8,6 +8,11 @@ The canonical label catalog is [.github/labels.yml](../.github/labels.yml).
 Maintainers can sync it with a standard GitHub label-sync tool, or apply labels
 manually with the same names, colors, and descriptions.
 
+The machine-readable security intake policy is
+[config/security-intake.seed.json](../config/security-intake.seed.json). Keep it
+in sync with `SECURITY.md`, `SUPPORT.md`, issue templates, and this triage
+guide whenever the private reporting flow changes.
+
 ## Required Labels
 
 - `bug`: public client or repository process bug.
@@ -40,6 +45,9 @@ manually with the same names, colors, and descriptions.
   secrets, signing material, QR payloads, subscription URLs, or account data in
   public issues. Use [SECURITY.md](../SECURITY.md).
 - Keep `security-private` as a redirect label, not a public investigation lane.
+- When a public issue contains vulnerability details, secrets, QR payloads,
+  subscription URLs, signing material, or private backend details, close or
+  redact it and redirect the reporter to private security reporting.
 - Do not apply `good first issue` until the task is safe for a newcomer, has a
   narrow public scope, and does not require private POKROV backend, signing, billing, deployment, node-management, or release-evidence access.
 - Use `release` only for source-only and evidence-backed release work unless a

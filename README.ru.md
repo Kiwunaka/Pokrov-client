@@ -128,6 +128,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.26.0-source` | Pending stacked PR, tag еще не создан | Runtime artifact manifest gate и local-only libcore review metadata находятся в stacked PR queue. |
 | `v0.27.0-source` | Pending stacked PR, tag еще не создан | Source release copy-claims gate находится в stacked PR queue. |
 | `v0.28.0-source` | Pending stacked PR, tag еще не создан | Free VPN catalog provenance gate находится в stacked PR queue. |
+| `v0.29.0-source` | Pending stacked PR, tag еще не создан | Private security intake gate находится в stacked PR queue. |
 
 ## Архитектурная Граница
 
