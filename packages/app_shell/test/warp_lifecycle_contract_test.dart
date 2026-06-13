@@ -99,6 +99,58 @@ void main() {
     expect(lifecycle.stateKey, 'home-warp-state-ready');
   });
 
+  test('warp lifecycle public copy stays neutral for every phase', () {
+    const readyPolicy = WarpRuntimePolicy(
+      enabled: true,
+      runtimeReady: true,
+      state: 'ready_to_consent',
+      wireguardConfigJson: '{"private_key":"redacted-test"}',
+    );
+    final lifecycles = <PokrovWarpLifecycle>[
+      PokrovWarpLifecycle.resolve(
+        policy: WarpRuntimePolicy.disabled,
+        consented: false,
+        busy: false,
+      ),
+      PokrovWarpLifecycle.resolve(
+        policy: readyPolicy,
+        consented: false,
+        busy: false,
+      ),
+      PokrovWarpLifecycle.resolve(
+        policy: readyPolicy,
+        consented: true,
+        busy: false,
+      ),
+      for (final state in <String>[
+        'active',
+        'degraded',
+        'fallback',
+        'revoked',
+        'error',
+      ])
+        PokrovWarpLifecycle.resolve(
+          policy: readyPolicy.copyWith(state: state),
+          consented: state != 'revoked',
+          busy: false,
+        ),
+    ];
+
+    for (final lifecycle in lifecycles) {
+      for (final text in <String>[
+        lifecycle.publicTitle,
+        lifecycle.publicSheetTitle,
+        lifecycle.publicStatus,
+        lifecycle.publicSheetBody,
+        lifecycle.publicActionLabel,
+      ]) {
+        expect(text, isNot(contains('POKROV')));
+        expect(text, isNot(contains('WARP')));
+        expect(text, isNot(contains('official')));
+      }
+    }
+  });
+
   test('warp cache payload stores only safe consent status', () {
     final status = WarpControlStatus.fromPolicy(
       const WarpRuntimePolicy(
