@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-06-13",
+  "policy": {
+    "source_only_milestones_must_not_claim_binaries": true,
+    "pending_milestones_must_not_claim_tags": true,
+    "release_notes_require_proof_manifest_after_v0_7": true
+  },
+  "milestones": [
+    {
+      "tag": "v0.1.0-source",
+      "status": "tagged",
+      "evidence": "docs/releases/v0.1.0-source.md",
+      "scope": "First source-only Android/Windows snapshot with local community import, QR import foundation, and gated Free VPN catalog metadata.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.2.0-source",
+      "status": "not_tagged",
+      "evidence": "docs/releases/source-readiness-v0.2-v0.3.md",
+      "scope": "Community import hub polish, variant-boundary enforcement, and source-import hardening.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.3.0-source",
+      "status": "not_tagged",
+      "evidence": "docs/releases/source-readiness-v0.2-v0.3.md",
+      "scope": "Operator fixture, Free VPN catalog gate, white-label token export, and foreground subscription scheduler.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.4.0-source",
+      "status": "stacked_pr_green_not_tagged",
+      "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/23",
+      "scope": "Native Android/Windows host brand-boundary hardening.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.5.0-source",
+      "status": "stacked_pr_green_not_tagged",
+      "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/24",
+      "scope": "Community routing and WARP copy honesty hardening.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.6.0-source",
+      "status": "stacked_pr_green_not_tagged",
+      "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/25",
+      "scope": "Dependency/license and generated-asset provenance inventory gates.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.7.0-source",
+      "status": "stacked_pr_green_not_tagged",
+      "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/26",
+      "scope": "Source-release proof helper for archive SHA-256 and source-only manifest generation.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
+    }
+  ]
+}

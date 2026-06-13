@@ -1,0 +1,65 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def _read_json(relative_path: str) -> dict:
+    return json.loads((ROOT / relative_path).read_text(encoding="utf-8"))
+
+
+def test_source_release_readiness_milestones_are_source_only() -> None:
+    readiness = _read_json("config/source-release-readiness.seed.json")
+    milestones = readiness["milestones"]
+
+    assert readiness["policy"]["source_only_milestones_must_not_claim_binaries"] is True
+    assert readiness["policy"]["pending_milestones_must_not_claim_tags"] is True
+    assert len(milestones) >= 7
+
+    for milestone in milestones:
+        assert milestone["tag"].startswith("v")
+        assert milestone["tag"].endswith("-source")
+        assert milestone["status"] in {
+            "tagged",
+            "not_tagged",
+            "stacked_pr_green_not_tagged",
+        }
+        assert milestone["source_only"] is True
+        assert milestone["ships_apk"] is False
+        assert milestone["ships_exe"] is False
+        assert milestone["store_release"] is False
+        assert milestone["trusted_signing_claim"] is False
+        assert milestone["scope"]
+        assert milestone["evidence"]
+
+
+def test_readiness_docs_and_readmes_mention_every_source_milestone() -> None:
+    readiness = _read_json("config/source-release-readiness.seed.json")
+    docs_text = "\n".join(
+        [
+            (ROOT / "README.md").read_text(encoding="utf-8"),
+            (ROOT / "README.en.md").read_text(encoding="utf-8"),
+            (ROOT / "README.ru.md").read_text(encoding="utf-8"),
+            (ROOT / "docs" / "releases" / "source-readiness-v0.2-v0.3.md").read_text(
+                encoding="utf-8"
+            ),
+        ]
+    )
+
+    for milestone in readiness["milestones"]:
+        assert milestone["tag"] in docs_text
+
+
+def test_tagged_milestones_have_release_notes_and_pending_milestones_are_clear() -> None:
+    readiness = _read_json("config/source-release-readiness.seed.json")
+
+    for milestone in readiness["milestones"]:
+        if milestone["status"] == "tagged":
+            evidence = ROOT / milestone["evidence"]
+            assert evidence.is_file()
+            assert "No APK or EXE binaries" in evidence.read_text(encoding="utf-8")
+        else:
+            assert "not_tagged" in milestone["status"]
