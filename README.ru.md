@@ -125,6 +125,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.23.0-source` | Pending stacked PR, tag еще не создан | CI source-release preflight smoke находится в stacked PR queue. |
 | `v0.24.0-source` | Pending stacked PR, tag еще не создан | Specialized GitHub triage templates находятся в stacked PR queue. |
 | `v0.25.0-source` | Pending stacked PR, tag еще не создан | GitHub label catalog and triage policy находятся в stacked PR queue. |
+| `v0.26.0-source` | Pending stacked PR, tag еще не создан | Runtime artifact manifest gate и local-only libcore review metadata находятся в stacked PR queue. |
 
 ## Архитектурная Граница
 

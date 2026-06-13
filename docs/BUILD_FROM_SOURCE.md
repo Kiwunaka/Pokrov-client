@@ -177,6 +177,9 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1 -OfflinePubGet
 
 Native runtime binaries are not committed to this repository. The public seed
 tracks `hiddify/hiddify-core` in `config/runtime-artifacts.seed.json`.
+That manifest is source-only release metadata: it records the upstream release,
+expected archive names, local sync destinations, and current license/binary
+review state without shipping those binaries.
 
 To fetch and place runtime artifacts for local testing:
 
@@ -185,6 +188,10 @@ powershell -ExecutionPolicy Bypass -File .\scripts\fetch-libcore-assets.ps1 -Pla
 ```
 
 Downloaded artifacts land under ignored local folders and must not be committed.
+When an asset entry still uses `PENDING_PUBLIC_BINARY_REVIEW`, the fetch helper
+prints a warning and treats the archive as local-only test material. After a
+public binary review records a real 64-character SHA-256 in the manifest, the
+helper verifies the downloaded archive before extraction or host sync.
 
 ## Tests
 
