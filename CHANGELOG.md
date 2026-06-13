@@ -25,6 +25,8 @@ production readiness without matching public evidence.
   smoke tests use the same `/api/tickets` paths as the app support adapter.
 - Added community local-access wording and model guards so Open Client does not
   present local profiles as a free POKROV node or Telegram-bonus service lane.
+- Added a variant command preview helper that prints seed-backed Android and
+  Windows `flutter run` / `flutter build` commands without mutating the tree.
 
 ### Changed
 

@@ -231,7 +231,18 @@ first operator smoke:
 
 ## Build Defines
 
+Preview the current operator command from
+[`config/variants/operator-client.seed.json`](../config/variants/operator-client.seed.json):
+
 ```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\print-build-variant-command.ps1 -Variant operator -Platform windows -Action build -Release
+```
+
+The helper prints a command only. It does not sign, package, upload, publish, or
+claim a release artifact.
+
+```powershell
+Push-Location apps/windows_shell
 flutter build windows --release `
   --dart-define=OPEN_CLIENT_VARIANT=operator `
   --dart-define=OPEN_CLIENT_BRAND_NAME="Acme VPN" `
@@ -241,6 +252,7 @@ flutter build windows --release `
   --dart-define=OPEN_CLIENT_CHECKOUT_URL="https://pay.acme.example/checkout" `
   --dart-define=OPEN_CLIENT_SUPPORT_URL="https://support.acme.example/" `
   --dart-define=OPEN_CLIENT_PRIVACY_URL="https://acme.example/privacy/"
+Pop-Location
 ```
 
 For Android, pass the same defines to `flutter build apk` or your Gradle-backed

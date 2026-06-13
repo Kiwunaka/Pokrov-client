@@ -67,14 +67,28 @@ First-run path for operators:
 5. replace all API, support, privacy, signing, and release surfaces with your
    own
 
-Example community run:
+Generate a seed-backed command before running or building a variant:
 
 ```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\print-build-variant-command.ps1 -Variant community -Platform android
+powershell -ExecutionPolicy Bypass -File .\scripts\print-build-variant-command.ps1 -Variant operator -Platform windows -Action build -Release
+```
+
+The helper prints a PowerShell preview only. It reads
+`config/variants/*.seed.json`, anchors the command inside `apps/android_shell`
+or `apps/windows_shell`, and does not build, sign, write local config, or create
+release artifacts.
+
+Example community run shape:
+
+```powershell
+Push-Location apps/android_shell
 flutter run `
   --dart-define=OPEN_CLIENT_VARIANT=community `
   --dart-define=OPEN_CLIENT_BRAND_NAME="Open Client" `
   --dart-define=OPEN_CLIENT_ANDROID_PACKAGE_NAME=org.pokrovclient.community `
   --dart-define=OPEN_CLIENT_ENABLE_FREE_CATALOG=false
+Pop-Location
 ```
 
 The Free VPN catalog preview is visible in community mode so users can inspect
@@ -82,9 +96,10 @@ the third-party boundary. Manual feed import stays disabled unless you compile
 with `--dart-define=OPEN_CLIENT_ENABLE_FREE_CATALOG=true`; even then, imports
 remain user-initiated and are not official POKROV nodes.
 
-Example operator run:
+Example operator run shape:
 
 ```powershell
+Push-Location apps/windows_shell
 flutter run `
   --dart-define=OPEN_CLIENT_VARIANT=operator `
   --dart-define=OPEN_CLIENT_BRAND_NAME="Acme VPN" `
@@ -93,6 +108,7 @@ flutter run `
   --dart-define=OPEN_CLIENT_CABINET_URL="https://app.acme.example/" `
   --dart-define=OPEN_CLIENT_SUPPORT_URL="https://support.acme.example/" `
   --dart-define=OPEN_CLIENT_PRIVACY_URL="https://acme.example/privacy/"
+Pop-Location
 ```
 
 Operator forks can export editable color tokens before wiring their own brand

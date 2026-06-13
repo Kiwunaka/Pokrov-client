@@ -45,12 +45,20 @@ Default properties:
 
 Build define shape:
 
+Preview the current seed-backed command with:
+
 ```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\print-build-variant-command.ps1 -Variant community -Platform android
+```
+
+```powershell
+Push-Location apps/android_shell
 flutter run `
   --dart-define=OPEN_CLIENT_VARIANT=community `
   --dart-define=OPEN_CLIENT_BRAND_NAME="Open Client" `
   --dart-define=OPEN_CLIENT_ANDROID_PACKAGE_NAME=org.pokrovclient.community `
   --dart-define=OPEN_CLIENT_ENABLE_FREE_CATALOG=false
+Pop-Location
 ```
 
 ## 2. Operator Client
@@ -83,7 +91,14 @@ Default properties:
 
 Build define shape:
 
+Preview the current seed-backed command with:
+
 ```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\print-build-variant-command.ps1 -Variant operator -Platform windows
+```
+
+```powershell
+Push-Location apps/windows_shell
 flutter run `
   --dart-define=OPEN_CLIENT_VARIANT=operator `
   --dart-define=OPEN_CLIENT_BRAND_NAME="Acme VPN" `
@@ -92,6 +107,7 @@ flutter run `
   --dart-define=OPEN_CLIENT_CABINET_URL="https://app.acme.example/" `
   --dart-define=OPEN_CLIENT_SUPPORT_URL="https://support.acme.example/" `
   --dart-define=OPEN_CLIENT_PRIVACY_URL="https://acme.example/privacy/"
+Pop-Location
 ```
 
 ## 3. POKROV Service Mode
@@ -112,13 +128,21 @@ Default properties:
 
 Build define shape:
 
+Preview the current seed-backed command with:
+
 ```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\print-build-variant-command.ps1 -Variant pokrov -Platform android
+```
+
+```powershell
+Push-Location apps/android_shell
 flutter run `
   --dart-define=OPEN_CLIENT_VARIANT=pokrov `
   --dart-define=OPEN_CLIENT_OFFICIAL_BUILD=true `
   --dart-define=OPEN_CLIENT_BRAND_NAME=POKROV `
   --dart-define=OPEN_CLIENT_ANDROID_PACKAGE_NAME=space.pokrov.app `
   --dart-define=OPEN_CLIENT_BRAND_ASSET=assets/brand/pokrov_mark.png
+Pop-Location
 ```
 
 ## Current Implementation Status
@@ -126,6 +150,7 @@ flutter run `
 Implemented now:
 
 - variant seed configs under `config/variants/`
+- seed-backed variant command preview helper for Android and Windows
 - compile-time variant profile in the shared app shell
 - community default avoids POKROV API bootstrap and POKROV support API calls
 - community redeem/import sheet can stage a local single-key profile for the
