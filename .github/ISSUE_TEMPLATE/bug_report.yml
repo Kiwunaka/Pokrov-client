@@ -6,7 +6,19 @@ body:
   - type: markdown
     attributes:
       value: |
-        Do not include secrets, tokens, personal connection links, or private account data.
+        Do not include secrets, tokens, QR payloads, subscription URLs, personal connection links, private backend details, or private account data. Do not report vulnerabilities here; use SECURITY.md.
+  - type: dropdown
+    id: track
+    attributes:
+      label: Track / variant
+      options:
+        - Personal Key / Community Client
+        - Operator / Company Client
+        - Official POKROV Service Mode
+        - Repository docs/process
+        - Other / not sure
+    validations:
+      required: true
   - type: dropdown
     id: platform
     attributes:

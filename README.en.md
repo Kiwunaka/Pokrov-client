@@ -43,13 +43,13 @@ the first sanitized Android + Windows client source snapshot.
 
 ## Product Modes
 
-- Community client: neutral, no POKROV branding, no POKROV API calls by
+- Personal Key Client / Community client: neutral, no POKROV branding, no POKROV API calls by
   default, local import for single `vless://`, `trojan://`, `ss://`, and
   `vmess://` keys, local multi-profile selection, subscription URL import and
   refresh, Android/Windows QR import, and gated third-party catalog metadata.
-- Operator client: a white-label path for companies that want to connect the
+- Operator / Company Client: a white-label path for companies that want to connect the
   app to their own backend, billing, support, and brand.
-- POKROV service mode: documented for official POKROV builds only. Forks and
+- POKROV Service Mode: documented for official POKROV builds only. Forks and
   operators must not distribute builds using POKROV names, logos, endpoints,
   support, or release claims.
 
@@ -57,6 +57,17 @@ The optional third-party public config catalog remains disabled by default and
 must stay clearly labeled as not official POKROV nodes. It is not a default free
 POKROV service and does not promise availability, safety, privacy, speed, or
 uptime.
+
+The Personal Key Client makes no POKROV API calls by default. This repository
+does not provide POKROV nodes or a default free service.
+
+## First-Run Paths
+
+| Track | Use it when | Start here |
+| --- | --- | --- |
+| Personal Key Client | You already have a key, QR code, or subscription URL and want a local-only client. | Build the `community` variant, paste a `vless://`, `trojan://`, `ss://`, or `vmess://` key, scan a QR code, or add a subscription URL. |
+| Operator / Company Client | You run a service and want your own branded client. | Run the local fixture backend, export white-label color tokens, implement the minimal managed-profile contract, then wire your own API, support, billing, signing, and release channels. |
+| POKROV Service Mode | You are producing an official POKROV build. | Use official POKROV release channels and private release gates. Forks and operator builds are not official POKROV builds. |
 
 ## Which App Should I Use?
 
@@ -91,10 +102,10 @@ uptime.
 | `v0.1.0-source` | Tagged | First source-only Android/Windows snapshot with local community import. No APK/EXE. |
 | `v0.2.0-source` | Not tagged | Community import hub polish, variant-boundary enforcement, and source-import hardening are on `main`; release tag pending. |
 | `v0.3.0-source` | Not tagged | Operator fixture, Free VPN catalog gate, white-label token export, and foreground subscription scheduler are on `main`; release tag pending. |
-| `v0.4.0-source` | PR green, not tagged | Native Android/Windows host brand-boundary hardening is in the stacked PR queue. |
-| `v0.5.0-source` | PR green, not tagged | Community routing and WARP copy honesty hardening is in the stacked PR queue. |
-| `v0.6.0-source` | PR green, not tagged | Dependency/license and generated-asset provenance gates are in the stacked PR queue. |
-| `v0.7.0-source` | PR green, not tagged | Source-release proof helper for archive SHA-256 and proof manifests is in the stacked PR queue. |
+| `v0.4.0-source` | Pending stacked PR, not tagged | Native Android/Windows host brand-boundary hardening is in the stacked PR queue. |
+| `v0.5.0-source` | Pending stacked PR, not tagged | Community routing and WARP copy honesty hardening is in the stacked PR queue. |
+| `v0.6.0-source` | Pending stacked PR, not tagged | Dependency/license and generated-asset provenance gates are in the stacked PR queue. |
+| `v0.7.0-source` | Pending stacked PR, not tagged | Source-release proof helper for archive SHA-256 and proof manifests is in the stacked PR queue. |
 
 ## Architecture Boundary
 

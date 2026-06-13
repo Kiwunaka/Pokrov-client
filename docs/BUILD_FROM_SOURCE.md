@@ -45,6 +45,26 @@ The `pokrov` variant is reserved for official POKROV service builds.
 Read [PRODUCT_VARIANTS.md](PRODUCT_VARIANTS.md) and
 [OPERATOR_INTEGRATION.md](OPERATOR_INTEGRATION.md) before shipping a fork.
 
+First-run path for ordinary users:
+
+1. choose the `community` variant
+2. run the dependency bootstrap
+3. start the Android or Windows shell from source
+4. paste a `vless://`, `trojan://`, `ss://`, or `vmess://` key
+5. scan a QR code or add a subscription URL when that is how your provider
+   shares profiles
+
+OS background refresh is not claimed for this source milestone.
+
+First-run path for operators:
+
+1. choose the `operator` variant
+2. run the local fixture backend
+3. export white-label color tokens
+4. implement the minimal managed-profile contract
+5. replace all API, support, privacy, signing, and release surfaces with your
+   own
+
 Example community run:
 
 ```powershell

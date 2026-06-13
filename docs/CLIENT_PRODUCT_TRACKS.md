@@ -29,15 +29,25 @@ Expected capabilities:
 - configurable public catalog and release metadata
 - custom branding through documented build flavors and white-label color token
   export
-- subscription or key import
+- operator-managed profile delivery, plus optional local user-owned
+  key/subscription import if the operator enables it
 - managed profile endpoint examples
 - operator-owned backend contract examples
 - operator-owned color-token export with contrast checks
 
+First-run path for operators:
+
+1. choose the `operator` variant
+2. run the local fixture backend
+3. export white-label color tokens
+4. implement the minimal managed-profile contract
+5. replace support, billing, privacy, signing, and release channels with
+   operator-owned surfaces
+
 Boundaries:
 
 - custom operator builds are not official POKROV builds
-- operators own their signing, support, backend compatibility, privacy policy,
+- operators own signing, support, backend compatibility, privacy policy,
   and release claims
 - POKROV domains, bots, signing identities, and release channels stay official
   POKROV assets
@@ -69,6 +79,16 @@ Expected capabilities:
 - basic latency and connection checks
 - clear unsupported-config errors
 
+First-run path for ordinary users:
+
+1. choose the `community` variant
+2. build from source for Android or Windows
+3. paste a `vless://`, `trojan://`, `ss://`, or `vmess://` key
+4. scan a QR code for the same local parser flow
+5. add a subscription URL only when you trust that provider
+6. refresh manually or on foreground resume; OS background refresh is not
+   claimed
+
 Boundaries:
 
 - personal profiles are local user-owned data
@@ -78,7 +98,7 @@ Boundaries:
   arbitrary third-party configs
 - advanced raw config editing should stay behind explicit advanced settings
 
-## Optional Free VPN Catalog
+## Optional Third-Party Public Config Catalog ("Free VPN" UI Label)
 
 The open-source client may include an opt-in `Free VPN` section for public
 third-party configuration feeds.

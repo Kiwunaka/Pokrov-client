@@ -27,6 +27,17 @@
 - [English README](README.en.md)
 - [Русская версия](README.ru.md)
 
+## Choose Your Track
+
+| Track | Who it is for | First step |
+| --- | --- | --- |
+| Personal Key Client | Ordinary users who already have a key, QR code, or subscription URL. | Build the `community` variant, then paste a `vless://`, `trojan://`, `ss://`, or `vmess://` key, scan a QR code, or add a subscription URL. |
+| Operator / Company Client | Companies, teams, and communities shipping a client for their own service. | Run the local fixture backend, export white-label color tokens, then connect your own API, brand, support, privacy policy, signing, and release channels. |
+| POKROV Service Mode | Official POKROV builds only. | Use official POKROV release channels; forks and operator builds are not official POKROV builds. |
+
+The Personal Key Client has no POKROV API calls by default. This repository
+does not provide POKROV nodes or a default free service.
+
 ## Current Status
 
 <p align="center">
@@ -52,10 +63,10 @@ Source release status:
 | `v0.1.0-source` | Tagged | First source-only Android/Windows snapshot with local community import. No APK/EXE. |
 | `v0.2.0-source` | Not tagged | Community import polish and source-import hardening are on `main`; release tag pending. |
 | `v0.3.0-source` | Not tagged | Operator fixture, Free VPN catalog gate, white-label tokens, and foreground subscription scheduler are on `main`; release tag pending. |
-| `v0.4.0-source` | PR green, not tagged | Native Android/Windows host brand-boundary hardening is in the stacked PR queue. |
-| `v0.5.0-source` | PR green, not tagged | Community routing and WARP copy honesty hardening is in the stacked PR queue. |
-| `v0.6.0-source` | PR green, not tagged | Dependency/license and generated-asset provenance gates are in the stacked PR queue. |
-| `v0.7.0-source` | PR green, not tagged | Source-release proof helper for archive SHA-256 and proof manifests is in the stacked PR queue. |
+| `v0.4.0-source` | Pending stacked PR, not tagged | Native Android/Windows host brand-boundary hardening is in the stacked PR queue. |
+| `v0.5.0-source` | Pending stacked PR, not tagged | Community routing and WARP copy honesty hardening is in the stacked PR queue. |
+| `v0.6.0-source` | Pending stacked PR, not tagged | Dependency/license and generated-asset provenance gates are in the stacked PR queue. |
+| `v0.7.0-source` | Pending stacked PR, not tagged | Source-release proof helper for archive SHA-256 and proof manifests is in the stacked PR queue. |
 
 ## Which App Should I Use?
 
