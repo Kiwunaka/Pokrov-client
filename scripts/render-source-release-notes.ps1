@@ -119,6 +119,10 @@ $(Format-List -Items $KnownLimitations)
 ## Verification
 
 $($codeFence)powershell
+`$preflight = Join-Path `$env:TEMP "$($proof.tag)-preflight"
+powershell -ExecutionPolicy Bypass -File .\scripts\source-release-preflight.ps1 -Tag $($proof.tag) -Ref refs/tags/$($proof.tag) -OutDir `$preflight -RequireTag
+
+# Individual commands run by the full preflight:
 python -m pytest tests
 powershell -ExecutionPolicy Bypass -File .\scripts\validate-seed.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1 -Source .

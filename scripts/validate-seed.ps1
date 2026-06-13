@@ -103,6 +103,7 @@ $requiredFiles = @(
   "scripts\\bootstrap-workspace.ps1",
   "scripts\\bootstrap-local.ps1",
   "scripts\\fetch-libcore-assets.ps1",
+  "scripts\\check-source-release-copy.ps1",
   "scripts\\prepare-oss-import.ps1",
   "scripts\\prepare-source-release.ps1",
   "scripts\\render-source-release-notes.ps1",
