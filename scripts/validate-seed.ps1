@@ -31,6 +31,8 @@ $requiredDirectories = @(
   "assets\\branding",
   "assets\\diagrams",
   "scripts",
+  "tools",
+  "tools\\variant_build",
   "test"
 )
 
@@ -103,10 +105,13 @@ $requiredFiles = @(
   "scripts\\fetch-libcore-assets.ps1",
   "scripts\\prepare-oss-import.ps1",
   "scripts\\prepare-source-release.ps1",
+  "scripts\\print-build-variant-command.ps1",
   "scripts\\run-operator-fixture-smoke.ps1",
   "scripts\\run-tests.ps1",
   "scripts\\validate-seed.ps1",
   "scripts\\export-white-label-color-tokens.ps1",
+  "tools\\variant_build\\__init__.py",
+  "tools\\variant_build\\variant_command.py",
   "test\\README.md",
   "test\\seed-layout.ps1",
   "packages\\app_shell\\test\\pokrov_seed_app_test.dart"
