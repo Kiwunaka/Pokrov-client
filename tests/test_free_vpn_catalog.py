@@ -19,6 +19,19 @@ def test_free_vpn_catalog_candidate_is_gated_and_attributed() -> None:
     assert catalog["requires_user_opt_in"] is True
     assert catalog["official_pokrov_nodes"] is False
     assert catalog["refresh_policy"]["mode"] == "manual"
+    assert catalog["refresh_policy"]["cache_locally"] is True
+    assert (
+        catalog["refresh_policy"]["cache_storage"]
+        == "local_profile_records_with_source_kind_third_party_catalog"
+    )
+    assert catalog["refresh_policy"]["entry_source_kind"] == "third_party_catalog"
+    assert catalog["refresh_policy"]["manual_import_action_required"] is True
+    assert catalog["refresh_policy"]["clear_action_required"] is True
+    assert (
+        catalog["refresh_policy"]["clear_action_scope"]
+        == "third_party_catalog_profiles_only"
+    )
+    assert catalog["refresh_policy"]["candidate_default_feed_id"] == "githubmirror-1"
     assert catalog["refresh_policy"]["offline_behavior"]
     assert catalog["refresh_policy"]["raw_unavailable_behavior"]
 
@@ -31,6 +44,10 @@ def test_free_vpn_catalog_candidate_is_gated_and_attributed() -> None:
     assert source["update_cadence"]
     assert source["freshness_expectation"]
     assert source["feeds"]
+    assert any(
+        feed["id"] == catalog["refresh_policy"]["candidate_default_feed_id"]
+        for feed in source["feeds"]
+    )
 
 
 def test_free_vpn_catalog_copy_keeps_third_party_boundary() -> None:
@@ -38,6 +55,8 @@ def test_free_vpn_catalog_copy_keeps_third_party_boundary() -> None:
     copy = " ".join(catalog["ui_copy"])
 
     assert "not official POKROV nodes" in copy
+    assert "stores imported entries locally" in copy
+    assert "clear them" in copy
     forbidden_claims = ["fastest", "safest", "private", "uptime", "legal"]
     assert not any(claim in copy.lower() for claim in forbidden_claims)
 
