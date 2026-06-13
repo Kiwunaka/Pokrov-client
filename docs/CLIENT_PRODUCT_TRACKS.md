@@ -125,6 +125,9 @@ Current implementation:
 
 - `config/free-vpn-catalog.seed.json` records the first reviewed disabled
   candidate metadata for `AvenCores/goida-vpn-configs`
+- parser fixtures cover the current `subscription_text` feed format, base64
+  subscription bodies, supported protocols, duplicate isolation, and unsupported
+  upstream protocol isolation
 - the catalog remains disabled by default and requires explicit user opt-in
 - tests require license metadata, attribution, opt-in, and third-party boundary
   copy before release
