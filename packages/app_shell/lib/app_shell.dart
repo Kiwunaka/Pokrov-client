@@ -9536,6 +9536,37 @@ class _SupportChatScreenState extends State<_SupportChatScreen> {
     };
   }
 
+  Map<String, Object?> _exportableSupportDiagnostics() {
+    final safe = <String, Object?>{};
+    for (final entry in _supportDiagnostics().entries) {
+      final key = entry.key.trim();
+      if (!PokrovAssistantRedactor.allowedDiagnosticKeys.contains(key) ||
+          PokrovAssistantRedactor.isSensitiveKey(key)) {
+        continue;
+      }
+      final value =
+          PokrovAssistantRedactor.safeRedactedDiagnosticValue(entry.value);
+      if (value != null) {
+        safe[key] = value;
+      }
+    }
+    return safe;
+  }
+
+  Future<void> _copySupportDiagnosticsJson() async {
+    final payload = const JsonEncoder.withIndent('  ')
+        .convert(_exportableSupportDiagnostics());
+    await Clipboard.setData(ClipboardData(text: payload));
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Diagnostics copied without keys or subscription links.'),
+      ),
+    );
+  }
+
   List<_SupportChatMessage> _messagesFromThread(SupportTicketThread thread) {
     final messages = <_SupportChatMessage>[];
     for (final message in thread.messages) {
@@ -9629,6 +9660,13 @@ class _SupportChatScreenState extends State<_SupportChatScreen> {
                       key: const ValueKey('support-diagnostics-close'),
                       onPressed: () => Navigator.of(context).maybePop(),
                       child: const Text('Готово'),
+                    ),
+                    const SizedBox(width: 8),
+                    OutlinedButton.icon(
+                      key: const ValueKey('support-diagnostics-copy-json'),
+                      onPressed: () => unawaited(_copySupportDiagnosticsJson()),
+                      icon: const Icon(Icons.copy_rounded, size: 18),
+                      label: const Text('Copy'),
                     ),
                     const SizedBox(width: 8),
                     FilledButton.icon(

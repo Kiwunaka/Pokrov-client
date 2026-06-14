@@ -83,6 +83,8 @@ production readiness without matching public evidence.
 - Added an enterprise boundary and seed-backed operator commercial-license
   guard for GPLv3, paid services, dual-license decisions, and fork
   distribution claims.
+- Added safe support diagnostics copy/export so users can share redacted JSON
+  without keys, subscription URLs, raw configs, or proxy links.
 
 ### Changed
 
@@ -91,7 +93,7 @@ production readiness without matching public evidence.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.40.0-source` candidates.
+  `v0.41.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -137,6 +139,7 @@ production readiness without matching public evidence.
 | `v0.38.0-source` | Pending stacked PR, not tagged | PR #58 |
 | `v0.39.0-source` | Pending stacked PR, not tagged | PR #59 |
 | `v0.40.0-source` | Pending stacked PR, not tagged | PR #60 |
+| `v0.41.0-source` | Pending stacked PR, not tagged | PR #61 |
 
 ### Still Source-Only
 

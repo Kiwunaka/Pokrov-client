@@ -2611,6 +2611,91 @@ void main() {
     expect(find.text('Still broken'), findsOneWidget);
   });
 
+  testWidgets('support diagnostics can be copied as redacted JSON',
+      (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1280, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final copied = <String>[];
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, (call) async {
+      if (call.method == 'Clipboard.setData') {
+        final arguments = call.arguments as Map<Object?, Object?>;
+        copied.add(arguments['text'] as String);
+      }
+      return null;
+    });
+    addTearDown(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, null);
+    });
+
+    final variant = const ClientVariantProfile(
+      variant: ProductVariant.operator,
+      id: 'operator',
+      displayName: 'Acme vless://secret@example.com',
+      brandMarkAssetName: '',
+      apiBaseUrl: 'https://api.operator.example/',
+      checkoutUrl: 'https://pay.operator.example/checkout',
+      cabinetUrl: 'https://app.operator.example/',
+      supportBot: '@operator_support',
+      feedbackBot: '@operator_feedback',
+      publicChannel: '@operator_channel',
+      supportEmail: 'support@operator.example',
+      supportUrl: 'https://support.operator.example/',
+      privacyPolicyUrl: 'https://operator.example/privacy/',
+      usesApiServices: true,
+      description: 'Operator test client mode.',
+    );
+    final supportTicketService = _FakeSupportTicketService(
+      const SupportTicketReceipt(
+        ticketId: 911,
+        statusTitle: 'Open',
+        messageCount: 1,
+      ),
+    );
+
+    await tester.pumpWidget(
+      PokrovSeedApp(
+        appContext: buildSeedAppContext(
+          hostPlatform: HostPlatform.windows,
+          variantProfile: variant,
+        ),
+        supportTicketService: supportTicketService,
+      ),
+    );
+    await tester.pumpAndSettle();
+    await _completeFirstLaunchIfPresent(tester);
+
+    await _tapNav(tester, 'nav-profile');
+    final support = find.byKey(const ValueKey('profile-section-support'));
+    await tester.dragUntilVisible(
+      support,
+      find.byType(Scrollable).first,
+      const Offset(0, -260),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(support);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('support-attach-diagnostics')));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('support-diagnostics-copy-json')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(copied, hasLength(1));
+    final payload = jsonDecode(copied.single) as Map<String, Object?>;
+    expect(payload['platform'], 'windows');
+    expect(payload['route_mode'], isNotEmpty);
+    expect(payload['connection_status'], isNotEmpty);
+    expect(copied.single, contains('[redacted]'));
+    expect(copied.single, isNot(contains('vless://')));
+    expect(copied.single, isNot(contains('secret@example.com')));
+    expect(copied.single, isNot(contains('raw_config')));
+    expect(copied.single, isNot(contains('subscription_url')));
+  });
+
   testWidgets('support chat keeps AI helper scoped to support suggestions',
       (tester) async {
     await tester.binding.setSurfaceSize(const Size(760, 800));
