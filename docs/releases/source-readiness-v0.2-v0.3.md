@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.38
+# Source Readiness: v0.2-v0.39
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -810,6 +810,35 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.39.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #59: source release publication dry-run validator for checking the release
+  evidence bundle and rendered release notes before manual GitHub Release
+  publication
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- run `scripts/prepare-release-evidence-bundle.ps1` with the exact preflight
+  summary and optional ruleset report
+- run `scripts/validate-source-release-publication.ps1` with the exact release
+  evidence bundle and rendered release notes
+- confirm the publication dry-run keeps `publish_performed=false` and
+  `tag_push_performed=false`
+- review the publication dry-run, release evidence bundle, preflight summary,
+  proof manifest, rendered GitHub Release body, and changelog section for the
+  exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
 - Free VPN catalog remains disabled by default and is not an official POKROV
@@ -896,3 +925,5 @@ Required before tagging:
   remote enforcement; it does not configure repository settings by itself.
 - The release evidence bundle is a local handoff artifact. It does not publish
   GitHub Releases, push tags, upload binaries, or replace maintainer review.
+- The publication dry-run validates local release evidence and rendered notes,
+  but maintainers still perform the actual GitHub Release creation manually.
