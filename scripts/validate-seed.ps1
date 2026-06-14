@@ -51,6 +51,7 @@ $requiredFiles = @(
   "config\\product-contract.seed.json",
   "config\\platform-matrix.seed.json",
   "config\\github-ruleset.seed.json",
+  "config\\release-evidence-bundle.seed.json",
   "config\\required-checks.seed.json",
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
@@ -125,6 +126,7 @@ $requiredFiles = @(
   "scripts\\fetch-libcore-assets.ps1",
   "scripts\\check-source-release-copy.ps1",
   "scripts\\prepare-oss-import.ps1",
+  "scripts\\prepare-release-evidence-bundle.ps1",
   "scripts\\prepare-source-release.ps1",
   "scripts\\render-source-release-notes.ps1",
   "scripts\\print-build-variant-command.ps1",
@@ -144,6 +146,7 @@ $jsonFiles = @(
   "config\\product-contract.seed.json",
   "config\\platform-matrix.seed.json",
   "config\\github-ruleset.seed.json",
+  "config\\release-evidence-bundle.seed.json",
   "config\\required-checks.seed.json",
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
@@ -975,6 +978,58 @@ if (Test-Path -LiteralPath $githubRulesetPath -PathType Leaf) {
     foreach ($forbiddenPhrase in @("-X POST", "-X PATCH", "-X PUT", "-X DELETE", "gh repo edit", "gh ruleset", "Invoke-RestMethod -Method Post", "Invoke-RestMethod -Method Patch", "Invoke-RestMethod -Method Put", "Invoke-RestMethod -Method Delete")) {
       if ($githubRulesetScript.IndexOf($forbiddenPhrase, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
         $manifestErrors.Add("scripts\\check-github-ruleset.ps1 must stay read-only and not include '$forbiddenPhrase'")
+      }
+    }
+  }
+}
+
+$releaseEvidencePath = Join-Path $root "config\\release-evidence-bundle.seed.json"
+if (Test-Path -LiteralPath $releaseEvidencePath -PathType Leaf) {
+  $releaseEvidence = Get-Content -Raw -LiteralPath $releaseEvidencePath | ConvertFrom-Json
+
+  if ($releaseEvidence.script -ne "scripts/prepare-release-evidence-bundle.ps1") {
+    $manifestErrors.Add("config\\release-evidence-bundle.seed.json must point to scripts/prepare-release-evidence-bundle.ps1")
+  }
+
+  if ($releaseEvidence.default_output_dir -ne "build/release-evidence") {
+    $manifestErrors.Add("config\\release-evidence-bundle.seed.json must keep default output under ignored build/release-evidence")
+  }
+
+  foreach ($field in @("source_only_boundary_required", "no_publish_side_effects", "writes_only_ignored_build_output", "ruleset_report_may_be_failing", "failing_ruleset_report_blocks_enforcement_claims", "does_not_replace_full_preflight")) {
+    if ($releaseEvidence.policy.$field -ne $true) {
+      $manifestErrors.Add("config\\release-evidence-bundle.seed.json policy.$field must remain true")
+    }
+  }
+
+  foreach ($flag in @("source_only", "no_apk", "no_exe", "no_store_release", "no_trusted_signing_claim")) {
+    if (@($releaseEvidence.required_summary_flags) -notcontains $flag) {
+      $manifestErrors.Add("config\\release-evidence-bundle.seed.json must require summary flag '$flag'")
+    }
+  }
+
+  $releaseEvidenceScriptPath = Join-Path $root "scripts\\prepare-release-evidence-bundle.ps1"
+  if (Test-Path -LiteralPath $releaseEvidenceScriptPath -PathType Leaf) {
+    $releaseEvidenceScript = Get-Content -Raw -LiteralPath $releaseEvidenceScriptPath
+    foreach ($requiredPhrase in @("Assert-SourceOnlySummary", "check-github-ruleset.ps1 -ReportOnly -Json", "github_enforcement_claim_allowed", "ships_apk = `$false", "ships_exe = `$false", "store_release = `$false", "trusted_signing_claim = `$false", "official_binary_claim = `$false", "build\release-evidence")) {
+      if ($releaseEvidenceScript.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add("scripts\\prepare-release-evidence-bundle.ps1 must include '$requiredPhrase'")
+      }
+    }
+    foreach ($forbiddenPhrase in @("gh release create", "git push", "-X POST", "-X PATCH", "-X PUT", "-X DELETE")) {
+      if ($releaseEvidenceScript.IndexOf($forbiddenPhrase, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+        $manifestErrors.Add("scripts\\prepare-release-evidence-bundle.ps1 must not publish or mutate remote state with '$forbiddenPhrase'")
+      }
+    }
+  }
+
+  foreach ($docPath in @("docs\\RELEASE_CHECKLIST.md", "docs\\RELEASE_POLICY.md", "scripts\\README.md")) {
+    $fullDocPath = Join-Path $root $docPath
+    if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
+      $docText = Get-Content -Raw -LiteralPath $fullDocPath
+      foreach ($requiredPhrase in @("prepare-release-evidence-bundle.ps1", "release evidence bundle")) {
+        if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+          $manifestErrors.Add("$docPath must include '$requiredPhrase'")
+        }
       }
     }
   }

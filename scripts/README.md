@@ -17,6 +17,9 @@ Current helpers:
 - `render-source-release-notes.ps1`: renders a source-only GitHub Release body from a `prepare-source-release.ps1` proof manifest and refuses manifests that do not preserve source-only honesty flags
 - `check-source-release-copy.ps1`: checks the release policy, checklist, template, renderer, and optionally a rendered release note for source-only claim boundaries
 - `source-release-preflight.ps1`: runs the source release gate, creates the proof archive/manifest, renders source-only release notes, checks release-copy boundaries, and writes a local preflight summary; `-SkipTestCommands` is only for smoke tests, not publishing
+- `prepare-release-evidence-bundle.ps1`: writes a local release evidence bundle
+  from a source preflight summary and optional GitHub ruleset report; output is
+  under ignored `build/release-evidence/` and nothing is published
 - `check-github-ruleset.ps1`: read-only GitHub settings verifier for repository
   rulesets or branch protection; uses `gh api`, supports `-ReportOnly -Json`,
   and does not create, edit, or delete remote settings
