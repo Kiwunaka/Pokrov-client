@@ -20,6 +20,10 @@ Current helpers:
 - `prepare-release-evidence-bundle.ps1`: writes a local release evidence bundle
   from a source preflight summary and optional GitHub ruleset report; output is
   under ignored `build/release-evidence/` and nothing is published
+- `validate-source-release-publication.ps1`: validates a release evidence
+  bundle and rendered release notes as a local publication dry-run; writes
+  ignored `build/source-release-publication/` output and does not publish, push
+  tags, or upload assets
 - `check-github-ruleset.ps1`: read-only GitHub settings verifier for repository
   rulesets or branch protection; uses `gh api`, supports `-ReportOnly -Json`,
   and does not create, edit, or delete remote settings
