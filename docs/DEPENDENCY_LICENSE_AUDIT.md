@@ -16,6 +16,11 @@ The table below records the first direct dependency pass. The inventory file is
 the source-release gate for exact transitive Dart/Flutter package names and
 versions.
 
+Dependency update routing is documented in
+[Dependency update policy](DEPENDENCY_UPDATE_POLICY.md). Dependabot updates do
+not bypass this inventory: when `pubspec.lock` files change, the reviewed
+package list must be updated before a source release claim.
+
 | Package or asset | Version | Use | License | Bundled | GPL compatible | Action |
 | --- | --- | --- | --- | --- | --- | --- |
 | Flutter SDK | project SDK | app framework | BSD-3-Clause | no | yes | verify installed SDK in CI |

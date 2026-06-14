@@ -47,6 +47,7 @@ $requiredFiles = @(
   "melos.yaml",
   "program.seed.yaml",
   ".github\\CODEOWNERS",
+  ".github\\dependabot.yml",
   "config\\product-contract.seed.json",
   "config\\platform-matrix.seed.json",
   "config\\runtime-profile.seed.json",
@@ -58,6 +59,7 @@ $requiredFiles = @(
   "config\\changelog-policy.seed.json",
   "config\\codeowners-review.seed.json",
   "config\\contributor-doctor.seed.json",
+  "config\\dependabot-policy.seed.json",
   "config\\dependency-license-inventory.seed.json",
   "config\\generated-assets.seed.json",
   "config\\source-release-readiness.seed.json",
@@ -77,6 +79,7 @@ $requiredFiles = @(
   "docs\\WHITE_LABEL_BRANDING.md",
   "docs\\BUILD_FROM_SOURCE.md",
   "docs\\DEPENDENCY_LICENSE_AUDIT.md",
+  "docs\\DEPENDENCY_UPDATE_POLICY.md",
   "docs\\RELEASE_CHECKLIST.md",
   "docs\\operator\\openapi.yaml",
   "apps\\README.md",
@@ -144,6 +147,7 @@ $jsonFiles = @(
   "config\\changelog-policy.seed.json",
   "config\\codeowners-review.seed.json",
   "config\\contributor-doctor.seed.json",
+  "config\\dependabot-policy.seed.json",
   "config\\dependency-license-inventory.seed.json",
   "config\\generated-assets.seed.json",
   "config\\source-release-readiness.seed.json",
@@ -774,6 +778,73 @@ if (Test-Path -LiteralPath $codeownersReviewPath -PathType Leaf) {
       foreach ($requiredPhrase in @("CODEOWNERS", "config/codeowners-review.seed.json", "maintainer-led")) {
         if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
           $manifestErrors.Add("$docPath must include '$requiredPhrase' for CODEOWNERS review routing")
+        }
+      }
+    }
+  }
+}
+
+$dependabotPolicyPath = Join-Path $root "config\\dependabot-policy.seed.json"
+if (Test-Path -LiteralPath $dependabotPolicyPath -PathType Leaf) {
+  $dependabotPolicy = Get-Content -Raw -LiteralPath $dependabotPolicyPath | ConvertFrom-Json
+
+  if ($dependabotPolicy.dependabot_path -ne ".github/dependabot.yml") {
+    $manifestErrors.Add("config\\dependabot-policy.seed.json must point to .github/dependabot.yml")
+  }
+
+  foreach ($field in @("github_actions_updates_required", "pub_workspace_updates_required", "weekly_schedule_required", "bounded_open_prs_required", "dependency_label_required", "human_review_required_before_merge", "source_only_release_boundaries_apply", "runtime_binary_review_remains_separate")) {
+    if ($dependabotPolicy.policy.$field -ne $true) {
+      $manifestErrors.Add("config\\dependabot-policy.seed.json policy.$field must remain true")
+    }
+  }
+
+  foreach ($ecosystem in @("github-actions", "pub")) {
+    if (@($dependabotPolicy.required_ecosystems) -notcontains $ecosystem) {
+      $manifestErrors.Add("config\\dependabot-policy.seed.json must require ecosystem '$ecosystem'")
+    }
+  }
+
+  $dependabotPath = Join-Path $root ".github\\dependabot.yml"
+  if (Test-Path -LiteralPath $dependabotPath -PathType Leaf) {
+    $dependabotText = Get-Content -Raw -LiteralPath $dependabotPath
+
+    foreach ($ecosystem in @($dependabotPolicy.required_ecosystems)) {
+      if ($dependabotText.IndexOf("package-ecosystem: `"$ecosystem`"", [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add(".github\\dependabot.yml must include ecosystem '$ecosystem'")
+      }
+    }
+
+    foreach ($directory in @($dependabotPolicy.required_pub_directories)) {
+      if ($dependabotText.IndexOf("directory: `"$directory`"", [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add(".github\\dependabot.yml must include pub directory '$directory'")
+      }
+    }
+
+    foreach ($requiredPhrase in @("interval: `"weekly`"", "open-pull-requests-limit:", "labels:", "dependencies", "commit-message:", "include: `"scope`"")) {
+      if ($dependabotText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add(".github\\dependabot.yml must include '$requiredPhrase'")
+      }
+    }
+  }
+
+  $labelsPath = Join-Path $root ".github\\labels.yml"
+  if (Test-Path -LiteralPath $labelsPath -PathType Leaf) {
+    $labelsText = Get-Content -Raw -LiteralPath $labelsPath
+    foreach ($label in @($dependabotPolicy.required_labels)) {
+      if ($labelsText.IndexOf("- name: $label", [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add(".github\\labels.yml must define dependency update label '$label'")
+      }
+    }
+  }
+
+  foreach ($docPath in @($dependabotPolicy.docs)) {
+    $relativeDocPath = $docPath.Replace("/", [System.IO.Path]::DirectorySeparatorChar)
+    $fullDocPath = Join-Path $root $relativeDocPath
+    if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
+      $docText = Get-Content -Raw -LiteralPath $fullDocPath
+      foreach ($requiredPhrase in @("Dependabot", "dependencies", "source-only", "license", "runtime binaries")) {
+        if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+          $manifestErrors.Add("$docPath must include '$requiredPhrase' for dependency update policy")
         }
       }
     }

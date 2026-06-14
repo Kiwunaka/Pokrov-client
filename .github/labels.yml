@@ -50,6 +50,10 @@
   color: 5319e7
   description: Public/private boundary, source import, secret avoidance, or clean-room guard.
 
+- name: dependencies
+  color: 0366d6
+  description: Dependency update, Dependabot PR, lockfile, or dependency review work.
+
 - name: security-private
   color: b60205
   description: Redirect to private security reporting; do not discuss vulnerability details publicly.

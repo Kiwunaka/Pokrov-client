@@ -65,6 +65,9 @@ production readiness without matching public evidence.
 - Added a CODEOWNERS review-routing seed and gate for maintainer-led ownership
   across security, release, Android, Windows, runtime, operator, docs, CI, and
   source-boundary paths.
+- Added a Dependabot and dependency update policy gate for GitHub Actions and
+  Dart/Flutter pub workspaces with bounded PRs, labels, human review, license
+  inventory, and source-only release boundaries.
 
 ### Changed
 
@@ -73,7 +76,7 @@ production readiness without matching public evidence.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.33.0-source` candidates.
+  `v0.34.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -112,6 +115,7 @@ production readiness without matching public evidence.
 | `v0.31.0-source` | Pending stacked PR, not tagged | PR #51 |
 | `v0.32.0-source` | Pending stacked PR, not tagged | PR #52 |
 | `v0.33.0-source` | Pending stacked PR, not tagged | PR #53 |
+| `v0.34.0-source` | Pending stacked PR, not tagged | PR #54 |
 
 ### Still Source-Only
 
