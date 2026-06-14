@@ -53,6 +53,7 @@ $requiredFiles = @(
   "config\\github-ruleset.seed.json",
   "config\\release-evidence-bundle.seed.json",
   "config\\source-release-publication-dry-run.seed.json",
+  "config\\source-tag-readiness.seed.json",
   "config\\required-checks.seed.json",
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
@@ -67,6 +68,8 @@ $requiredFiles = @(
   "config\\dependabot-policy.seed.json",
   "config\\dependency-license-inventory.seed.json",
   "config\\generated-assets.seed.json",
+  "config\\diagnostics-export-policy.seed.json",
+  "config\\release-blocker-inventory.seed.json",
   "config\\source-release-readiness.seed.json",
   "config\\white-label-color-tokens.seed.json",
   "config\\white-label-color-tokens.schema.json",
@@ -87,6 +90,8 @@ $requiredFiles = @(
   "docs\\DEPENDENCY_LICENSE_AUDIT.md",
   "docs\\DEPENDENCY_UPDATE_POLICY.md",
   "docs\\GITHUB_RULESET_SETUP.md",
+  "docs\\DIAGNOSTICS_EXPORT_POLICY.md",
+  "docs\\RELEASE_BLOCKERS.md",
   "docs\\RELEASE_CHECKLIST.md",
   "docs\\REQUIRED_CHECKS.md",
   "docs\\operator\\openapi.yaml",
@@ -131,6 +136,7 @@ $requiredFiles = @(
   "scripts\\prepare-oss-import.ps1",
   "scripts\\prepare-release-evidence-bundle.ps1",
   "scripts\\validate-source-release-publication.ps1",
+  "scripts\\check-source-tag-readiness.ps1",
   "scripts\\prepare-source-release.ps1",
   "scripts\\render-source-release-notes.ps1",
   "scripts\\print-build-variant-command.ps1",
@@ -152,6 +158,7 @@ $jsonFiles = @(
   "config\\github-ruleset.seed.json",
   "config\\release-evidence-bundle.seed.json",
   "config\\source-release-publication-dry-run.seed.json",
+  "config\\source-tag-readiness.seed.json",
   "config\\required-checks.seed.json",
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
@@ -166,6 +173,8 @@ $jsonFiles = @(
   "config\\dependabot-policy.seed.json",
   "config\\dependency-license-inventory.seed.json",
   "config\\generated-assets.seed.json",
+  "config\\diagnostics-export-policy.seed.json",
+  "config\\release-blocker-inventory.seed.json",
   "config\\source-release-readiness.seed.json",
   "config\\white-label-color-tokens.seed.json",
   "config\\white-label-color-tokens.schema.json",
@@ -1144,6 +1153,60 @@ if (Test-Path -LiteralPath $publicationDryRunPath -PathType Leaf) {
     if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
       $docText = Get-Content -Raw -LiteralPath $fullDocPath
       foreach ($requiredPhrase in @("validate-source-release-publication.ps1", "publication dry-run")) {
+        if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+          $manifestErrors.Add("$docPath must include '$requiredPhrase'")
+        }
+      }
+    }
+  }
+}
+
+$sourceTagReadinessPath = Join-Path $root "config\\source-tag-readiness.seed.json"
+if (Test-Path -LiteralPath $sourceTagReadinessPath -PathType Leaf) {
+  $sourceTagReadiness = Get-Content -Raw -LiteralPath $sourceTagReadinessPath | ConvertFrom-Json
+
+  if ($sourceTagReadiness.script -ne "scripts/check-source-tag-readiness.ps1") {
+    $manifestErrors.Add("config\\source-tag-readiness.seed.json must point to scripts/check-source-tag-readiness.ps1")
+  }
+
+  if ($sourceTagReadiness.default_output_dir -ne "build/source-tag-readiness") {
+    $manifestErrors.Add("config\\source-tag-readiness.seed.json must keep default output under ignored build/source-tag-readiness")
+  }
+
+  foreach ($field in @("read_only", "no_tag_creation", "no_git_push", "no_github_release_publish", "nonzero_when_blocked", "writes_only_ignored_build_output", "requires_blocker_inventory", "requires_source_readiness_milestone")) {
+    if ($sourceTagReadiness.policy.$field -ne $true) {
+      $manifestErrors.Add("config\\source-tag-readiness.seed.json policy.$field must remain true")
+    }
+  }
+
+  if ($sourceTagReadiness.inputs.blocker_inventory -ne "config/release-blocker-inventory.seed.json") {
+    $manifestErrors.Add("config\\source-tag-readiness.seed.json must read config/release-blocker-inventory.seed.json")
+  }
+
+  if ($sourceTagReadiness.inputs.source_readiness -ne "config/source-release-readiness.seed.json") {
+    $manifestErrors.Add("config\\source-tag-readiness.seed.json must read config/source-release-readiness.seed.json")
+  }
+
+  $sourceTagReadinessScriptPath = Join-Path $root "scripts\\check-source-tag-readiness.ps1"
+  if (Test-Path -LiteralPath $sourceTagReadinessScriptPath -PathType Leaf) {
+    $sourceTagReadinessScript = Get-Content -Raw -LiteralPath $sourceTagReadinessScriptPath
+    foreach ($requiredPhrase in @("release-blocker-inventory.seed.json", "source-release-readiness.seed.json", "open_blocker_count", "build\source-tag-readiness", "exit 2")) {
+      if ($sourceTagReadinessScript.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add("scripts\\check-source-tag-readiness.ps1 must include '$requiredPhrase'")
+      }
+    }
+    foreach ($forbiddenPhrase in @("git tag", "git push", "gh release create", "gh release upload", "-X POST", "-X PATCH", "-X PUT", "-X DELETE")) {
+      if ($sourceTagReadinessScript.IndexOf($forbiddenPhrase, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+        $manifestErrors.Add("scripts\\check-source-tag-readiness.ps1 must remain read-only and must not include '$forbiddenPhrase'")
+      }
+    }
+  }
+
+  foreach ($docPath in @("docs\\RELEASE_BLOCKERS.md", "docs\\RELEASE_CHECKLIST.md", "scripts\\README.md")) {
+    $fullDocPath = Join-Path $root $docPath
+    if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
+      $docText = Get-Content -Raw -LiteralPath $fullDocPath
+      foreach ($requiredPhrase in @("check-source-tag-readiness.ps1", "source tag readiness")) {
         if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
           $manifestErrors.Add("$docPath must include '$requiredPhrase'")
         }

@@ -24,6 +24,10 @@ Current helpers:
   bundle and rendered release notes as a local publication dry-run; writes
   ignored `build/source-release-publication/` output and does not publish, push
   tags, or upload assets
+- `check-source-tag-readiness.ps1`: reads the release blocker inventory and
+  source readiness list, then writes a local source tag readiness summary under
+  ignored `build/source-tag-readiness/`; returns a non-zero exit code while
+  required manual maintainer blockers remain open
 - `check-github-ruleset.ps1`: read-only GitHub settings verifier for repository
   rulesets or branch protection; uses `gh api`, supports `-ReportOnly -Json`,
   and does not create, edit, or delete remote settings
