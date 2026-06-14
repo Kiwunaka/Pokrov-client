@@ -54,6 +54,7 @@ $requiredFiles = @(
   "config\\release-evidence-bundle.seed.json",
   "config\\source-release-publication-dry-run.seed.json",
   "config\\source-tag-readiness.seed.json",
+  "config\\release-merge-order.seed.json",
   "config\\required-checks.seed.json",
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
@@ -137,6 +138,7 @@ $requiredFiles = @(
   "scripts\\prepare-release-evidence-bundle.ps1",
   "scripts\\validate-source-release-publication.ps1",
   "scripts\\check-source-tag-readiness.ps1",
+  "scripts\\check-release-merge-order.ps1",
   "scripts\\prepare-source-release.ps1",
   "scripts\\render-source-release-notes.ps1",
   "scripts\\print-build-variant-command.ps1",
@@ -159,6 +161,7 @@ $jsonFiles = @(
   "config\\release-evidence-bundle.seed.json",
   "config\\source-release-publication-dry-run.seed.json",
   "config\\source-tag-readiness.seed.json",
+  "config\\release-merge-order.seed.json",
   "config\\required-checks.seed.json",
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
@@ -1207,6 +1210,67 @@ if (Test-Path -LiteralPath $sourceTagReadinessPath -PathType Leaf) {
     if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
       $docText = Get-Content -Raw -LiteralPath $fullDocPath
       foreach ($requiredPhrase in @("check-source-tag-readiness.ps1", "source tag readiness")) {
+        if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+          $manifestErrors.Add("$docPath must include '$requiredPhrase'")
+        }
+      }
+    }
+  }
+}
+
+$releaseMergeOrderPath = Join-Path $root "config\\release-merge-order.seed.json"
+if (Test-Path -LiteralPath $releaseMergeOrderPath -PathType Leaf) {
+  $releaseMergeOrder = Get-Content -Raw -LiteralPath $releaseMergeOrderPath | ConvertFrom-Json
+
+  if ($releaseMergeOrder.script -ne "scripts/check-release-merge-order.ps1") {
+    $manifestErrors.Add("config\\release-merge-order.seed.json must point to scripts/check-release-merge-order.ps1")
+  }
+
+  if ($releaseMergeOrder.default_output_dir -ne "build/release-merge-order") {
+    $manifestErrors.Add("config\\release-merge-order.seed.json must keep default output under ignored build/release-merge-order")
+  }
+
+  foreach ($field in @("read_only", "no_merge", "no_git_push", "no_github_api_mutation", "requires_linear_base_to_head_chain", "writes_only_ignored_build_output")) {
+    if ($releaseMergeOrder.policy.$field -ne $true) {
+      $manifestErrors.Add("config\\release-merge-order.seed.json policy.$field must remain true")
+    }
+  }
+
+  $stack = @($releaseMergeOrder.stack)
+  if ($stack.Count -lt 2) {
+    $manifestErrors.Add("config\\release-merge-order.seed.json must contain at least two stacked PR entries")
+  }
+  for ($index = 1; $index -lt $stack.Count; $index += 1) {
+    $previous = $stack[$index - 1]
+    $current = $stack[$index]
+    if ($current.base -ne $previous.head) {
+      $manifestErrors.Add("config\\release-merge-order.seed.json PR #$($current.pr) base must equal PR #$($previous.pr) head")
+    }
+    if ([int]$current.pr -le [int]$previous.pr) {
+      $manifestErrors.Add("config\\release-merge-order.seed.json PR numbers must increase")
+    }
+  }
+
+  $releaseMergeOrderScriptPath = Join-Path $root "scripts\\check-release-merge-order.ps1"
+  if (Test-Path -LiteralPath $releaseMergeOrderScriptPath -PathType Leaf) {
+    $releaseMergeOrderScript = Get-Content -Raw -LiteralPath $releaseMergeOrderScriptPath
+    foreach ($requiredPhrase in @("release-merge-order.seed.json", "merge_order_ok = `$true", "build\release-merge-order", "stack_count", "linear_base_to_head_chain")) {
+      if ($releaseMergeOrderScript.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add("scripts\\check-release-merge-order.ps1 must include '$requiredPhrase'")
+      }
+    }
+    foreach ($forbiddenPhrase in @("git merge", "git push", "gh pr merge", "gh api", "-X POST", "-X PATCH", "-X PUT", "-X DELETE")) {
+      if ($releaseMergeOrderScript.IndexOf($forbiddenPhrase, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+        $manifestErrors.Add("scripts\\check-release-merge-order.ps1 must remain read-only and must not include '$forbiddenPhrase'")
+      }
+    }
+  }
+
+  foreach ($docPath in @("docs\\RELEASE_BLOCKERS.md", "docs\\RELEASE_CHECKLIST.md", "scripts\\README.md")) {
+    $fullDocPath = Join-Path $root $docPath
+    if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
+      $docText = Get-Content -Raw -LiteralPath $fullDocPath
+      foreach ($requiredPhrase in @("check-release-merge-order.ps1", "release merge order")) {
         if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
           $manifestErrors.Add("$docPath must include '$requiredPhrase'")
         }

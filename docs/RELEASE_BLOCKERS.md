@@ -42,6 +42,11 @@ summary. The command is read-only, writes ignored
 `build/source-tag-readiness/` output, and returns non-zero while required
 manual maintainer blockers remain open.
 
+Run `scripts/check-release-merge-order.ps1` for a local release merge order
+summary before manual merge or tag work. The command is read-only, writes
+ignored `build/release-merge-order/` output, and checks that each stacked PR
+base matches the previous PR head in the local manifest.
+
 ## Evidence Rules
 
 Do not mark a blocker complete from intent or memory. Use current evidence:

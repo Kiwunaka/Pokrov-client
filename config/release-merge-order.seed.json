@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "script": "scripts/check-release-merge-order.ps1",
+  "default_output_dir": "build/release-merge-order",
+  "policy": {
+    "read_only": true,
+    "no_merge": true,
+    "no_git_push": true,
+    "no_github_api_mutation": true,
+    "requires_linear_base_to_head_chain": true,
+    "writes_only_ignored_build_output": true
+  },
+  "stack": [
+    {
+      "pr": 61,
+      "candidate": "v0.41.0-source",
+      "base": "codex/v0.40-enterprise-boundary",
+      "head": "codex/v0.41-safe-diagnostics-export"
+    },
+    {
+      "pr": 62,
+      "candidate": "v0.42.0-source",
+      "base": "codex/v0.41-safe-diagnostics-export",
+      "head": "codex/v0.42-diagnostics-export-policy"
+    },
+    {
+      "pr": 63,
+      "candidate": "v0.43.0-source",
+      "base": "codex/v0.42-diagnostics-export-policy",
+      "head": "codex/v0.43-release-blocker-inventory"
+    },
+    {
+      "pr": 64,
+      "candidate": "v0.44.0-source",
+      "base": "codex/v0.43-release-blocker-inventory",
+      "head": "codex/v0.44-tag-readiness-command"
+    },
+    {
+      "pr": 65,
+      "candidate": "v0.45.0-source",
+      "base": "codex/v0.44-tag-readiness-command",
+      "head": "codex/v0.45-release-merge-order"
+    }
+  ]
+}

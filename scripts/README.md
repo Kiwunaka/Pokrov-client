@@ -28,6 +28,10 @@ Current helpers:
   source readiness list, then writes a local source tag readiness summary under
   ignored `build/source-tag-readiness/`; returns a non-zero exit code while
   required manual maintainer blockers remain open
+- `check-release-merge-order.ps1`: checks the local release merge order
+  manifest for a linear stacked PR base-to-head chain; writes ignored
+  `build/release-merge-order/` output and does not merge, push, or publish
+  anything
 - `check-github-ruleset.ps1`: read-only GitHub settings verifier for repository
   rulesets or branch protection; uses `gh api`, supports `-ReportOnly -Json`,
   and does not create, edit, or delete remote settings

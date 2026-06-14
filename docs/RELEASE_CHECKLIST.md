@@ -39,6 +39,11 @@ Use this checklist before publishing a public source or binary release.
   source-readiness list before a source tag is attempted; it writes ignored
   `build/source-tag-readiness/` output and returns non-zero while manual
   maintainer blockers remain open.
+- `powershell -ExecutionPolicy Bypass -File .\scripts\check-release-merge-order.ps1`
+  runs the release merge order check against the local stacked PR manifest
+  before manual merge or tag work; it writes ignored
+  `build/release-merge-order/` output and does not merge, push, or publish
+  anything.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\check-source-release-copy.ps1`
   passes for the release policy, checklist, source release template, renderer,
   and final rendered release note.
