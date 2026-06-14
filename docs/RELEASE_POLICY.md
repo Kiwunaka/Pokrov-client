@@ -42,6 +42,11 @@ checks the draft with `scripts/check-source-release-copy.ps1`, and writes a
 local preflight summary. The `-SkipTestCommands` switch is only for local or CI
 smoke coverage and must not be used for publishing a public source release.
 
+Use `scripts/prepare-release-evidence-bundle.ps1` after source preflight to
+collect the preflight summary, source-only flags, proof paths, and optional
+GitHub ruleset report into one release evidence bundle under ignored `build/`
+output. The bundle is a maintainer handoff artifact, not a release publisher.
+
 Required checks and release gates are summarized in
 [REQUIRED_CHECKS.md](REQUIRED_CHECKS.md). That page documents the expected
 GitHub check names, including `Source import and public tree checks` and

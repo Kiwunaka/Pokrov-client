@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.37
+# Source Readiness: v0.2-v0.38
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -782,6 +782,34 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.38.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #58: release evidence bundle helper that collects source preflight output,
+  proof paths, source-only flags, and optional GitHub ruleset status
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- optionally run `scripts/check-github-ruleset.ps1 -ReportOnly -Json` and keep
+  the report with the handoff
+- run `scripts/prepare-release-evidence-bundle.ps1` with the exact preflight
+  summary and optional ruleset report
+- confirm the release evidence bundle keeps source-only flags true and keeps
+  GitHub enforcement claims disabled when the ruleset report is failing or
+  missing
+- review the preflight summary, proof manifest, rendered GitHub Release body,
+  release evidence bundle, and changelog section for the exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
 - Free VPN catalog remains disabled by default and is not an official POKROV
@@ -866,3 +894,5 @@ Required before tagging:
   observation in GitHub settings before public copy can claim enforcement.
 - The GitHub ruleset verifier is read-only. A failing verifier records missing
   remote enforcement; it does not configure repository settings by itself.
+- The release evidence bundle is a local handoff artifact. It does not publish
+  GitHub Releases, push tags, upload binaries, or replace maintainer review.
