@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-06-14",
+  "defaults": {
+    "local_only": true,
+    "user_initiated_only": true,
+    "no_background_upload": true,
+    "no_raw_logs_by_default": true,
+    "clipboard_exports_redacted": true,
+    "support_ticket_attachments_redacted": true
+  },
+  "allowed_surfaces": [
+    "support_diagnostics_copy_json",
+    "support_ticket_diagnostics_attachment",
+    "contributor_doctor_redacted_json"
+  ],
+  "forbidden_payloads": [
+    "raw_config",
+    "subscription_url",
+    "proxy_link",
+    "token",
+    "secret",
+    "private_key",
+    "wireguard_private_material",
+    "warp_private_material",
+    "private_backend_details",
+    "signing_material"
+  ],
+  "redaction": {
+    "marker": "[redacted]",
+    "max_string_length": 160,
+    "drop_unknown_diagnostic_keys": true,
+    "drop_sensitive_key_fragments": true
+  },
+  "implementation": {
+    "shared_redactor": "PokrovAssistantRedactor",
+    "support_copy_entrypoint": "support-diagnostics-copy-json",
+    "support_attachment_media_type": "app_diagnostics",
+    "future_log_exports_require_policy_update": true
+  },
+  "release_boundaries": {
+    "source_only": true,
+    "no_binary_claim": true,
+    "no_runtime_connectivity_claim": true,
+    "no_remote_support_upload_claim": true
+  }
+}
