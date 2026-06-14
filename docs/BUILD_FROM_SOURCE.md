@@ -176,6 +176,9 @@ output when filing a build issue:
 powershell -ExecutionPolicy Bypass -File .\scripts\doctor.ps1 -Json
 ```
 
+If this fails, use [Troubleshooting](TROUBLESHOOTING.md) before opening a build
+issue.
+
 After the doctor passes, resolve workspace dependencies:
 
 ```powershell

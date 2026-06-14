@@ -8,6 +8,8 @@ or prepare a source-only release.
 
 - [Build from source](BUILD_FROM_SOURCE.md): local requirements, variants,
   dependency setup, tests, and clean-clone proof.
+- [Troubleshooting](TROUBLESHOOTING.md): source checkout, dependency, Android,
+  Windows, and clean-clone failure routing.
 - [Open-source scope](OPEN_SOURCE_SCOPE.md): what is public, what remains
   private, and which claims are not made by this repository.
 - [Product variants](PRODUCT_VARIANTS.md): community, operator, and official

@@ -131,6 +131,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.29.0-source` | Pending stacked PR, tag еще не создан | Private security intake gate находится в stacked PR queue. |
 | `v0.30.0-source` | Pending stacked PR, tag еще не создан | Changelog and release-history gate находится в stacked PR queue. |
 | `v0.31.0-source` | Pending stacked PR, tag еще не создан | Contributor doctor and docs index gate находится в stacked PR queue. |
+| `v0.32.0-source` | Pending stacked PR, tag еще не создан | Build troubleshooting router находится в stacked PR queue. |
 
 ## Архитектурная Граница
 
@@ -179,6 +180,8 @@ material, private release evidence или operator runbooks.
 
 Инструкция по сборке лежит в
 [docs/BUILD_FROM_SOURCE.md](docs/BUILD_FROM_SOURCE.md).
+Troubleshooting лежит в
+[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
 
 Инструменты source import для maintainers:
 
@@ -212,6 +215,7 @@ source readiness.
 - [SECURITY.md](SECURITY.md)
 - [BRAND.md](BRAND.md)
 - [docs/README.md](docs/README.md)
+- [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 - [docs/MAINTAINER_CHECKLIST.md](docs/MAINTAINER_CHECKLIST.md)
 - [docs/PROJECT_PRINCIPLES.md](docs/PROJECT_PRINCIPLES.md)
 - [docs/GITHUB_TRIAGE.md](docs/GITHUB_TRIAGE.md)

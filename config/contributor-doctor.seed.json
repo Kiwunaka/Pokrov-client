@@ -8,8 +8,15 @@
     "no_build_or_release_artifacts": true,
     "no_network_required": true,
     "json_output_supported": true,
-    "command_checks_can_be_skipped": true
+    "command_checks_can_be_skipped": true,
+    "ci_smoke_uses_skip_command_checks": true
   },
+  "ci_smoke": {
+    "workflow": ".github/workflows/ci.yml",
+    "step_name": "Run contributor doctor source-boundary smoke",
+    "command": ".\\scripts\\doctor.ps1 -SkipCommandChecks"
+  },
+  "troubleshooting_doc": "docs/TROUBLESHOOTING.md",
   "required_commands": [
     "git",
     "python",
@@ -33,6 +40,7 @@
   "required_docs": [
     "CONTRIBUTING.md",
     "docs/BUILD_FROM_SOURCE.md",
+    "docs/TROUBLESHOOTING.md",
     "scripts/README.md"
   ]
 }

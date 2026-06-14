@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Include the exact command, platform, commit/tag, and whether a clean clone required any private files. Run the read-only contributor doctor with `powershell -ExecutionPolicy Bypass -File .\scripts\doctor.ps1 -Json` and paste redacted output when possible. Do not paste secrets, tokens, QR payloads, subscription URLs, personal connection links, signing files, or private backend details. Do not report vulnerabilities here; use SECURITY.md.
+        Include the exact command, platform, commit/tag, and whether a clean clone required any private files. Read `docs/TROUBLESHOOTING.md`, then run the read-only contributor doctor with `powershell -ExecutionPolicy Bypass -File .\scripts\doctor.ps1 -Json` and paste redacted output when possible. Do not paste secrets, tokens, QR payloads, subscription URLs, personal connection links, signing files, or private backend details. Do not report vulnerabilities here; use SECURITY.md.
   - type: dropdown
     id: track
     attributes:
@@ -33,6 +33,22 @@ body:
     id: commit
     attributes:
       label: Commit or tag
+  - type: dropdown
+    id: troubleshooting
+    attributes:
+      label: Troubleshooting step tried
+      description: Pick the closest step from docs/TROUBLESHOOTING.md.
+      options:
+        - Ran contributor doctor
+        - Checked PowerShell execution policy
+        - Checked missing command/toolchain
+        - Checked dependency bootstrap
+        - Checked Android SDK/Gradle/runtime-artifact boundary
+        - Checked Windows Visual Studio/CMake/runtime-artifact boundary
+        - Checked clean clone/source-boundary proof
+        - Not yet
+    validations:
+      required: true
   - type: textarea
     id: command
     attributes:

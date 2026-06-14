@@ -15,6 +15,7 @@ def test_docs_index_routes_first_steps_users_operators_and_maintainers() -> None
 
     for phrase in (
         "Build from source",
+        "TROUBLESHOOTING.md",
         "OPEN_SOURCE_SCOPE.md",
         "PRODUCT_VARIANTS.md",
         "CLIENT_PRODUCT_TRACKS.md",
@@ -40,3 +41,4 @@ def test_docs_index_mentions_read_only_contributor_doctor() -> None:
     assert "read-only" in text
     assert "does not install" in text
     assert "does not" in text
+    assert "Troubleshooting" in text
