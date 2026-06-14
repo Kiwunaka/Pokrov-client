@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.47
+# Source Readiness: v0.2-v0.48
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -1068,8 +1068,44 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.48.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #68: Android device validation checklist and local smoke precheck plus
+  release merge handoff default-path regression fix
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run `scripts/android-device-smoke.ps1` and review the generated
+  `MANUAL_OWNER_TEST` summary
+- run `scripts/prepare-release-merge-handoff.ps1` without custom paths after
+  generating the prerequisite default summaries
+- clear every required manual maintainer blocker before treating the line as
+  ready
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the publication dry-run, release evidence bundle, preflight summary,
+  proof manifest, rendered GitHub Release body, and changelog section for the
+  exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
+- Android device validation is a public checklist and local precheck only. It
+  does not run ADB, install builds, mutate a device, replace the release-build
+  audit, or prove APK, store, trusted signing, production, or official binary
+  readiness.
+- The release merge handoff helper now supports the documented no-argument
+  command, but it still depends on prerequisite default summaries and does not
+  merge PRs, create tags, push refs, publish releases, or clear manual
+  blockers.
 - The release merge handoff helper is a local summary builder only. It does not
   merge PRs, choose a release commit, create annotated tags, push refs, publish
   GitHub Releases, upload assets, clear manual blockers, or authorize binary
