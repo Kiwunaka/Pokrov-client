@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-06-14",
+  "changelog_path": "CHANGELOG.md",
+  "policy": {
+    "keep_unreleased_section": true,
+    "track_source_readiness_milestones": true,
+    "pending_prs_must_not_be_presented_as_tags": true,
+    "source_only_boundary_required": true,
+    "release_notes_must_stay_evidence_honest": true
+  },
+  "required_sections": [
+    "## Unreleased",
+    "### Added",
+    "### Changed",
+    "### Source Readiness Candidates",
+    "### Still Source-Only"
+  ],
+  "required_source_only_phrases": [
+    "No APK",
+    "EXE",
+    "store release",
+    "trusted signing",
+    "official binary claim"
+  ],
+  "forbidden_unreleased_claims": [
+    "published v0.30.0-source",
+    "tagged v0.30.0-source",
+    "official APK",
+    "official EXE",
+    "store-ready",
+    "trusted-signed"
+  ],
+  "source_readiness_inventory": "config/source-release-readiness.seed.json"
+}
