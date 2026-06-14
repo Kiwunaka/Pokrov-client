@@ -52,6 +52,8 @@ Repository ruleset and branch protection setup is tracked in
 [GITHUB_RULESET_SETUP.md](GITHUB_RULESET_SETUP.md) and
 `config/github-ruleset.seed.json`. Release copy must not claim remote GitHub
 enforcement until those settings are configured and observed in GitHub.
+Use `scripts/check-github-ruleset.ps1` as the read-only verification helper
+after manual GitHub setup.
 
 Run `scripts/check-source-release-copy.ps1 -ReleaseNotesPath <file>` again after
 manual edits to the GitHub Release body. It verifies that source-only releases
