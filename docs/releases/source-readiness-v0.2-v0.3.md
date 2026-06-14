@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.39
+# Source Readiness: v0.2-v0.40
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -839,6 +839,34 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.40.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #60: enterprise boundary and operator commercial-license guard for GPLv3,
+  paid service, dual-license, and fork distribution claims
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- confirm `docs/ENTERPRISE.md` still says it is not legal advice, does not
+  change `LICENSE`, does not waive GPLv3 obligations, and does not offer a
+  commercial license by default
+- confirm operator docs still say operators bring their own backend, billing,
+  support, signing, privacy policy, release channels, checksums, release notes,
+  and source-compliance path
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the publication dry-run, release evidence bundle, preflight summary,
+  proof manifest, rendered GitHub Release body, and changelog section for the
+  exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
 - Free VPN catalog remains disabled by default and is not an official POKROV
@@ -927,3 +955,6 @@ Required before tagging:
   GitHub Releases, push tags, upload binaries, or replace maintainer review.
 - The publication dry-run validates local release evidence and rendered notes,
   but maintainers still perform the actual GitHub Release creation manually.
+- Enterprise boundary docs are operational guidance, not legal advice. They do
+  not change GPLv3, offer a commercial license by default, waive operator
+  source obligations, or make operator builds official POKROV builds.

@@ -25,6 +25,8 @@
   &middot;
   <a href="docs/OPEN_SOURCE_SCOPE.md">Scope</a>
   &middot;
+  <a href="docs/ENTERPRISE.md">Enterprise</a>
+  &middot;
   <a href="SECURITY.md">Security</a>
   &middot;
   <a href="BRAND.md">Brand</a>
@@ -138,6 +140,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.37.0-source` | Pending stacked PR, not tagged | GitHub ruleset verifier is in the stacked PR queue. |
 | `v0.38.0-source` | Pending stacked PR, not tagged | Release evidence bundle helper is in the stacked PR queue. |
 | `v0.39.0-source` | Pending stacked PR, not tagged | Source release publication dry-run validator is in the stacked PR queue. |
+| `v0.40.0-source` | Pending stacked PR, not tagged | Enterprise boundary and operator commercial-license guard is in the stacked PR queue. |
 
 ## Architecture Boundary
 
@@ -177,6 +180,7 @@ boundary.
 |   |-- SOURCE_IMPORT_PLAYBOOK.md
 |   |-- PRODUCT_VARIANTS.md
 |   |-- OPERATOR_INTEGRATION.md
+|   |-- ENTERPRISE.md
 |   `-- GOVERNANCE.md
 `-- assets/
     |-- brand/
@@ -231,6 +235,7 @@ Before contributing, read:
 - [docs/SOURCE_IMPORT_PLAYBOOK.md](docs/SOURCE_IMPORT_PLAYBOOK.md)
 - [docs/PRODUCT_VARIANTS.md](docs/PRODUCT_VARIANTS.md)
 - [docs/OPERATOR_INTEGRATION.md](docs/OPERATOR_INTEGRATION.md)
+- [docs/ENTERPRISE.md](docs/ENTERPRISE.md)
 - [docs/FREE_VPN_CATALOG_GATE.md](docs/FREE_VPN_CATALOG_GATE.md)
 - [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)
 - [docs/GOVERNANCE.md](docs/GOVERNANCE.md)
@@ -256,6 +261,8 @@ Forks and rebuilt clients must not imply that they are official POKROV builds.
 
 This repository is licensed under the GNU General Public License v3.0. See
 [LICENSE](LICENSE).
+
+See [Enterprise boundary](docs/ENTERPRISE.md) for the operator and commercial license boundary. It does not change the GPLv3 license or offer a commercial license by default.
 
 The POKROV name, logos, domains, official channels, signing identities, and
 release distribution channels are governed separately by [BRAND.md](BRAND.md).
