@@ -137,6 +137,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.35.0-source` | Pending stacked PR, tag еще не создан | Required checks policy gate находится в stacked PR queue. |
 | `v0.36.0-source` | Pending stacked PR, tag еще не создан | GitHub ruleset setup gate находится в stacked PR queue. |
 | `v0.37.0-source` | Pending stacked PR, tag еще не создан | GitHub ruleset verifier находится в stacked PR queue. |
+| `v0.38.0-source` | Pending stacked PR, tag еще не создан | Release evidence bundle helper находится в stacked PR queue. |
 
 ## Архитектурная Граница
 

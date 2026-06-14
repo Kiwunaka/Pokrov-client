@@ -28,6 +28,9 @@ Use this checklist before publishing a public source or binary release.
   can be used as the single local gate that runs tests, clean-clone proof,
   source proof generation, release-note rendering, and preflight summary
   generation. Do not use `-SkipTestCommands` for publishing.
+- `powershell -ExecutionPolicy Bypass -File .\scripts\prepare-release-evidence-bundle.ps1`
+  writes the release evidence bundle after source preflight and optional
+  GitHub ruleset report review; it does not publish a release.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\check-source-release-copy.ps1`
   passes for the release policy, checklist, source release template, renderer,
   and final rendered release note.
