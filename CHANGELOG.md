@@ -59,6 +59,9 @@ production readiness without matching public evidence.
 - Added a read-only contributor doctor, docs index, and build-issue reporting
   hook so source contributors can share redacted toolchain diagnostics without
   installing dependencies or creating artifacts.
+- Added a build troubleshooting router for source checkout, toolchain,
+  Android, Windows, runtime-artifact, clean-clone, and redacted issue-report
+  paths.
 
 ### Changed
 
@@ -67,7 +70,7 @@ production readiness without matching public evidence.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.31.0-source` candidates.
+  `v0.32.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -104,6 +107,7 @@ production readiness without matching public evidence.
 | `v0.29.0-source` | Pending stacked PR, not tagged | PR #49 |
 | `v0.30.0-source` | Pending stacked PR, not tagged | PR #50 |
 | `v0.31.0-source` | Pending stacked PR, not tagged | PR #51 |
+| `v0.32.0-source` | Pending stacked PR, not tagged | PR #52 |
 
 ### Still Source-Only
 

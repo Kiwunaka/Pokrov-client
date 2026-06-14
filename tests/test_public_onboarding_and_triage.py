@@ -161,6 +161,8 @@ def test_specialized_issue_templates_route_import_operator_and_security() -> Non
 
     for phrase in (
         "Contributor doctor output",
+        "docs/TROUBLESHOOTING.md",
+        "Troubleshooting step tried",
         "scripts\\doctor.ps1 -Json",
         "read-only contributor doctor",
         "redact local paths",
