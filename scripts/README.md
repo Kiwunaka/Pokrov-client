@@ -36,6 +36,11 @@ Current helpers:
   snapshot against the local merge-order manifest; writes ignored
   `build/release-stack-github-status/` output and does not merge, push, or
   publish anything
+- `prepare-release-merge-handoff.ps1`: creates a release merge handoff report
+  by bundling release merge order, release stack GitHub status, and source tag
+  readiness summaries into an ignored
+  `build/release-merge-handoff/` maintainer handoff report without merging,
+  tagging, pushing, publishing, or uploading anything
 - `check-github-ruleset.ps1`: read-only GitHub settings verifier for repository
   rulesets or branch protection; uses `gh api`, supports `-ReportOnly -Json`,
   and does not create, edit, or delete remote settings

@@ -95,6 +95,8 @@ production readiness without matching public evidence.
   manifest before manual merge or tag work.
 - Added a release stack GitHub status verifier that checks a read-only PR
   status snapshot before manual merge or tag work.
+- Added a release merge handoff helper that bundles local merge-order,
+  GitHub-status, and tag-readiness summaries for maintainer review.
 
 ### Changed
 
@@ -103,7 +105,7 @@ production readiness without matching public evidence.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.46.0-source` candidates.
+  `v0.47.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -155,6 +157,7 @@ production readiness without matching public evidence.
 | `v0.44.0-source` | Pending stacked PR, not tagged | PR #64 |
 | `v0.45.0-source` | Pending stacked PR, not tagged | PR #65 |
 | `v0.46.0-source` | Pending stacked PR, not tagged | PR #66 |
+| `v0.47.0-source` | Pending stacked PR, not tagged | PR #67 |
 
 ### Still Source-Only
 

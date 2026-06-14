@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "script": "scripts/prepare-release-merge-handoff.ps1",
+  "default_output_dir": "build/release-merge-handoff",
+  "policy": {
+    "read_only": true,
+    "no_merge": true,
+    "no_git_push": true,
+    "no_tag_creation": true,
+    "no_github_release_publish": true,
+    "writes_only_ignored_build_output": true,
+    "requires_merge_order_summary": true,
+    "requires_github_status_summary": true,
+    "requires_tag_readiness_summary": true
+  },
+  "inputs": {
+    "merge_order": "build/release-merge-order/release-merge-order.json",
+    "github_status": "build/release-stack-github-status/release-stack-github-status.json",
+    "tag_readiness": "build/source-tag-readiness/v0.47.0-source-tag-readiness.json"
+  }
+}

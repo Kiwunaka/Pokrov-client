@@ -56,6 +56,7 @@ $requiredFiles = @(
   "config\\source-tag-readiness.seed.json",
   "config\\release-merge-order.seed.json",
   "config\\release-stack-github-status.seed.json",
+  "config\\release-merge-handoff.seed.json",
   "config\\required-checks.seed.json",
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
@@ -141,6 +142,7 @@ $requiredFiles = @(
   "scripts\\check-source-tag-readiness.ps1",
   "scripts\\check-release-merge-order.ps1",
   "scripts\\check-release-stack-github-status.ps1",
+  "scripts\\prepare-release-merge-handoff.ps1",
   "scripts\\prepare-source-release.ps1",
   "scripts\\render-source-release-notes.ps1",
   "scripts\\print-build-variant-command.ps1",
@@ -165,6 +167,7 @@ $jsonFiles = @(
   "config\\source-tag-readiness.seed.json",
   "config\\release-merge-order.seed.json",
   "config\\release-stack-github-status.seed.json",
+  "config\\release-merge-handoff.seed.json",
   "config\\required-checks.seed.json",
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
@@ -1330,6 +1333,62 @@ if (Test-Path -LiteralPath $releaseStackGithubStatusPath -PathType Leaf) {
     if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
       $docText = Get-Content -Raw -LiteralPath $fullDocPath
       foreach ($requiredPhrase in @("check-release-stack-github-status.ps1", "release stack GitHub status")) {
+        if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+          $manifestErrors.Add("$docPath must include '$requiredPhrase'")
+        }
+      }
+    }
+  }
+}
+
+$releaseMergeHandoffPath = Join-Path $root "config\\release-merge-handoff.seed.json"
+if (Test-Path -LiteralPath $releaseMergeHandoffPath -PathType Leaf) {
+  $releaseMergeHandoff = Get-Content -Raw -LiteralPath $releaseMergeHandoffPath | ConvertFrom-Json
+
+  if ($releaseMergeHandoff.script -ne "scripts/prepare-release-merge-handoff.ps1") {
+    $manifestErrors.Add("config\\release-merge-handoff.seed.json must point to scripts/prepare-release-merge-handoff.ps1")
+  }
+
+  if ($releaseMergeHandoff.default_output_dir -ne "build/release-merge-handoff") {
+    $manifestErrors.Add("config\\release-merge-handoff.seed.json must keep default output under ignored build/release-merge-handoff")
+  }
+
+  foreach ($field in @("read_only", "no_merge", "no_git_push", "no_tag_creation", "no_github_release_publish", "writes_only_ignored_build_output", "requires_merge_order_summary", "requires_github_status_summary", "requires_tag_readiness_summary")) {
+    if ($releaseMergeHandoff.policy.$field -ne $true) {
+      $manifestErrors.Add("config\\release-merge-handoff.seed.json policy.$field must remain true")
+    }
+  }
+
+  if ($releaseMergeHandoff.inputs.merge_order -ne "build/release-merge-order/release-merge-order.json") {
+    $manifestErrors.Add("config\\release-merge-handoff.seed.json must read the release merge order summary")
+  }
+  if ($releaseMergeHandoff.inputs.github_status -ne "build/release-stack-github-status/release-stack-github-status.json") {
+    $manifestErrors.Add("config\\release-merge-handoff.seed.json must read the release stack GitHub status summary")
+  }
+  if ($releaseMergeHandoff.inputs.tag_readiness -notmatch "-tag-readiness\.json$") {
+    $manifestErrors.Add("config\\release-merge-handoff.seed.json must read a source tag readiness summary")
+  }
+
+  $releaseMergeHandoffScriptPath = Join-Path $root "scripts\\prepare-release-merge-handoff.ps1"
+  if (Test-Path -LiteralPath $releaseMergeHandoffScriptPath -PathType Leaf) {
+    $releaseMergeHandoffScript = Get-Content -Raw -LiteralPath $releaseMergeHandoffScriptPath
+    foreach ($requiredPhrase in @("release-merge-handoff.seed.json", "merge_order_ok", "github_status_ok", "ready_for_tag", "handoff_ready_for_maintainer", "build\release-merge-handoff", "manual_merge_required = `$true")) {
+      if ($releaseMergeHandoffScript.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add("scripts\\prepare-release-merge-handoff.ps1 must include '$requiredPhrase'")
+      }
+    }
+    foreach ($forbiddenPhrase in @("git merge", "git push", "git tag", "gh pr merge", "gh release create", "gh release upload", "gh api", "-X POST", "-X PATCH", "-X PUT", "-X DELETE")) {
+      if ($releaseMergeHandoffScript.IndexOf($forbiddenPhrase, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+        $manifestErrors.Add("scripts\\prepare-release-merge-handoff.ps1 must remain read-only and must not include '$forbiddenPhrase'")
+      }
+    }
+  }
+
+  foreach ($docPath in @("docs\\RELEASE_BLOCKERS.md", "docs\\RELEASE_CHECKLIST.md", "scripts\\README.md")) {
+    $fullDocPath = Join-Path $root $docPath
+    if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
+      $docText = Get-Content -Raw -LiteralPath $fullDocPath
+      foreach ($requiredPhrase in @("prepare-release-merge-handoff.ps1", "release merge handoff")) {
         if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
           $manifestErrors.Add("$docPath must include '$requiredPhrase'")
         }

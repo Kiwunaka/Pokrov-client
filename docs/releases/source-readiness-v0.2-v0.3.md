@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.46
+# Source Readiness: v0.2-v0.47
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -1035,8 +1035,45 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.47.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #67: release merge handoff helper that bundles local merge-order,
+  GitHub-status, and tag-readiness summaries for maintainer review
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run `scripts/check-release-merge-order.ps1` and confirm the generated summary
+  records a linear base-to-head chain for the exact stacked PR sequence
+- run `scripts/check-release-stack-github-status.ps1` and confirm the generated
+  summary records matching base/head refs, non-draft PRs, clean merge state,
+  and successful required CI checks for the exact stacked PR sequence
+- run `scripts/check-source-tag-readiness.ps1 -Tag <tag>` and confirm the
+  generated summary matches the exact source candidate and blocker inventory
+- run `scripts/prepare-release-merge-handoff.ps1` with those exact summaries
+  and review the handoff before manual merge or tag work
+- clear every required manual maintainer blocker before treating the line as
+  ready
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the publication dry-run, release evidence bundle, preflight summary,
+  proof manifest, rendered GitHub Release body, and changelog section for the
+  exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
+- The release merge handoff helper is a local summary builder only. It does not
+  merge PRs, choose a release commit, create annotated tags, push refs, publish
+  GitHub Releases, upload assets, clear manual blockers, or authorize binary
+  claims.
 - The release stack GitHub status verifier checks a read-only PR status
   snapshot. It does not merge PRs, create tags, push refs, publish GitHub
   Releases, upload assets, or prove that maintainers completed the manual merge

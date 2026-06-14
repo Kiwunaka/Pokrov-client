@@ -46,6 +46,12 @@
       "candidate": "v0.46.0-source",
       "base": "codex/v0.45-release-merge-order",
       "head": "codex/v0.46-release-stack-github-status"
+    },
+    {
+      "pr": 67,
+      "candidate": "v0.47.0-source",
+      "base": "codex/v0.46-release-stack-github-status",
+      "head": "codex/v0.47-release-merge-handoff"
     }
   ]
 }
