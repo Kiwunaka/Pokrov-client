@@ -42,6 +42,9 @@ Use this checklist before publishing a public source or binary release.
 - GitHub ruleset setup in [GITHUB_RULESET_SETUP.md](GITHUB_RULESET_SETUP.md)
   still matches `config/github-ruleset.seed.json`; do not claim remote
   enforcement until GitHub settings are configured and observed.
+- `powershell -ExecutionPolicy Bypass -File .\scripts\check-github-ruleset.ps1`
+  passes before claiming remote GitHub ruleset or branch-protection
+  enforcement.
 - No generated build folders, local platform config, signing files, or runtime
   binaries are committed.
 

@@ -9,6 +9,10 @@ required CI job names live in
 [`config/required-checks.seed.json`](../config/required-checks.seed.json) and
 [`REQUIRED_CHECKS.md`](REQUIRED_CHECKS.md).
 
+The read-only verifier is
+[`scripts/check-github-ruleset.ps1`](../scripts/check-github-ruleset.ps1). It
+uses `gh api` to inspect repository rulesets and branch protection. It does not create, edit, or delete GitHub settings.
+
 ## Preferred Setup
 
 Use a repository ruleset for `main` when available. A branch protection rule is
@@ -40,6 +44,18 @@ handoff or maintainer notes:
 - conversations must be resolved before merge
 - force pushes and branch deletion are blocked for protected targets
 - a test pull request without required checks cannot be merged
+
+Run the verifier after manual setup:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\check-github-ruleset.ps1 `
+  -Repository Kiwunaka/Pokrov-client `
+  -Branch main
+```
+
+For a non-blocking status report before settings exist, use `-ReportOnly
+-Json`. A failing verifier is expected until a maintainer configures GitHub
+rulesets or branch protection.
 
 Until that observation exists, public docs and release notes must keep saying
 that this repository documents the expected setup, not that GitHub enforcement

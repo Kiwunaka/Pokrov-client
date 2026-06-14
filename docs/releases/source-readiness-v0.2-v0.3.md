@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.36
+# Source Readiness: v0.2-v0.37
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -755,6 +755,33 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.37.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #57: read-only GitHub ruleset verifier for maintainers to audit remote
+  rulesets or branch protection before claiming enforcement
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- confirm `scripts/check-github-ruleset.ps1` remains read-only and does not
+  create, edit, or delete remote GitHub settings
+- run `scripts/check-github-ruleset.ps1 -ReportOnly -Json` to record current
+  remote GitHub settings status
+- before claiming remote enforcement, run `scripts/check-github-ruleset.ps1`
+  without `-ReportOnly` and confirm it passes
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the preflight summary, proof manifest, rendered GitHub Release body,
+  and changelog section for the exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
 - Free VPN catalog remains disabled by default and is not an official POKROV
@@ -837,3 +864,5 @@ Required before tagging:
 - GitHub ruleset setup is now seed-backed, but actual remote repository
   rulesets or branch protection still require maintainer configuration and
   observation in GitHub settings before public copy can claim enforcement.
+- The GitHub ruleset verifier is read-only. A failing verifier records missing
+  remote enforcement; it does not configure repository settings by itself.
