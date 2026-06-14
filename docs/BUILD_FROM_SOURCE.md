@@ -164,6 +164,21 @@ cmake -S apps/windows_shell/windows -B apps/windows_shell/build/windows/x64 `
 From the repository root:
 
 ```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\doctor.ps1
+```
+
+The contributor doctor is read-only. It checks local commands and required
+public files, then exits without installing dependencies, building artifacts,
+fetching runtime binaries, copying config, or publishing anything. Use JSON
+output when filing a build issue:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\doctor.ps1 -Json
+```
+
+After the doctor passes, resolve workspace dependencies:
+
+```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\bootstrap-workspace.ps1
 ```
 

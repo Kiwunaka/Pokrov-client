@@ -23,6 +23,7 @@ Why is this useful?
 - [ ] I confirmed this does not add unsupported store, stable, trusted-signing, RU-origin, WARP production, or default free-service claims.
 - [ ] I kept third-party public config catalog behavior disabled unless this PR updates the documented gates.
 - [ ] I updated source-only release notes or readiness docs when release status changed.
+- [ ] I ran or considered `scripts\doctor.ps1` when this changes setup, build, local environment, or onboarding docs.
 
 ## Notes
 

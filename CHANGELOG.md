@@ -56,6 +56,9 @@ production readiness without matching public evidence.
   release claim safety.
 - Added a changelog policy seed and release-history gate so source readiness
   milestones stay synchronized with public release notes.
+- Added a read-only contributor doctor, docs index, and build-issue reporting
+  hook so source contributors can share redacted toolchain diagnostics without
+  installing dependencies or creating artifacts.
 
 ### Changed
 
@@ -64,7 +67,7 @@ production readiness without matching public evidence.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.30.0-source` candidates.
+  `v0.31.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -100,6 +103,7 @@ production readiness without matching public evidence.
 | `v0.28.0-source` | Pending stacked PR, not tagged | PR #48 |
 | `v0.29.0-source` | Pending stacked PR, not tagged | PR #49 |
 | `v0.30.0-source` | Pending stacked PR, not tagged | PR #50 |
+| `v0.31.0-source` | Pending stacked PR, not tagged | PR #51 |
 
 ### Still Source-Only
 

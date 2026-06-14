@@ -130,6 +130,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.28.0-source` | Pending stacked PR, tag еще не создан | Free VPN catalog provenance gate находится в stacked PR queue. |
 | `v0.29.0-source` | Pending stacked PR, tag еще не создан | Private security intake gate находится в stacked PR queue. |
 | `v0.30.0-source` | Pending stacked PR, tag еще не создан | Changelog and release-history gate находится в stacked PR queue. |
+| `v0.31.0-source` | Pending stacked PR, tag еще не создан | Contributor doctor and docs index gate находится в stacked PR queue. |
 
 ## Архитектурная Граница
 
@@ -210,6 +211,7 @@ source readiness.
 - [CONTRIBUTING.md](CONTRIBUTING.md)
 - [SECURITY.md](SECURITY.md)
 - [BRAND.md](BRAND.md)
+- [docs/README.md](docs/README.md)
 - [docs/MAINTAINER_CHECKLIST.md](docs/MAINTAINER_CHECKLIST.md)
 - [docs/PROJECT_PRINCIPLES.md](docs/PROJECT_PRINCIPLES.md)
 - [docs/GITHUB_TRIAGE.md](docs/GITHUB_TRIAGE.md)

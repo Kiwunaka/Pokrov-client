@@ -129,6 +129,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.28.0-source` | Pending stacked PR, not tagged | Free VPN catalog provenance gate is in the stacked PR queue. |
 | `v0.29.0-source` | Pending stacked PR, not tagged | Private security intake gate is in the stacked PR queue. |
 | `v0.30.0-source` | Pending stacked PR, not tagged | Changelog and release-history gate is in the stacked PR queue. |
+| `v0.31.0-source` | Pending stacked PR, not tagged | Contributor doctor and docs index gate is in the stacked PR queue. |
 
 ## Architecture Boundary
 
@@ -210,6 +211,7 @@ Before contributing, read:
 - [CONTRIBUTING.md](CONTRIBUTING.md)
 - [SECURITY.md](SECURITY.md)
 - [BRAND.md](BRAND.md)
+- [docs/README.md](docs/README.md)
 - [docs/MAINTAINER_CHECKLIST.md](docs/MAINTAINER_CHECKLIST.md)
 - [docs/PROJECT_PRINCIPLES.md](docs/PROJECT_PRINCIPLES.md)
 - [docs/GITHUB_TRIAGE.md](docs/GITHUB_TRIAGE.md)

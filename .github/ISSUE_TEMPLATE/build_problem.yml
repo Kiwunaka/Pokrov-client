@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Include the exact command, platform, commit/tag, and whether a clean clone required any private files. Do not paste secrets, tokens, QR payloads, subscription URLs, personal connection links, signing files, or private backend details. Do not report vulnerabilities here; use SECURITY.md.
+        Include the exact command, platform, commit/tag, and whether a clean clone required any private files. Run the read-only contributor doctor with `powershell -ExecutionPolicy Bypass -File .\scripts\doctor.ps1 -Json` and paste redacted output when possible. Do not paste secrets, tokens, QR payloads, subscription URLs, personal connection links, signing files, or private backend details. Do not report vulnerabilities here; use SECURITY.md.
   - type: dropdown
     id: track
     attributes:
@@ -45,3 +45,9 @@ body:
       label: Output
       description: Redact secrets, tokens, paths containing personal data, and private URLs.
       render: text
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Contributor doctor output
+      description: Run `powershell -ExecutionPolicy Bypass -File .\scripts\doctor.ps1 -Json` and redact local paths, usernames, private URLs, tokens, QR payloads, and subscription URLs before posting.
+      render: json

@@ -4,6 +4,9 @@ This folder is for non-destructive local helpers only.
 
 Current helpers:
 
+- `doctor.ps1`: read-only contributor diagnostic for required public files,
+  PowerShell version, and local `git`/`python`/`flutter`/`dart` commands; pass
+  `-Json` for build issues or `-SkipCommandChecks` for docs-only validation
 - `validate-seed.ps1`: checks the public Android/Windows scaffold, shared packages, and JSON config seeds
 - `bootstrap-workspace.ps1`: runs `flutter pub get` across the clean-room packages and available host entrypoints; pass `-OfflinePubGet` when an old Flutter/Dart pub advisory fetch breaks online dependency resolution but the local package cache is already populated
 - `run-tests.ps1`: bootstraps the workspace and runs the shared shell widget tests; accepts `-OfflinePubGet` and forwards it to bootstrap
