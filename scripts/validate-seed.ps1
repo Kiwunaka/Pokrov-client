@@ -52,6 +52,7 @@ $requiredFiles = @(
   "config\\platform-matrix.seed.json",
   "config\\github-ruleset.seed.json",
   "config\\release-evidence-bundle.seed.json",
+  "config\\source-release-publication-dry-run.seed.json",
   "config\\required-checks.seed.json",
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
@@ -127,6 +128,7 @@ $requiredFiles = @(
   "scripts\\check-source-release-copy.ps1",
   "scripts\\prepare-oss-import.ps1",
   "scripts\\prepare-release-evidence-bundle.ps1",
+  "scripts\\validate-source-release-publication.ps1",
   "scripts\\prepare-source-release.ps1",
   "scripts\\render-source-release-notes.ps1",
   "scripts\\print-build-variant-command.ps1",
@@ -147,6 +149,7 @@ $jsonFiles = @(
   "config\\platform-matrix.seed.json",
   "config\\github-ruleset.seed.json",
   "config\\release-evidence-bundle.seed.json",
+  "config\\source-release-publication-dry-run.seed.json",
   "config\\required-checks.seed.json",
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
@@ -1027,6 +1030,64 @@ if (Test-Path -LiteralPath $releaseEvidencePath -PathType Leaf) {
     if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
       $docText = Get-Content -Raw -LiteralPath $fullDocPath
       foreach ($requiredPhrase in @("prepare-release-evidence-bundle.ps1", "release evidence bundle")) {
+        if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+          $manifestErrors.Add("$docPath must include '$requiredPhrase'")
+        }
+      }
+    }
+  }
+}
+
+$publicationDryRunPath = Join-Path $root "config\\source-release-publication-dry-run.seed.json"
+if (Test-Path -LiteralPath $publicationDryRunPath -PathType Leaf) {
+  $publicationDryRun = Get-Content -Raw -LiteralPath $publicationDryRunPath | ConvertFrom-Json
+
+  if ($publicationDryRun.script -ne "scripts/validate-source-release-publication.ps1") {
+    $manifestErrors.Add("config\\source-release-publication-dry-run.seed.json must point to scripts/validate-source-release-publication.ps1")
+  }
+
+  if ($publicationDryRun.default_output_dir -ne "build/source-release-publication") {
+    $manifestErrors.Add("config\\source-release-publication-dry-run.seed.json must keep default output under ignored build/source-release-publication")
+  }
+
+  foreach ($field in @("dry_run_only", "no_github_release_publish", "no_tag_push", "writes_only_ignored_build_output", "requires_source_only_evidence_bundle", "requires_release_copy_check", "github_enforcement_claim_requires_bundle_approval")) {
+    if ($publicationDryRun.policy.$field -ne $true) {
+      $manifestErrors.Add("config\\source-release-publication-dry-run.seed.json policy.$field must remain true")
+    }
+  }
+
+  foreach ($flag in @("source_only", "no_apk", "no_exe", "no_store_release", "no_trusted_signing_claim")) {
+    if (@($publicationDryRun.required_evidence_flags) -notcontains $flag) {
+      $manifestErrors.Add("config\\source-release-publication-dry-run.seed.json must require evidence flag '$flag'")
+    }
+  }
+
+  foreach ($phrase in @("Source archive SHA-256:", "Source proof manifest:", "Verification date:", "This is a source-only release")) {
+    if (@($publicationDryRun.required_release_note_phrases) -notcontains $phrase) {
+      $manifestErrors.Add("config\\source-release-publication-dry-run.seed.json must require release-note phrase '$phrase'")
+    }
+  }
+
+  $publicationDryRunScriptPath = Join-Path $root "scripts\\validate-source-release-publication.ps1"
+  if (Test-Path -LiteralPath $publicationDryRunScriptPath -PathType Leaf) {
+    $publicationDryRunScript = Get-Content -Raw -LiteralPath $publicationDryRunScriptPath
+    foreach ($requiredPhrase in @("check-source-release-copy.ps1", "github_enforcement_claim_allowed", "publish_performed = `$false", "tag_push_performed = `$false", "dry_run_only = `$true", "build\source-release-publication")) {
+      if ($publicationDryRunScript.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add("scripts\\validate-source-release-publication.ps1 must include '$requiredPhrase'")
+      }
+    }
+    foreach ($forbiddenPhrase in @("gh release create", "gh release upload", "git push", "-X POST", "-X PATCH", "-X PUT", "-X DELETE")) {
+      if ($publicationDryRunScript.IndexOf($forbiddenPhrase, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+        $manifestErrors.Add("scripts\\validate-source-release-publication.ps1 must not publish or mutate remote state with '$forbiddenPhrase'")
+      }
+    }
+  }
+
+  foreach ($docPath in @("docs\\RELEASE_CHECKLIST.md", "docs\\RELEASE_POLICY.md", "scripts\\README.md")) {
+    $fullDocPath = Join-Path $root $docPath
+    if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
+      $docText = Get-Content -Raw -LiteralPath $fullDocPath
+      foreach ($requiredPhrase in @("validate-source-release-publication.ps1", "publication dry-run")) {
         if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
           $manifestErrors.Add("$docPath must include '$requiredPhrase'")
         }

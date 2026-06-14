@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-06-14",
+  "script": "scripts/validate-source-release-publication.ps1",
+  "default_output_dir": "build/source-release-publication",
+  "inputs": [
+    "release evidence bundle JSON",
+    "rendered source release notes"
+  ],
+  "policy": {
+    "dry_run_only": true,
+    "no_github_release_publish": true,
+    "no_tag_push": true,
+    "writes_only_ignored_build_output": true,
+    "requires_source_only_evidence_bundle": true,
+    "requires_release_copy_check": true,
+    "github_enforcement_claim_requires_bundle_approval": true
+  },
+  "required_evidence_flags": [
+    "source_only",
+    "no_apk",
+    "no_exe",
+    "no_store_release",
+    "no_trusted_signing_claim"
+  ],
+  "required_release_note_phrases": [
+    "Source archive SHA-256:",
+    "Source proof manifest:",
+    "Verification date:",
+    "This is a source-only release"
+  ]
+}

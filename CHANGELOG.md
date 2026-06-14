@@ -77,6 +77,9 @@ production readiness without matching public evidence.
   rulesets or branch protection before claiming enforcement.
 - Added a release evidence bundle helper that collects source preflight output,
   proof paths, source-only flags, and optional GitHub ruleset status.
+- Added a source release publication dry-run validator that checks release
+  evidence bundles and rendered release notes without publishing releases,
+  pushing tags, or uploading assets.
 
 ### Changed
 
@@ -85,7 +88,7 @@ production readiness without matching public evidence.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.38.0-source` candidates.
+  `v0.39.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -129,6 +132,7 @@ production readiness without matching public evidence.
 | `v0.36.0-source` | Pending stacked PR, not tagged | PR #56 |
 | `v0.37.0-source` | Pending stacked PR, not tagged | PR #57 |
 | `v0.38.0-source` | Pending stacked PR, not tagged | PR #58 |
+| `v0.39.0-source` | Pending stacked PR, not tagged | PR #59 |
 
 ### Still Source-Only
 

@@ -1,0 +1,154 @@
+param(
+  [Parameter(Mandatory = $true)]
+  [ValidatePattern('^v\d+\.\d+\.\d+-source$')]
+  [string]$Tag,
+
+  [Parameter(Mandatory = $true)]
+  [string]$EvidenceBundlePath,
+
+  [Parameter(Mandatory = $true)]
+  [string]$ReleaseNotesPath,
+
+  [string]$OutDir = ""
+)
+
+$ErrorActionPreference = "Stop"
+$root = Split-Path -Parent $PSScriptRoot
+$defaultOutputDir = "build\source-release-publication"
+
+function Resolve-RepoPath {
+  param([Parameter(Mandatory = $true)][string]$Path)
+
+  if ([System.IO.Path]::IsPathRooted($Path)) {
+    return $Path
+  }
+  return Join-Path $root $Path
+}
+
+function Assert-FlagTrue {
+  param(
+    [Parameter(Mandatory = $true)][object]$Payload,
+    [Parameter(Mandatory = $true)][string]$Name
+  )
+
+  if ($Payload.$Name -ne $true) {
+    throw "Publication dry-run refused evidence with $Name not true."
+  }
+}
+
+function Assert-Contains {
+  param(
+    [Parameter(Mandatory = $true)][string]$Text,
+    [Parameter(Mandatory = $true)][string]$Phrase,
+    [Parameter(Mandatory = $true)][string]$Label
+  )
+
+  if ($Text.IndexOf($Phrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+    throw "$Label must include '$Phrase'."
+  }
+}
+
+Push-Location $root
+try {
+  $resolvedEvidenceBundlePath = Resolve-RepoPath -Path $EvidenceBundlePath
+  $resolvedReleaseNotesPath = Resolve-RepoPath -Path $ReleaseNotesPath
+
+  if (-not (Test-Path -LiteralPath $resolvedEvidenceBundlePath -PathType Leaf)) {
+    throw "Evidence bundle not found: $resolvedEvidenceBundlePath"
+  }
+  if (-not (Test-Path -LiteralPath $resolvedReleaseNotesPath -PathType Leaf)) {
+    throw "Release notes not found: $resolvedReleaseNotesPath"
+  }
+
+  if ([string]::IsNullOrWhiteSpace($OutDir)) {
+    $OutDir = Join-Path $root (Join-Path $defaultOutputDir $Tag)
+  } else {
+    $OutDir = Resolve-RepoPath -Path $OutDir
+  }
+  New-Item -ItemType Directory -Path $OutDir -Force | Out-Null
+
+  $evidence = Get-Content -Raw -LiteralPath $resolvedEvidenceBundlePath | ConvertFrom-Json
+  if ($evidence.tag -ne $Tag) {
+    throw "Evidence bundle tag '$($evidence.tag)' does not match $Tag."
+  }
+
+  foreach ($flag in @(
+      "source_only",
+      "no_apk",
+      "no_exe",
+      "no_store_release",
+      "no_trusted_signing_claim"
+    )) {
+    Assert-FlagTrue -Payload $evidence -Name $flag
+  }
+
+  if ([int]$evidence.forbidden_file_count -ne 0) {
+    throw "Publication dry-run refused evidence with forbidden_file_count=$($evidence.forbidden_file_count)."
+  }
+
+  if ($evidence.release_boundary.ships_apk -ne $false -or
+    $evidence.release_boundary.ships_exe -ne $false -or
+    $evidence.release_boundary.store_release -ne $false -or
+    $evidence.release_boundary.trusted_signing_claim -ne $false -or
+    $evidence.release_boundary.official_binary_claim -ne $false) {
+    throw "Publication dry-run refused evidence with binary or official release boundary enabled."
+  }
+
+  powershell -ExecutionPolicy Bypass -File .\scripts\check-source-release-copy.ps1 -ReleaseNotesPath $resolvedReleaseNotesPath
+  if ($LASTEXITCODE -ne 0) {
+    throw "check-source-release-copy.ps1 failed for rendered release notes."
+  }
+
+  $releaseNotes = Get-Content -Raw -LiteralPath $resolvedReleaseNotesPath
+  foreach ($phrase in @(
+      "Source archive SHA-256:",
+      "Source proof manifest:",
+      "Verification date:",
+      "This is a source-only release"
+    )) {
+    Assert-Contains -Text $releaseNotes -Phrase $phrase -Label $resolvedReleaseNotesPath
+  }
+
+  if ($evidence.github_enforcement_claim_allowed -ne $true) {
+    foreach ($forbiddenPhrase in @(
+        "remote GitHub enforcement is active",
+        "branch protection is enforced",
+        "repository rulesets are enforced"
+      )) {
+      if ($releaseNotes.IndexOf($forbiddenPhrase, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+        throw "Release notes must not claim '$forbiddenPhrase' unless github_enforcement_claim_allowed is true."
+      }
+    }
+  }
+
+  $dryRunPath = Join-Path $OutDir "$Tag-publication-dry-run.json"
+  $summary = [ordered]@{
+    schema_version = 1
+    tag = $Tag
+    generated_at = (Get-Date).ToUniversalTime().ToString("o")
+    dry_run_only = $true
+    publish_performed = $false
+    tag_push_performed = $false
+    evidence_bundle = $resolvedEvidenceBundlePath
+    release_notes = $resolvedReleaseNotesPath
+    commit_sha = $evidence.commit_sha
+    source_archive_sha256 = $evidence.source_archive_sha256
+    github_ruleset_ok = $evidence.github_ruleset_ok
+    github_enforcement_claim_allowed = $evidence.github_enforcement_claim_allowed
+    source_only = [bool]$evidence.source_only
+    no_apk = [bool]$evidence.no_apk
+    no_exe = [bool]$evidence.no_exe
+    no_store_release = [bool]$evidence.no_store_release
+    no_trusted_signing_claim = [bool]$evidence.no_trusted_signing_claim
+    ready_for_manual_review = $true
+    manual_publish_note = "Review this dry-run output, release notes, proof manifest, and evidence bundle before creating a GitHub Release manually."
+  }
+
+  $summaryJson = $summary | ConvertTo-Json -Depth 20
+  [System.IO.File]::WriteAllText($dryRunPath, $summaryJson, [System.Text.UTF8Encoding]::new($false))
+
+  Write-Host "Source release publication dry-run written:" -ForegroundColor Green
+  Write-Host $dryRunPath
+} finally {
+  Pop-Location
+}
