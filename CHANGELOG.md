@@ -87,6 +87,8 @@ production readiness without matching public evidence.
   without keys, subscription URLs, raw configs, or proxy links.
 - Added a diagnostics export policy seed and docs gate for local-only,
   user-initiated, redacted support diagnostics and future log-export surfaces.
+- Added a release blocker inventory seed and docs gate for source tag
+  readiness, manual maintainer steps, and no-binary release boundaries.
 
 ### Changed
 
@@ -95,7 +97,7 @@ production readiness without matching public evidence.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.42.0-source` candidates.
+  `v0.43.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -143,6 +145,7 @@ production readiness without matching public evidence.
 | `v0.40.0-source` | Pending stacked PR, not tagged | PR #60 |
 | `v0.41.0-source` | Pending stacked PR, not tagged | PR #61 |
 | `v0.42.0-source` | Pending stacked PR, not tagged | PR #62 |
+| `v0.43.0-source` | Pending stacked PR, not tagged | PR #63 |
 
 ### Still Source-Only
 
