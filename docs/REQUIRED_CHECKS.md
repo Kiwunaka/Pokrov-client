@@ -8,6 +8,9 @@ remote repository.
 The machine-readable policy is
 [`config/required-checks.seed.json`](../config/required-checks.seed.json). The
 active CI workflow is [`.github/workflows/ci.yml`](../.github/workflows/ci.yml).
+GitHub repository ruleset and branch protection setup is tracked separately in
+[`GITHUB_RULESET_SETUP.md`](GITHUB_RULESET_SETUP.md) and
+[`config/github-ruleset.seed.json`](../config/github-ruleset.seed.json).
 
 ## Pull Request Checks
 

@@ -39,6 +39,9 @@ Use this checklist before publishing a public source or binary release.
   matches `.github/workflows/ci.yml` and `config/required-checks.seed.json`,
   including `Source import and public tree checks` and
   `Flutter analyze and tests`.
+- GitHub ruleset setup in [GITHUB_RULESET_SETUP.md](GITHUB_RULESET_SETUP.md)
+  still matches `config/github-ruleset.seed.json`; do not claim remote
+  enforcement until GitHub settings are configured and observed.
 - No generated build folders, local platform config, signing files, or runtime
   binaries are committed.
 

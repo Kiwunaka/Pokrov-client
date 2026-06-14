@@ -71,6 +71,8 @@ production readiness without matching public evidence.
 - Added a required checks and branch-protection policy gate for CI job names,
   source-release gates, read-only workflow permissions, and no-claim release
   boundaries.
+- Added a GitHub ruleset setup gate for repository ruleset or branch protection
+  configuration, manual verification, and no-claim release boundaries.
 
 ### Changed
 
@@ -79,7 +81,7 @@ production readiness without matching public evidence.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.35.0-source` candidates.
+  `v0.36.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -120,6 +122,7 @@ production readiness without matching public evidence.
 | `v0.33.0-source` | Pending stacked PR, not tagged | PR #53 |
 | `v0.34.0-source` | Pending stacked PR, not tagged | PR #54 |
 | `v0.35.0-source` | Pending stacked PR, not tagged | PR #55 |
+| `v0.36.0-source` | Pending stacked PR, not tagged | PR #56 |
 
 ### Still Source-Only
 

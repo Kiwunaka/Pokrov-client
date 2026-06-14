@@ -48,6 +48,11 @@ GitHub check names, including `Source import and public tree checks` and
 `Flutter analyze and tests`, and branch-protection guidance without claiming
 that remote repository settings are already enforced.
 
+Repository ruleset and branch protection setup is tracked in
+[GITHUB_RULESET_SETUP.md](GITHUB_RULESET_SETUP.md) and
+`config/github-ruleset.seed.json`. Release copy must not claim remote GitHub
+enforcement until those settings are configured and observed in GitHub.
+
 Run `scripts/check-source-release-copy.ps1 -ReleaseNotesPath <file>` again after
 manual edits to the GitHub Release body. It verifies that source-only releases
 still say no APK/EXE, no store release, no trusted signing claim, no official
