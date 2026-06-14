@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.43
+# Source Readiness: v0.2-v0.44
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -950,8 +950,37 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.44.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #64: source tag readiness command that reads blocker and readiness seeds,
+  writes a local summary, and returns non-zero while required blockers remain
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run `scripts/check-source-tag-readiness.ps1 -Tag <tag>` and confirm the
+  generated summary matches the exact source candidate and blocker inventory
+- clear every required manual maintainer blocker before treating the command as
+  ready
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the publication dry-run, release evidence bundle, preflight summary,
+  proof manifest, rendered GitHub Release body, and changelog section for the
+  exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
+- The source tag readiness command is a local review helper. It does not merge
+  PRs, create tags, push refs, publish GitHub Releases, upload assets, run the
+  full source preflight, or approve release copy by itself.
 - The release blocker inventory is a planning and review guardrail. It does
   not merge PRs, create tags, run the maintainer preflight, publish releases,
   or make the source line ready for tag by itself.

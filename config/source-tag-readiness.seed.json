@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "script": "scripts/check-source-tag-readiness.ps1",
+  "default_output_dir": "build/source-tag-readiness",
+  "inputs": {
+    "blocker_inventory": "config/release-blocker-inventory.seed.json",
+    "source_readiness": "config/source-release-readiness.seed.json"
+  },
+  "policy": {
+    "read_only": true,
+    "no_tag_creation": true,
+    "no_git_push": true,
+    "no_github_release_publish": true,
+    "nonzero_when_blocked": true,
+    "writes_only_ignored_build_output": true,
+    "requires_blocker_inventory": true,
+    "requires_source_readiness_milestone": true
+  },
+  "outputs": {
+    "summary_suffix": "-tag-readiness.json",
+    "ready_exit_code": 0,
+    "blocked_exit_code": 2
+  }
+}

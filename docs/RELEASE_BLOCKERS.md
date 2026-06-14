@@ -37,6 +37,11 @@ The blocker inventory deliberately uses `pending_maintainer_review` and
 cannot choose the release commit, merge the PR stack, create the annotated tag,
 review final public copy, or manually publish a GitHub Release.
 
+Run `scripts/check-source-tag-readiness.ps1 -Tag <tag>` for a local source tag readiness
+summary. The command is read-only, writes ignored
+`build/source-tag-readiness/` output, and returns non-zero while required
+manual maintainer blockers remain open.
+
 ## Evidence Rules
 
 Do not mark a blocker complete from intent or memory. Use current evidence:
