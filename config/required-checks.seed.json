@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-06-14",
+  "workflow": ".github/workflows/ci.yml",
+  "policy": {
+    "pull_request_ci_required": true,
+    "main_push_ci_required": true,
+    "contents_read_permission_required": true,
+    "source_release_preflight_smoke_required": true,
+    "clean_clone_source_boundary_required": true,
+    "flutter_analyze_required": true,
+    "workspace_tests_required": true,
+    "branch_protection_documented_not_claimed": true,
+    "skip_test_commands_forbidden_for_public_release": true
+  },
+  "required_jobs": [
+    "Source import and public tree checks",
+    "Flutter analyze and tests"
+  ],
+  "required_steps": [
+    "Run Python contract tests",
+    "Run operator fixture smoke",
+    "Validate public seed contracts",
+    "Run contributor doctor source-boundary smoke",
+    "Run source-release preflight smoke",
+    "Run OSS import dry-run wrapper",
+    "Export white-label token smoke",
+    "Verify clean clone source boundary",
+    "Analyze shared app shell",
+    "Run workspace tests"
+  ],
+  "release_required_commands": [
+    "python -m pytest tests",
+    "powershell -ExecutionPolicy Bypass -File .\\scripts\\validate-seed.ps1",
+    "powershell -ExecutionPolicy Bypass -File .\\scripts\\run-tests.ps1",
+    "powershell -ExecutionPolicy Bypass -File .\\scripts\\source-release-preflight.ps1 -RequireTag",
+    "powershell -ExecutionPolicy Bypass -File .\\scripts\\verify-clean-clone.ps1"
+  ],
+  "docs": [
+    "docs/REQUIRED_CHECKS.md",
+    "docs/RELEASE_CHECKLIST.md",
+    "docs/RELEASE_POLICY.md"
+  ]
+}

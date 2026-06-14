@@ -94,6 +94,7 @@ Source release status:
 | `v0.32.0-source` | Pending stacked PR, not tagged | Build troubleshooting router is in the stacked PR queue. |
 | `v0.33.0-source` | Pending stacked PR, not tagged | CODEOWNERS review-routing gate is in the stacked PR queue. |
 | `v0.34.0-source` | Pending stacked PR, not tagged | Dependabot dependency update policy gate is in the stacked PR queue. |
+| `v0.35.0-source` | Pending stacked PR, not tagged | Required checks policy gate is in the stacked PR queue. |
 
 ## Which App Should I Use?
 
@@ -126,6 +127,7 @@ Read the scope documents before opening issues or pull requests:
 - [Docs index](docs/README.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
 - [Release policy](docs/RELEASE_POLICY.md)
+- [Required checks](docs/REQUIRED_CHECKS.md)
 - [Dependency license audit](docs/DEPENDENCY_LICENSE_AUDIT.md)
 - [Dependency update policy](docs/DEPENDENCY_UPDATE_POLICY.md)
 - [Maintainer checklist](docs/MAINTAINER_CHECKLIST.md)

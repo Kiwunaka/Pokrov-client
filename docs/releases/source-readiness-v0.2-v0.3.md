@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.34
+# Source Readiness: v0.2-v0.35
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -700,6 +700,34 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.35.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #55: required checks and branch-protection policy gate for CI job names,
+  source-release gates, read-only workflow permissions, and no-claim release
+  boundaries
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- confirm `config/required-checks.seed.json` still matches
+  `.github/workflows/ci.yml`
+- confirm `docs/REQUIRED_CHECKS.md` still documents required check names without
+  claiming remote GitHub branch protection is already enabled
+- confirm release docs still forbid using `-SkipTestCommands` for public source
+  release publication
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the preflight summary, proof manifest, rendered GitHub Release body,
+  and changelog section for the exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
 - Free VPN catalog remains disabled by default and is not an official POKROV
@@ -776,3 +804,6 @@ Required before tagging:
 - Dependabot update routing improves source dependency visibility, but it does
   not replace human license review, runtime binary review, source-release
   proof, signing, store submission, or official binary approval.
+- Required-checks policy documents the expected CI and release gates, but remote
+  GitHub branch protection/ruleset enforcement still has to be configured and
+  observed in repository settings before public copy can claim it is enforced.

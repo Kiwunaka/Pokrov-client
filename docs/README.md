@@ -53,6 +53,8 @@ anything.
 - [Release policy](RELEASE_POLICY.md): source-only release rules.
 - [Release checklist](RELEASE_CHECKLIST.md): pre-tag and release evidence
   checks.
+- [Required checks](REQUIRED_CHECKS.md): CI job names, branch-protection
+  guidance, and source-release gates.
 - [Source release template](releases/SOURCE_RELEASE_TEMPLATE.md): GitHub
   Release body shape for source-only tags.
 - [Source readiness](releases/source-readiness-v0.2-v0.3.md): tracked

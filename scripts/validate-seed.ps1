@@ -50,6 +50,7 @@ $requiredFiles = @(
   ".github\\dependabot.yml",
   "config\\product-contract.seed.json",
   "config\\platform-matrix.seed.json",
+  "config\\required-checks.seed.json",
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
   "config\\windows-release.seed.json",
@@ -81,6 +82,7 @@ $requiredFiles = @(
   "docs\\DEPENDENCY_LICENSE_AUDIT.md",
   "docs\\DEPENDENCY_UPDATE_POLICY.md",
   "docs\\RELEASE_CHECKLIST.md",
+  "docs\\REQUIRED_CHECKS.md",
   "docs\\operator\\openapi.yaml",
   "apps\\README.md",
   "apps\\android_shell\\README.md",
@@ -138,6 +140,7 @@ $requiredFiles = @(
 $jsonFiles = @(
   "config\\product-contract.seed.json",
   "config\\platform-matrix.seed.json",
+  "config\\required-checks.seed.json",
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
   "config\\windows-release.seed.json",
@@ -845,6 +848,57 @@ if (Test-Path -LiteralPath $dependabotPolicyPath -PathType Leaf) {
       foreach ($requiredPhrase in @("Dependabot", "dependencies", "source-only", "license", "runtime binaries")) {
         if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
           $manifestErrors.Add("$docPath must include '$requiredPhrase' for dependency update policy")
+        }
+      }
+    }
+  }
+}
+
+$requiredChecksPath = Join-Path $root "config\\required-checks.seed.json"
+if (Test-Path -LiteralPath $requiredChecksPath -PathType Leaf) {
+  $requiredChecks = Get-Content -Raw -LiteralPath $requiredChecksPath | ConvertFrom-Json
+
+  if ($requiredChecks.workflow -ne ".github/workflows/ci.yml") {
+    $manifestErrors.Add("config\\required-checks.seed.json must point to .github/workflows/ci.yml")
+  }
+
+  foreach ($field in @("pull_request_ci_required", "main_push_ci_required", "contents_read_permission_required", "source_release_preflight_smoke_required", "clean_clone_source_boundary_required", "flutter_analyze_required", "workspace_tests_required", "branch_protection_documented_not_claimed", "skip_test_commands_forbidden_for_public_release")) {
+    if ($requiredChecks.policy.$field -ne $true) {
+      $manifestErrors.Add("config\\required-checks.seed.json policy.$field must remain true")
+    }
+  }
+
+  $workflowPath = Join-Path $root ".github\\workflows\\ci.yml"
+  if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
+    $workflowText = Get-Content -Raw -LiteralPath $workflowPath
+
+    foreach ($requiredPhrase in @("pull_request:", "branches:", "- main", "permissions:", "contents: read")) {
+      if ($workflowText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add(".github\\workflows\\ci.yml must include '$requiredPhrase' for required checks policy")
+      }
+    }
+
+    foreach ($jobName in @($requiredChecks.required_jobs)) {
+      if ($workflowText.IndexOf("name: $jobName", [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add(".github\\workflows\\ci.yml must include required job '$jobName'")
+      }
+    }
+
+    foreach ($stepName in @($requiredChecks.required_steps)) {
+      if ($workflowText.IndexOf("name: $stepName", [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add(".github\\workflows\\ci.yml must include required step '$stepName'")
+      }
+    }
+  }
+
+  foreach ($docPath in @($requiredChecks.docs)) {
+    $relativeDocPath = $docPath.Replace("/", [System.IO.Path]::DirectorySeparatorChar)
+    $fullDocPath = Join-Path $root $relativeDocPath
+    if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
+      $docText = Get-Content -Raw -LiteralPath $fullDocPath
+      foreach ($requiredPhrase in @("Required checks", "Source import and public tree checks", "Flutter analyze and tests", "-SkipTestCommands", "source-only")) {
+        if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+          $manifestErrors.Add("$docPath must include '$requiredPhrase' for required checks policy")
         }
       }
     }
