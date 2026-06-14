@@ -144,7 +144,7 @@ def test_release_stack_github_status_command_accepts_clean_snapshot(
     assert summary["github_status_ok"] is True
     assert summary["read_only"] is True
     assert summary["stack_count"] >= 5
-    assert summary["latest_pr"] == 68
+    assert summary["latest_pr"] == 69
     assert summary["clean_pr_count"] == summary["stack_count"]
     assert summary["successful_check_count"] == summary["stack_count"] * 2
     assert summary["errors"] == []

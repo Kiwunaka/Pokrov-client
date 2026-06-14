@@ -4295,6 +4295,8 @@ class AppFirstRuntimeBootstrapper
           HttpHeaders.userAgentHeader,
           _userAgent(hostPlatform),
         );
+        request.headers.set('X-Request-ID', _generateRequestId());
+        request.headers.set('X-Client-Version', _appVersion);
         if (bearerToken.isNotEmpty) {
           request.headers.set(
             HttpHeaders.authorizationHeader,
@@ -4498,6 +4500,13 @@ class AppFirstRuntimeBootstrapper
 
   String _userAgent(HostPlatform hostPlatform) =>
       'POKROV/${hostPlatform.name}/$_appVersion';
+
+  String _generateRequestId() {
+    final random = Random.secure();
+    final bytes = List<int>.generate(16, (_) => random.nextInt(256));
+    final suffix = base64Url.encode(bytes).replaceAll('=', '');
+    return 'pokrov-client-$suffix';
+  }
 
   String _generateInstallId(HostPlatform hostPlatform) {
     final random = Random.secure();

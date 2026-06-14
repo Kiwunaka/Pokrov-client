@@ -58,6 +58,12 @@
       "candidate": "v0.48.0-source",
       "base": "codex/v0.47-release-merge-handoff",
       "head": "codex/v0.48-android-device-validation"
+    },
+    {
+      "pr": 69,
+      "candidate": "v0.49.0-source",
+      "base": "codex/v0.48-android-device-validation",
+      "head": "codex/v0.49-operator-request-headers"
     }
   ]
 }
