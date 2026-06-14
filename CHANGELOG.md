@@ -85,6 +85,8 @@ production readiness without matching public evidence.
   distribution claims.
 - Added safe support diagnostics copy/export so users can share redacted JSON
   without keys, subscription URLs, raw configs, or proxy links.
+- Added a diagnostics export policy seed and docs gate for local-only,
+  user-initiated, redacted support diagnostics and future log-export surfaces.
 
 ### Changed
 
@@ -93,7 +95,7 @@ production readiness without matching public evidence.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.41.0-source` candidates.
+  `v0.42.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -140,6 +142,7 @@ production readiness without matching public evidence.
 | `v0.39.0-source` | Pending stacked PR, not tagged | PR #59 |
 | `v0.40.0-source` | Pending stacked PR, not tagged | PR #60 |
 | `v0.41.0-source` | Pending stacked PR, not tagged | PR #61 |
+| `v0.42.0-source` | Pending stacked PR, not tagged | PR #62 |
 
 ### Still Source-Only
 
