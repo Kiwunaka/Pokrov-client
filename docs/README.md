@@ -34,6 +34,8 @@ anything.
   config catalog rules and attribution boundaries.
 - [GitHub triage](GITHUB_TRIAGE.md): issue routing, labels, and public
   redaction rules.
+- [Governance](GOVERNANCE.md): maintainer-led decision rules and CODEOWNERS
+  review routing.
 - [Support](../SUPPORT.md): where to ask for help without posting private
   keys, QR payloads, subscription URLs, or backend details.
 - [Security](../SECURITY.md): private reporting route for vulnerabilities.
