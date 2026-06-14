@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "note": "Local-only workstation overrides copied by scripts/bootstrap-local.ps1 when needed.",
+  "android_device_id": "",
+  "windows_device_id": "",
+  "operator_fixture_port": 18766,
+  "free_catalog_enabled_for_local_testing": false
+}

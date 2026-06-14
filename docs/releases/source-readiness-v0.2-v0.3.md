@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.30
+# Source Readiness: v0.2-v0.31
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -588,6 +588,32 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.31.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #51: contributor doctor and docs index gate for read-only toolchain
+  diagnostics, local bootstrap template coverage, build issue reporting, and
+  source-only onboarding
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run `scripts\doctor.ps1` and confirm it remains read-only
+- confirm build issues ask for redacted `scripts\doctor.ps1 -Json` output
+- confirm `config/templates/device-overrides.seed.json` still exists for
+  `bootstrap-local.ps1`
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the preflight summary, proof manifest, rendered GitHub Release body,
+  and changelog section for the exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
 - Free VPN catalog remains disabled by default and is not an official POKROV
@@ -652,3 +678,6 @@ Required before tagging:
 - Changelog and release-history policy is now seed-backed, but maintainers
   still own exact release-date and final feature-status edits when a real
   source tag is published.
+- Contributor doctor is a read-only diagnostic helper. It does not install
+  dependencies, fetch runtime binaries, build artifacts, copy local config, or
+  prove Android SDK, Visual Studio, signing, store, or runtime binary readiness.

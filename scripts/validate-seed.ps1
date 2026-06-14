@@ -52,6 +52,7 @@ $requiredFiles = @(
   "config\\free-vpn-catalog.seed.json",
   "config\\security-intake.seed.json",
   "config\\changelog-policy.seed.json",
+  "config\\contributor-doctor.seed.json",
   "config\\dependency-license-inventory.seed.json",
   "config\\generated-assets.seed.json",
   "config\\source-release-readiness.seed.json",
@@ -61,6 +62,8 @@ $requiredFiles = @(
   "config\\variants\\operator-client.seed.json",
   "config\\variants\\pokrov-service.seed.json",
   "config\\templates\\local.env.example",
+  "config\\templates\\device-overrides.seed.json",
+  "docs\\README.md",
   "docs\\OPEN_SOURCE_SCOPE.md",
   "docs\\PRODUCT_VARIANTS.md",
   "docs\\OPERATOR_INTEGRATION.md",
@@ -114,6 +117,7 @@ $requiredFiles = @(
   "scripts\\run-operator-fixture-smoke.ps1",
   "scripts\\run-tests.ps1",
   "scripts\\validate-seed.ps1",
+  "scripts\\doctor.ps1",
   "scripts\\export-white-label-color-tokens.ps1",
   "tools\\variant_build\\__init__.py",
   "tools\\variant_build\\variant_command.py",
@@ -132,6 +136,7 @@ $jsonFiles = @(
   "config\\free-vpn-catalog.seed.json",
   "config\\security-intake.seed.json",
   "config\\changelog-policy.seed.json",
+  "config\\contributor-doctor.seed.json",
   "config\\dependency-license-inventory.seed.json",
   "config\\generated-assets.seed.json",
   "config\\source-release-readiness.seed.json",
@@ -139,7 +144,8 @@ $jsonFiles = @(
   "config\\white-label-color-tokens.schema.json",
   "config\\variants\\community-client.seed.json",
   "config\\variants\\operator-client.seed.json",
-  "config\\variants\\pokrov-service.seed.json"
+  "config\\variants\\pokrov-service.seed.json",
+  "config\\templates\\device-overrides.seed.json"
 )
 
 $missing = [System.Collections.Generic.List[string]]::new()
@@ -596,6 +602,71 @@ if (Test-Path -LiteralPath $changelogPolicyPath -PathType Leaf) {
         }
       }
     }
+  }
+}
+
+$contributorDoctorPath = Join-Path $root "config\\contributor-doctor.seed.json"
+if (Test-Path -LiteralPath $contributorDoctorPath -PathType Leaf) {
+  $contributorDoctor = Get-Content -Raw -LiteralPath $contributorDoctorPath | ConvertFrom-Json
+
+  if ($contributorDoctor.script -ne "scripts/doctor.ps1") {
+    $manifestErrors.Add("config\\contributor-doctor.seed.json must point to scripts/doctor.ps1")
+  }
+
+  foreach ($field in @("read_only_by_default", "no_dependency_install", "no_build_or_release_artifacts", "no_network_required", "json_output_supported", "command_checks_can_be_skipped")) {
+    if ($contributorDoctor.policy.$field -ne $true) {
+      $manifestErrors.Add("config\\contributor-doctor.seed.json policy.$field must remain true")
+    }
+  }
+
+  foreach ($commandName in @("git", "python", "flutter", "dart")) {
+    if (@($contributorDoctor.required_commands) -notcontains $commandName) {
+      $manifestErrors.Add("config\\contributor-doctor.seed.json must require command '$commandName'")
+    }
+  }
+
+  foreach ($publicFile in @($contributorDoctor.required_public_files)) {
+    $relativeFile = $publicFile.Replace("/", [System.IO.Path]::DirectorySeparatorChar)
+    if (-not (Test-Path -LiteralPath (Join-Path $root $relativeFile) -PathType Leaf)) {
+      $manifestErrors.Add("config\\contributor-doctor.seed.json required public file '$publicFile' must exist")
+    }
+  }
+
+  $doctorScriptPath = Join-Path $root "scripts\\doctor.ps1"
+  if (Test-Path -LiteralPath $doctorScriptPath -PathType Leaf) {
+    $doctorScriptText = Get-Content -Raw -LiteralPath $doctorScriptPath
+    foreach ($requiredPhrase in @("-SkipCommandChecks", "-Json", "Contributor doctor OK.", "read_only")) {
+      if ($doctorScriptText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add("scripts\\doctor.ps1 must include '$requiredPhrase'")
+      }
+    }
+    foreach ($forbiddenPhrase in @("flutter pub get", "flutter build", "Copy-Item", "New-Item")) {
+      if ($doctorScriptText.IndexOf($forbiddenPhrase, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+        $manifestErrors.Add("scripts\\doctor.ps1 must stay read-only and not include '$forbiddenPhrase'")
+      }
+    }
+  }
+
+  $doctorDocsText = ""
+  foreach ($docPath in @($contributorDoctor.required_docs)) {
+    $relativeDocPath = $docPath.Replace("/", [System.IO.Path]::DirectorySeparatorChar)
+    $fullDocPath = Join-Path $root $relativeDocPath
+    if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
+      $doctorDocsText += "`n" + (Get-Content -Raw -LiteralPath $fullDocPath)
+    }
+  }
+
+  $doctorDocsMentionScript = $false
+  foreach ($needle in @("scripts\doctor.ps1", "scripts/doctor.ps1")) {
+    if ($doctorDocsText.IndexOf($needle, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+      $doctorDocsMentionScript = $true
+    }
+  }
+  if (-not $doctorDocsMentionScript) {
+    $manifestErrors.Add("Contributor docs must mention scripts\\doctor.ps1")
+  }
+  if ($doctorDocsText.IndexOf("read-only", [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+    $manifestErrors.Add("Contributor docs must state that scripts\\doctor.ps1 is read-only")
   }
 }
 
