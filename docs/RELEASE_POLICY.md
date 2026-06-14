@@ -42,6 +42,12 @@ checks the draft with `scripts/check-source-release-copy.ps1`, and writes a
 local preflight summary. The `-SkipTestCommands` switch is only for local or CI
 smoke coverage and must not be used for publishing a public source release.
 
+Required checks and release gates are summarized in
+[REQUIRED_CHECKS.md](REQUIRED_CHECKS.md). That page documents the expected
+GitHub check names, including `Source import and public tree checks` and
+`Flutter analyze and tests`, and branch-protection guidance without claiming
+that remote repository settings are already enforced.
+
 Run `scripts/check-source-release-copy.ps1 -ReleaseNotesPath <file>` again after
 manual edits to the GitHub Release body. It verifies that source-only releases
 still say no APK/EXE, no store release, no trusted signing claim, no official
