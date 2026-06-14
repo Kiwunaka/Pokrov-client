@@ -91,6 +91,8 @@ production readiness without matching public evidence.
   readiness, manual maintainer steps, and no-binary release boundaries.
 - Added a source tag readiness command that reads blocker and readiness seeds,
   writes a local summary, and returns non-zero while required blockers remain.
+- Added a release merge-order verifier that checks the local stacked PR
+  manifest before manual merge or tag work.
 
 ### Changed
 
@@ -99,7 +101,7 @@ production readiness without matching public evidence.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.44.0-source` candidates.
+  `v0.45.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -149,6 +151,7 @@ production readiness without matching public evidence.
 | `v0.42.0-source` | Pending stacked PR, not tagged | PR #62 |
 | `v0.43.0-source` | Pending stacked PR, not tagged | PR #63 |
 | `v0.44.0-source` | Pending stacked PR, not tagged | PR #64 |
+| `v0.45.0-source` | Pending stacked PR, not tagged | PR #65 |
 
 ### Still Source-Only
 

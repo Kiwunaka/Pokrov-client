@@ -145,6 +145,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.42.0-source` | Pending stacked PR, not tagged | Privacy-first diagnostics export policy gate is in the stacked PR queue. |
 | `v0.43.0-source` | Pending stacked PR, not tagged | Release blocker inventory for source tag readiness is in the stacked PR queue. |
 | `v0.44.0-source` | Pending stacked PR, not tagged | Source tag readiness command is in the stacked PR queue. |
+| `v0.45.0-source` | Pending stacked PR, not tagged | Release merge-order verifier is in the stacked PR queue. |
 
 ## Architecture Boundary
 
