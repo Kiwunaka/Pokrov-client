@@ -97,6 +97,9 @@ production readiness without matching public evidence.
   status snapshot before manual merge or tag work.
 - Added a release merge handoff helper that bundles local merge-order,
   GitHub-status, and tag-readiness summaries for maintainer review.
+- Added an Android device validation checklist and local smoke precheck that
+  writes a claim-safe `MANUAL_OWNER_TEST` summary without running ADB,
+  installing builds, or mutating devices.
 
 ### Changed
 
@@ -104,8 +107,10 @@ production readiness without matching public evidence.
 - Hardened source-import policy and clean-clone verification.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
+- Fixed the documented no-argument release merge handoff command so it uses the
+  seed default input paths.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.47.0-source` candidates.
+  `v0.48.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -158,6 +163,7 @@ production readiness without matching public evidence.
 | `v0.45.0-source` | Pending stacked PR, not tagged | PR #65 |
 | `v0.46.0-source` | Pending stacked PR, not tagged | PR #66 |
 | `v0.47.0-source` | Pending stacked PR, not tagged | PR #67 |
+| `v0.48.0-source` | Pending stacked PR, not tagged | PR #68 |
 
 ### Still Source-Only
 

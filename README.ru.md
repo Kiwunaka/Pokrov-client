@@ -149,6 +149,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.45.0-source` | Pending stacked PR, tag еще не создан | Release merge-order verifier находится в stacked PR queue. |
 | `v0.46.0-source` | Pending stacked PR, tag еще не создан | Release stack GitHub status verifier находится в stacked PR queue. |
 | `v0.47.0-source` | Pending stacked PR, tag еще не создан | Release merge handoff helper находится в stacked PR queue. |
+| `v0.48.0-source` | Pending stacked PR, tag еще не создан | Android device validation и release merge handoff default-path fix находятся в stacked PR queue. |
 
 ## Архитектурная Граница
 

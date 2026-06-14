@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-06-14",
+  "script": "scripts/android-device-smoke.ps1",
+  "checklist_doc": "docs/device-validation/android.md",
+  "default_output_dir": "build/android-device-validation",
+  "policy": {
+    "read_only": true,
+    "no_device_mutation_by_default": true,
+    "physical_device_result_is_manual_owner_test": true,
+    "does_not_claim_store_or_trusted_signing": true,
+    "does_not_replace_release_build_audit": true
+  },
+  "manual_checks": [
+    "vpn_permission_flow",
+    "foreground_service_special_use",
+    "notification_disconnect",
+    "system_vpn_revoke",
+    "wifi_full_tunnel",
+    "mobile_network_full_tunnel",
+    "airplane_mode_recovery",
+    "reconnect_loop",
+    "subscription_refresh_failure_preserves_profile",
+    "dns_no_desktop_loopback",
+    "route_materialization",
+    "false_connected_guard"
+  ],
+  "required_public_files": [
+    "apps/android_shell/android/app/src/main/AndroidManifest.xml",
+    "apps/android_shell/android/app/src/main/kotlin/space/pokrov/pokrov_android_shell/PokrovRuntimeVpnService.kt",
+    "apps/android_shell/README.md",
+    "docs/device-validation/android.md"
+  ],
+  "release_claims": {
+    "store_ready": false,
+    "trusted_signing": false,
+    "production_ready": false,
+    "official_binary_proof": false
+  }
+}

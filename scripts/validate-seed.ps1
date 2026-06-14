@@ -28,6 +28,7 @@ $requiredDirectories = @(
   "config\\templates",
   "config\\variants",
   "docs",
+  "docs\\device-validation",
   "docs\\operator",
   "docs\\releases",
   "assets\\brand",
@@ -51,6 +52,7 @@ $requiredFiles = @(
   "config\\product-contract.seed.json",
   "config\\platform-matrix.seed.json",
   "config\\github-ruleset.seed.json",
+  "config\\android-device-validation.seed.json",
   "config\\release-evidence-bundle.seed.json",
   "config\\source-release-publication-dry-run.seed.json",
   "config\\source-tag-readiness.seed.json",
@@ -90,6 +92,7 @@ $requiredFiles = @(
   "docs\\FREE_VPN_CATALOG_GATE.md",
   "docs\\WHITE_LABEL_BRANDING.md",
   "docs\\BUILD_FROM_SOURCE.md",
+  "docs\\device-validation\\android.md",
   "docs\\DEPENDENCY_LICENSE_AUDIT.md",
   "docs\\DEPENDENCY_UPDATE_POLICY.md",
   "docs\\GITHUB_RULESET_SETUP.md",
@@ -132,6 +135,7 @@ $requiredFiles = @(
   "assets\\branding\\README.md",
   "scripts\\README.md",
   "scripts\\bootstrap-workspace.ps1",
+  "scripts\\android-device-smoke.ps1",
   "scripts\\bootstrap-local.ps1",
   "scripts\\check-github-ruleset.ps1",
   "scripts\\fetch-libcore-assets.ps1",
@@ -162,6 +166,7 @@ $jsonFiles = @(
   "config\\product-contract.seed.json",
   "config\\platform-matrix.seed.json",
   "config\\github-ruleset.seed.json",
+  "config\\android-device-validation.seed.json",
   "config\\release-evidence-bundle.seed.json",
   "config\\source-release-publication-dry-run.seed.json",
   "config\\source-tag-readiness.seed.json",
@@ -1055,6 +1060,72 @@ if (Test-Path -LiteralPath $githubRulesetPath -PathType Leaf) {
     foreach ($forbiddenPhrase in @("-X POST", "-X PATCH", "-X PUT", "-X DELETE", "gh repo edit", "gh ruleset", "Invoke-RestMethod -Method Post", "Invoke-RestMethod -Method Patch", "Invoke-RestMethod -Method Put", "Invoke-RestMethod -Method Delete")) {
       if ($githubRulesetScript.IndexOf($forbiddenPhrase, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
         $manifestErrors.Add("scripts\\check-github-ruleset.ps1 must stay read-only and not include '$forbiddenPhrase'")
+      }
+    }
+  }
+}
+
+$androidDeviceValidationPath = Join-Path $root "config\android-device-validation.seed.json"
+if (Test-Path -LiteralPath $androidDeviceValidationPath -PathType Leaf) {
+  $androidDeviceValidation = Get-Content -Raw -LiteralPath $androidDeviceValidationPath | ConvertFrom-Json
+  if ($androidDeviceValidation.script -ne "scripts/android-device-smoke.ps1") {
+    $manifestErrors.Add("config\android-device-validation.seed.json must point to scripts/android-device-smoke.ps1")
+  }
+  if ($androidDeviceValidation.checklist_doc -ne "docs/device-validation/android.md") {
+    $manifestErrors.Add("config\android-device-validation.seed.json must point to docs/device-validation/android.md")
+  }
+  if ($androidDeviceValidation.default_output_dir -ne "build/android-device-validation") {
+    $manifestErrors.Add("config\android-device-validation.seed.json must keep default output under ignored build/android-device-validation")
+  }
+  foreach ($field in @("read_only", "no_device_mutation_by_default", "physical_device_result_is_manual_owner_test", "does_not_claim_store_or_trusted_signing", "does_not_replace_release_build_audit")) {
+    if ($androidDeviceValidation.policy.$field -ne $true) {
+      $manifestErrors.Add("config\android-device-validation.seed.json policy.$field must remain true")
+    }
+  }
+  foreach ($requiredCheck in @("vpn_permission_flow", "foreground_service_special_use", "notification_disconnect", "system_vpn_revoke", "wifi_full_tunnel", "mobile_network_full_tunnel", "airplane_mode_recovery", "reconnect_loop", "subscription_refresh_failure_preserves_profile", "dns_no_desktop_loopback", "route_materialization", "false_connected_guard")) {
+    if ($androidDeviceValidation.manual_checks -notcontains $requiredCheck) {
+      $manifestErrors.Add("config\android-device-validation.seed.json must include manual check '$requiredCheck'")
+    }
+  }
+  foreach ($field in @("store_ready", "trusted_signing", "production_ready", "official_binary_proof")) {
+    if ($androidDeviceValidation.release_claims.$field -ne $false) {
+      $manifestErrors.Add("config\android-device-validation.seed.json release_claims.$field must remain false")
+    }
+  }
+
+  $androidDeviceScriptPath = Join-Path $root "scripts\android-device-smoke.ps1"
+  if (Test-Path -LiteralPath $androidDeviceScriptPath -PathType Leaf) {
+    $androidDeviceScript = Get-Content -Raw -LiteralPath $androidDeviceScriptPath
+    foreach ($requiredPhrase in @("android-device-validation.seed.json", "MANUAL_OWNER_TEST", "android.permission.BIND_VPN_SERVICE", "FOREGROUND_SERVICE_TYPE_SPECIAL_USE", "notification disconnect", "build/android-device-validation")) {
+      if ($androidDeviceScript.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add("scripts\android-device-smoke.ps1 must include '$requiredPhrase'")
+      }
+    }
+    foreach ($forbiddenPhrase in @("adb install", "adb uninstall", "adb shell", "Start-Process adb", "gradlew assembleRelease", "flutter build apk", "gh release", "git push", "gh api")) {
+      if ($androidDeviceScript.IndexOf($forbiddenPhrase, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+        $manifestErrors.Add("scripts\android-device-smoke.ps1 must remain a read-only local precheck and must not include '$forbiddenPhrase'")
+      }
+    }
+  }
+
+  $androidDeviceDocPath = Join-Path $root "docs\device-validation\android.md"
+  if (Test-Path -LiteralPath $androidDeviceDocPath -PathType Leaf) {
+    $androidDeviceDoc = Get-Content -Raw -LiteralPath $androidDeviceDocPath
+    foreach ($requiredPhrase in @("MANUAL_OWNER_TEST", "scripts\android-device-smoke.ps1", "VpnService permission", "Android 14 specialUse foreground service", "notification disconnect", "system VPN settings", "does not prove store readiness", "does not prove trusted signing", "does not replace the release-build audit")) {
+      if ($androidDeviceDoc.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add("docs\device-validation\android.md must include '$requiredPhrase'")
+      }
+    }
+  }
+
+  foreach ($docPath in @("docs\README.md", "apps\android_shell\README.md", "scripts\README.md")) {
+    $fullDocPath = Join-Path $root $docPath
+    if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
+      $docText = Get-Content -Raw -LiteralPath $fullDocPath
+      foreach ($requiredPhrase in @("android-device-smoke.ps1", "Android device validation", "MANUAL_OWNER_TEST")) {
+        if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+          $manifestErrors.Add("$docPath must include '$requiredPhrase' for Android device validation")
+        }
       }
     }
   }

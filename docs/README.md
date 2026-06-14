@@ -10,6 +10,9 @@ or prepare a source-only release.
   dependency setup, tests, and clean-clone proof.
 - [Troubleshooting](TROUBLESHOOTING.md): source checkout, dependency, Android,
   Windows, and clean-clone failure routing.
+- [Android device validation](device-validation/android.md): public
+  `MANUAL_OWNER_TEST` checklist and local precheck via
+  `scripts\android-device-smoke.ps1` for Android release-build device review.
 - [Open-source scope](OPEN_SOURCE_SCOPE.md): what is public, what remains
   private, and which claims are not made by this repository.
 - [Product variants](PRODUCT_VARIANTS.md): community, operator, and official

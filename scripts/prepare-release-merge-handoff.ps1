@@ -46,7 +46,7 @@ function Assert-BuildOutputPath {
 
 function Get-InputPath {
   param(
-    [Parameter(Mandatory = $true)][string]$ProvidedPath,
+    [AllowEmptyString()][string]$ProvidedPath,
     [Parameter(Mandatory = $true)][string]$DefaultPath
   )
 
