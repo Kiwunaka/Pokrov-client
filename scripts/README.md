@@ -17,6 +17,9 @@ Current helpers:
 - `render-source-release-notes.ps1`: renders a source-only GitHub Release body from a `prepare-source-release.ps1` proof manifest and refuses manifests that do not preserve source-only honesty flags
 - `check-source-release-copy.ps1`: checks the release policy, checklist, template, renderer, and optionally a rendered release note for source-only claim boundaries
 - `source-release-preflight.ps1`: runs the source release gate, creates the proof archive/manifest, renders source-only release notes, checks release-copy boundaries, and writes a local preflight summary; `-SkipTestCommands` is only for smoke tests, not publishing
+- `check-github-ruleset.ps1`: read-only GitHub settings verifier for repository
+  rulesets or branch protection; uses `gh api`, supports `-ReportOnly -Json`,
+  and does not create, edit, or delete remote settings
 - `print-build-variant-command.ps1`: prints a PowerShell `flutter run` or `flutter build` command from `config/variants/*.seed.json`; preview-only, no files are changed
 - `export-white-label-color-tokens.ps1`: validates `config/white-label-color-tokens.seed.json` and writes local JSON, Dart, and CSS color-token exports under ignored `build/white_label_tokens/`
 

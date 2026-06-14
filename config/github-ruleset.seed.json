@@ -3,6 +3,7 @@
   "reviewed_at": "2026-06-14",
   "mode": "setup_guidance_not_remote_enforcement",
   "docs": "docs/GITHUB_RULESET_SETUP.md",
+  "verifier_script": "scripts/check-github-ruleset.ps1",
   "target_branches": ["main"],
   "required_status_checks": [
     "Source import and public tree checks",
@@ -18,7 +19,10 @@
     "conversation_resolution_required": true,
     "block_force_pushes_required": true,
     "block_branch_deletion_required": true,
-    "bypass_must_be_explicit_and_minimal": true
+    "bypass_must_be_explicit_and_minimal": true,
+    "verifier_is_read_only": true,
+    "verifier_report_only_supported": true,
+    "verifier_not_required_in_ci_until_remote_settings_exist": true
   },
   "manual_verification_required": [
     "GitHub repository ruleset or branch protection is active for main",

@@ -20,6 +20,7 @@ def test_github_ruleset_seed_defines_manual_enforcement_contract() -> None:
 
     assert seed["mode"] == "setup_guidance_not_remote_enforcement"
     assert seed["docs"] == "docs/GITHUB_RULESET_SETUP.md"
+    assert seed["verifier_script"] == "scripts/check-github-ruleset.ps1"
     assert seed["target_branches"] == ["main"]
     assert seed["policy"]["repository_ruleset_preferred"] is True
     assert seed["policy"]["branch_protection_fallback_supported"] is True
@@ -31,6 +32,9 @@ def test_github_ruleset_seed_defines_manual_enforcement_contract() -> None:
     assert seed["policy"]["block_force_pushes_required"] is True
     assert seed["policy"]["block_branch_deletion_required"] is True
     assert seed["policy"]["bypass_must_be_explicit_and_minimal"] is True
+    assert seed["policy"]["verifier_is_read_only"] is True
+    assert seed["policy"]["verifier_report_only_supported"] is True
+    assert seed["policy"]["verifier_not_required_in_ci_until_remote_settings_exist"] is True
 
 
 def test_github_ruleset_required_checks_match_required_checks_seed() -> None:
@@ -45,6 +49,8 @@ def test_github_ruleset_docs_avoid_remote_enforcement_claims() -> None:
 
     for phrase in (
         "not proof that remote GitHub settings are already active",
+        "scripts/check-github-ruleset.ps1",
+        "does not create, edit, or delete GitHub settings",
         "repository ruleset or branch protection is active for `main`",
         "required status checks exactly match `config/required-checks.seed.json`",
         "CODEOWNERS review is required",
@@ -69,13 +75,49 @@ def test_release_and_governance_docs_link_github_ruleset_setup() -> None:
 
     assert "GITHUB_RULESET_SETUP.md" in docs
     assert "config/github-ruleset.seed.json" in docs
+    assert "scripts/check-github-ruleset.ps1" in docs
     assert "not proof" in docs
+
+
+def test_github_ruleset_verifier_script_is_read_only() -> None:
+    script = _read("scripts/check-github-ruleset.ps1")
+    docs = _read("scripts/README.md")
+
+    for phrase in (
+        "gh api",
+        "ReportOnly",
+        "read_only",
+        "required_status_checks",
+        "branch_protection",
+        "ruleset",
+    ):
+        assert phrase in script
+
+    for forbidden in (
+        "-X POST",
+        "-X PATCH",
+        "-X PUT",
+        "-X DELETE",
+        "gh repo edit",
+        "gh ruleset",
+        "Invoke-RestMethod -Method Post",
+        "Invoke-RestMethod -Method Patch",
+        "Invoke-RestMethod -Method Put",
+        "Invoke-RestMethod -Method Delete",
+    ):
+        assert forbidden not in script
+
+    assert "check-github-ruleset.ps1" in docs
+    assert "read-only" in docs
+    assert "-ReportOnly -Json" in docs
 
 
 def test_validate_seed_knows_github_ruleset_setup() -> None:
     validator = _read("scripts/validate-seed.ps1")
 
     assert "config\\\\github-ruleset.seed.json" in validator
+    assert "scripts\\\\check-github-ruleset.ps1" in validator
     assert "GITHUB_RULESET_SETUP.md" in validator
     assert "required_status_checks" in validator
     assert "remote_enforcement_not_claimed" in validator
+    assert "verifier_is_read_only" in validator

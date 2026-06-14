@@ -121,6 +121,7 @@ $requiredFiles = @(
   "scripts\\README.md",
   "scripts\\bootstrap-workspace.ps1",
   "scripts\\bootstrap-local.ps1",
+  "scripts\\check-github-ruleset.ps1",
   "scripts\\fetch-libcore-assets.ps1",
   "scripts\\check-source-release-copy.ps1",
   "scripts\\prepare-oss-import.ps1",
@@ -920,11 +921,15 @@ if (Test-Path -LiteralPath $githubRulesetPath -PathType Leaf) {
     $manifestErrors.Add("config\\github-ruleset.seed.json must point to docs/GITHUB_RULESET_SETUP.md")
   }
 
+  if ($githubRuleset.verifier_script -ne "scripts/check-github-ruleset.ps1") {
+    $manifestErrors.Add("config\\github-ruleset.seed.json must point to scripts/check-github-ruleset.ps1")
+  }
+
   if (@($githubRuleset.target_branches) -notcontains "main") {
     $manifestErrors.Add("config\\github-ruleset.seed.json must target main")
   }
 
-  foreach ($field in @("repository_ruleset_preferred", "branch_protection_fallback_supported", "remote_enforcement_not_claimed", "pull_request_required", "required_status_checks_required", "codeowners_review_required", "conversation_resolution_required", "block_force_pushes_required", "block_branch_deletion_required", "bypass_must_be_explicit_and_minimal")) {
+  foreach ($field in @("repository_ruleset_preferred", "branch_protection_fallback_supported", "remote_enforcement_not_claimed", "pull_request_required", "required_status_checks_required", "codeowners_review_required", "conversation_resolution_required", "block_force_pushes_required", "block_branch_deletion_required", "bypass_must_be_explicit_and_minimal", "verifier_is_read_only", "verifier_report_only_supported", "verifier_not_required_in_ci_until_remote_settings_exist")) {
     if ($githubRuleset.policy.$field -ne $true) {
       $manifestErrors.Add("config\\github-ruleset.seed.json policy.$field must remain true")
     }
@@ -952,9 +957,24 @@ if (Test-Path -LiteralPath $githubRulesetPath -PathType Leaf) {
   $githubRulesetDocPath = Join-Path $root "docs\\GITHUB_RULESET_SETUP.md"
   if (Test-Path -LiteralPath $githubRulesetDocPath -PathType Leaf) {
     $githubRulesetDoc = Get-Content -Raw -LiteralPath $githubRulesetDocPath
-    foreach ($requiredPhrase in @("not proof that remote GitHub settings are already active", "Source import and public tree checks", "Flutter analyze and tests", "CODEOWNERS review", "conversation resolution", "blocked force pushes", "blocked branch deletion", "a test pull request without required checks cannot be merged", "do not prove APK, EXE, store release, trusted signing")) {
+    foreach ($requiredPhrase in @("not proof that remote GitHub settings are already active", "scripts/check-github-ruleset.ps1", "Source import and public tree checks", "Flutter analyze and tests", "CODEOWNERS review", "conversation resolution", "blocked force pushes", "blocked branch deletion", "a test pull request without required checks cannot be merged", "do not prove APK, EXE, store release, trusted signing")) {
       if ($githubRulesetDoc.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
         $manifestErrors.Add("docs\\GITHUB_RULESET_SETUP.md must include '$requiredPhrase'")
+      }
+    }
+  }
+
+  $githubRulesetScriptPath = Join-Path $root "scripts\\check-github-ruleset.ps1"
+  if (Test-Path -LiteralPath $githubRulesetScriptPath -PathType Leaf) {
+    $githubRulesetScript = Get-Content -Raw -LiteralPath $githubRulesetScriptPath
+    foreach ($requiredPhrase in @("gh api", "-ReportOnly", "read_only", "required_status_checks", "branch_protection", "ruleset")) {
+      if ($githubRulesetScript.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add("scripts\\check-github-ruleset.ps1 must include '$requiredPhrase'")
+      }
+    }
+    foreach ($forbiddenPhrase in @("-X POST", "-X PATCH", "-X PUT", "-X DELETE", "gh repo edit", "gh ruleset", "Invoke-RestMethod -Method Post", "Invoke-RestMethod -Method Patch", "Invoke-RestMethod -Method Put", "Invoke-RestMethod -Method Delete")) {
+      if ($githubRulesetScript.IndexOf($forbiddenPhrase, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+        $manifestErrors.Add("scripts\\check-github-ruleset.ps1 must stay read-only and not include '$forbiddenPhrase'")
       }
     }
   }

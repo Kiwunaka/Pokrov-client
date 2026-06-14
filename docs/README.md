@@ -56,7 +56,8 @@ anything.
 - [Required checks](REQUIRED_CHECKS.md): CI job names, branch-protection
   guidance, and source-release gates.
 - [GitHub ruleset setup](GITHUB_RULESET_SETUP.md): repository ruleset or
-  branch protection setup checklist.
+  branch protection setup checklist and
+  `scripts/check-github-ruleset.ps1` verifier.
 - [Source release template](releases/SOURCE_RELEASE_TEMPLATE.md): GitHub
   Release body shape for source-only tags.
 - [Source readiness](releases/source-readiness-v0.2-v0.3.md): tracked
