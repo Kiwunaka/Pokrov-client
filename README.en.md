@@ -130,6 +130,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.29.0-source` | Pending stacked PR, not tagged | Private security intake gate is in the stacked PR queue. |
 | `v0.30.0-source` | Pending stacked PR, not tagged | Changelog and release-history gate is in the stacked PR queue. |
 | `v0.31.0-source` | Pending stacked PR, not tagged | Contributor doctor and docs index gate is in the stacked PR queue. |
+| `v0.32.0-source` | Pending stacked PR, not tagged | Build troubleshooting router is in the stacked PR queue. |
 
 ## Architecture Boundary
 
@@ -179,6 +180,8 @@ boundary.
 
 Build instructions are available in
 [docs/BUILD_FROM_SOURCE.md](docs/BUILD_FROM_SOURCE.md).
+Troubleshooting is available in
+[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
 
 Source import tooling is available for maintainers:
 
@@ -212,6 +215,7 @@ Before contributing, read:
 - [SECURITY.md](SECURITY.md)
 - [BRAND.md](BRAND.md)
 - [docs/README.md](docs/README.md)
+- [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 - [docs/MAINTAINER_CHECKLIST.md](docs/MAINTAINER_CHECKLIST.md)
 - [docs/PROJECT_PRINCIPLES.md](docs/PROJECT_PRINCIPLES.md)
 - [docs/GITHUB_TRIAGE.md](docs/GITHUB_TRIAGE.md)

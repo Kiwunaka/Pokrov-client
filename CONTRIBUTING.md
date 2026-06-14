@@ -17,6 +17,7 @@ Read:
 - [docs/OPEN_SOURCE_SCOPE.md](docs/OPEN_SOURCE_SCOPE.md)
 - [docs/PRODUCT_VARIANTS.md](docs/PRODUCT_VARIANTS.md)
 - [docs/FREE_VPN_CATALOG_GATE.md](docs/FREE_VPN_CATALOG_GATE.md)
+- [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 
 For setup or build work, run the read-only contributor doctor first:
 

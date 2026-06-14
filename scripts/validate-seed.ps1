@@ -65,6 +65,7 @@ $requiredFiles = @(
   "config\\templates\\device-overrides.seed.json",
   "docs\\README.md",
   "docs\\OPEN_SOURCE_SCOPE.md",
+  "docs\\TROUBLESHOOTING.md",
   "docs\\PRODUCT_VARIANTS.md",
   "docs\\OPERATOR_INTEGRATION.md",
   "docs\\FREE_VPN_CATALOG_GATE.md",
@@ -613,10 +614,22 @@ if (Test-Path -LiteralPath $contributorDoctorPath -PathType Leaf) {
     $manifestErrors.Add("config\\contributor-doctor.seed.json must point to scripts/doctor.ps1")
   }
 
-  foreach ($field in @("read_only_by_default", "no_dependency_install", "no_build_or_release_artifacts", "no_network_required", "json_output_supported", "command_checks_can_be_skipped")) {
+  foreach ($field in @("read_only_by_default", "no_dependency_install", "no_build_or_release_artifacts", "no_network_required", "json_output_supported", "command_checks_can_be_skipped", "ci_smoke_uses_skip_command_checks")) {
     if ($contributorDoctor.policy.$field -ne $true) {
       $manifestErrors.Add("config\\contributor-doctor.seed.json policy.$field must remain true")
     }
+  }
+
+  if ($contributorDoctor.troubleshooting_doc -ne "docs/TROUBLESHOOTING.md") {
+    $manifestErrors.Add("config\\contributor-doctor.seed.json must point to docs/TROUBLESHOOTING.md")
+  }
+
+  if ($contributorDoctor.ci_smoke.workflow -ne ".github/workflows/ci.yml") {
+    $manifestErrors.Add("config\\contributor-doctor.seed.json ci_smoke.workflow must point to .github/workflows/ci.yml")
+  }
+
+  if ($contributorDoctor.ci_smoke.command -notmatch "doctor\.ps1" -or $contributorDoctor.ci_smoke.command -notmatch "SkipCommandChecks") {
+    $manifestErrors.Add("config\\contributor-doctor.seed.json ci_smoke.command must run doctor.ps1 with -SkipCommandChecks")
   }
 
   foreach ($commandName in @("git", "python", "flutter", "dart")) {
@@ -667,6 +680,35 @@ if (Test-Path -LiteralPath $contributorDoctorPath -PathType Leaf) {
   }
   if ($doctorDocsText.IndexOf("read-only", [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
     $manifestErrors.Add("Contributor docs must state that scripts\\doctor.ps1 is read-only")
+  }
+
+  $workflowPath = Join-Path $root ".github\\workflows\\ci.yml"
+  if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
+    $workflowText = Get-Content -Raw -LiteralPath $workflowPath
+    foreach ($requiredPhrase in @("Run contributor doctor source-boundary smoke", "doctor.ps1 -SkipCommandChecks")) {
+      if ($workflowText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add(".github\\workflows\\ci.yml must include contributor doctor source-boundary smoke")
+      }
+    }
+  }
+
+  $troubleshootingPath = Join-Path $root "docs\\TROUBLESHOOTING.md"
+  if (Test-Path -LiteralPath $troubleshootingPath -PathType Leaf) {
+    $troubleshootingText = Get-Content -Raw -LiteralPath $troubleshootingPath
+    $troubleshootingMentionsDoctor = $false
+    foreach ($needle in @("scripts\doctor.ps1", "scripts/doctor.ps1")) {
+      if ($troubleshootingText.IndexOf($needle, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+        $troubleshootingMentionsDoctor = $true
+      }
+    }
+    if (-not $troubleshootingMentionsDoctor) {
+      $manifestErrors.Add("docs\\TROUBLESHOOTING.md must mention scripts\\doctor.ps1")
+    }
+    foreach ($requiredPhrase in @("-Json", "redacted", "Android", "Windows", "source-only", "does not install", "does not install dependencies", "runtime binaries")) {
+      if ($troubleshootingText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add("docs\\TROUBLESHOOTING.md must include '$requiredPhrase'")
+      }
+    }
   }
 }
 

@@ -38,6 +38,10 @@ jobs:
         shell: pwsh
         run: .\scripts\validate-seed.ps1
 
+      - name: Run contributor doctor source-boundary smoke
+        shell: pwsh
+        run: .\scripts\doctor.ps1 -SkipCommandChecks
+
       - name: Run source-release preflight smoke
         shell: pwsh
         run: |

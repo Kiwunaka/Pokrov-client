@@ -91,6 +91,7 @@ Source release status:
 | `v0.29.0-source` | Pending stacked PR, not tagged | Private security intake gate is in the stacked PR queue. |
 | `v0.30.0-source` | Pending stacked PR, not tagged | Changelog and release-history gate is in the stacked PR queue. |
 | `v0.31.0-source` | Pending stacked PR, not tagged | Contributor doctor and docs index gate is in the stacked PR queue. |
+| `v0.32.0-source` | Pending stacked PR, not tagged | Build troubleshooting router is in the stacked PR queue. |
 
 ## Which App Should I Use?
 
@@ -121,6 +122,7 @@ Read the scope documents before opening issues or pull requests:
 
 - [Open-source scope](docs/OPEN_SOURCE_SCOPE.md)
 - [Docs index](docs/README.md)
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
 - [Release policy](docs/RELEASE_POLICY.md)
 - [Dependency license audit](docs/DEPENDENCY_LICENSE_AUDIT.md)
 - [Maintainer checklist](docs/MAINTAINER_CHECKLIST.md)
