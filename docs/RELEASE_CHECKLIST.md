@@ -44,6 +44,11 @@ Use this checklist before publishing a public source or binary release.
   before manual merge or tag work; it writes ignored
   `build/release-merge-order/` output and does not merge, push, or publish
   anything.
+- `powershell -ExecutionPolicy Bypass -File .\scripts\check-release-stack-github-status.ps1`
+  runs the release stack GitHub status check against a read-only PR status
+  snapshot before manual merge or tag work; it writes ignored
+  `build/release-stack-github-status/` output and does not merge, push, or
+  publish anything.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\check-source-release-copy.ps1`
   passes for the release policy, checklist, source release template, renderer,
   and final rendered release note.

@@ -40,6 +40,12 @@
       "candidate": "v0.45.0-source",
       "base": "codex/v0.44-tag-readiness-command",
       "head": "codex/v0.45-release-merge-order"
+    },
+    {
+      "pr": 66,
+      "candidate": "v0.46.0-source",
+      "base": "codex/v0.45-release-merge-order",
+      "head": "codex/v0.46-release-stack-github-status"
     }
   ]
 }

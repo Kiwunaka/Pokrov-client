@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "script": "scripts/check-release-stack-github-status.ps1",
+  "default_output_dir": "build/release-stack-github-status",
+  "input_manifest": "config/release-merge-order.seed.json",
+  "policy": {
+    "read_only": true,
+    "no_merge": true,
+    "no_git_push": true,
+    "no_github_api_mutation": true,
+    "uses_pr_status_snapshot": true,
+    "writes_only_ignored_build_output": true,
+    "requires_clean_prs": true,
+    "requires_ci_success": true
+  },
+  "required_status_checks": [
+    "Source import and public tree checks",
+    "Flutter analyze and tests"
+  ]
+}
