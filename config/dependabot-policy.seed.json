@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-06-14",
+  "dependabot_path": ".github/dependabot.yml",
+  "policy": {
+    "github_actions_updates_required": true,
+    "pub_workspace_updates_required": true,
+    "weekly_schedule_required": true,
+    "bounded_open_prs_required": true,
+    "dependency_label_required": true,
+    "human_review_required_before_merge": true,
+    "source_only_release_boundaries_apply": true,
+    "runtime_binary_review_remains_separate": true
+  },
+  "required_ecosystems": [
+    "github-actions",
+    "pub"
+  ],
+  "required_pub_directories": [
+    "/apps/android_shell",
+    "/apps/windows_shell",
+    "/packages/app_shell",
+    "/packages/core_domain",
+    "/packages/platform_contracts",
+    "/packages/runtime_engine",
+    "/packages/support_context"
+  ],
+  "required_labels": [
+    "dependencies"
+  ],
+  "docs": [
+    "docs/DEPENDENCY_UPDATE_POLICY.md",
+    "docs/DEPENDENCY_LICENSE_AUDIT.md",
+    "docs/GITHUB_TRIAGE.md"
+  ]
+}

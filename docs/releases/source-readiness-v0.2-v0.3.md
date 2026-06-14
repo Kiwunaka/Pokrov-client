@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.33
+# Source Readiness: v0.2-v0.34
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -670,6 +670,36 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.34.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #54: Dependabot and dependency update policy gate for GitHub Actions and
+  Dart/Flutter pub workspaces with bounded PRs, labels, human review, license
+  inventory, and source-only release boundaries
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- confirm `.github/dependabot.yml` still covers GitHub Actions and every
+  Android/Windows/shared Dart pub workspace
+- confirm `config/dependabot-policy.seed.json` still matches the configured
+  ecosystems, pub directories, labels, and human-review gates
+- confirm dependency update docs still say Dependabot PRs are review requests,
+  not automatic release approval
+- confirm `config/dependency-license-inventory.seed.json` is updated when
+  `pubspec.lock` contents change
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the preflight summary, proof manifest, rendered GitHub Release body,
+  and changelog section for the exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
 - Free VPN catalog remains disabled by default and is not an official POKROV
@@ -743,3 +773,6 @@ Required before tagging:
 - CODEOWNERS review routing is maintainer-led and source-only. It does not
   grant official binary authority, trusted signing, store readiness, production
   support, or private backend access.
+- Dependabot update routing improves source dependency visibility, but it does
+  not replace human license review, runtime binary review, source-release
+  proof, signing, store submission, or official binary approval.
