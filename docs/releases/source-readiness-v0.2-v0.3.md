@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.32
+# Source Readiness: v0.2-v0.33
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -642,6 +642,34 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.33.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #53: CODEOWNERS and review-routing gate for maintainer-led source-only
+  ownership across security, release, Android, Windows, runtime, operator,
+  docs, CI, and source-boundary paths
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- confirm `.github/CODEOWNERS` still covers security, release, Android,
+  Windows, runtime, operator contract, docs, CI, and source-boundary paths
+- confirm `config/codeowners-review.seed.json` still matches the CODEOWNERS
+  routes and allowed owners
+- confirm governance and triage docs still say CODEOWNERS is review routing,
+  not an official-build, signing, store, or production-readiness claim
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the preflight summary, proof manifest, rendered GitHub Release body,
+  and changelog section for the exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
 - Free VPN catalog remains disabled by default and is not an official POKROV
@@ -712,3 +740,6 @@ Required before tagging:
 - Troubleshooting docs route common local failures, but they do not replace
   platform SDK setup, private operator support, runtime binary review, signing,
   store submission, or official POKROV release gates.
+- CODEOWNERS review routing is maintainer-led and source-only. It does not
+  grant official binary authority, trusted signing, store readiness, production
+  support, or private backend access.

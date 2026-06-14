@@ -1,2 +1,38 @@
-# Default maintainers
+# Source-only public review routing.
+#
+# CODEOWNERS is intentionally maintainer-led for now. It routes sensitive public
+# client areas to the same maintainer while the project stabilizes source-only
+# releases, Android/Windows hosts, security intake, runtime artifacts, and
+# operator contracts.
+
 * @Kiwunaka
+
+/.github/ @Kiwunaka
+/.github/workflows/ @Kiwunaka
+/.github/ISSUE_TEMPLATE/ @Kiwunaka
+
+/SECURITY.md @Kiwunaka
+/SUPPORT.md @Kiwunaka
+/BRAND.md @Kiwunaka
+/CONTRIBUTING.md @Kiwunaka
+/LICENSE @Kiwunaka
+/NOTICE @Kiwunaka
+
+/docs/ @Kiwunaka
+/docs/releases/ @Kiwunaka
+/docs/operator/ @Kiwunaka
+
+/config/ @Kiwunaka
+/scripts/ @Kiwunaka
+/tools/source_import/ @Kiwunaka
+
+/apps/android_shell/ @Kiwunaka
+/apps/windows_shell/ @Kiwunaka
+
+/packages/app_shell/ @Kiwunaka
+/packages/core_domain/ @Kiwunaka
+/packages/platform_contracts/ @Kiwunaka
+/packages/runtime_engine/ @Kiwunaka
+/packages/support_context/ @Kiwunaka
+
+/assets/ @Kiwunaka

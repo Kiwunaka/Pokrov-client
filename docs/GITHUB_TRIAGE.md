@@ -13,6 +13,14 @@ The machine-readable security intake policy is
 in sync with `SECURITY.md`, `SUPPORT.md`, issue templates, and this triage
 guide whenever the private reporting flow changes.
 
+Review routing is defined in [.github/CODEOWNERS](../.github/CODEOWNERS) and
+tracked by
+[config/codeowners-review.seed.json](../config/codeowners-review.seed.json).
+CODEOWNERS is maintainer-led while source-only releases stabilize; it routes
+security, release, Android, Windows, runtime, operator contract, source-boundary,
+and public-triage changes to the maintainer review path without implying
+official support for forks.
+
 ## Required Labels
 
 - `bug`: public client or repository process bug.
@@ -52,3 +60,5 @@ guide whenever the private reporting flow changes.
   narrow public scope, and does not require private POKROV backend, signing, billing, deployment, node-management, or release-evidence access.
 - Use `release` only for source-only and evidence-backed release work unless a
   separate binary release gate exists.
+- CODEOWNERS review is a routing aid, not a guarantee that a pull request is
+  official, trusted-signed, store-ready, or production-ready.

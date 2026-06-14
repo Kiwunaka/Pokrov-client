@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-06-14",
+  "codeowners_path": ".github/CODEOWNERS",
+  "policy": {
+    "maintainer_led_until_broader_governance": true,
+    "default_owner_required": true,
+    "security_and_release_routes_required": true,
+    "android_and_windows_routes_required": true,
+    "operator_contract_routes_required": true,
+    "source_only_boundary_routes_required": true
+  },
+  "allowed_owners": [
+    "@Kiwunaka"
+  ],
+  "required_routes": [
+    {"pattern": "*", "owner": "@Kiwunaka", "scope": "default"},
+    {"pattern": "/.github/", "owner": "@Kiwunaka", "scope": "github-process"},
+    {"pattern": "/.github/workflows/", "owner": "@Kiwunaka", "scope": "ci"},
+    {"pattern": "/.github/ISSUE_TEMPLATE/", "owner": "@Kiwunaka", "scope": "public-triage"},
+    {"pattern": "/SECURITY.md", "owner": "@Kiwunaka", "scope": "security"},
+    {"pattern": "/docs/releases/", "owner": "@Kiwunaka", "scope": "source-release"},
+    {"pattern": "/docs/operator/", "owner": "@Kiwunaka", "scope": "operator-contract"},
+    {"pattern": "/config/", "owner": "@Kiwunaka", "scope": "seed-contracts"},
+    {"pattern": "/scripts/", "owner": "@Kiwunaka", "scope": "maintainer-tooling"},
+    {"pattern": "/tools/source_import/", "owner": "@Kiwunaka", "scope": "source-boundary"},
+    {"pattern": "/apps/android_shell/", "owner": "@Kiwunaka", "scope": "android"},
+    {"pattern": "/apps/windows_shell/", "owner": "@Kiwunaka", "scope": "windows"},
+    {"pattern": "/packages/app_shell/", "owner": "@Kiwunaka", "scope": "shared-app-shell"},
+    {"pattern": "/packages/runtime_engine/", "owner": "@Kiwunaka", "scope": "runtime"},
+    {"pattern": "/packages/core_domain/", "owner": "@Kiwunaka", "scope": "domain"},
+    {"pattern": "/packages/platform_contracts/", "owner": "@Kiwunaka", "scope": "platform-contracts"},
+    {"pattern": "/packages/support_context/", "owner": "@Kiwunaka", "scope": "support-context"},
+    {"pattern": "/assets/", "owner": "@Kiwunaka", "scope": "assets-and-branding"}
+  ],
+  "docs": [
+    "docs/GITHUB_TRIAGE.md",
+    "docs/GOVERNANCE.md"
+  ]
+}

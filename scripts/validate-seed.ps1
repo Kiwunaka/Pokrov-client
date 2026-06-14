@@ -1,6 +1,9 @@
 $root = Split-Path -Parent $PSScriptRoot
 
 $requiredDirectories = @(
+  ".github",
+  ".github\\ISSUE_TEMPLATE",
+  ".github\\workflows",
   "apps",
   "apps\\android_shell",
   "apps\\android_shell\\lib",
@@ -43,6 +46,7 @@ $requiredFiles = @(
   ".editorconfig",
   "melos.yaml",
   "program.seed.yaml",
+  ".github\\CODEOWNERS",
   "config\\product-contract.seed.json",
   "config\\platform-matrix.seed.json",
   "config\\runtime-profile.seed.json",
@@ -52,6 +56,7 @@ $requiredFiles = @(
   "config\\free-vpn-catalog.seed.json",
   "config\\security-intake.seed.json",
   "config\\changelog-policy.seed.json",
+  "config\\codeowners-review.seed.json",
   "config\\contributor-doctor.seed.json",
   "config\\dependency-license-inventory.seed.json",
   "config\\generated-assets.seed.json",
@@ -137,6 +142,7 @@ $jsonFiles = @(
   "config\\free-vpn-catalog.seed.json",
   "config\\security-intake.seed.json",
   "config\\changelog-policy.seed.json",
+  "config\\codeowners-review.seed.json",
   "config\\contributor-doctor.seed.json",
   "config\\dependency-license-inventory.seed.json",
   "config\\generated-assets.seed.json",
@@ -707,6 +713,68 @@ if (Test-Path -LiteralPath $contributorDoctorPath -PathType Leaf) {
     foreach ($requiredPhrase in @("-Json", "redacted", "Android", "Windows", "source-only", "does not install", "does not install dependencies", "runtime binaries")) {
       if ($troubleshootingText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
         $manifestErrors.Add("docs\\TROUBLESHOOTING.md must include '$requiredPhrase'")
+      }
+    }
+  }
+}
+
+$codeownersReviewPath = Join-Path $root "config\\codeowners-review.seed.json"
+if (Test-Path -LiteralPath $codeownersReviewPath -PathType Leaf) {
+  $codeownersReview = Get-Content -Raw -LiteralPath $codeownersReviewPath | ConvertFrom-Json
+
+  if ($codeownersReview.codeowners_path -ne ".github/CODEOWNERS") {
+    $manifestErrors.Add("config\\codeowners-review.seed.json must point to .github/CODEOWNERS")
+  }
+
+  foreach ($field in @("maintainer_led_until_broader_governance", "default_owner_required", "security_and_release_routes_required", "android_and_windows_routes_required", "operator_contract_routes_required", "source_only_boundary_routes_required")) {
+    if ($codeownersReview.policy.$field -ne $true) {
+      $manifestErrors.Add("config\\codeowners-review.seed.json policy.$field must remain true")
+    }
+  }
+
+  if (@($codeownersReview.allowed_owners) -notcontains "@Kiwunaka") {
+    $manifestErrors.Add("config\\codeowners-review.seed.json must keep @Kiwunaka as an allowed owner")
+  }
+
+  $codeownersPath = Join-Path $root ".github\\CODEOWNERS"
+  if (Test-Path -LiteralPath $codeownersPath -PathType Leaf) {
+    $codeownersText = Get-Content -Raw -LiteralPath $codeownersPath
+    $codeownersLines = $codeownersText -split "\r?\n" |
+      ForEach-Object { $_.Trim() } |
+      Where-Object { -not [string]::IsNullOrWhiteSpace($_) -and -not $_.StartsWith("#") }
+
+    foreach ($route in @($codeownersReview.required_routes)) {
+      $expectedLine = "$($route.pattern) $($route.owner)"
+      if ($codeownersLines -notcontains $expectedLine) {
+        $manifestErrors.Add(".github\\CODEOWNERS must include route '$expectedLine'")
+      }
+    }
+
+    foreach ($line in $codeownersLines) {
+      $parts = $line -split "\s+"
+      foreach ($owner in @($parts | Select-Object -Skip 1)) {
+        if (@($codeownersReview.allowed_owners) -notcontains $owner) {
+          $manifestErrors.Add(".github\\CODEOWNERS owner '$owner' is not listed in config\\codeowners-review.seed.json")
+        }
+      }
+    }
+
+    foreach ($requiredPhrase in @("Source-only public review routing", "security intake", "runtime artifacts", "operator contracts")) {
+      if ($codeownersText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add(".github\\CODEOWNERS must document '$requiredPhrase'")
+      }
+    }
+  }
+
+  foreach ($docPath in @($codeownersReview.docs)) {
+    $relativeDocPath = $docPath.Replace("/", [System.IO.Path]::DirectorySeparatorChar)
+    $fullDocPath = Join-Path $root $relativeDocPath
+    if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
+      $docText = Get-Content -Raw -LiteralPath $fullDocPath
+      foreach ($requiredPhrase in @("CODEOWNERS", "config/codeowners-review.seed.json", "maintainer-led")) {
+        if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+          $manifestErrors.Add("$docPath must include '$requiredPhrase' for CODEOWNERS review routing")
+        }
       }
     }
   }
