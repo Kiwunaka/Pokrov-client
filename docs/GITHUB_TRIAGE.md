@@ -39,6 +39,8 @@ official support for forks.
   release copy.
 - `source-boundary`: public/private boundary, source import, secret avoidance,
   or clean-room guard.
+- `dependencies`: Dependabot, dependency update, lockfile, or dependency review
+  work.
 - `security-private`: redirect to private security reporting.
 - `help wanted`: public help is welcome after scope and safety boundaries are
   clear.
@@ -62,3 +64,6 @@ official support for forks.
   separate binary release gate exists.
 - CODEOWNERS review is a routing aid, not a guarantee that a pull request is
   official, trusted-signed, store-ready, or production-ready.
+- Dependabot pull requests use `dependencies` plus a route-specific label, but
+  still require license inventory review, tests, and source-only release
+  boundary checks before merge; they do not approve runtime binaries.

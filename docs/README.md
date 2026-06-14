@@ -60,3 +60,5 @@ anything.
 - [Changelog](../CHANGELOG.md): evidence-honest release history.
 - [Dependency license audit](DEPENDENCY_LICENSE_AUDIT.md): reviewed package
   inventory and remaining binary-release boundaries.
+- [Dependency update policy](DEPENDENCY_UPDATE_POLICY.md): Dependabot scope,
+  review gates, labels, and source-only boundaries.

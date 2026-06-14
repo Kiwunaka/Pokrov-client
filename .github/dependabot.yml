@@ -4,3 +4,118 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "source-boundary"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+
+  - package-ecosystem: "pub"
+    directory: "/apps/android_shell"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:20"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "android"
+    commit-message:
+      prefix: "deps(android)"
+      include: "scope"
+
+  - package-ecosystem: "pub"
+    directory: "/apps/windows_shell"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:30"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "windows"
+    commit-message:
+      prefix: "deps(windows)"
+      include: "scope"
+
+  - package-ecosystem: "pub"
+    directory: "/packages/app_shell"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:40"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "community"
+    commit-message:
+      prefix: "deps(app-shell)"
+      include: "scope"
+
+  - package-ecosystem: "pub"
+    directory: "/packages/runtime_engine"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:50"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "runtime"
+    commit-message:
+      prefix: "deps(runtime)"
+      include: "scope"
+
+  - package-ecosystem: "pub"
+    directory: "/packages/core_domain"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "07:00"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "source-boundary"
+    commit-message:
+      prefix: "deps(core)"
+      include: "scope"
+
+  - package-ecosystem: "pub"
+    directory: "/packages/platform_contracts"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "07:10"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "source-boundary"
+    commit-message:
+      prefix: "deps(platform)"
+      include: "scope"
+
+  - package-ecosystem: "pub"
+    directory: "/packages/support_context"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "07:20"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "source-boundary"
+    commit-message:
+      prefix: "deps(support)"
+      include: "scope"

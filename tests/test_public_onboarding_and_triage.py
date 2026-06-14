@@ -190,6 +190,7 @@ def test_github_label_catalog_covers_public_triage_routes() -> None:
         "runtime",
         "release",
         "source-boundary",
+        "dependencies",
         "security-private",
         "help wanted",
         "good first issue",
