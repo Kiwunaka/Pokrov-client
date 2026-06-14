@@ -100,6 +100,7 @@ Source release status:
 | `v0.38.0-source` | Pending stacked PR, not tagged | Release evidence bundle helper is in the stacked PR queue. |
 | `v0.39.0-source` | Pending stacked PR, not tagged | Source release publication dry-run validator is in the stacked PR queue. |
 | `v0.40.0-source` | Pending stacked PR, not tagged | Enterprise boundary and operator commercial-license guard is in the stacked PR queue. |
+| `v0.41.0-source` | Pending stacked PR, not tagged | Safe diagnostics copy/export for support without keys or subscription links is in the stacked PR queue. |
 
 ## Which App Should I Use?
 

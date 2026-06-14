@@ -142,6 +142,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.38.0-source` | Pending stacked PR, tag еще не создан | Release evidence bundle helper находится в stacked PR queue. |
 | `v0.39.0-source` | Pending stacked PR, tag еще не создан | Source release publication dry-run validator находится в stacked PR queue. |
 | `v0.40.0-source` | Pending stacked PR, tag еще не создан | Enterprise boundary and operator commercial-license guard находится в stacked PR queue. |
+| `v0.41.0-source` | Pending stacked PR, tag еще не создан | Safe diagnostics copy/export для support без keys или subscription links находится в stacked PR queue. |
 
 ## Архитектурная Граница
 
