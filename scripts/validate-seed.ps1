@@ -55,6 +55,7 @@ $requiredFiles = @(
   "config\\source-release-publication-dry-run.seed.json",
   "config\\source-tag-readiness.seed.json",
   "config\\release-merge-order.seed.json",
+  "config\\release-stack-github-status.seed.json",
   "config\\required-checks.seed.json",
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
@@ -139,6 +140,7 @@ $requiredFiles = @(
   "scripts\\validate-source-release-publication.ps1",
   "scripts\\check-source-tag-readiness.ps1",
   "scripts\\check-release-merge-order.ps1",
+  "scripts\\check-release-stack-github-status.ps1",
   "scripts\\prepare-source-release.ps1",
   "scripts\\render-source-release-notes.ps1",
   "scripts\\print-build-variant-command.ps1",
@@ -162,6 +164,7 @@ $jsonFiles = @(
   "config\\source-release-publication-dry-run.seed.json",
   "config\\source-tag-readiness.seed.json",
   "config\\release-merge-order.seed.json",
+  "config\\release-stack-github-status.seed.json",
   "config\\required-checks.seed.json",
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
@@ -1271,6 +1274,62 @@ if (Test-Path -LiteralPath $releaseMergeOrderPath -PathType Leaf) {
     if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
       $docText = Get-Content -Raw -LiteralPath $fullDocPath
       foreach ($requiredPhrase in @("check-release-merge-order.ps1", "release merge order")) {
+        if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+          $manifestErrors.Add("$docPath must include '$requiredPhrase'")
+        }
+      }
+    }
+  }
+}
+
+$releaseStackGithubStatusPath = Join-Path $root "config\\release-stack-github-status.seed.json"
+if (Test-Path -LiteralPath $releaseStackGithubStatusPath -PathType Leaf) {
+  $releaseStackGithubStatus = Get-Content -Raw -LiteralPath $releaseStackGithubStatusPath | ConvertFrom-Json
+
+  if ($releaseStackGithubStatus.script -ne "scripts/check-release-stack-github-status.ps1") {
+    $manifestErrors.Add("config\\release-stack-github-status.seed.json must point to scripts/check-release-stack-github-status.ps1")
+  }
+
+  if ($releaseStackGithubStatus.default_output_dir -ne "build/release-stack-github-status") {
+    $manifestErrors.Add("config\\release-stack-github-status.seed.json must keep default output under ignored build/release-stack-github-status")
+  }
+
+  if ($releaseStackGithubStatus.input_manifest -ne "config/release-merge-order.seed.json") {
+    $manifestErrors.Add("config\\release-stack-github-status.seed.json must read config/release-merge-order.seed.json")
+  }
+
+  foreach ($field in @("read_only", "no_merge", "no_git_push", "no_github_api_mutation", "uses_pr_status_snapshot", "writes_only_ignored_build_output", "requires_clean_prs", "requires_ci_success")) {
+    if ($releaseStackGithubStatus.policy.$field -ne $true) {
+      $manifestErrors.Add("config\\release-stack-github-status.seed.json policy.$field must remain true")
+    }
+  }
+
+  foreach ($requiredCheck in @("Source import and public tree checks", "Flutter analyze and tests")) {
+    if (@($releaseStackGithubStatus.required_status_checks) -notcontains $requiredCheck) {
+      $manifestErrors.Add("config\\release-stack-github-status.seed.json must require '$requiredCheck'")
+    }
+  }
+
+  $releaseStackGithubStatusScriptPath = Join-Path $root "scripts\\check-release-stack-github-status.ps1"
+  if (Test-Path -LiteralPath $releaseStackGithubStatusScriptPath -PathType Leaf) {
+    $releaseStackGithubStatusScript = Get-Content -Raw -LiteralPath $releaseStackGithubStatusScriptPath
+    foreach ($requiredPhrase in @("release-stack-github-status.seed.json", "release-merge-order.seed.json", "gh pr list", "mergeStateStatus", "statusCheckRollup", "build\release-stack-github-status", "github_status_ok = `$true")) {
+      if ($releaseStackGithubStatusScript.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add("scripts\\check-release-stack-github-status.ps1 must include '$requiredPhrase'")
+      }
+    }
+    foreach ($forbiddenPhrase in @("git merge", "git push", "gh pr merge", "gh api", "-X POST", "-X PATCH", "-X PUT", "-X DELETE")) {
+      if ($releaseStackGithubStatusScript.IndexOf($forbiddenPhrase, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+        $manifestErrors.Add("scripts\\check-release-stack-github-status.ps1 must remain read-only and must not include '$forbiddenPhrase'")
+      }
+    }
+  }
+
+  foreach ($docPath in @("docs\\RELEASE_BLOCKERS.md", "docs\\RELEASE_CHECKLIST.md", "scripts\\README.md")) {
+    $fullDocPath = Join-Path $root $docPath
+    if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
+      $docText = Get-Content -Raw -LiteralPath $fullDocPath
+      foreach ($requiredPhrase in @("check-release-stack-github-status.ps1", "release stack GitHub status")) {
         if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
           $manifestErrors.Add("$docPath must include '$requiredPhrase'")
         }

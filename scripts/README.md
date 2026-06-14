@@ -32,6 +32,10 @@ Current helpers:
   manifest for a linear stacked PR base-to-head chain; writes ignored
   `build/release-merge-order/` output and does not merge, push, or publish
   anything
+- `check-release-stack-github-status.ps1`: checks a read-only release stack GitHub status
+  snapshot against the local merge-order manifest; writes ignored
+  `build/release-stack-github-status/` output and does not merge, push, or
+  publish anything
 - `check-github-ruleset.ps1`: read-only GitHub settings verifier for repository
   rulesets or branch protection; uses `gh api`, supports `-ReportOnly -Json`,
   and does not create, edit, or delete remote settings

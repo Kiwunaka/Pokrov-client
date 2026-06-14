@@ -59,7 +59,7 @@ anything.
   checks.
 - [Release blockers](RELEASE_BLOCKERS.md): machine-readable blocker inventory
   and manual maintainer steps before a source tag, including source tag
-  readiness and release merge order helpers.
+  readiness, release merge order, and release stack GitHub status helpers.
 - [Required checks](REQUIRED_CHECKS.md): CI job names, branch-protection
   guidance, and source-release gates.
 - [GitHub ruleset setup](GITHUB_RULESET_SETUP.md): repository ruleset or

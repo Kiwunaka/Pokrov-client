@@ -47,6 +47,12 @@ summary before manual merge or tag work. The command is read-only, writes
 ignored `build/release-merge-order/` output, and checks that each stacked PR
 base matches the previous PR head in the local manifest.
 
+Run `scripts/check-release-stack-github-status.ps1` for a local release stack GitHub status
+summary before manual merge or tag work. The command is read-only, writes
+ignored `build/release-stack-github-status/` output, and checks that the PR
+status snapshot matches the local stack manifest, is not draft, has clean merge
+state, and has successful required CI checks.
+
 ## Evidence Rules
 
 Do not mark a blocker complete from intent or memory. Use current evidence:
