@@ -49,6 +49,11 @@ Use this checklist before publishing a public source or binary release.
   snapshot before manual merge or tag work; it writes ignored
   `build/release-stack-github-status/` output and does not merge, push, or
   publish anything.
+- `powershell -ExecutionPolicy Bypass -File .\scripts\prepare-release-merge-handoff.ps1`
+  creates a release merge handoff report by bundling the release merge order,
+  release stack GitHub status, and source tag
+  readiness summaries into an ignored `build/release-merge-handoff/` maintainer
+  handoff report; it does not merge, tag, push, publish, or upload anything.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\check-source-release-copy.ps1`
   passes for the release policy, checklist, source release template, renderer,
   and final rendered release note.

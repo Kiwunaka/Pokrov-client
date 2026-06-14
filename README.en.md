@@ -147,6 +147,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.44.0-source` | Pending stacked PR, not tagged | Source tag readiness command is in the stacked PR queue. |
 | `v0.45.0-source` | Pending stacked PR, not tagged | Release merge-order verifier is in the stacked PR queue. |
 | `v0.46.0-source` | Pending stacked PR, not tagged | Release stack GitHub status verifier is in the stacked PR queue. |
+| `v0.47.0-source` | Pending stacked PR, not tagged | Release merge handoff helper is in the stacked PR queue. |
 
 ## Architecture Boundary
 
