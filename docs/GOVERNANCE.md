@@ -16,6 +16,11 @@ Maintainers are responsible for:
 Review routing is recorded in [.github/CODEOWNERS](../.github/CODEOWNERS) and
 the seed-backed policy at
 [config/codeowners-review.seed.json](../config/codeowners-review.seed.json).
+GitHub repository ruleset or branch protection setup is recorded in
+[GITHUB_RULESET_SETUP.md](GITHUB_RULESET_SETUP.md) and
+[config/github-ruleset.seed.json](../config/github-ruleset.seed.json), but it
+must not be claimed as remotely enforced until maintainers configure and
+observe the GitHub settings.
 Until broader public maintainer roles are established, CODEOWNERS stays
 maintainer-led and routes sensitive source-only areas for review:
 
