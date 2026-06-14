@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.40
+# Source Readiness: v0.2-v0.41
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -867,8 +867,36 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.41.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #61: safe support diagnostics copy/export for redacted JSON without keys,
+  subscription URLs, raw configs, or proxy links
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- confirm support diagnostics copy/export still uses the shared redactor and
+  does not include proxy links, subscription URLs, raw configs, token/secret
+  fields, WARP private material, or private backend details
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the publication dry-run, release evidence bundle, preflight summary,
+  proof manifest, rendered GitHub Release body, and changelog section for the
+  exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
+- Safe diagnostics export is a support aid only. It does not upload logs,
+  prove runtime connectivity, include raw configs, or replace maintainer review
+  for accidental secrets.
 - Free VPN catalog remains disabled by default and is not an official POKROV
   service.
 - No OS background subscription refresh is claimed.
