@@ -58,6 +58,7 @@ $requiredFiles = @(
   "config\\runtime-artifacts.seed.json",
   "config\\windows-release.seed.json",
   "config\\operator-api.fixture.json",
+  "config\\enterprise-boundary.seed.json",
   "config\\free-vpn-catalog.seed.json",
   "config\\security-intake.seed.json",
   "config\\changelog-policy.seed.json",
@@ -79,6 +80,7 @@ $requiredFiles = @(
   "docs\\TROUBLESHOOTING.md",
   "docs\\PRODUCT_VARIANTS.md",
   "docs\\OPERATOR_INTEGRATION.md",
+  "docs\\ENTERPRISE.md",
   "docs\\FREE_VPN_CATALOG_GATE.md",
   "docs\\WHITE_LABEL_BRANDING.md",
   "docs\\BUILD_FROM_SOURCE.md",
@@ -155,6 +157,7 @@ $jsonFiles = @(
   "config\\runtime-artifacts.seed.json",
   "config\\windows-release.seed.json",
   "config\\operator-api.fixture.json",
+  "config\\enterprise-boundary.seed.json",
   "config\\free-vpn-catalog.seed.json",
   "config\\security-intake.seed.json",
   "config\\changelog-policy.seed.json",
@@ -452,6 +455,59 @@ if (Test-Path -LiteralPath $operatorFixturePath -PathType Leaf) {
   foreach ($value in $forbiddenServiceHosts) {
     if ($serializedOperatorFixture.Contains($value)) {
       $manifestErrors.Add("config\\operator-api.fixture.json must not contain official POKROV or legacy service endpoints")
+    }
+  }
+}
+
+$enterpriseBoundaryPath = Join-Path $root "config\\enterprise-boundary.seed.json"
+if (Test-Path -LiteralPath $enterpriseBoundaryPath -PathType Leaf) {
+  $enterpriseBoundary = Get-Content -Raw -LiteralPath $enterpriseBoundaryPath | ConvertFrom-Json
+
+  if ($enterpriseBoundary.doc -ne "docs/ENTERPRISE.md") {
+    $manifestErrors.Add("config\\enterprise-boundary.seed.json must point to docs/ENTERPRISE.md")
+  }
+
+  if ($enterpriseBoundary.current_public_license -ne "GPL-3.0-only") {
+    $manifestErrors.Add("config\\enterprise-boundary.seed.json must keep current_public_license GPL-3.0-only")
+  }
+
+  foreach ($field in @("does_not_change_license", "not_legal_advice", "operator_brings_own_backend", "operator_owns_distribution_claims", "no_private_pokrov_access_included", "no_commercial_license_offered_by_default", "dual_license_requires_owner_decision", "official_branding_forbidden_for_forks", "gpl_source_obligations_not_waived")) {
+    if ($enterpriseBoundary.policy.$field -ne $true) {
+      $manifestErrors.Add("config\\enterprise-boundary.seed.json policy.$field must remain true")
+    }
+  }
+
+  foreach ($responsibility in @("backend and managed profile API", "billing, checkout, refunds, and abuse handling", "support and privacy policy", "signing identities and store or direct-download release channels", "checksums, release notes, source-compliance process, and user claims")) {
+    if (@($enterpriseBoundary.operator_responsibilities) -notcontains $responsibility) {
+      $manifestErrors.Add("config\\enterprise-boundary.seed.json must keep operator responsibility '$responsibility'")
+    }
+  }
+
+  foreach ($forbiddenClaim in @("commercial license is available by default", "operator builds are official POKROV builds", "GPLv3 obligations are waived", "private POKROV backend access is included", "trusted signing, store release, or production readiness is included")) {
+    if (@($enterpriseBoundary.forbidden_claims) -notcontains $forbiddenClaim) {
+      $manifestErrors.Add("config\\enterprise-boundary.seed.json must forbid claim '$forbiddenClaim'")
+    }
+  }
+
+  $enterpriseDocPath = Join-Path $root "docs\\ENTERPRISE.md"
+  if (Test-Path -LiteralPath $enterpriseDocPath -PathType Leaf) {
+    $enterpriseDoc = Get-Content -Raw -LiteralPath $enterpriseDocPath
+    foreach ($requiredPhrase in @("This is not legal advice", "does not change [LICENSE](../LICENSE)", "does not waive GPLv3 obligations", "does not offer a commercial license by default", "Operator builds are not official POKROV builds", "No dual license is offered by default", "source-compliance path")) {
+      if ($enterpriseDoc.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add("docs\\ENTERPRISE.md must include '$requiredPhrase'")
+      }
+    }
+  }
+
+  foreach ($docPath in @("README.md", "README.en.md", "README.ru.md", "docs\\README.md", "docs\\OPERATOR_INTEGRATION.md", "docs\\OPEN_SOURCE_SCOPE.md")) {
+    $fullDocPath = Join-Path $root $docPath
+    if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
+      $docText = Get-Content -Raw -LiteralPath $fullDocPath
+      foreach ($requiredPhrase in @("docs/ENTERPRISE.md", "Enterprise boundary", "commercial license")) {
+        if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+          $manifestErrors.Add("$docPath must include '$requiredPhrase' for enterprise boundary")
+        }
+      }
     }
   }
 }

@@ -25,6 +25,8 @@
   &middot;
   <a href="docs/OPEN_SOURCE_SCOPE.md">Scope</a>
   &middot;
+  <a href="docs/ENTERPRISE.md">Enterprise</a>
+  &middot;
   <a href="SECURITY.md">Security</a>
   &middot;
   <a href="BRAND.md">Brand</a>
@@ -139,6 +141,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.37.0-source` | Pending stacked PR, tag еще не создан | GitHub ruleset verifier находится в stacked PR queue. |
 | `v0.38.0-source` | Pending stacked PR, tag еще не создан | Release evidence bundle helper находится в stacked PR queue. |
 | `v0.39.0-source` | Pending stacked PR, tag еще не создан | Source release publication dry-run validator находится в stacked PR queue. |
+| `v0.40.0-source` | Pending stacked PR, tag еще не создан | Enterprise boundary and operator commercial-license guard находится в stacked PR queue. |
 
 ## Архитектурная Граница
 
@@ -177,6 +180,7 @@ material, private release evidence или operator runbooks.
 |   |-- SOURCE_IMPORT_PLAYBOOK.md
 |   |-- PRODUCT_VARIANTS.md
 |   |-- OPERATOR_INTEGRATION.md
+|   |-- ENTERPRISE.md
 |   `-- GOVERNANCE.md
 `-- assets/
     |-- brand/
@@ -231,6 +235,7 @@ source readiness.
 - [docs/SOURCE_IMPORT_PLAYBOOK.md](docs/SOURCE_IMPORT_PLAYBOOK.md)
 - [docs/PRODUCT_VARIANTS.md](docs/PRODUCT_VARIANTS.md)
 - [docs/OPERATOR_INTEGRATION.md](docs/OPERATOR_INTEGRATION.md)
+- [docs/ENTERPRISE.md](docs/ENTERPRISE.md)
 - [docs/FREE_VPN_CATALOG_GATE.md](docs/FREE_VPN_CATALOG_GATE.md)
 - [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)
 - [docs/GOVERNANCE.md](docs/GOVERNANCE.md)
@@ -256,6 +261,10 @@ support и не backend endpoints для community builds, forks или operator
 
 Репозиторий распространяется по GNU General Public License v3.0. См.
 [LICENSE](LICENSE).
+
+См. [Enterprise boundary](docs/ENTERPRISE.md) для operator and commercial
+license boundary. Этот документ не меняет GPLv3 license и не предлагает
+commercial license by default.
 
 Название POKROV, логотипы, домены, официальные каналы, signing identities и
 release distribution channels регулируются отдельно в [BRAND.md](BRAND.md).
