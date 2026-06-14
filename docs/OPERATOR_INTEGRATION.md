@@ -90,6 +90,10 @@ branded client:
 - keep `error.message` safe for logs and support, without secrets or profile
   URLs
 
+The public client sends a fresh `X-Request-ID` per operator API request and the
+runtime app version in `X-Client-Version`. Treat the request ID as a short-lived
+support trace only; do not use it as a stable user identifier.
+
 Standard error response:
 
 ```json

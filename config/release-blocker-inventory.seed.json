@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reviewed_at": "2026-06-14",
+  "reviewed_at": "2026-06-15",
   "release_line": "source-only",
   "target_tag_family": "v0.x.0-source",
   "status": "not_ready_for_tag",
@@ -11,9 +11,9 @@
   "trusted_signing_claim": false,
   "tracked_candidates": {
     "base_candidate": "v0.1.0-source",
-    "latest_candidate": "v0.48.0-source",
-    "latest_stacked_pr": 68,
-    "covered_range": "v0.1.0-source through v0.48.0-source",
+    "latest_candidate": "v0.49.0-source",
+    "latest_stacked_pr": 69,
+    "covered_range": "v0.1.0-source through v0.49.0-source",
     "tag_creation_allowed": false
   },
   "blockers": [

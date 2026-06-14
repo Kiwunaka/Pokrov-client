@@ -16,6 +16,6 @@
   "inputs": {
     "merge_order": "build/release-merge-order/release-merge-order.json",
     "github_status": "build/release-stack-github-status/release-stack-github-status.json",
-    "tag_readiness": "build/source-tag-readiness/v0.48.0-source-tag-readiness.json"
+    "tag_readiness": "build/source-tag-readiness/v0.49.0-source-tag-readiness.json"
   }
 }

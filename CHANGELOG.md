@@ -100,6 +100,9 @@ production readiness without matching public evidence.
 - Added an Android device validation checklist and local smoke precheck that
   writes a claim-safe `MANUAL_OWNER_TEST` summary without running ADB,
   installing builds, or mutating devices.
+- Added operator API request header compliance so managed/operator client
+  requests send per-request `X-Request-ID` and `X-Client-Version` metadata for
+  compatibility gates and redacted support tracing.
 
 ### Changed
 
@@ -110,7 +113,7 @@ production readiness without matching public evidence.
 - Fixed the documented no-argument release merge handoff command so it uses the
   seed default input paths.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.48.0-source` candidates.
+  `v0.49.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -164,6 +167,7 @@ production readiness without matching public evidence.
 | `v0.46.0-source` | Pending stacked PR, not tagged | PR #66 |
 | `v0.47.0-source` | Pending stacked PR, not tagged | PR #67 |
 | `v0.48.0-source` | Pending stacked PR, not tagged | PR #68 |
+| `v0.49.0-source` | Pending stacked PR, not tagged | PR #69 |
 
 ### Still Source-Only
 

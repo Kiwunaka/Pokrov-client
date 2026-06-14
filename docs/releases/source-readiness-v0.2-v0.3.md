@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.48
+# Source Readiness: v0.2-v0.49
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -1096,8 +1096,37 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.49.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #69: operator API request header compliance for per-request trace IDs and
+  client version compatibility metadata
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the focused operator header test:
+  `flutter test test/app_first_runtime_bootstrap_test.dart --plain-name "operator API requests carry trace and client version headers"`
+- clear every required manual maintainer blocker before treating the line as
+  ready
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the publication dry-run, release evidence bundle, preflight summary,
+  proof manifest, rendered GitHub Release body, and changelog section for the
+  exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
+- Operator request headers improve compatibility and support tracing for
+  operator builds, but they do not make the public source snapshot an official
+  POKROV service binary or prove any backend production readiness.
 - Android device validation is a public checklist and local precheck only. It
   does not run ADB, install builds, mutate a device, replace the release-build
   audit, or prove APK, store, trusted signing, production, or official binary
