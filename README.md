@@ -95,6 +95,7 @@ Source release status:
 | `v0.33.0-source` | Pending stacked PR, not tagged | CODEOWNERS review-routing gate is in the stacked PR queue. |
 | `v0.34.0-source` | Pending stacked PR, not tagged | Dependabot dependency update policy gate is in the stacked PR queue. |
 | `v0.35.0-source` | Pending stacked PR, not tagged | Required checks policy gate is in the stacked PR queue. |
+| `v0.36.0-source` | Pending stacked PR, not tagged | GitHub ruleset setup gate is in the stacked PR queue. |
 
 ## Which App Should I Use?
 

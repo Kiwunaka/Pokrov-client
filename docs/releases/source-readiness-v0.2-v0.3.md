@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.35
+# Source Readiness: v0.2-v0.36
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -728,6 +728,33 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.36.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #56: GitHub ruleset setup gate for repository ruleset or branch protection
+  configuration, manual verification, and no-claim release boundaries
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- confirm `config/github-ruleset.seed.json` still matches
+  `docs/GITHUB_RULESET_SETUP.md` and `config/required-checks.seed.json`
+- confirm `docs/GITHUB_RULESET_SETUP.md` still says it is setup guidance, not
+  proof of remote GitHub enforcement
+- if public copy claims branch protection/rulesets are enforced, confirm the
+  repository settings were configured and observed in GitHub first
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the preflight summary, proof manifest, rendered GitHub Release body,
+  and changelog section for the exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
 - Free VPN catalog remains disabled by default and is not an official POKROV
@@ -807,3 +834,6 @@ Required before tagging:
 - Required-checks policy documents the expected CI and release gates, but remote
   GitHub branch protection/ruleset enforcement still has to be configured and
   observed in repository settings before public copy can claim it is enforced.
+- GitHub ruleset setup is now seed-backed, but actual remote repository
+  rulesets or branch protection still require maintainer configuration and
+  observation in GitHub settings before public copy can claim enforcement.

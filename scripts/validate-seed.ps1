@@ -50,6 +50,7 @@ $requiredFiles = @(
   ".github\\dependabot.yml",
   "config\\product-contract.seed.json",
   "config\\platform-matrix.seed.json",
+  "config\\github-ruleset.seed.json",
   "config\\required-checks.seed.json",
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
@@ -81,6 +82,7 @@ $requiredFiles = @(
   "docs\\BUILD_FROM_SOURCE.md",
   "docs\\DEPENDENCY_LICENSE_AUDIT.md",
   "docs\\DEPENDENCY_UPDATE_POLICY.md",
+  "docs\\GITHUB_RULESET_SETUP.md",
   "docs\\RELEASE_CHECKLIST.md",
   "docs\\REQUIRED_CHECKS.md",
   "docs\\operator\\openapi.yaml",
@@ -140,6 +142,7 @@ $requiredFiles = @(
 $jsonFiles = @(
   "config\\product-contract.seed.json",
   "config\\platform-matrix.seed.json",
+  "config\\github-ruleset.seed.json",
   "config\\required-checks.seed.json",
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
@@ -900,6 +903,58 @@ if (Test-Path -LiteralPath $requiredChecksPath -PathType Leaf) {
         if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
           $manifestErrors.Add("$docPath must include '$requiredPhrase' for required checks policy")
         }
+      }
+    }
+  }
+}
+
+$githubRulesetPath = Join-Path $root "config\\github-ruleset.seed.json"
+if (Test-Path -LiteralPath $githubRulesetPath -PathType Leaf) {
+  $githubRuleset = Get-Content -Raw -LiteralPath $githubRulesetPath | ConvertFrom-Json
+
+  if ($githubRuleset.mode -ne "setup_guidance_not_remote_enforcement") {
+    $manifestErrors.Add("config\\github-ruleset.seed.json must stay setup guidance, not a remote enforcement claim")
+  }
+
+  if ($githubRuleset.docs -ne "docs/GITHUB_RULESET_SETUP.md") {
+    $manifestErrors.Add("config\\github-ruleset.seed.json must point to docs/GITHUB_RULESET_SETUP.md")
+  }
+
+  if (@($githubRuleset.target_branches) -notcontains "main") {
+    $manifestErrors.Add("config\\github-ruleset.seed.json must target main")
+  }
+
+  foreach ($field in @("repository_ruleset_preferred", "branch_protection_fallback_supported", "remote_enforcement_not_claimed", "pull_request_required", "required_status_checks_required", "codeowners_review_required", "conversation_resolution_required", "block_force_pushes_required", "block_branch_deletion_required", "bypass_must_be_explicit_and_minimal")) {
+    if ($githubRuleset.policy.$field -ne $true) {
+      $manifestErrors.Add("config\\github-ruleset.seed.json policy.$field must remain true")
+    }
+  }
+
+  if (Test-Path -LiteralPath $requiredChecksPath -PathType Leaf) {
+    $requiredChecks = Get-Content -Raw -LiteralPath $requiredChecksPath | ConvertFrom-Json
+    if ((@($githubRuleset.required_status_checks) -join "|") -ne (@($requiredChecks.required_jobs) -join "|")) {
+      $manifestErrors.Add("config\\github-ruleset.seed.json required_status_checks must match config\\required-checks.seed.json required_jobs")
+    }
+  }
+
+  foreach ($requiredVerification in @("GitHub repository ruleset or branch protection is active for main", "Required status checks exactly match config/required-checks.seed.json", "CODEOWNERS review is required for matching paths", "Conversations must be resolved before merge", "Force pushes and branch deletion are blocked for protected targets", "A test pull request without required checks cannot be merged")) {
+    if (@($githubRuleset.manual_verification_required) -notcontains $requiredVerification) {
+      $manifestErrors.Add("config\\github-ruleset.seed.json must require manual verification '$requiredVerification'")
+    }
+  }
+
+  foreach ($forbiddenClaim in @("remote branch protection is enforced", "repository rulesets are active", "all maintainers are blocked from bypass", "GitHub settings prove binary release readiness", "GitHub settings prove trusted signing or store readiness")) {
+    if (@($githubRuleset.forbidden_claims_until_observed) -notcontains $forbiddenClaim) {
+      $manifestErrors.Add("config\\github-ruleset.seed.json must forbid claim '$forbiddenClaim' until observed")
+    }
+  }
+
+  $githubRulesetDocPath = Join-Path $root "docs\\GITHUB_RULESET_SETUP.md"
+  if (Test-Path -LiteralPath $githubRulesetDocPath -PathType Leaf) {
+    $githubRulesetDoc = Get-Content -Raw -LiteralPath $githubRulesetDocPath
+    foreach ($requiredPhrase in @("not proof that remote GitHub settings are already active", "Source import and public tree checks", "Flutter analyze and tests", "CODEOWNERS review", "conversation resolution", "blocked force pushes", "blocked branch deletion", "a test pull request without required checks cannot be merged", "do not prove APK, EXE, store release, trusted signing")) {
+      if ($githubRulesetDoc.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add("docs\\GITHUB_RULESET_SETUP.md must include '$requiredPhrase'")
       }
     }
   }
