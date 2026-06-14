@@ -18,6 +18,20 @@ Read:
 - [docs/PRODUCT_VARIANTS.md](docs/PRODUCT_VARIANTS.md)
 - [docs/FREE_VPN_CATALOG_GATE.md](docs/FREE_VPN_CATALOG_GATE.md)
 
+For setup or build work, run the read-only contributor doctor first:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\doctor.ps1
+```
+
+It only checks local commands and required public files. It does not install
+dependencies, build artifacts, fetch runtime binaries, copy config, or publish
+anything. For issue reports, include a redacted JSON run when useful:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\doctor.ps1 -Json
+```
+
 ## Contribution Rules
 
 - Keep changes focused and easy to review.
@@ -42,6 +56,9 @@ Good pull requests include:
 - why the change is useful
 - how it was checked
 - any remaining risk or follow-up
+
+If setup, dependency, build, or docs onboarding behavior changed, include the
+`scripts\doctor.ps1` result or explain why it is not relevant.
 
 For source changes, include platform-specific checks for Android or Windows
 when applicable. For parser, subscription, QR, or catalog changes, include

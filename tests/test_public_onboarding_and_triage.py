@@ -132,6 +132,7 @@ def test_specialized_issue_templates_route_import_operator_and_security() -> Non
     import_template = _read(".github/ISSUE_TEMPLATE/profile_import_problem.yml")
     operator_template = _read(".github/ISSUE_TEMPLATE/operator_integration_question.yml")
     security_template = _read(".github/ISSUE_TEMPLATE/security_redirect.yml")
+    build_template = _read(".github/ISSUE_TEMPLATE/build_problem.yml")
     config = _read(".github/ISSUE_TEMPLATE/config.yml")
 
     for phrase in (
@@ -157,6 +158,14 @@ def test_specialized_issue_templates_route_import_operator_and_security() -> Non
         "security-private",
     ):
         assert phrase in security_template
+
+    for phrase in (
+        "Contributor doctor output",
+        "scripts\\doctor.ps1 -Json",
+        "read-only contributor doctor",
+        "redact local paths",
+    ):
+        assert phrase in build_template
 
     assert "https://github.com/Kiwunaka/Pokrov-client/security/policy" in config
 
@@ -214,6 +223,7 @@ def test_pull_request_template_guards_tracks_release_claims_and_catalog() -> Non
         "does not imply official POKROV service claims",
         "third-party public config catalog behavior disabled",
         "source-only release notes",
+        "scripts\\doctor.ps1",
     ):
         assert phrase in text
 

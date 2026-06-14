@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-06-14",
+  "script": "scripts/doctor.ps1",
+  "policy": {
+    "read_only_by_default": true,
+    "no_dependency_install": true,
+    "no_build_or_release_artifacts": true,
+    "no_network_required": true,
+    "json_output_supported": true,
+    "command_checks_can_be_skipped": true
+  },
+  "required_commands": [
+    "git",
+    "python",
+    "flutter",
+    "dart"
+  ],
+  "required_public_files": [
+    "README.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "docs/BUILD_FROM_SOURCE.md",
+    "apps/android_shell/android/gradlew.bat",
+    "apps/android_shell/android/app/build.gradle",
+    "apps/windows_shell/windows/CMakeLists.txt",
+    "scripts/bootstrap-workspace.ps1",
+    "scripts/run-tests.ps1",
+    "scripts/validate-seed.ps1",
+    "config/templates/local.env.example",
+    "config/templates/device-overrides.seed.json"
+  ],
+  "required_docs": [
+    "CONTRIBUTING.md",
+    "docs/BUILD_FROM_SOURCE.md",
+    "scripts/README.md"
+  ]
+}
