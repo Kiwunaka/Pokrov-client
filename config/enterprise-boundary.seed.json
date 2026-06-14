@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-06-14",
+  "doc": "docs/ENTERPRISE.md",
+  "current_public_license": "GPL-3.0-only",
+  "policy": {
+    "does_not_change_license": true,
+    "not_legal_advice": true,
+    "operator_brings_own_backend": true,
+    "operator_owns_distribution_claims": true,
+    "no_private_pokrov_access_included": true,
+    "no_commercial_license_offered_by_default": true,
+    "dual_license_requires_owner_decision": true,
+    "official_branding_forbidden_for_forks": true,
+    "gpl_source_obligations_not_waived": true
+  },
+  "current_model": [
+    "GPLv3 public client source",
+    "paid support and integration services may be offered separately",
+    "operator-owned backend, billing, support, signing, and release channels"
+  ],
+  "future_options": [
+    "GPL-only support and integration",
+    "open-core services around the GPL client",
+    "dual license only after an explicit owner decision and contributor policy"
+  ],
+  "operator_responsibilities": [
+    "backend and managed profile API",
+    "billing, checkout, refunds, and abuse handling",
+    "support and privacy policy",
+    "signing identities and store or direct-download release channels",
+    "checksums, release notes, source-compliance process, and user claims"
+  ],
+  "forbidden_claims": [
+    "commercial license is available by default",
+    "operator builds are official POKROV builds",
+    "GPLv3 obligations are waived",
+    "private POKROV backend access is included",
+    "trusted signing, store release, or production readiness is included"
+  ]
+}

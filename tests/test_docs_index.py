@@ -21,6 +21,7 @@ def test_docs_index_routes_first_steps_users_operators_and_maintainers() -> None
         "CLIENT_PRODUCT_TRACKS.md",
         "FREE_VPN_CATALOG_GATE.md",
         "OPERATOR_INTEGRATION.md",
+        "ENTERPRISE.md",
         "operator/openapi.yaml",
         "WHITE_LABEL_BRANDING.md",
         "RELEASE_POLICY.md",

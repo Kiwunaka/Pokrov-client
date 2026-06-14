@@ -80,6 +80,9 @@ production readiness without matching public evidence.
 - Added a source release publication dry-run validator that checks release
   evidence bundles and rendered release notes without publishing releases,
   pushing tags, or uploading assets.
+- Added an enterprise boundary and seed-backed operator commercial-license
+  guard for GPLv3, paid services, dual-license decisions, and fork
+  distribution claims.
 
 ### Changed
 
@@ -88,7 +91,7 @@ production readiness without matching public evidence.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.39.0-source` candidates.
+  `v0.40.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -133,6 +136,7 @@ production readiness without matching public evidence.
 | `v0.37.0-source` | Pending stacked PR, not tagged | PR #57 |
 | `v0.38.0-source` | Pending stacked PR, not tagged | PR #58 |
 | `v0.39.0-source` | Pending stacked PR, not tagged | PR #59 |
+| `v0.40.0-source` | Pending stacked PR, not tagged | PR #60 |
 
 ### Still Source-Only
 

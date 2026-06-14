@@ -99,6 +99,7 @@ Source release status:
 | `v0.37.0-source` | Pending stacked PR, not tagged | GitHub ruleset verifier is in the stacked PR queue. |
 | `v0.38.0-source` | Pending stacked PR, not tagged | Release evidence bundle helper is in the stacked PR queue. |
 | `v0.39.0-source` | Pending stacked PR, not tagged | Source release publication dry-run validator is in the stacked PR queue. |
+| `v0.40.0-source` | Pending stacked PR, not tagged | Enterprise boundary and operator commercial-license guard is in the stacked PR queue. |
 
 ## Which App Should I Use?
 
@@ -140,6 +141,7 @@ Read the scope documents before opening issues or pull requests:
 - [Source import playbook](docs/SOURCE_IMPORT_PLAYBOOK.md)
 - [Product variants](docs/PRODUCT_VARIANTS.md)
 - [Operator integration](docs/OPERATOR_INTEGRATION.md)
+- [Enterprise boundary](docs/ENTERPRISE.md)
 - [Governance](docs/GOVERNANCE.md)
 - [Brand policy](BRAND.md)
 - [Security policy](SECURITY.md)
@@ -148,6 +150,8 @@ Read the scope documents before opening issues or pull requests:
 
 This repository is licensed under the GNU General Public License v3.0. See
 [LICENSE](LICENSE).
+
+See [Enterprise boundary](docs/ENTERPRISE.md) for the operator and commercial license boundary. It does not change the GPLv3 license or offer a commercial license by default.
 
 The POKROV name, logos, domains, support channels, signing identities, and
 official release channels are governed separately by [BRAND.md](BRAND.md).

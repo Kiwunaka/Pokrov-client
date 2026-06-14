@@ -44,6 +44,8 @@ anything.
 
 - [Operator integration](OPERATOR_INTEGRATION.md): expected backend surfaces,
   first-run operator path, and responsibilities.
+- [Enterprise boundary](ENTERPRISE.md) (`docs/ENTERPRISE.md`): GPLv3, commercial license, paid
+  services, and operator distribution boundaries.
 - [Operator OpenAPI](operator/openapi.yaml): source fixture API contract.
 - [White-label branding](WHITE_LABEL_BRANDING.md): neutral token roles and
   operator-owned branding boundary.

@@ -435,6 +435,17 @@
       "ships_exe": false,
       "store_release": false,
       "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.40.0-source",
+      "status": "stacked_pr_green_not_tagged",
+      "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/60",
+      "scope": "Enterprise boundary and operator commercial-license guard for GPLv3, paid service, dual-license, and fork distribution claims.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
     }
   ]
 }

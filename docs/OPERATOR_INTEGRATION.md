@@ -16,6 +16,11 @@ public source.
 POKROV does not provide your backend, billing, support, signing, or release
 claims.
 
+Read [Enterprise boundary](ENTERPRISE.md) (`docs/ENTERPRISE.md`) before
+distributing operator builds. It covers GPLv3, commercial license boundaries,
+paid services, and the fact that operator builds remain operator-owned
+distributions.
+
 Operator builds are not POKROV builds. Do not use POKROV names, logos,
 endpoints, support bots, signing identities, release channels, or official
 service claims for your users.
