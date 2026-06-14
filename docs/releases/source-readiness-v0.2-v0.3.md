@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.41
+# Source Readiness: v0.2-v0.42
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -892,8 +892,40 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.42.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #62: privacy-first diagnostics export policy gate for local-only,
+  user-initiated, redacted support diagnostics and future log-export surfaces
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- confirm `config/diagnostics-export-policy.seed.json` and
+  `docs/DIAGNOSTICS_EXPORT_POLICY.md` still require local-only,
+  user-initiated, redacted exports by default
+- confirm new diagnostics or log export surfaces are listed in the policy seed,
+  documented, tested, and do not include raw configs, subscription URLs, proxy
+  links, token/secret fields, WARP private material, signing material, or
+  private backend details
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the publication dry-run, release evidence bundle, preflight summary,
+  proof manifest, rendered GitHub Release body, and changelog section for the
+  exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
+- The diagnostics export policy is a source guardrail. It does not make support
+  upload automatic, prove runtime connectivity, approve raw log export, or
+  replace manual review of accidental secrets.
 - Safe diagnostics export is a support aid only. It does not upload logs,
   prove runtime connectivity, include raw configs, or replace maintainer review
   for accidental secrets.

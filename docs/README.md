@@ -34,6 +34,8 @@ anything.
   config catalog rules and attribution boundaries.
 - [GitHub triage](GITHUB_TRIAGE.md): issue routing, labels, and public
   redaction rules.
+- [Diagnostics export policy](DIAGNOSTICS_EXPORT_POLICY.md): local-only,
+  user-initiated, redacted diagnostics and future log-export boundaries.
 - [Governance](GOVERNANCE.md): maintainer-led decision rules and CODEOWNERS
   review routing.
 - [Support](../SUPPORT.md): where to ask for help without posting private
