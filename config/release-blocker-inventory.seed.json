@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-06-14",
+  "release_line": "source-only",
+  "target_tag_family": "v0.x.0-source",
+  "status": "not_ready_for_tag",
+  "source_only": true,
+  "ships_apk": false,
+  "ships_exe": false,
+  "store_release": false,
+  "trusted_signing_claim": false,
+  "tracked_candidates": {
+    "base_candidate": "v0.1.0-source",
+    "latest_candidate": "v0.43.0-source",
+    "latest_stacked_pr": 63,
+    "covered_range": "v0.1.0-source through v0.43.0-source",
+    "tag_creation_allowed": false
+  },
+  "blockers": [
+    {
+      "id": "merge_stacked_pr_sequence",
+      "status": "pending_maintainer_review",
+      "required_before_tag": true,
+      "evidence": "All stacked PRs through the selected candidate are merged to main in order."
+    },
+    {
+      "id": "choose_exact_commit_sha",
+      "status": "pending_maintainer_review",
+      "required_before_tag": true,
+      "evidence": "Maintainer records the exact commit SHA that will receive the annotated source tag."
+    },
+    {
+      "id": "run_full_source_preflight",
+      "status": "manual_owner_test",
+      "required_before_tag": true,
+      "evidence": "Maintainer runs scripts/source-release-preflight.ps1 -RequireTag without -SkipTestCommands on the exact annotated tag."
+    },
+    {
+      "id": "review_release_evidence_bundle",
+      "status": "manual_owner_test",
+      "required_before_tag": true,
+      "evidence": "Maintainer reviews the release evidence bundle, preflight summary, proof manifest, and rendered release notes."
+    },
+    {
+      "id": "review_public_release_notes",
+      "status": "pending_maintainer_review",
+      "required_before_tag": true,
+      "evidence": "Release notes state feature status, known limitations, source proof, and no binary/store/trusted-signing claims."
+    },
+    {
+      "id": "confirm_no_binary_claims",
+      "status": "pending_maintainer_review",
+      "required_before_tag": true,
+      "evidence": "Release copy confirms no APK, EXE, store release, trusted signing, official binary, or production support claim."
+    },
+    {
+      "id": "confirm_catalog_and_diagnostics_boundaries",
+      "status": "pending_maintainer_review",
+      "required_before_tag": true,
+      "evidence": "Maintainer confirms Free VPN catalog remains gated third-party opt-in and diagnostics exports remain local-only, user-initiated, and redacted."
+    }
+  ]
+}

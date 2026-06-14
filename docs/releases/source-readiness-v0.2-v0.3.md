@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.42
+# Source Readiness: v0.2-v0.43
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -921,8 +921,40 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.43.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #63: release blocker inventory for source tag readiness, manual
+  maintainer steps, and no-binary release boundaries
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- confirm `config/release-blocker-inventory.seed.json` and
+  `docs/RELEASE_BLOCKERS.md` still mark the line as not ready for tag until
+  every required manual maintainer step is cleared for the exact source
+  candidate
+- confirm the blocker inventory still requires full source preflight, release
+  evidence bundle review, release-note review, no-binary copy review, and
+  catalog/diagnostics boundary review
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the publication dry-run, release evidence bundle, preflight summary,
+  proof manifest, rendered GitHub Release body, and changelog section for the
+  exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
+- The release blocker inventory is a planning and review guardrail. It does
+  not merge PRs, create tags, run the maintainer preflight, publish releases,
+  or make the source line ready for tag by itself.
 - The diagnostics export policy is a source guardrail. It does not make support
   upload automatic, prove runtime connectivity, approve raw log export, or
   replace manual review of accidental secrets.
