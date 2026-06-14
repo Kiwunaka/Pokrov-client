@@ -68,6 +68,9 @@ production readiness without matching public evidence.
 - Added a Dependabot and dependency update policy gate for GitHub Actions and
   Dart/Flutter pub workspaces with bounded PRs, labels, human review, license
   inventory, and source-only release boundaries.
+- Added a required checks and branch-protection policy gate for CI job names,
+  source-release gates, read-only workflow permissions, and no-claim release
+  boundaries.
 
 ### Changed
 
@@ -76,7 +79,7 @@ production readiness without matching public evidence.
 - Updated source-release documentation to separate tagged releases from
   source-readiness milestones.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.34.0-source` candidates.
+  `v0.35.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -116,6 +119,7 @@ production readiness without matching public evidence.
 | `v0.32.0-source` | Pending stacked PR, not tagged | PR #52 |
 | `v0.33.0-source` | Pending stacked PR, not tagged | PR #53 |
 | `v0.34.0-source` | Pending stacked PR, not tagged | PR #54 |
+| `v0.35.0-source` | Pending stacked PR, not tagged | PR #55 |
 
 ### Still Source-Only
 

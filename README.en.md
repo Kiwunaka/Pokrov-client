@@ -133,6 +133,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.32.0-source` | Pending stacked PR, not tagged | Build troubleshooting router is in the stacked PR queue. |
 | `v0.33.0-source` | Pending stacked PR, not tagged | CODEOWNERS review-routing gate is in the stacked PR queue. |
 | `v0.34.0-source` | Pending stacked PR, not tagged | Dependabot dependency update policy gate is in the stacked PR queue. |
+| `v0.35.0-source` | Pending stacked PR, not tagged | Required checks policy gate is in the stacked PR queue. |
 
 ## Architecture Boundary
 
@@ -218,6 +219,7 @@ Before contributing, read:
 - [BRAND.md](BRAND.md)
 - [docs/README.md](docs/README.md)
 - [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
+- [docs/REQUIRED_CHECKS.md](docs/REQUIRED_CHECKS.md)
 - [docs/DEPENDENCY_UPDATE_POLICY.md](docs/DEPENDENCY_UPDATE_POLICY.md)
 - [docs/MAINTAINER_CHECKLIST.md](docs/MAINTAINER_CHECKLIST.md)
 - [docs/PROJECT_PRINCIPLES.md](docs/PROJECT_PRINCIPLES.md)

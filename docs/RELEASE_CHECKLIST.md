@@ -35,6 +35,10 @@ Use this checklist before publishing a public source or binary release.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1`
   passes before a public source release.
 - GitHub Actions CI is green on the release branch or tag.
+- Required checks policy in [REQUIRED_CHECKS.md](REQUIRED_CHECKS.md) still
+  matches `.github/workflows/ci.yml` and `config/required-checks.seed.json`,
+  including `Source import and public tree checks` and
+  `Flutter analyze and tests`.
 - No generated build folders, local platform config, signing files, or runtime
   binaries are committed.
 
