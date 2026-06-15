@@ -49,10 +49,10 @@ def _merge_order_summary(ok: bool = True) -> dict:
         "read_only": True,
         "merge_order_ok": ok,
         "linear_base_to_head_chain": ok,
-        "stack_count": 30,
-        "latest_pr": 90,
-        "latest_candidate": "v0.70.0-source",
-        "errors": [] if ok else ["PR #90 base must equal previous head"],
+        "stack_count": 31,
+        "latest_pr": 91,
+        "latest_candidate": "v0.71.0-source",
+        "errors": [] if ok else ["PR #91 base must equal previous head"],
     }
 
 
@@ -62,15 +62,15 @@ def _github_status_summary(ok: bool = True) -> dict:
         "generated_at": "2026-06-15T00:00:02Z",
         "read_only": True,
         "github_status_ok": ok,
-        "stack_count": 30,
-        "latest_pr": 90,
-        "latest_candidate": "v0.70.0-source",
-        "clean_pr_count": 24 if ok else 23,
+        "stack_count": 31,
+        "latest_pr": 91,
+        "latest_candidate": "v0.71.0-source",
+        "clean_pr_count": 25 if ok else 24,
         "draft_pr_count": 0,
         "unclean_pr_count": 0 if ok else 1,
-        "successful_check_count": 90 if ok else 89,
+        "successful_check_count": 93 if ok else 92,
         "failed_check_count": 0 if ok else 1,
-        "errors": [] if ok else ["PR #90 check 'Flutter analyze and tests' is FAILURE"],
+        "errors": [] if ok else ["PR #91 check 'Flutter analyze and tests' is FAILURE"],
     }
 
 
@@ -91,7 +91,7 @@ def _tag_readiness_summary(ready: bool = False) -> dict:
         "schema_version": 1,
         "generated_at": "2026-06-15T00:00:03Z",
         "read_only": True,
-        "tag": "v0.70.0-source",
+        "tag": "v0.71.0-source",
         "ready_for_tag": ready,
         "source_only": True,
         "ships_apk": False,
@@ -99,8 +99,8 @@ def _tag_readiness_summary(ready: bool = False) -> dict:
         "store_release": False,
         "trusted_signing_claim": False,
         "tag_creation_allowed": ready,
-        "latest_candidate": "v0.70.0-source",
-        "latest_stacked_pr": 90,
+        "latest_candidate": "v0.71.0-source",
+        "latest_stacked_pr": 91,
         "open_blocker_count": len(open_blockers),
         "open_blockers": open_blockers,
     }
@@ -111,7 +111,7 @@ def _publication_dry_run_summary(ok: bool = True) -> dict:
         "schema_version": 1,
         "generated_at": "2026-06-15T00:00:04Z",
         "read_only": True,
-        "tag": "v0.70.0-source",
+        "tag": "v0.71.0-source",
         "source_only": True,
         "dry_run_only": True,
         "ready_for_manual_review": ok,
@@ -169,7 +169,7 @@ def _write_input_summaries(
             / "source-tag-readiness"
             / "test-inputs"
             / suffix
-            / "v0.70.0-source-tag-readiness.json"
+            / "v0.71.0-source-tag-readiness.json"
         )
         publication_path = (
             ROOT
@@ -177,13 +177,13 @@ def _write_input_summaries(
             / "source-release-publication"
             / "test-inputs"
             / suffix
-            / "v0.70.0-source-publication-dry-run.json"
+            / "v0.71.0-source-publication-dry-run.json"
         )
     else:
         merge_path = tmp_path / "release-merge-order.json"
         github_path = tmp_path / "release-stack-github-status.json"
-        tag_path = tmp_path / "v0.70.0-source-tag-readiness.json"
-        publication_path = tmp_path / "v0.70.0-source-publication-dry-run.json"
+        tag_path = tmp_path / "v0.71.0-source-tag-readiness.json"
+        publication_path = tmp_path / "v0.71.0-source-publication-dry-run.json"
     for path in (merge_path, github_path, tag_path, publication_path):
         path.parent.mkdir(parents=True, exist_ok=True)
     _write_json(merge_path, _merge_order_summary(merge_ok))
@@ -195,6 +195,9 @@ def _write_input_summaries(
 
 def test_release_merge_handoff_seed_defines_read_only_inputs() -> None:
     seed = _read_json("config/release-merge-handoff.seed.json")
+    latest_candidate = _read_json("config/release-blocker-inventory.seed.json")[
+        "tracked_candidates"
+    ]["latest_candidate"]
 
     assert seed["script"] == "scripts/prepare-release-merge-handoff.ps1"
     assert seed["default_output_dir"] == "build/release-merge-handoff"
@@ -233,12 +236,50 @@ def test_release_merge_handoff_seed_defines_read_only_inputs() -> None:
     )
     assert seed["inputs"]["tag_readiness"].endswith("-tag-readiness.json")
     assert seed["inputs"]["publication_dry_run"].endswith("-publication-dry-run.json")
+    assert latest_candidate in seed["inputs"]["tag_readiness"]
+    assert latest_candidate in seed["inputs"]["publication_dry_run"]
     assert seed["input_roots"] == {
         "merge_order": "build/release-merge-order",
         "github_status": "build/release-stack-github-status",
         "tag_readiness": "build/source-tag-readiness",
         "publication_dry_run": "build/source-release-publication",
     }
+
+
+def test_release_merge_handoff_seed_rejects_stale_default_candidate_paths() -> None:
+    handoff_seed_path = ROOT / "config" / "release-merge-handoff.seed.json"
+    snapshots = _snapshot_files([handoff_seed_path])
+
+    try:
+        seed = json.loads(handoff_seed_path.read_text(encoding="utf-8"))
+        seed["inputs"]["tag_readiness"] = (
+            "build/source-tag-readiness/v0.69.0-source-tag-readiness.json"
+        )
+        seed["inputs"]["publication_dry_run"] = (
+            "build/source-release-publication/v0.69.0-source/"
+            "v0.69.0-source-publication-dry-run.json"
+        )
+        _write_json(handoff_seed_path, seed)
+
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "validate-seed.ps1"),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    finally:
+        _restore_files(snapshots)
+
+    assert result.returncode != 0
+    output = result.stdout + result.stderr
+    assert "release-merge-handoff.seed.json inputs must track latest_candidate" in output
 
 
 def test_release_merge_handoff_script_is_read_only() -> None:
@@ -338,8 +379,8 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
     assert summary["manual_tag_required"] is True
     assert summary["publish_performed"] is False
     assert summary["tag_push_performed"] is False
-    assert summary["latest_candidate"] == "v0.70.0-source"
-    assert summary["latest_pr"] == 90
+    assert summary["latest_candidate"] == "v0.71.0-source"
+    assert summary["latest_pr"] == 91
     assert summary["source_only"] is True
     assert summary["no_apk"] is True
     assert summary["no_exe"] is True
@@ -364,7 +405,7 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
         "sha256"
     ] == _sha256(publication_path)
     assert summary["input_fingerprints"]["publication_dry_run"]["path"].endswith(
-        "v0.70.0-source-publication-dry-run.json"
+        "v0.71.0-source-publication-dry-run.json"
     )
     assert summary["input_generated_at"] == {
         "merge_order": "2026-06-15T00:00:01Z",
@@ -379,8 +420,8 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
         "publication_dry_run": 1,
     }
     assert summary["input_stack_counts"] == {
-        "merge_order": 30,
-        "github_status": 30,
+        "merge_order": 31,
+        "github_status": 31,
     }
     assert summary["input_error_count"] == 0
     assert "merge stacked PRs in order" in " ".join(summary["next_manual_steps"])
@@ -402,14 +443,14 @@ def test_release_merge_handoff_uses_seed_default_input_paths() -> None:
         ROOT
         / "build"
         / "source-tag-readiness"
-        / "v0.70.0-source-tag-readiness.json"
+        / "v0.71.0-source-tag-readiness.json"
     )
     default_publication_path = (
         ROOT
         / "build"
         / "source-release-publication"
-        / "v0.70.0-source"
-        / "v0.70.0-source-publication-dry-run.json"
+        / "v0.71.0-source"
+        / "v0.71.0-source-publication-dry-run.json"
     )
     out_dir = ROOT / "build" / "release-merge-handoff"
     summary_path = out_dir / "release-merge-handoff.json"
@@ -448,8 +489,8 @@ def test_release_merge_handoff_uses_seed_default_input_paths() -> None:
         assert result.returncode == 0, result.stderr + result.stdout
         summary = json.loads(summary_path.read_text(encoding="utf-8-sig"))
         assert summary["handoff_ready_for_maintainer"] is True
-        assert summary["latest_candidate"] == "v0.70.0-source"
-        assert summary["latest_pr"] == 90
+        assert summary["latest_candidate"] == "v0.71.0-source"
+        assert summary["latest_pr"] == 91
         assert summary["publication_dry_run_ok"] is True
         assert summary["source_only"] is True
         assert summary["no_apk"] is True
@@ -541,7 +582,7 @@ def test_release_merge_handoff_blocks_mismatched_input_candidates(
         / "source-release-publication"
         / "test-inputs"
         / suffix
-        / "v0.70.0-source-publication-dry-run.json"
+        / "v0.71.0-source-publication-dry-run.json"
     )
     for path in (merge_path, github_path, tag_path, publication_path):
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -647,7 +688,7 @@ def test_release_merge_handoff_blocks_input_summary_errors(
         tmp_path
     )
     merge_summary = json.loads(merge_path.read_text(encoding="utf-8"))
-    merge_summary["errors"] = ["PR #90 base was stale when checked"]
+    merge_summary["errors"] = ["PR #91 base was stale when checked"]
     _write_json(merge_path, merge_summary)
     out_dir = ROOT / "build" / "release-merge-handoff" / "test-output"
     shutil.rmtree(out_dir, ignore_errors=True)
@@ -686,7 +727,7 @@ def test_release_merge_handoff_blocks_input_summary_errors(
     assert result.returncode == 2
     assert summary["handoff_ready_for_maintainer"] is False
     assert summary["input_error_count"] == 1
-    assert summary["input_errors"] == ["PR #90 base was stale when checked"]
+    assert summary["input_errors"] == ["PR #91 base was stale when checked"]
     assert "input summaries report errors" in summary["blocking_errors"]
 
 

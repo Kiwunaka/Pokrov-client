@@ -190,6 +190,12 @@
       "candidate": "v0.70.0-source",
       "base": "codex/v0.69-tag-readiness-blocker-evidence",
       "head": "codex/v0.70-tag-readiness-pr-consistency"
+    },
+    {
+      "pr": 91,
+      "candidate": "v0.71.0-source",
+      "base": "codex/v0.70-tag-readiness-pr-consistency",
+      "head": "codex/v0.71-handoff-seed-candidate-paths"
     }
   ]
 }

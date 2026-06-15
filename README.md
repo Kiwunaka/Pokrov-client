@@ -130,6 +130,7 @@ Source release status:
 | `v0.68.0-source` | Pending stacked PR, not tagged | Release merge handoff tag-readiness blocker-absence consistency is in the stacked PR queue. |
 | `v0.69.0-source` | Pending stacked PR, not tagged | Source tag-readiness open-blocker evidence fields are in the stacked PR queue. |
 | `v0.70.0-source` | Pending stacked PR, not tagged | Release merge handoff tag-readiness latest stacked PR consistency is in the stacked PR queue. |
+| `v0.71.0-source` | Pending stacked PR, not tagged | Release merge handoff default candidate paths are kept in sync with blocker inventory. |
 
 ## Which App Should I Use?
 

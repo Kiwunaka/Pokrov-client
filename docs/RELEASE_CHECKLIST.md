@@ -63,7 +63,8 @@ Use this checklist before publishing a public source or binary release.
   tag-readiness ready-flag consistency, tag-readiness blocker-absence
   consistency, open-blocker evidence fields, and tag-readiness latest stacked
   PR consistency, plus explicit source-only no-binary flags. The handoff
-  accepts prerequisite summaries only from their
+  seed defaults must track the blocker inventory latest candidate, and the
+  handoff accepts prerequisite summaries only from their
   expected
   ignored `build/` output roots; it does not merge, tag, push, publish, or
   upload anything.

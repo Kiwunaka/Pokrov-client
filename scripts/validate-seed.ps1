@@ -1482,6 +1482,18 @@ if (Test-Path -LiteralPath $releaseMergeHandoffPath -PathType Leaf) {
   if ($releaseMergeHandoff.inputs.publication_dry_run -notmatch "-publication-dry-run\.json$") {
     $manifestErrors.Add("config\\release-merge-handoff.seed.json must read a source publication dry-run summary")
   }
+  $releaseBlockerInventoryPath = Join-Path $root "config\\release-blocker-inventory.seed.json"
+  if (Test-Path -LiteralPath $releaseBlockerInventoryPath -PathType Leaf) {
+    $releaseBlockerInventory = Get-Content -Raw -LiteralPath $releaseBlockerInventoryPath | ConvertFrom-Json
+    $latestCandidate = [string]$releaseBlockerInventory.tracked_candidates.latest_candidate
+    if (
+      [string]::IsNullOrWhiteSpace($latestCandidate) -or
+      $releaseMergeHandoff.inputs.tag_readiness.IndexOf($latestCandidate, [System.StringComparison]::OrdinalIgnoreCase) -lt 0 -or
+      $releaseMergeHandoff.inputs.publication_dry_run.IndexOf($latestCandidate, [System.StringComparison]::OrdinalIgnoreCase) -lt 0
+    ) {
+      $manifestErrors.Add("config\\release-merge-handoff.seed.json inputs must track latest_candidate from config\\release-blocker-inventory.seed.json")
+    }
+  }
   $expectedMergeHandoffInputRoots = @{
     merge_order = "build/release-merge-order"
     github_status = "build/release-stack-github-status"
