@@ -28,6 +28,10 @@ Source readiness note: `v0.59.0-source` is a pending stacked PR for release
 merge handoff canonical input roots; it is not tagged and does not ship APK/EXE
 binaries.
 
+Source readiness note: `v0.60.0-source` is a pending stacked PR for release
+merge handoff input timestamps; it is not tagged and does not ship APK/EXE
+binaries.
+
 <p align="center">
   <img src="assets/brand/pokrov-oss-hero.png" alt="POKROV Client open-source hero artwork" width="100%">
 </p>
