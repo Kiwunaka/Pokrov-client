@@ -254,6 +254,8 @@ try {
   ) | Select-Object -Unique
   if (@($prValues).Count -ne 1) {
     $blockingErrors.Add("input summaries do not agree on latest PR")
+  } elseif ([int]$tagReadiness.latest_stacked_pr -ne [int]@($prValues)[0]) {
+    $blockingErrors.Add("tag readiness latest stacked PR mismatch")
   }
   $stackCountValues = @(
     [int]$mergeOrder.stack_count,

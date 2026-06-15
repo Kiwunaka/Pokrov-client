@@ -64,9 +64,10 @@ Current helpers:
   summary checks, tag-readiness blocker-count consistency, tag-readiness
   blocker entry-shape checks, tag-readiness ready-flag consistency,
   tag-readiness blocker-absence consistency, open-blocker evidence fields, and
-  explicit source-only no-binary flags. Prerequisite summaries must come from
-  their expected ignored `build/` output roots; the helper does not merge, tag,
-  push, publish, or upload anything
+  tag-readiness latest stacked PR consistency, plus explicit source-only
+  no-binary flags. Prerequisite summaries must come from their expected ignored
+  `build/` output roots; the helper does not merge, tag, push, publish, or
+  upload anything
 - `verify-windows-bundle.ps1`: Windows bundle verifier for source-only Windows
   bundle proof; checks required Windows shell source paths and rejects
   committed Windows binaries, archives, signing files, or local runtime

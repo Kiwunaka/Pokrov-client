@@ -155,8 +155,10 @@ production readiness without matching public evidence.
   so summaries cannot deny tag creation after blockers are gone.
 - Added source tag-readiness open-blocker evidence fields and handoff checks
   so maintainer summaries keep blocker evidence attached.
+- Added release merge handoff tag-readiness latest stacked PR consistency
+  checks so stale tag-readiness summaries cannot describe an older PR.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.69.0-source` candidates.
+  `v0.70.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -231,6 +233,7 @@ production readiness without matching public evidence.
 | `v0.67.0-source` | Pending stacked PR, not tagged | PR #87 |
 | `v0.68.0-source` | Pending stacked PR, not tagged | PR #88 |
 | `v0.69.0-source` | Pending stacked PR, not tagged | PR #89 |
+| `v0.70.0-source` | Pending stacked PR, not tagged | PR #90 |
 
 ### Still Source-Only
 

@@ -184,6 +184,12 @@
       "candidate": "v0.69.0-source",
       "base": "codex/v0.68-merge-handoff-tag-denial",
       "head": "codex/v0.69-tag-readiness-blocker-evidence"
+    },
+    {
+      "pr": 90,
+      "candidate": "v0.70.0-source",
+      "base": "codex/v0.69-tag-readiness-blocker-evidence",
+      "head": "codex/v0.70-tag-readiness-pr-consistency"
     }
   ]
 }
