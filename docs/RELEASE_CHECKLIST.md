@@ -54,6 +54,12 @@ Use this checklist before publishing a public source or binary release.
   release stack GitHub status, and source tag
   readiness summaries into an ignored `build/release-merge-handoff/` maintainer
   handoff report; it does not merge, tag, push, publish, or upload anything.
+- `powershell -ExecutionPolicy Bypass -File .\scripts\verify-windows-bundle.ps1`
+  runs the Windows bundle verifier and writes source-only Windows bundle proof
+  under ignored `build/windows-bundle-verifier/`; it checks required Windows
+  shell source paths and refuses committed Windows binaries, archives, signing
+  files, or local runtime artifacts. It does not build, sign, package, publish,
+  or download runtime artifacts.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\check-source-release-copy.ps1`
   passes for the release policy, checklist, source release template, renderer,
   and final rendered release note.

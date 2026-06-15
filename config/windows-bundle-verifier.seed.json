@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "script": "scripts/verify-windows-bundle.ps1",
+  "default_output_dir": "build/windows-bundle-verifier",
+  "policy": {
+    "read_only": true,
+    "source_only": true,
+    "no_flutter_build": true,
+    "no_runtime_download": true,
+    "no_signing": true,
+    "no_packaging": true,
+    "no_publish": true,
+    "forbid_committed_windows_binaries": true,
+    "writes_only_ignored_build_output": true
+  },
+  "required_paths": [
+    "apps/windows_shell/pubspec.yaml",
+    "apps/windows_shell/lib/main.dart",
+    "apps/windows_shell/lib/community_qr_scanner.dart",
+    "apps/windows_shell/test/widget_test.dart",
+    "apps/windows_shell/windows/CMakeLists.txt",
+    "apps/windows_shell/windows/flutter/CMakeLists.txt",
+    "apps/windows_shell/windows/runner/CMakeLists.txt",
+    "apps/windows_shell/windows/runner/main.cpp",
+    "apps/windows_shell/windows/runner/runner.exe.manifest",
+    "config/windows-release.seed.json"
+  ],
+  "scan_roots": [
+    "apps/windows_shell"
+  ],
+  "forbidden_committed_extensions": [
+    ".dll",
+    ".exe",
+    ".msi",
+    ".msix",
+    ".pfx",
+    ".p12",
+    ".pem",
+    ".key",
+    ".cer",
+    ".crt",
+    ".zip"
+  ],
+  "allowed_committed_files": [
+    "apps/windows_shell/windows/runner/runner.exe.manifest"
+  ],
+  "release_claim_boundary": {
+    "ships_exe": false,
+    "store_release": false,
+    "trusted_signing_claim": false,
+    "runtime_binary_ready": false,
+    "official_binary_claim": false
+  }
+}

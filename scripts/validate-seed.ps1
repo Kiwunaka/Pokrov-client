@@ -63,6 +63,7 @@ $requiredFiles = @(
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
   "config\\windows-release.seed.json",
+  "config\\windows-bundle-verifier.seed.json",
   "config\\operator-api.fixture.json",
   "config\\enterprise-boundary.seed.json",
   "config\\free-vpn-catalog.seed.json",
@@ -147,6 +148,7 @@ $requiredFiles = @(
   "scripts\\check-release-merge-order.ps1",
   "scripts\\check-release-stack-github-status.ps1",
   "scripts\\prepare-release-merge-handoff.ps1",
+  "scripts\\verify-windows-bundle.ps1",
   "scripts\\prepare-source-release.ps1",
   "scripts\\render-source-release-notes.ps1",
   "scripts\\print-build-variant-command.ps1",
@@ -177,6 +179,7 @@ $jsonFiles = @(
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
   "config\\windows-release.seed.json",
+  "config\\windows-bundle-verifier.seed.json",
   "config\\operator-api.fixture.json",
   "config\\enterprise-boundary.seed.json",
   "config\\free-vpn-catalog.seed.json",
@@ -432,6 +435,43 @@ if (Test-Path -LiteralPath $windowsReleaseConfigPath -PathType Leaf) {
   foreach ($requiredPath in @("open_client_windows.exe", "libcore.dll", "data/app.so")) {
     if (@($windowsReleaseConfig.required_files) -notcontains $requiredPath) {
       $manifestErrors.Add("config\\windows-release.seed.json must list required build file '$requiredPath'")
+    }
+  }
+}
+
+$windowsBundleVerifierPath = Join-Path $root "config\\windows-bundle-verifier.seed.json"
+if (Test-Path -LiteralPath $windowsBundleVerifierPath -PathType Leaf) {
+  $windowsBundleVerifier = Get-Content -Raw -LiteralPath $windowsBundleVerifierPath | ConvertFrom-Json
+
+  if ($windowsBundleVerifier.script -ne "scripts/verify-windows-bundle.ps1") {
+    $manifestErrors.Add("config\\windows-bundle-verifier.seed.json must point to scripts/verify-windows-bundle.ps1")
+  }
+
+  if ($windowsBundleVerifier.default_output_dir -ne "build/windows-bundle-verifier") {
+    $manifestErrors.Add("config\\windows-bundle-verifier.seed.json must write under build/windows-bundle-verifier")
+  }
+
+  foreach ($field in @("read_only", "source_only", "no_flutter_build", "no_runtime_download", "no_signing", "no_packaging", "no_publish", "forbid_committed_windows_binaries")) {
+    if ($windowsBundleVerifier.policy.$field -ne $true) {
+      $manifestErrors.Add("config\\windows-bundle-verifier.seed.json policy.$field must be true")
+    }
+  }
+
+  foreach ($requiredPath in @("apps/windows_shell/pubspec.yaml", "apps/windows_shell/lib/main.dart", "apps/windows_shell/windows/CMakeLists.txt", "apps/windows_shell/windows/runner/runner.exe.manifest", "config/windows-release.seed.json")) {
+    if (@($windowsBundleVerifier.required_paths) -notcontains $requiredPath) {
+      $manifestErrors.Add("config\\windows-bundle-verifier.seed.json must require '$requiredPath'")
+    }
+  }
+
+  foreach ($extension in @(".dll", ".exe", ".msi", ".msix", ".pfx", ".p12", ".pem", ".key", ".cer", ".crt", ".zip")) {
+    if (@($windowsBundleVerifier.forbidden_committed_extensions) -notcontains $extension) {
+      $manifestErrors.Add("config\\windows-bundle-verifier.seed.json must forbid committed '$extension' files")
+    }
+  }
+
+  foreach ($field in @("ships_exe", "store_release", "trusted_signing_claim", "runtime_binary_ready", "official_binary_claim")) {
+    if ($windowsBundleVerifier.release_claim_boundary.$field -ne $false) {
+      $manifestErrors.Add("config\\windows-bundle-verifier.seed.json release_claim_boundary.$field must remain false")
     }
   }
 }

@@ -106,6 +106,10 @@ production readiness without matching public evidence.
 - Added Android native Gradle unit tests to CI through a source-only stub lane
   that does not fetch or commit libcore.aar and does not prove APK, store,
   trusted signing, or runtime readiness.
+- Added a Windows bundle verifier that writes source-only Windows bundle proof
+  while refusing committed Windows binaries, archives, signing files, and local
+  runtime artifacts; it does not build, sign, package, publish, or download
+  runtime artifacts.
 
 ### Changed
 
@@ -116,7 +120,7 @@ production readiness without matching public evidence.
 - Fixed the documented no-argument release merge handoff command so it uses the
   seed default input paths.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.50.0-source` candidates.
+  `v0.51.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -172,6 +176,7 @@ production readiness without matching public evidence.
 | `v0.48.0-source` | Pending stacked PR, not tagged | PR #68 |
 | `v0.49.0-source` | Pending stacked PR, not tagged | PR #69 |
 | `v0.50.0-source` | Pending stacked PR, not tagged | PR #70 |
+| `v0.51.0-source` | Pending stacked PR, not tagged | PR #71 |
 
 ### Still Source-Only
 

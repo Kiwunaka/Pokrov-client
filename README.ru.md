@@ -152,6 +152,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.48.0-source` | Pending stacked PR, tag еще не создан | Android device validation и release merge handoff default-path fix находятся в stacked PR queue. |
 | `v0.49.0-source` | Pending stacked PR, tag еще не создан | Operator request trace и client-version headers находятся в stacked PR queue. |
 | `v0.50.0-source` | Pending stacked PR, tag еще не создан | Android native Gradle CI через source-only stubs находится в stacked PR queue. |
+| `v0.51.0-source` | Pending stacked PR, tag еще не создан | Windows bundle verifier source-only proof находится в stacked PR queue. |
 
 ## Архитектурная Граница
 

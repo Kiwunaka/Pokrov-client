@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.50
+# Source Readiness: v0.2-v0.51
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -1148,8 +1148,38 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.51.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #71: Windows bundle verifier for source-only Windows shell proof,
+  committed artifact checks, and release-boundary documentation
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the Windows bundle verifier:
+  `scripts/verify-windows-bundle.ps1`
+- clear every required manual maintainer blocker before treating the line as
+  ready
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the publication dry-run, release evidence bundle, preflight summary,
+  proof manifest, rendered GitHub Release body, and changelog section for the
+  exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
+- The Windows bundle verifier checks tracked source files and committed
+  artifacts only. It does not build a Windows app, sign or package installers,
+  download runtime artifacts, prove runtime connectivity, or authorize EXE,
+  store, trusted-signing, production, or official binary claims.
 - Android native Gradle CI uses source-only stubs for libcore APIs so public
   Kotlin unit tests can run without private runtime artifacts. It does not
   fetch or commit libcore.aar and does not prove APK, store, trusted signing,
