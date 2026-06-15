@@ -214,6 +214,15 @@ try {
   if ($tagOpenBlockerCount -ne @($tagOpenBlockers).Count) {
     $blockingErrors.Add("tag readiness open blocker count mismatch")
   }
+  foreach ($openBlocker in $tagOpenBlockers) {
+    if (
+      [string]::IsNullOrWhiteSpace([string]$openBlocker.id) -or
+      [string]::IsNullOrWhiteSpace([string]$openBlocker.status)
+    ) {
+      $blockingErrors.Add("tag readiness open blockers have invalid entries")
+      break
+    }
+  }
   $candidateValues = @(
     [string]$mergeOrder.latest_candidate,
     [string]$githubStatus.latest_candidate,
