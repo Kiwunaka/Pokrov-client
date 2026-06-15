@@ -84,6 +84,10 @@ Source readiness note: `v0.73.0-source` is a pending stacked PR for source tag
 readiness stale-tag rejection; it is not tagged and does not ship APK/EXE
 binaries.
 
+Source readiness note: `v0.74.0-source` is a pending stacked PR for source tag
+readiness milestone evidence PR checks; it is not tagged and does not ship
+APK/EXE binaries.
+
 <p align="center">
   <img src="assets/brand/pokrov-oss-hero.png" alt="POKROV Client open-source hero artwork" width="100%">
 </p>

@@ -16,6 +16,26 @@ def _read_json(relative_path: str) -> dict:
     return json.loads(_read(relative_path))
 
 
+def _write_json(path: Path, payload: dict) -> None:
+    path.write_text(json.dumps(payload), encoding="utf-8")
+
+
+def _snapshot_files(paths: list[Path]) -> dict[Path, bytes | None]:
+    snapshots: dict[Path, bytes | None] = {}
+    for path in paths:
+        snapshots[path] = path.read_bytes() if path.exists() else None
+    return snapshots
+
+
+def _restore_files(snapshots: dict[Path, bytes | None]) -> None:
+    for path, content in snapshots.items():
+        if content is None:
+            path.unlink(missing_ok=True)
+        else:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(content)
+
+
 def test_source_tag_readiness_seed_defines_read_only_command() -> None:
     seed = _read_json("config/source-tag-readiness.seed.json")
 
@@ -27,6 +47,7 @@ def test_source_tag_readiness_seed_defines_read_only_command() -> None:
     assert seed["policy"]["no_github_release_publish"] is True
     assert seed["policy"]["nonzero_when_blocked"] is True
     assert seed["policy"]["requires_latest_candidate_tag_match"] is True
+    assert seed["policy"]["requires_latest_stacked_pr_evidence_match"] is True
     assert seed["policy"]["requires_error_summary"] is True
     assert seed["policy"]["requires_open_blocker_evidence_fields"] is True
     assert seed["inputs"]["blocker_inventory"] == (
@@ -47,6 +68,7 @@ def test_source_tag_readiness_script_is_local_only() -> None:
         "open_blocker_count",
         "error_count",
         "requested tag does not match latest blocker inventory candidate",
+        "source readiness milestone evidence does not match latest stacked PR",
         "build\\source-tag-readiness",
         "exit 2",
     ):
@@ -76,7 +98,7 @@ def test_source_tag_readiness_reports_current_blockers(tmp_path: Path) -> None:
             "-File",
             str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
             "-Tag",
-            "v0.73.0-source",
+            "v0.74.0-source",
             "-OutDir",
             str(out_dir),
         ],
@@ -91,11 +113,11 @@ def test_source_tag_readiness_reports_current_blockers(tmp_path: Path) -> None:
     assert "merge_stacked_pr_sequence" in result.stdout
 
     summary = json.loads(
-        (out_dir / "v0.73.0-source-tag-readiness.json").read_text(
+        (out_dir / "v0.74.0-source-tag-readiness.json").read_text(
             encoding="utf-8-sig"
         )
     )
-    assert summary["tag"] == "v0.73.0-source"
+    assert summary["tag"] == "v0.74.0-source"
     assert summary["ready_for_tag"] is False
     assert summary["source_only"] is True
     assert summary["ships_apk"] is False
@@ -103,7 +125,7 @@ def test_source_tag_readiness_reports_current_blockers(tmp_path: Path) -> None:
     assert summary["store_release"] is False
     assert summary["trusted_signing_claim"] is False
     assert summary["tag_creation_allowed"] is False
-    assert summary["latest_candidate"] == "v0.73.0-source"
+    assert summary["latest_candidate"] == "v0.74.0-source"
     assert summary["error_count"] == 0
     assert summary["errors"] == []
     assert summary["open_blocker_count"] >= 7
@@ -146,9 +168,61 @@ def test_source_tag_readiness_blocks_stale_requested_tag(tmp_path: Path) -> None
         )
     )
     assert summary["tag"] == "v0.71.0-source"
-    assert summary["latest_candidate"] == "v0.73.0-source"
+    assert summary["latest_candidate"] == "v0.74.0-source"
     assert summary["ready_for_tag"] is False
     assert "requested tag does not match latest blocker inventory candidate" in summary[
+        "errors"
+    ]
+
+
+def test_source_tag_readiness_blocks_milestone_evidence_pr_mismatch(
+    tmp_path: Path,
+) -> None:
+    readiness_path = ROOT / "config" / "source-release-readiness.seed.json"
+    snapshots = _snapshot_files([readiness_path])
+    out_dir = tmp_path / "bad-evidence-readiness"
+
+    try:
+        readiness = json.loads(readiness_path.read_text(encoding="utf-8"))
+        for milestone in readiness["milestones"]:
+            if milestone["tag"] == "v0.74.0-source":
+                milestone["evidence"] = "https://github.com/Kiwunaka/Pokrov-client/pull/92"
+                break
+        _write_json(readiness_path, readiness)
+
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
+                "-Tag",
+                "v0.74.0-source",
+                "-OutDir",
+                str(out_dir),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        summary = json.loads(
+            (out_dir / "v0.74.0-source-tag-readiness.json").read_text(
+                encoding="utf-8-sig"
+            )
+        )
+    finally:
+        _restore_files(snapshots)
+
+    assert result.returncode == 2
+    assert "source readiness milestone evidence does not match latest stacked PR" in (
+        result.stdout + result.stderr
+    )
+    assert summary["latest_stacked_pr"] == 94
+    assert summary["milestone_evidence"].endswith("/pull/92")
+    assert "source readiness milestone evidence does not match latest stacked PR" in summary[
         "errors"
     ]
 

@@ -164,8 +164,10 @@ production readiness without matching public evidence.
   inventory tracks.
 - Added source tag-readiness stale-tag rejection so the readiness command
   blocks requested tags outside the blocker inventory latest candidate.
+- Added source tag-readiness milestone evidence checks so the readiness command
+  blocks evidence that points at a different stacked PR than blocker inventory.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.73.0-source` candidates.
+  `v0.74.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -244,6 +246,7 @@ production readiness without matching public evidence.
 | `v0.71.0-source` | Pending stacked PR, not tagged | PR #91 |
 | `v0.72.0-source` | Pending stacked PR, not tagged | PR #92 |
 | `v0.73.0-source` | Pending stacked PR, not tagged | PR #93 |
+| `v0.74.0-source` | Pending stacked PR, not tagged | PR #94 |
 
 ### Still Source-Only
 
