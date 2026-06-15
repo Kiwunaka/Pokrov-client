@@ -154,6 +154,12 @@
       "candidate": "v0.64.0-source",
       "base": "codex/v0.63-merge-handoff-input-errors",
       "head": "codex/v0.64-merge-handoff-tag-errors"
+    },
+    {
+      "pr": 85,
+      "candidate": "v0.65.0-source",
+      "base": "codex/v0.64-merge-handoff-tag-errors",
+      "head": "codex/v0.65-merge-handoff-blocker-count"
     }
   ]
 }

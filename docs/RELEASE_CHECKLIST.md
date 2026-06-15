@@ -58,10 +58,11 @@ Use this checklist before publishing a public source or binary release.
   readiness summaries into an ignored `build/release-merge-handoff/` maintainer
   handoff report with input SHA-256 fingerprints, input generated-at
   timestamps, input schema versions, read-only input summary checks, and
-  stack-count consistency, error-free input summary checks, plus explicit
-  source-only no-binary flags. The handoff accepts prerequisite summaries only
-  from their expected ignored `build/` output roots; it does not merge, tag,
-  push, publish, or upload anything.
+  stack-count consistency, error-free input summary checks, tag-readiness
+  blocker-count consistency, plus explicit source-only no-binary flags. The
+  handoff accepts prerequisite summaries only from their expected ignored
+  `build/` output roots; it does not merge, tag, push, publish, or upload
+  anything.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\verify-windows-bundle.ps1`
   runs the Windows bundle verifier and writes source-only Windows bundle proof
   under ignored `build/windows-bundle-verifier/`; it checks required Windows

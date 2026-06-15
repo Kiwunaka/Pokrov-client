@@ -145,8 +145,10 @@ production readiness without matching public evidence.
   prerequisite summaries that still report upstream errors.
 - Added release merge handoff tag-readiness input-error coverage so
   prerequisite errors from source tag readiness are also blocked.
+- Added release merge handoff tag-readiness blocker-count consistency checks
+  so stale blocker summaries cannot reach maintainer handoff as ready.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.64.0-source` candidates.
+  `v0.65.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -216,6 +218,7 @@ production readiness without matching public evidence.
 | `v0.62.0-source` | Pending stacked PR, not tagged | PR #82 |
 | `v0.63.0-source` | Pending stacked PR, not tagged | PR #83 |
 | `v0.64.0-source` | Pending stacked PR, not tagged | PR #84 |
+| `v0.65.0-source` | Pending stacked PR, not tagged | PR #85 |
 
 ### Still Source-Only
 
