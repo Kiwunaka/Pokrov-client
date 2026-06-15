@@ -196,6 +196,12 @@
       "candidate": "v0.71.0-source",
       "base": "codex/v0.70-tag-readiness-pr-consistency",
       "head": "codex/v0.71-handoff-seed-candidate-paths"
+    },
+    {
+      "pr": 92,
+      "candidate": "v0.72.0-source",
+      "base": "codex/v0.71-handoff-seed-candidate-paths",
+      "head": "codex/v0.72-handoff-blocker-inventory-match"
     }
   ]
 }
