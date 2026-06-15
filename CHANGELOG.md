@@ -143,8 +143,10 @@ production readiness without matching public evidence.
   handoffs reject mixed merge-order and GitHub-status stack snapshots.
 - Added release merge handoff input-error checks so maintainer handoffs reject
   prerequisite summaries that still report upstream errors.
+- Added release merge handoff tag-readiness input-error coverage so
+  prerequisite errors from source tag readiness are also blocked.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.63.0-source` candidates.
+  `v0.64.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -213,6 +215,7 @@ production readiness without matching public evidence.
 | `v0.61.0-source` | Pending stacked PR, not tagged | PR #81 |
 | `v0.62.0-source` | Pending stacked PR, not tagged | PR #82 |
 | `v0.63.0-source` | Pending stacked PR, not tagged | PR #83 |
+| `v0.64.0-source` | Pending stacked PR, not tagged | PR #84 |
 
 ### Still Source-Only
 
