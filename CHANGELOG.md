@@ -133,8 +133,10 @@ production readiness without matching public evidence.
   records SHA-256 proofs for every release summary it consumed.
 - Added source-only flags to the release merge handoff summary so the final
   maintainer artifact carries explicit no-binary release boundaries.
+- Added canonical build input roots to the release merge handoff so the final
+  maintainer artifact consumes only expected prerequisite summaries.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.58.0-source` candidates.
+  `v0.59.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -198,6 +200,7 @@ production readiness without matching public evidence.
 | `v0.56.0-source` | Pending stacked PR, not tagged | PR #76 |
 | `v0.57.0-source` | Pending stacked PR, not tagged | PR #77 |
 | `v0.58.0-source` | Pending stacked PR, not tagged | PR #78 |
+| `v0.59.0-source` | Pending stacked PR, not tagged | PR #79 |
 
 ### Still Source-Only
 

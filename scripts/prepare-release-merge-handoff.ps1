@@ -64,6 +64,25 @@ function Assert-BuildOutputPath {
   }
 }
 
+function Assert-BuildInputPath {
+  param(
+    [Parameter(Mandatory = $true)][string]$Path,
+    [Parameter(Mandatory = $true)][string]$AllowedRoot,
+    [Parameter(Mandatory = $true)][string]$InputName
+  )
+
+  $allowedInputRoot = [System.IO.Path]::GetFullPath((Join-Path $root $AllowedRoot))
+  $resolvedInputPath = [System.IO.Path]::GetFullPath($Path)
+  $allowedPrefix = $allowedInputRoot.TrimEnd(
+    [System.IO.Path]::DirectorySeparatorChar,
+    [System.IO.Path]::AltDirectorySeparatorChar
+  ) + [System.IO.Path]::DirectorySeparatorChar
+  if (-not $resolvedInputPath.StartsWith($allowedPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+    $allowedRootDisplay = $AllowedRoot -replace "/", "\"
+    throw "Release merge handoff input '$InputName' must stay under $allowedRootDisplay."
+  }
+}
+
 function Get-InputPath {
   param(
     [AllowEmptyString()][string]$ProvidedPath,
@@ -85,6 +104,12 @@ try {
   $githubStatusPath = Get-InputPath -ProvidedPath $GithubStatusPath -DefaultPath $seed.inputs.github_status
   $tagReadinessPath = Get-InputPath -ProvidedPath $TagReadinessPath -DefaultPath $seed.inputs.tag_readiness
   $publicationDryRunPath = Get-InputPath -ProvidedPath $PublicationDryRunPath -DefaultPath $seed.inputs.publication_dry_run
+
+  Assert-BuildInputPath -Path $mergeOrderPath -AllowedRoot $seed.input_roots.merge_order -InputName "merge_order"
+  Assert-BuildInputPath -Path $githubStatusPath -AllowedRoot $seed.input_roots.github_status -InputName "github_status"
+  Assert-BuildInputPath -Path $tagReadinessPath -AllowedRoot $seed.input_roots.tag_readiness -InputName "tag_readiness"
+  Assert-BuildInputPath -Path $publicationDryRunPath -AllowedRoot $seed.input_roots.publication_dry_run -InputName "publication_dry_run"
+
   $mergeOrder = Read-JsonFile -Path $mergeOrderPath
   $githubStatus = Read-JsonFile -Path $githubStatusPath
   $tagReadiness = Read-JsonFile -Path $tagReadinessPath

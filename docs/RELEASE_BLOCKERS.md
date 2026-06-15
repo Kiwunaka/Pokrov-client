@@ -58,7 +58,8 @@ summary after the merge-order, GitHub-status, source-tag-readiness, and
 publication dry-run summaries exist. The command is read-only, writes ignored
 `build/release-merge-handoff/` output, records input SHA-256 fingerprints, and
 records explicit source-only no-binary flags plus the next manual maintainer
-steps without merging, tagging, pushing, publishing, or uploading anything.
+steps without merging, tagging, pushing, publishing, or uploading anything. The
+input summaries must come from the expected ignored `build/` output roots.
 
 ## Evidence Rules
 
