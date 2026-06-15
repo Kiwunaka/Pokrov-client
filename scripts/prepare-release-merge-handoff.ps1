@@ -209,6 +209,11 @@ try {
   if (@($inputErrors).Count -gt 0) {
     $blockingErrors.Add("input summaries report errors")
   }
+  $tagOpenBlockers = @($tagReadiness.open_blockers)
+  $tagOpenBlockerCount = [int]$tagReadiness.open_blocker_count
+  if ($tagOpenBlockerCount -ne @($tagOpenBlockers).Count) {
+    $blockingErrors.Add("tag readiness open blocker count mismatch")
+  }
   $candidateValues = @(
     [string]$mergeOrder.latest_candidate,
     [string]$githubStatus.latest_candidate,
@@ -317,11 +322,11 @@ try {
     publication_dry_run = [string]$publicationDryRun.tag
     windows_bundle_verifier_ok = [bool]$publicationDryRun.windows_bundle_verifier_ok
     windows_bundle_verifier_summary = [string]$publicationDryRun.windows_bundle_verifier_summary
-    open_blocker_count = [int]$tagReadiness.open_blocker_count
+    open_blocker_count = [int]$tagOpenBlockerCount
     blocking_errors = @($blockingErrors)
     input_error_count = [int]@($inputErrors).Count
     input_errors = @($inputErrors)
-    open_blockers = @($tagReadiness.open_blockers)
+    open_blockers = @($tagOpenBlockers)
     next_manual_steps = @(
       "merge stacked PRs in order after maintainer review",
       "choose and record the exact commit SHA on main",
