@@ -1464,7 +1464,7 @@ if (Test-Path -LiteralPath $releaseMergeHandoffPath -PathType Leaf) {
     $manifestErrors.Add("config\\release-merge-handoff.seed.json must keep default output under ignored build/release-merge-handoff")
   }
 
-  foreach ($field in @("read_only", "no_merge", "no_git_push", "no_tag_creation", "no_github_release_publish", "writes_only_ignored_build_output", "requires_merge_order_summary", "requires_github_status_summary", "requires_tag_readiness_summary", "requires_publication_dry_run_summary")) {
+  foreach ($field in @("read_only", "no_merge", "no_git_push", "no_tag_creation", "no_github_release_publish", "writes_only_ignored_build_output", "requires_merge_order_summary", "requires_github_status_summary", "requires_tag_readiness_summary", "requires_publication_dry_run_summary", "requires_input_fingerprints")) {
     if ($releaseMergeHandoff.policy.$field -ne $true) {
       $manifestErrors.Add("config\\release-merge-handoff.seed.json policy.$field must remain true")
     }
@@ -1486,7 +1486,7 @@ if (Test-Path -LiteralPath $releaseMergeHandoffPath -PathType Leaf) {
   $releaseMergeHandoffScriptPath = Join-Path $root "scripts\\prepare-release-merge-handoff.ps1"
   if (Test-Path -LiteralPath $releaseMergeHandoffScriptPath -PathType Leaf) {
     $releaseMergeHandoffScript = Get-Content -Raw -LiteralPath $releaseMergeHandoffScriptPath
-    foreach ($requiredPhrase in @("release-merge-handoff.seed.json", "merge_order_ok", "github_status_ok", "publication_dry_run_ok", "ready_for_tag", "ready_for_manual_review", "windows_bundle_verifier_ok", "handoff_ready_for_maintainer", "build\release-merge-handoff", "manual_merge_required = `$true")) {
+    foreach ($requiredPhrase in @("release-merge-handoff.seed.json", "merge_order_ok", "github_status_ok", "publication_dry_run_ok", "ready_for_tag", "ready_for_manual_review", "windows_bundle_verifier_ok", "input_fingerprints", "SHA256", "ComputeHash", "handoff_ready_for_maintainer", "build\release-merge-handoff", "manual_merge_required = `$true")) {
       if ($releaseMergeHandoffScript.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
         $manifestErrors.Add("scripts\\prepare-release-merge-handoff.ps1 must include '$requiredPhrase'")
       }
