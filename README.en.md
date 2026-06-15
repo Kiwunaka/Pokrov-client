@@ -170,6 +170,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.67.0-source` | Pending stacked PR, not tagged | Release merge handoff tag-readiness ready-flag consistency is in the stacked PR queue. |
 | `v0.68.0-source` | Pending stacked PR, not tagged | Release merge handoff tag-readiness blocker-absence consistency is in the stacked PR queue. |
 | `v0.69.0-source` | Pending stacked PR, not tagged | Source tag-readiness open-blocker evidence fields are in the stacked PR queue. |
+| `v0.70.0-source` | Pending stacked PR, not tagged | Release merge handoff tag-readiness latest stacked PR consistency is in the stacked PR queue. |
 
 ## Architecture Boundary
 
