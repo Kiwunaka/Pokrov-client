@@ -64,6 +64,12 @@
       "candidate": "v0.49.0-source",
       "base": "codex/v0.48-android-device-validation",
       "head": "codex/v0.49-operator-request-headers"
+    },
+    {
+      "pr": 70,
+      "candidate": "v0.50.0-source",
+      "base": "codex/v0.49-operator-request-headers",
+      "head": "codex/v0.50-android-native-ci"
     }
   ]
 }

@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.49
+# Source Readiness: v0.2-v0.50
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -1122,8 +1122,38 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.50.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #70: Android native Gradle unit tests in CI through a source-only libcore
+  stub lane plus required-check synchronization
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the Android native source-only lane:
+  `scripts/run-android-native-tests.ps1 -SourceOnly`
+- clear every required manual maintainer blocker before treating the line as
+  ready
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review the publication dry-run, release evidence bundle, preflight summary,
+  proof manifest, rendered GitHub Release body, and changelog section for the
+  exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
+- Android native Gradle CI uses source-only stubs for libcore APIs so public
+  Kotlin unit tests can run without private runtime artifacts. It does not
+  fetch or commit libcore.aar and does not prove APK, store, trusted signing,
+  or runtime readiness.
 - Operator request headers improve compatibility and support tracing for
   operator builds, but they do not make the public source snapshot an official
   POKROV service binary or prove any backend production readiness.

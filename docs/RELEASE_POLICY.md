@@ -55,7 +55,8 @@ does not publish, push tags, or upload assets.
 Required checks and release gates are summarized in
 [REQUIRED_CHECKS.md](REQUIRED_CHECKS.md). That page documents the expected
 GitHub check names, including `Source import and public tree checks` and
-`Flutter analyze and tests`, and branch-protection guidance without claiming
+`Flutter analyze and tests`, `Android native Gradle unit tests`, and
+branch-protection guidance without claiming
 that remote repository settings are already enforced.
 
 Repository ruleset and branch protection setup is tracked in

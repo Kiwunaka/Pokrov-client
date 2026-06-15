@@ -109,6 +109,7 @@ Source release status:
 | `v0.47.0-source` | Pending stacked PR, not tagged | Release merge handoff helper is in the stacked PR queue. |
 | `v0.48.0-source` | Pending stacked PR, not tagged | Android device validation and release merge handoff default-path fix are in the stacked PR queue. |
 | `v0.49.0-source` | Pending stacked PR, not tagged | Operator request trace and client-version headers are in the stacked PR queue. |
+| `v0.50.0-source` | Pending stacked PR, not tagged | Android native Gradle CI through source-only stubs is in the stacked PR queue. |
 
 ## Which App Should I Use?
 

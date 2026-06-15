@@ -15,6 +15,7 @@
   },
   "required_status_checks": [
     "Source import and public tree checks",
-    "Flutter analyze and tests"
+    "Flutter analyze and tests",
+    "Android native Gradle unit tests"
   ]
 }

@@ -21,12 +21,22 @@ Current responsibility:
 Validation lane:
 
 - `flutter test` in `apps/android_shell/` covers shell boot plus the visible route-mode and runtime-diagnostics affordances
-- `android\\gradlew.bat testDebugUnitTest` covers manifest guards, platform monitoring, runtime-state preservation, DNS planning, and TUN route planning
+- Android native Gradle unit tests cover manifest guards, platform monitoring,
+  runtime-state preservation, DNS planning, and TUN route planning
+- the CI-safe source-only stub lane is
+  `..\\..\\scripts\\run-android-native-tests.ps1 -SourceOnly`; it does not
+  fetch or commit libcore.aar and does not prove APK, store, trusted signing,
+  or runtime readiness
+- the maintainer runtime-backed lane is
+  `..\\..\\scripts\\run-android-native-tests.ps1` after fetching local runtime
+  artifacts; it is still local-only
 - Android device validation: `..\\..\\scripts\\android-device-smoke.ps1` runs the local
   validation local precheck and writes a `MANUAL_OWNER_TEST` summary under
   ignored `build/android-device-validation/`; see
   `docs/device-validation/android.md`
-- `..\\..\\scripts\\run-tests.ps1` is the canonical wrapper that runs both the Android-shell Flutter lane and the Android Gradle unit lane alongside the shared workspace tests
+- `..\\..\\scripts\\run-tests.ps1` is the canonical wrapper for the shared
+  Flutter workspace tests; pass `-RunAndroidGradle` to run the runtime-backed
+  Android native lane locally after fetching runtime artifacts
 - the current repo-local lane now covers Android `Full tunnel` plus the shared Android or Windows `All except RU` materialization contract; selected-apps parity is still not claimed by this test pack
 - this test lane is repo-local proof only; it does not replace the required physical-device release-build localhost/control-surface audit
 

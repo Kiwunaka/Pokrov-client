@@ -96,3 +96,26 @@ jobs:
       - name: Run workspace tests
         shell: pwsh
         run: .\scripts\run-tests.ps1
+
+  android-native:
+    name: Android native Gradle unit tests
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Run Android native Gradle unit tests
+        shell: pwsh
+        run: .\scripts\run-android-native-tests.ps1 -SourceOnly

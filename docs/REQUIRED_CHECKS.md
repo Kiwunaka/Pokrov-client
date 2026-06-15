@@ -18,6 +18,7 @@ Pull requests should keep these CI jobs green:
 
 - `Source import and public tree checks`
 - `Flutter analyze and tests`
+- `Android native Gradle unit tests`
 
 The workflow should keep read-only repository permissions, including
 `contents: read`.
@@ -30,13 +31,17 @@ proof.
 The Flutter job covers workspace bootstrap, shared app-shell analysis, and the
 workspace Flutter test lane.
 
+The Android native Gradle job covers the public Android Kotlin unit tests
+through the source-only stub lane. It does not fetch or commit libcore.aar and
+does not prove APK, store, trusted signing, or runtime readiness.
+
 ## GitHub Settings Guidance
 
 When configuring branch protection or repository rulesets in GitHub settings,
 maintainers should require:
 
 - pull requests before merge
-- the two CI job names above
+- the three CI job names above
 - up-to-date branches when practical for the stacked PR flow
 - CODEOWNERS review for sensitive paths when the repository policy requires it
 - conversation resolution before merge
@@ -53,6 +58,7 @@ annotated source tag:
 python -m pytest tests
 powershell -ExecutionPolicy Bypass -File .\scripts\validate-seed.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\run-android-native-tests.ps1 -SourceOnly
 powershell -ExecutionPolicy Bypass -File .\scripts\source-release-preflight.ps1 -RequireTag
 powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1
 ```
