@@ -63,9 +63,10 @@ tag-readiness blocker-count consistency, tag-readiness blocker entry-shape
 checks, tag-readiness ready-flag consistency, tag-readiness blocker-absence
 consistency, open-blocker evidence fields, tag-readiness latest stacked PR
 consistency, and explicit source-only no-binary flags plus the next manual
-maintainer steps without merging,
-tagging, pushing, publishing, or uploading anything. The input summaries must
-come from the expected ignored `build/` output roots.
+maintainer steps. The handoff seed defaults must track the blocker inventory
+latest candidate, and the helper does not merge, tag, push, publish, or upload
+anything. The input summaries must come from the expected ignored `build/`
+output roots.
 
 ## Evidence Rules
 

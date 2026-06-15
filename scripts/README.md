@@ -65,7 +65,8 @@ Current helpers:
   blocker entry-shape checks, tag-readiness ready-flag consistency,
   tag-readiness blocker-absence consistency, open-blocker evidence fields, and
   tag-readiness latest stacked PR consistency, plus explicit source-only
-  no-binary flags. Prerequisite summaries must come from their expected ignored
+  no-binary flags. Seed defaults must track the blocker inventory latest
+  candidate, and prerequisite summaries must come from their expected ignored
   `build/` output roots; the helper does not merge, tag, push, publish, or
   upload anything
 - `verify-windows-bundle.ps1`: Windows bundle verifier for source-only Windows

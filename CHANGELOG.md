@@ -157,8 +157,10 @@ production readiness without matching public evidence.
   so maintainer summaries keep blocker evidence attached.
 - Added release merge handoff tag-readiness latest stacked PR consistency
   checks so stale tag-readiness summaries cannot describe an older PR.
+- Added release merge handoff seed validation so default tag-readiness and
+  publication dry-run input paths track the blocker inventory latest candidate.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.70.0-source` candidates.
+  `v0.71.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -234,6 +236,7 @@ production readiness without matching public evidence.
 | `v0.68.0-source` | Pending stacked PR, not tagged | PR #88 |
 | `v0.69.0-source` | Pending stacked PR, not tagged | PR #89 |
 | `v0.70.0-source` | Pending stacked PR, not tagged | PR #90 |
+| `v0.71.0-source` | Pending stacked PR, not tagged | PR #91 |
 
 ### Still Source-Only
 
