@@ -60,6 +60,10 @@ def test_source_release_preflight_script_runs_smoke_and_writes_outputs(
     assert summary["no_store_release"] is True
     assert summary["no_trusted_signing_claim"] is True
     assert summary["forbidden_file_count"] == 0
+    assert summary["windows_bundle_verifier_ok"] is True
+    assert summary["windows_bundle_verifier_summary"].endswith(
+        "windows-bundle-verifier.json"
+    )
     assert summary["commit_sha"] == proof["commit_sha"]
     assert summary["source_archive_sha256"] == proof["source_archive_sha256"]
     assert Path(summary["proof_manifest"]).name == proof_manifest.name
@@ -90,6 +94,9 @@ def test_source_release_preflight_script_documents_full_release_checks() -> None
     assert "python -m pytest tests" in script
     assert "validate-seed.ps1" in script
     assert "verify-clean-clone.ps1" in script
+    assert "verify-windows-bundle.ps1" in script
+    assert "Verify Windows bundle source boundary" in script
+    assert "windows_bundle_verifier_ok" in script
     assert "run-tests.ps1" in script
     assert "prepare-source-release.ps1" in script
     assert "render-source-release-notes.ps1" in script
@@ -108,6 +115,8 @@ def test_ci_runs_source_release_preflight_smoke() -> None:
     gitignore = (ROOT / ".gitignore").read_text(encoding="utf-8")
 
     assert "Run source-release preflight smoke" in workflow
+    assert "Run Windows bundle verifier" in workflow
+    assert "verify-windows-bundle.ps1" in workflow
     assert "source-release-preflight.ps1" in workflow
     assert "-SkipTestCommands" in workflow
     assert "Prepare source-release proof smoke" not in workflow

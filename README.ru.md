@@ -1,5 +1,9 @@
 # POKROV Client
 
+Source readiness note: `v0.53.0-source` is a pending stacked PR for Windows
+verifier CI/preflight enforcement; it is not tagged and does not ship APK/EXE
+binaries.
+
 <p align="center">
   <img src="assets/brand/pokrov-oss-hero.png" alt="POKROV Client open-source hero artwork" width="100%">
 </p>

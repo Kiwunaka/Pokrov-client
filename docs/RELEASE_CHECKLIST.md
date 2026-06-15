@@ -26,8 +26,9 @@ Use this checklist before publishing a public source or binary release.
   the GitHub Release body.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\source-release-preflight.ps1`
   can be used as the single local gate that runs tests, clean-clone proof,
-  source proof generation, release-note rendering, and preflight summary
-  generation. Do not use `-SkipTestCommands` for publishing.
+  Windows bundle verification, source proof generation, release-note rendering,
+  and preflight summary generation. Do not use `-SkipTestCommands` for
+  publishing.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\prepare-release-evidence-bundle.ps1`
   writes the release evidence bundle after source preflight and optional
   GitHub ruleset report review; it does not publish a release.

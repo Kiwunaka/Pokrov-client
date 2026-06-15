@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.52
+# Source Readiness: v0.2-v0.53
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -1200,8 +1200,37 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.53.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #73: Windows bundle verifier enforcement in CI and source-release
+  preflight summaries for source-only release proof
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the Windows bundle verifier:
+  `scripts/verify-windows-bundle.ps1`
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- confirm the preflight summary includes `windows_bundle_verifier_ok=true`
+  and the verifier summary path
+- review the publication dry-run, release evidence bundle, preflight summary,
+  proof manifest, rendered GitHub Release body, and changelog section for the
+  exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
+- Windows verifier CI/preflight enforcement records source-only Windows shell
+  proof in the preflight summary, but it still does not build, sign, package,
+  publish, upload, or claim any EXE/installable Windows release.
 - Runtime archive entry checks reduce local extraction risk for fetched libcore
   archives, but they do not approve runtime binary licensing, redistribution,
   SHA-256 review, APK/EXE delivery, store release, trusted signing, or official

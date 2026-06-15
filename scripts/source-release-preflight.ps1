@@ -67,6 +67,7 @@ try {
   $manifestPath = Join-Path $proofDir "$Tag-source-proof.json"
   $releaseNotesPath = Join-Path $resolvedOutDir "$Tag-release-notes.md"
   $summaryPath = Join-Path $resolvedOutDir "$Tag-source-preflight.json"
+  $windowsBundleVerifierSummaryPath = Join-Path $root "build\windows-bundle-verifier\windows-bundle-verifier.json"
 
   New-Item -ItemType Directory -Path $resolvedOutDir -Force | Out-Null
 
@@ -110,6 +111,11 @@ try {
     }
   }
 
+  Invoke-Step "Verify Windows bundle source boundary" {
+    powershell -ExecutionPolicy Bypass -File .\scripts\verify-windows-bundle.ps1
+    Assert-LastExitCode "verify-windows-bundle.ps1 failed"
+  }
+
   Invoke-Step "Prepare source-only proof manifest" {
     $prepareArgs = @(
       "-ExecutionPolicy",
@@ -149,7 +155,11 @@ try {
   }
 
   $proof = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
+  $windowsBundleVerifier = Get-Content -Raw -LiteralPath $windowsBundleVerifierSummaryPath | ConvertFrom-Json
   Assert-SourceOnlyProof -Proof $proof
+  if ($windowsBundleVerifier.windows_bundle_ok -ne $true) {
+    throw "Source preflight refused Windows bundle verifier summary with windows_bundle_ok not true."
+  }
 
   $summary = [ordered]@{
     schema_version = 1
@@ -165,6 +175,8 @@ try {
     no_store_release = [bool]$proof.no_store_release
     no_trusted_signing_claim = [bool]$proof.no_trusted_signing_claim
     forbidden_file_count = [int]$proof.forbidden_file_count
+    windows_bundle_verifier_ok = [bool]$windowsBundleVerifier.windows_bundle_ok
+    windows_bundle_verifier_summary = $windowsBundleVerifierSummaryPath
     tag_object_sha = $proof.tag_object_sha
     commit_sha = $proof.commit_sha
     source_archive = (Join-Path $proofDir $proof.source_archive)
