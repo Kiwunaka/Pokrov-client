@@ -31,7 +31,8 @@ Use this checklist before publishing a public source or binary release.
   publishing.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\prepare-release-evidence-bundle.ps1`
   writes the release evidence bundle after source preflight and optional
-  GitHub ruleset report review; it does not publish a release.
+  GitHub ruleset report review; it requires the preflight Windows bundle
+  verifier proof and does not publish a release.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\validate-source-release-publication.ps1`
   runs the publication dry-run against the release evidence bundle and rendered
   release notes before any manual GitHub Release publication.

@@ -154,6 +154,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.51.0-source` | Pending stacked PR, not tagged | Windows bundle verifier source-only proof is in the stacked PR queue. |
 | `v0.52.0-source` | Pending stacked PR, not tagged | Runtime archive extraction hardening is in the stacked PR queue. |
 | `v0.53.0-source` | Pending stacked PR, not tagged | Windows verifier CI/preflight enforcement is in the stacked PR queue. |
+| `v0.54.0-source` | Pending stacked PR, not tagged | Release evidence bundle Windows proof gate is in the stacked PR queue. |
 
 ## Architecture Boundary
 

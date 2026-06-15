@@ -42,6 +42,14 @@ function Assert-SourceOnlySummary {
   if ([int]$Summary.forbidden_file_count -ne 0) {
     throw "Release evidence refused preflight summary with forbidden_file_count=$($Summary.forbidden_file_count)."
   }
+
+  if ($Summary.windows_bundle_verifier_ok -ne $true) {
+    throw "Release evidence refused preflight summary with windows_bundle_verifier_ok not true."
+  }
+
+  if ([string]::IsNullOrWhiteSpace([string]$Summary.windows_bundle_verifier_summary)) {
+    throw "Release evidence refused preflight summary without windows_bundle_verifier_summary."
+  }
 }
 
 Push-Location $root
@@ -110,6 +118,8 @@ try {
     no_store_release = [bool]$preflightSummary.no_store_release
     no_trusted_signing_claim = [bool]$preflightSummary.no_trusted_signing_claim
     forbidden_file_count = [int]$preflightSummary.forbidden_file_count
+    windows_bundle_verifier_ok = [bool]$preflightSummary.windows_bundle_verifier_ok
+    windows_bundle_verifier_summary = $preflightSummary.windows_bundle_verifier_summary
     preflight_summary = $resolvedPreflightSummaryPath
     proof_manifest = $preflightSummary.proof_manifest
     release_notes = $preflightSummary.release_notes

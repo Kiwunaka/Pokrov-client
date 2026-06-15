@@ -35,8 +35,9 @@ Current helpers:
   preflight summary; `-SkipTestCommands` is only for smoke tests, not
   publishing
 - `prepare-release-evidence-bundle.ps1`: writes a local release evidence bundle
-  from a source preflight summary and optional GitHub ruleset report; output is
-  under ignored `build/release-evidence/` and nothing is published
+  from a source preflight summary and optional GitHub ruleset report; it
+  requires the preflight Windows bundle verifier proof, writes output under
+  ignored `build/release-evidence/`, and publishes nothing
 - `validate-source-release-publication.ps1`: validates a release evidence
   bundle and rendered release notes as a local publication dry-run; writes
   ignored `build/source-release-publication/` output and does not publish, push

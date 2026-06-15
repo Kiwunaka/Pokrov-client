@@ -88,6 +88,12 @@
       "candidate": "v0.53.0-source",
       "base": "codex/v0.52-runtime-archive-hardening",
       "head": "codex/v0.53-windows-verifier-preflight"
+    },
+    {
+      "pr": 74,
+      "candidate": "v0.54.0-source",
+      "base": "codex/v0.53-windows-verifier-preflight",
+      "head": "codex/v0.54-release-evidence-windows-proof"
     }
   ]
 }

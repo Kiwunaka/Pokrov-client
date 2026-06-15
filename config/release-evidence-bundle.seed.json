@@ -13,14 +13,16 @@
     "writes_only_ignored_build_output": true,
     "ruleset_report_may_be_failing": true,
     "failing_ruleset_report_blocks_enforcement_claims": true,
-    "does_not_replace_full_preflight": true
+    "does_not_replace_full_preflight": true,
+    "windows_bundle_verifier_required": true
   },
   "required_summary_flags": [
     "source_only",
     "no_apk",
     "no_exe",
     "no_store_release",
-    "no_trusted_signing_claim"
+    "no_trusted_signing_claim",
+    "windows_bundle_verifier_ok"
   ],
   "forbidden_claims": [
     "APK shipped",

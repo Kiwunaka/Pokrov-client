@@ -112,6 +112,8 @@ production readiness without matching public evidence.
   runtime artifacts.
 - Added Windows bundle verifier enforcement to CI and source-release preflight
   summaries so source-only release proof records the Windows shell boundary.
+- Added release evidence bundle enforcement for Windows verifier proof so
+  stale preflight summaries cannot produce complete release evidence.
 - Hardened local runtime archive fetching so archive entries are inspected
   before extraction or host sync and path traversal entries are refused.
 
@@ -124,7 +126,7 @@ production readiness without matching public evidence.
 - Fixed the documented no-argument release merge handoff command so it uses the
   seed default input paths.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.53.0-source` candidates.
+  `v0.54.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -183,6 +185,7 @@ production readiness without matching public evidence.
 | `v0.51.0-source` | Pending stacked PR, not tagged | PR #71 |
 | `v0.52.0-source` | Pending stacked PR, not tagged | PR #72 |
 | `v0.53.0-source` | Pending stacked PR, not tagged | PR #73 |
+| `v0.54.0-source` | Pending stacked PR, not tagged | PR #74 |
 
 ### Still Source-Only
 
