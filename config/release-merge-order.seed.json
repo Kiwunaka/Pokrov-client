@@ -136,6 +136,12 @@
       "candidate": "v0.61.0-source",
       "base": "codex/v0.60-merge-handoff-input-timestamps",
       "head": "codex/v0.61-merge-handoff-input-schema"
+    },
+    {
+      "pr": 82,
+      "candidate": "v0.62.0-source",
+      "base": "codex/v0.61-merge-handoff-input-schema",
+      "head": "codex/v0.62-merge-handoff-stack-counts"
     }
   ]
 }

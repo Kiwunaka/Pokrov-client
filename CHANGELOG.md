@@ -139,8 +139,10 @@ production readiness without matching public evidence.
   maintainer artifact records when each prerequisite summary was produced.
 - Added release merge handoff input schema and read-only checks so maintainer
   handoffs refuse malformed or non-read-only prerequisite summaries.
+- Added release merge handoff stack-count consistency checks so maintainer
+  handoffs reject mixed merge-order and GitHub-status stack snapshots.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.61.0-source` candidates.
+  `v0.62.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -207,6 +209,7 @@ production readiness without matching public evidence.
 | `v0.59.0-source` | Pending stacked PR, not tagged | PR #79 |
 | `v0.60.0-source` | Pending stacked PR, not tagged | PR #80 |
 | `v0.61.0-source` | Pending stacked PR, not tagged | PR #81 |
+| `v0.62.0-source` | Pending stacked PR, not tagged | PR #82 |
 
 ### Still Source-Only
 

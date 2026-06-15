@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.61
+# Source Readiness: v0.2-v0.62
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -1252,6 +1252,43 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.62.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #82: release merge handoff stack-count consistency checks for merge-order
+  and GitHub-status evidence
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- run `scripts/prepare-release-evidence-bundle.ps1` with the exact preflight
+  summary
+- run `scripts/validate-source-release-publication.ps1` with the exact release
+  evidence bundle and rendered release notes
+- run `scripts/check-release-merge-order.ps1`,
+  `scripts/check-release-stack-github-status.ps1`,
+  `scripts/check-source-tag-readiness.ps1`, and
+  `scripts/validate-source-release-publication.ps1` so each prerequisite
+  summary includes `generated_at`, `schema_version=1`, and `read_only=true`
+- run `scripts/prepare-release-merge-handoff.ps1` with the exact merge-order,
+  GitHub-status, tag-readiness, and publication dry-run summaries
+- confirm the release merge handoff summary includes `input_generated_at` and
+  `input_schema_versions` for every consumed prerequisite summary
+- confirm the release merge handoff summary includes matching
+  `input_stack_counts` for merge-order and GitHub-status summaries
+- review the publication dry-run, release evidence bundle, preflight summary,
+  proof manifest, rendered GitHub Release body, and changelog section for the
+  exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## v0.61.0-source Candidate
 
 Status: stacked PR green, not tagged.
@@ -1646,6 +1683,9 @@ Required before tagging:
   non-read-only summary risk, but still do not merge PRs, push tags, publish
   releases, upload assets, build binaries, or authorize installable APK/EXE
   release claims.
+- Release merge handoff stack-count consistency checks reduce mixed-snapshot
+  merge-order/GitHub-status risk, but still depend on maintainer review of the
+  exact merged PR stack before tags or releases.
 - Enterprise boundary docs are operational guidance, not legal advice. They do
   not change GPLv3, offer a commercial license by default, waive operator
   source obligations, or make operator builds official POKROV builds.

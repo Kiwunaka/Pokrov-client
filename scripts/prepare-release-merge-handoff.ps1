@@ -207,6 +207,13 @@ try {
   if (@($prValues).Count -ne 1) {
     $blockingErrors.Add("input summaries do not agree on latest PR")
   }
+  $stackCountValues = @(
+    [int]$mergeOrder.stack_count,
+    [int]$githubStatus.stack_count
+  ) | Select-Object -Unique
+  if (@($stackCountValues).Count -ne 1) {
+    $blockingErrors.Add("input summaries do not agree on stack count")
+  }
   foreach ($field in @("ships_apk", "ships_exe", "store_release", "trusted_signing_claim")) {
     if ($tagReadiness.$field -ne $false) {
       $blockingErrors.Add("tag readiness summary has unsafe release flag '$field'")
@@ -269,6 +276,10 @@ try {
       github_status = [int]$githubStatus.schema_version
       tag_readiness = [int]$tagReadiness.schema_version
       publication_dry_run = [int]$publicationDryRun.schema_version
+    }
+    input_stack_counts = [ordered]@{
+      merge_order = [int]$mergeOrder.stack_count
+      github_status = [int]$githubStatus.stack_count
     }
     publication_dry_run_ok = [bool](
       $publicationDryRun.source_only -eq $true -and
