@@ -62,9 +62,10 @@ Current helpers:
   fingerprints, input generated-at timestamps, input schema versions,
   read-only input summary checks, stack-count consistency, error-free input
   summary checks, tag-readiness blocker-count consistency, tag-readiness
-  blocker entry-shape checks, and explicit source-only no-binary flags.
-  Prerequisite summaries must come from their expected ignored `build/` output
-  roots; the helper does not merge, tag, push, publish, or upload anything
+  blocker entry-shape checks, tag-readiness ready-flag consistency, and
+  explicit source-only no-binary flags. Prerequisite summaries must come from
+  their expected ignored `build/` output roots; the helper does not merge, tag,
+  push, publish, or upload anything
 - `verify-windows-bundle.ps1`: Windows bundle verifier for source-only Windows
   bundle proof; checks required Windows shell source paths and rejects
   committed Windows binaries, archives, signing files, or local runtime
