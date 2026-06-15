@@ -173,6 +173,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.70.0-source` | Pending stacked PR, not tagged | Release merge handoff tag-readiness latest stacked PR consistency is in the stacked PR queue. |
 | `v0.71.0-source` | Pending stacked PR, not tagged | Release merge handoff default candidate paths are kept in sync with blocker inventory. |
 | `v0.72.0-source` | Pending stacked PR, not tagged | Release merge handoff runtime candidate and PR checks are matched to blocker inventory. |
+| `v0.73.0-source` | Pending stacked PR, not tagged | Source tag readiness rejects stale requested tags outside blocker inventory latest candidate. |
 
 ## Architecture Boundary
 
