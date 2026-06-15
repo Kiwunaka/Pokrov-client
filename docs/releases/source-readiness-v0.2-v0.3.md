@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.58
+# Source Readiness: v0.2-v0.59
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -1252,6 +1252,41 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.59.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #79: release merge handoff canonical build input roots for merge-order,
+  GitHub-status, tag-readiness, and publication dry-run summaries
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- run `scripts/prepare-release-evidence-bundle.ps1` with the exact preflight
+  summary
+- run `scripts/validate-source-release-publication.ps1` with the exact release
+  evidence bundle and rendered release notes
+- run `scripts/check-release-merge-order.ps1`,
+  `scripts/check-release-stack-github-status.ps1`,
+  `scripts/check-source-tag-readiness.ps1`, and
+  `scripts/validate-source-release-publication.ps1` so the prerequisite
+  summaries exist under their expected ignored `build/` output roots
+- run `scripts/prepare-release-merge-handoff.ps1` with the exact merge-order,
+  GitHub-status, tag-readiness, and publication dry-run summaries
+- confirm the release merge handoff summary includes input fingerprints,
+  source-only no-binary flags, and no blocking errors
+- review the publication dry-run, release evidence bundle, preflight summary,
+  proof manifest, rendered GitHub Release body, and changelog section for the
+  exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## v0.58.0-source Candidate
 
 Status: stacked PR green, not tagged.
@@ -1374,6 +1409,10 @@ Required before tagging:
 
 ## Known Limitations Before the Next Tags
 
+- Release merge handoff canonical input roots reduce accidental stale or
+  external-summary review risk, but they still do not merge PRs, push tags,
+  publish releases, upload assets, build binaries, or authorize installable
+  APK/EXE release claims.
 - Release merge handoff source-only flags make no-binary boundaries explicit in
   the maintainer artifact, but they still do not merge PRs, push tags, publish
   releases, upload assets, build binaries, or authorize APK/EXE/installable

@@ -118,6 +118,7 @@ Source release status:
 | `v0.56.0-source` | Pending stacked PR, not tagged | Release merge handoff publication proof gate is in the stacked PR queue. |
 | `v0.57.0-source` | Pending stacked PR, not tagged | Release merge handoff input fingerprints are in the stacked PR queue. |
 | `v0.58.0-source` | Pending stacked PR, not tagged | Release merge handoff source-only flags are in the stacked PR queue. |
+| `v0.59.0-source` | Pending stacked PR, not tagged | Release merge handoff canonical input roots are in the stacked PR queue. |
 
 ## Which App Should I Use?
 
