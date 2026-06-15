@@ -142,6 +142,12 @@
       "candidate": "v0.62.0-source",
       "base": "codex/v0.61-merge-handoff-input-schema",
       "head": "codex/v0.62-merge-handoff-stack-counts"
+    },
+    {
+      "pr": 83,
+      "candidate": "v0.63.0-source",
+      "base": "codex/v0.62-merge-handoff-stack-counts",
+      "head": "codex/v0.63-merge-handoff-input-errors"
     }
   ]
 }

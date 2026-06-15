@@ -122,6 +122,7 @@ Source release status:
 | `v0.60.0-source` | Pending stacked PR, not tagged | Release merge handoff input timestamps are in the stacked PR queue. |
 | `v0.61.0-source` | Pending stacked PR, not tagged | Release merge handoff input schema/read-only checks are in the stacked PR queue. |
 | `v0.62.0-source` | Pending stacked PR, not tagged | Release merge handoff stack-count consistency checks are in the stacked PR queue. |
+| `v0.63.0-source` | Pending stacked PR, not tagged | Release merge handoff input-error checks are in the stacked PR queue. |
 
 ## Which App Should I Use?
 

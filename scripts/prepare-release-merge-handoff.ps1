@@ -190,6 +190,10 @@ try {
   if ($publicationDryRun.windows_bundle_verifier_ok -ne $true -or [string]::IsNullOrWhiteSpace([string]$publicationDryRun.windows_bundle_verifier_summary)) {
     $blockingErrors.Add("publication dry-run missing Windows bundle verifier proof")
   }
+  $inputErrors = @($mergeOrder.errors) + @($githubStatus.errors) + @($publicationDryRun.errors)
+  if (@($inputErrors).Count -gt 0) {
+    $blockingErrors.Add("input summaries report errors")
+  }
   $candidateValues = @(
     [string]$mergeOrder.latest_candidate,
     [string]$githubStatus.latest_candidate,
@@ -300,7 +304,8 @@ try {
     windows_bundle_verifier_summary = [string]$publicationDryRun.windows_bundle_verifier_summary
     open_blocker_count = [int]$tagReadiness.open_blocker_count
     blocking_errors = @($blockingErrors)
-    input_errors = @($mergeOrder.errors) + @($githubStatus.errors) + @($publicationDryRun.errors)
+    input_error_count = [int]@($inputErrors).Count
+    input_errors = @($inputErrors)
     open_blockers = @($tagReadiness.open_blockers)
     next_manual_steps = @(
       "merge stacked PRs in order after maintainer review",
