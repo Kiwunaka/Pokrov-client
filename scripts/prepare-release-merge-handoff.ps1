@@ -128,6 +128,18 @@ function Get-InputPath {
   return Resolve-RepoPath -Path $ProvidedPath
 }
 
+function Get-InputErrors {
+  param([Parameter(Mandatory = $true)][object]$Payload)
+
+  $property = $Payload.PSObject.Properties["errors"]
+  if ($null -eq $property) {
+    return @()
+  }
+  return @($property.Value) | Where-Object {
+    -not [string]::IsNullOrWhiteSpace([string]$_)
+  }
+}
+
 Push-Location $root
 try {
   $seedPath = Join-Path $root "config\release-merge-handoff.seed.json"
@@ -190,7 +202,10 @@ try {
   if ($publicationDryRun.windows_bundle_verifier_ok -ne $true -or [string]::IsNullOrWhiteSpace([string]$publicationDryRun.windows_bundle_verifier_summary)) {
     $blockingErrors.Add("publication dry-run missing Windows bundle verifier proof")
   }
-  $inputErrors = @($mergeOrder.errors) + @($githubStatus.errors) + @($publicationDryRun.errors)
+  $inputErrors = @(Get-InputErrors -Payload $mergeOrder) +
+    @(Get-InputErrors -Payload $githubStatus) +
+    @(Get-InputErrors -Payload $tagReadiness) +
+    @(Get-InputErrors -Payload $publicationDryRun)
   if (@($inputErrors).Count -gt 0) {
     $blockingErrors.Add("input summaries report errors")
   }
