@@ -114,6 +114,8 @@ production readiness without matching public evidence.
   summaries so source-only release proof records the Windows shell boundary.
 - Added release evidence bundle enforcement for Windows verifier proof so
   stale preflight summaries cannot produce complete release evidence.
+- Added publication dry-run enforcement for Windows verifier proof so stale
+  evidence bundles cannot reach manual GitHub Release review.
 - Hardened local runtime archive fetching so archive entries are inspected
   before extraction or host sync and path traversal entries are refused.
 
@@ -126,7 +128,7 @@ production readiness without matching public evidence.
 - Fixed the documented no-argument release merge handoff command so it uses the
   seed default input paths.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.54.0-source` candidates.
+  `v0.55.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -186,6 +188,7 @@ production readiness without matching public evidence.
 | `v0.52.0-source` | Pending stacked PR, not tagged | PR #72 |
 | `v0.53.0-source` | Pending stacked PR, not tagged | PR #73 |
 | `v0.54.0-source` | Pending stacked PR, not tagged | PR #74 |
+| `v0.55.0-source` | Pending stacked PR, not tagged | PR #75 |
 
 ### Still Source-Only
 

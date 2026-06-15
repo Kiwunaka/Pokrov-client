@@ -46,11 +46,11 @@ def test_release_blocker_inventory_records_current_candidate_scope() -> None:
     inventory = _read_json("config/release-blocker-inventory.seed.json")
     candidates = inventory["tracked_candidates"]
 
-    assert candidates["latest_stacked_pr"] == 74
-    assert candidates["latest_candidate"] == "v0.54.0-source"
+    assert candidates["latest_stacked_pr"] == 75
+    assert candidates["latest_candidate"] == "v0.55.0-source"
     assert candidates["base_candidate"] == "v0.1.0-source"
     assert candidates["tag_creation_allowed"] is False
-    assert "v0.54.0-source" in candidates["covered_range"]
+    assert "v0.55.0-source" in candidates["covered_range"]
 
 
 def test_release_blocker_inventory_is_documented_and_indexed() -> None:

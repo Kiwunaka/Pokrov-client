@@ -52,7 +52,8 @@ handoff artifact, not a release publisher.
 Use `scripts/validate-source-release-publication.ps1` as the publication dry-run
 before manual GitHub Release creation. It validates the release
 evidence bundle and rendered release notes, writes ignored local output, and
-does not publish, push tags, or upload assets.
+requires the release evidence bundle's Windows verifier proof. It does not
+publish, push tags, or upload assets.
 
 Required checks and release gates are summarized in
 [REQUIRED_CHECKS.md](REQUIRED_CHECKS.md). That page documents the expected

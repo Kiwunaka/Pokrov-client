@@ -39,9 +39,10 @@ Current helpers:
   requires the preflight Windows bundle verifier proof, writes output under
   ignored `build/release-evidence/`, and publishes nothing
 - `validate-source-release-publication.ps1`: validates a release evidence
-  bundle and rendered release notes as a local publication dry-run; writes
-  ignored `build/source-release-publication/` output and does not publish, push
-  tags, or upload assets
+  bundle and rendered release notes as a local publication dry-run; it requires
+  the release evidence bundle's Windows verifier proof, writes ignored
+  `build/source-release-publication/` output, and does not publish, push tags,
+  or upload assets
 - `check-source-tag-readiness.ps1`: reads the release blocker inventory and
   source readiness list, then writes a local source tag readiness summary under
   ignored `build/source-tag-readiness/`; returns a non-zero exit code while

@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.54
+# Source Readiness: v0.2-v0.55
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -1252,8 +1252,40 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.55.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #75: publication dry-run gate requiring Windows bundle verifier proof in
+  release evidence before manual GitHub Release review
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- run `scripts/prepare-release-evidence-bundle.ps1` with the exact preflight
+  summary
+- run `scripts/validate-source-release-publication.ps1` with the exact release
+  evidence bundle and rendered release notes
+- confirm the publication dry-run summary includes
+  `windows_bundle_verifier_ok=true` and the verifier summary path
+- review the publication dry-run, release evidence bundle, preflight summary,
+  proof manifest, rendered GitHub Release body, and changelog section for the
+  exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## Known Limitations Before the Next Tags
 
+- Publication dry-run enforcement refuses release evidence without Windows
+  bundle verifier proof, but it still does not publish releases, push tags,
+  upload assets, build binaries, or authorize APK/EXE/installable release
+  claims.
 - Release evidence now refuses stale preflight summaries without Windows bundle
   verifier proof, but it still does not build, sign, package, publish, upload,
   or claim any APK/EXE/installable release.

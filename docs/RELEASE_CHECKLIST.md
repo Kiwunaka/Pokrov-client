@@ -35,7 +35,8 @@ Use this checklist before publishing a public source or binary release.
   verifier proof and does not publish a release.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\validate-source-release-publication.ps1`
   runs the publication dry-run against the release evidence bundle and rendered
-  release notes before any manual GitHub Release publication.
+  release notes before any manual GitHub Release publication; it requires the
+  release evidence bundle's Windows verifier proof.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\check-source-tag-readiness.ps1`
   runs the source tag readiness check against the release blocker inventory and
   source-readiness list before a source tag is attempted; it writes ignored

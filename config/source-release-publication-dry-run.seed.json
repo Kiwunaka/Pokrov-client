@@ -14,14 +14,16 @@
     "writes_only_ignored_build_output": true,
     "requires_source_only_evidence_bundle": true,
     "requires_release_copy_check": true,
-    "github_enforcement_claim_requires_bundle_approval": true
+    "github_enforcement_claim_requires_bundle_approval": true,
+    "windows_bundle_verifier_claim_requires_bundle_proof": true
   },
   "required_evidence_flags": [
     "source_only",
     "no_apk",
     "no_exe",
     "no_store_release",
-    "no_trusted_signing_claim"
+    "no_trusted_signing_claim",
+    "windows_bundle_verifier_ok"
   ],
   "required_release_note_phrases": [
     "Source archive SHA-256:",

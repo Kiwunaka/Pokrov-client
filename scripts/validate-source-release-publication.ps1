@@ -86,6 +86,14 @@ try {
     throw "Publication dry-run refused evidence with forbidden_file_count=$($evidence.forbidden_file_count)."
   }
 
+  if ($evidence.windows_bundle_verifier_ok -ne $true) {
+    throw "Publication dry-run refused evidence with windows_bundle_verifier_ok not true."
+  }
+
+  if ([string]::IsNullOrWhiteSpace([string]$evidence.windows_bundle_verifier_summary)) {
+    throw "Publication dry-run refused evidence without windows_bundle_verifier_summary."
+  }
+
   if ($evidence.release_boundary.ships_apk -ne $false -or
     $evidence.release_boundary.ships_exe -ne $false -or
     $evidence.release_boundary.store_release -ne $false -or
@@ -133,6 +141,8 @@ try {
     release_notes = $resolvedReleaseNotesPath
     commit_sha = $evidence.commit_sha
     source_archive_sha256 = $evidence.source_archive_sha256
+    windows_bundle_verifier_ok = [bool]$evidence.windows_bundle_verifier_ok
+    windows_bundle_verifier_summary = $evidence.windows_bundle_verifier_summary
     github_ruleset_ok = $evidence.github_ruleset_ok
     github_enforcement_claim_allowed = $evidence.github_enforcement_claim_allowed
     source_only = [bool]$evidence.source_only
