@@ -14,7 +14,8 @@
     "nonzero_when_blocked": true,
     "writes_only_ignored_build_output": true,
     "requires_blocker_inventory": true,
-    "requires_source_readiness_milestone": true
+    "requires_source_readiness_milestone": true,
+    "requires_open_blocker_evidence_fields": true
   },
   "outputs": {
     "summary_suffix": "-tag-readiness.json",

@@ -83,6 +83,7 @@ try {
         [ordered]@{
           id = $_.id
           status = $_.status
+          required_before_tag = [bool]$_.required_before_tag
           evidence = $_.evidence
         }
       }
