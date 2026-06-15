@@ -133,6 +133,7 @@ Source release status:
 | `v0.71.0-source` | Pending stacked PR, not tagged | Release merge handoff default candidate paths are kept in sync with blocker inventory. |
 | `v0.72.0-source` | Pending stacked PR, not tagged | Release merge handoff runtime candidate and PR checks are matched to blocker inventory. |
 | `v0.73.0-source` | Pending stacked PR, not tagged | Source tag readiness rejects stale requested tags outside blocker inventory latest candidate. |
+| `v0.74.0-source` | Pending stacked PR, not tagged | Source tag readiness checks milestone evidence against blocker inventory latest PR. |
 
 ## Which App Should I Use?
 

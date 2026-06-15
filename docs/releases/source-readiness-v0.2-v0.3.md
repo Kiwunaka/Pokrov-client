@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.73
+# Source Readiness: v0.2-v0.74
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -6,14 +6,14 @@ checklist is run on the exact commit. The machine-readable readiness inventory
 lives in
 [`config/source-release-readiness.seed.json`](../../config/source-release-readiness.seed.json).
 
-## v0.73.0-source Candidate
+## v0.74.0-source Candidate
 
 Status: stacked PR green, not tagged.
 
 Current evidence:
 
-- PR #93: source tag readiness rejects requested tags outside the blocker
-  inventory latest source candidate
+- PR #94: source tag readiness rejects milestone evidence that points at a
+  different stacked PR than blocker inventory
 - GitHub CI green on the stacked PR
 
 Required before tagging:

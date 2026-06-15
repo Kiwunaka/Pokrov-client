@@ -16,6 +16,7 @@
     "requires_blocker_inventory": true,
     "requires_source_readiness_milestone": true,
     "requires_latest_candidate_tag_match": true,
+    "requires_latest_stacked_pr_evidence_match": true,
     "requires_error_summary": true,
     "requires_open_blocker_evidence_fields": true
   },

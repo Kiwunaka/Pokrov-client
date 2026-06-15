@@ -46,6 +46,13 @@ try {
   if ($null -eq $milestone) {
     throw "Source readiness milestone not found for $Tag."
   }
+  $latestStackedPr = [int]$inventory.tracked_candidates.latest_stacked_pr
+  $expectedEvidencePr = "/pull/$latestStackedPr"
+  if ($latestStackedPr -le 0) {
+    $errors.Add("latest blocker inventory stacked PR is missing")
+  } elseif ([string]$milestone.evidence -notlike "*$expectedEvidencePr*") {
+    $errors.Add("source readiness milestone evidence does not match latest stacked PR")
+  }
 
   if ([string]::IsNullOrWhiteSpace($OutDir)) {
     $OutDir = Join-Path $root (Join-Path $defaultOutputDir $Tag)
@@ -81,7 +88,7 @@ try {
     trusted_signing_claim = [bool]$inventory.trusted_signing_claim
     status = $inventory.status
     latest_candidate = $latestCandidate
-    latest_stacked_pr = [int]$inventory.tracked_candidates.latest_stacked_pr
+    latest_stacked_pr = $latestStackedPr
     tag_creation_allowed = [bool]$inventory.tracked_candidates.tag_creation_allowed
     milestone_status = $milestone.status
     milestone_evidence = $milestone.evidence
