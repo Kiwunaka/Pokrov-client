@@ -125,6 +125,7 @@ Source release status:
 | `v0.63.0-source` | Pending stacked PR, not tagged | Release merge handoff input-error checks are in the stacked PR queue. |
 | `v0.64.0-source` | Pending stacked PR, not tagged | Release merge handoff tag-readiness input-error coverage is in the stacked PR queue. |
 | `v0.65.0-source` | Pending stacked PR, not tagged | Release merge handoff tag-readiness blocker-count consistency is in the stacked PR queue. |
+| `v0.66.0-source` | Pending stacked PR, not tagged | Release merge handoff tag-readiness blocker entry-shape checks are in the stacked PR queue. |
 
 ## Which App Should I Use?
 
