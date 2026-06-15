@@ -24,9 +24,9 @@ The workflow should keep read-only repository permissions, including
 `contents: read`.
 
 The source-import job covers Python contract tests, operator fixture smoke,
-seed validation, contributor doctor smoke, source-release preflight smoke,
-source-import dry-run, white-label token smoke, and clean-clone source-boundary
-proof.
+seed validation, contributor doctor smoke, Windows bundle verification,
+source-release preflight smoke, source-import dry-run, white-label token smoke,
+and clean-clone source-boundary proof.
 
 The Flutter job covers workspace bootstrap, shared app-shell analysis, and the
 workspace Flutter test lane.
@@ -59,6 +59,7 @@ python -m pytest tests
 powershell -ExecutionPolicy Bypass -File .\scripts\validate-seed.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\run-android-native-tests.ps1 -SourceOnly
+powershell -ExecutionPolicy Bypass -File .\scripts\verify-windows-bundle.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\source-release-preflight.ps1 -RequireTag
 powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1
 ```

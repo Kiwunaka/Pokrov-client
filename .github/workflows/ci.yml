@@ -42,6 +42,10 @@ jobs:
         shell: pwsh
         run: .\scripts\doctor.ps1 -SkipCommandChecks
 
+      - name: Run Windows bundle verifier
+        shell: pwsh
+        run: .\scripts\verify-windows-bundle.ps1
+
       - name: Run source-release preflight smoke
         shell: pwsh
         run: |
