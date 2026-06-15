@@ -226,6 +226,9 @@ try {
   if ($tagOpenBlockerCount -gt 0 -and ($tagReadiness.ready_for_tag -eq $true -or $tagReadiness.tag_creation_allowed -eq $true)) {
     $blockingErrors.Add("tag readiness allows tag creation while blockers remain")
   }
+  if ($tagOpenBlockerCount -eq 0 -and ($tagReadiness.ready_for_tag -ne $true -or $tagReadiness.tag_creation_allowed -ne $true)) {
+    $blockingErrors.Add("tag readiness denies tag creation without blockers")
+  }
   $candidateValues = @(
     [string]$mergeOrder.latest_candidate,
     [string]$githubStatus.latest_candidate,

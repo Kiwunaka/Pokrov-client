@@ -172,6 +172,12 @@
       "candidate": "v0.67.0-source",
       "base": "codex/v0.66-merge-handoff-blocker-shape",
       "head": "codex/v0.67-merge-handoff-readiness-flags"
+    },
+    {
+      "pr": 88,
+      "candidate": "v0.68.0-source",
+      "base": "codex/v0.67-merge-handoff-readiness-flags",
+      "head": "codex/v0.68-merge-handoff-tag-denial"
     }
   ]
 }
