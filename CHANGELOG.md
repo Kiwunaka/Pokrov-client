@@ -110,6 +110,8 @@ production readiness without matching public evidence.
   while refusing committed Windows binaries, archives, signing files, and local
   runtime artifacts; it does not build, sign, package, publish, or download
   runtime artifacts.
+- Hardened local runtime archive fetching so archive entries are inspected
+  before extraction or host sync and path traversal entries are refused.
 
 ### Changed
 
@@ -120,7 +122,7 @@ production readiness without matching public evidence.
 - Fixed the documented no-argument release merge handoff command so it uses the
   seed default input paths.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.51.0-source` candidates.
+  `v0.52.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -177,6 +179,7 @@ production readiness without matching public evidence.
 | `v0.49.0-source` | Pending stacked PR, not tagged | PR #69 |
 | `v0.50.0-source` | Pending stacked PR, not tagged | PR #70 |
 | `v0.51.0-source` | Pending stacked PR, not tagged | PR #71 |
+| `v0.52.0-source` | Pending stacked PR, not tagged | PR #72 |
 
 ### Still Source-Only
 

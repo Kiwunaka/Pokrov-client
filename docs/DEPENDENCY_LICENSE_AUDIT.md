@@ -63,7 +63,9 @@ Runtime artifact metadata lives in
 The source-only release lane may document local fetch instructions, but it must
 not claim archive hashes, redistribution clearance, APK/EXE delivery, or bundled
 runtime safety until that manifest is updated from pending review to recorded
-binary evidence.
+binary evidence. The local fetch helper performs archive entry traversal checks
+before extraction or host sync, but that safety guard is not a binary license
+review, redistribution approval, or public runtime-safety claim.
 
 ## Generated Asset Provenance
 
