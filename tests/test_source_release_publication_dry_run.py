@@ -21,6 +21,7 @@ def test_publication_dry_run_seed_defines_no_publish_policy() -> None:
 
     assert seed["script"] == "scripts/validate-source-release-publication.ps1"
     assert seed["default_output_dir"] == "build/source-release-publication"
+    assert seed["policy"]["read_only"] is True
     assert seed["policy"]["dry_run_only"] is True
     assert seed["policy"]["no_github_release_publish"] is True
     assert seed["policy"]["no_tag_push"] is True
@@ -40,6 +41,7 @@ def test_publication_dry_run_script_is_local_only() -> None:
         "github_enforcement_claim_allowed",
         "publish_performed = $false",
         "tag_push_performed = $false",
+        "read_only = $true",
         "dry_run_only = $true",
         "windows_bundle_verifier_ok",
         "windows_bundle_verifier_summary",
@@ -137,6 +139,7 @@ def test_publication_dry_run_writes_summary_from_fixtures(tmp_path: Path) -> Non
     )
 
     summary = json.loads((out_dir / "v9.9.9-source-publication-dry-run.json").read_text())
+    assert summary["read_only"] is True
     assert summary["dry_run_only"] is True
     assert summary["publish_performed"] is False
     assert summary["tag_push_performed"] is False
