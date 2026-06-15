@@ -130,6 +130,12 @@
       "candidate": "v0.60.0-source",
       "base": "codex/v0.59-merge-handoff-input-roots",
       "head": "codex/v0.60-merge-handoff-input-timestamps"
+    },
+    {
+      "pr": 81,
+      "candidate": "v0.61.0-source",
+      "base": "codex/v0.60-merge-handoff-input-timestamps",
+      "head": "codex/v0.61-merge-handoff-input-schema"
     }
   ]
 }

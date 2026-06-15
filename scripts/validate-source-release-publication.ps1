@@ -134,6 +134,7 @@ try {
     schema_version = 1
     tag = $Tag
     generated_at = (Get-Date).ToUniversalTime().ToString("o")
+    read_only = $true
     dry_run_only = $true
     publish_performed = $false
     tag_push_performed = $false

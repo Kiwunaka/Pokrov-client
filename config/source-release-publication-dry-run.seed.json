@@ -8,6 +8,7 @@
     "rendered source release notes"
   ],
   "policy": {
+    "read_only": true,
     "dry_run_only": true,
     "no_github_release_publish": true,
     "no_tag_push": true,

@@ -94,6 +94,28 @@ function Assert-InputGeneratedAt {
   }
 }
 
+function Assert-InputSchemaVersion {
+  param(
+    [Parameter(Mandatory = $true)][object]$Payload,
+    [Parameter(Mandatory = $true)][string]$InputName
+  )
+
+  if ([int]$Payload.schema_version -ne 1) {
+    throw "Release merge handoff input '$InputName' must use schema_version 1."
+  }
+}
+
+function Assert-InputReadOnly {
+  param(
+    [Parameter(Mandatory = $true)][object]$Payload,
+    [Parameter(Mandatory = $true)][string]$InputName
+  )
+
+  if ($Payload.read_only -ne $true) {
+    throw "Release merge handoff input '$InputName' must be read-only."
+  }
+}
+
 function Get-InputPath {
   param(
     [AllowEmptyString()][string]$ProvidedPath,
@@ -130,6 +152,14 @@ try {
   Assert-InputGeneratedAt -Payload $githubStatus -InputName "github_status"
   Assert-InputGeneratedAt -Payload $tagReadiness -InputName "tag_readiness"
   Assert-InputGeneratedAt -Payload $publicationDryRun -InputName "publication_dry_run"
+  Assert-InputSchemaVersion -Payload $mergeOrder -InputName "merge_order"
+  Assert-InputSchemaVersion -Payload $githubStatus -InputName "github_status"
+  Assert-InputSchemaVersion -Payload $tagReadiness -InputName "tag_readiness"
+  Assert-InputSchemaVersion -Payload $publicationDryRun -InputName "publication_dry_run"
+  Assert-InputReadOnly -Payload $mergeOrder -InputName "merge_order"
+  Assert-InputReadOnly -Payload $githubStatus -InputName "github_status"
+  Assert-InputReadOnly -Payload $tagReadiness -InputName "tag_readiness"
+  Assert-InputReadOnly -Payload $publicationDryRun -InputName "publication_dry_run"
 
   $blockingErrors = [System.Collections.Generic.List[string]]::new()
 
@@ -233,6 +263,12 @@ try {
       github_status = [string]$githubStatus.generated_at
       tag_readiness = [string]$tagReadiness.generated_at
       publication_dry_run = [string]$publicationDryRun.generated_at
+    }
+    input_schema_versions = [ordered]@{
+      merge_order = [int]$mergeOrder.schema_version
+      github_status = [int]$githubStatus.schema_version
+      tag_readiness = [int]$tagReadiness.schema_version
+      publication_dry_run = [int]$publicationDryRun.schema_version
     }
     publication_dry_run_ok = [bool](
       $publicationDryRun.source_only -eq $true -and
