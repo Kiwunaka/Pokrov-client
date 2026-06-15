@@ -83,6 +83,17 @@ function Assert-BuildInputPath {
   }
 }
 
+function Assert-InputGeneratedAt {
+  param(
+    [Parameter(Mandatory = $true)][object]$Payload,
+    [Parameter(Mandatory = $true)][string]$InputName
+  )
+
+  if ([string]::IsNullOrWhiteSpace([string]$Payload.generated_at)) {
+    throw "Release merge handoff input '$InputName' must include generated_at."
+  }
+}
+
 function Get-InputPath {
   param(
     [AllowEmptyString()][string]$ProvidedPath,
@@ -114,6 +125,12 @@ try {
   $githubStatus = Read-JsonFile -Path $githubStatusPath
   $tagReadiness = Read-JsonFile -Path $tagReadinessPath
   $publicationDryRun = Read-JsonFile -Path $publicationDryRunPath
+
+  Assert-InputGeneratedAt -Payload $mergeOrder -InputName "merge_order"
+  Assert-InputGeneratedAt -Payload $githubStatus -InputName "github_status"
+  Assert-InputGeneratedAt -Payload $tagReadiness -InputName "tag_readiness"
+  Assert-InputGeneratedAt -Payload $publicationDryRun -InputName "publication_dry_run"
+
   $blockingErrors = [System.Collections.Generic.List[string]]::new()
 
   if ($mergeOrder.merge_order_ok -ne $true) {
@@ -210,6 +227,12 @@ try {
       github_status = Get-InputFingerprint -Path $githubStatusPath
       tag_readiness = Get-InputFingerprint -Path $tagReadinessPath
       publication_dry_run = Get-InputFingerprint -Path $publicationDryRunPath
+    }
+    input_generated_at = [ordered]@{
+      merge_order = [string]$mergeOrder.generated_at
+      github_status = [string]$githubStatus.generated_at
+      tag_readiness = [string]$tagReadiness.generated_at
+      publication_dry_run = [string]$publicationDryRun.generated_at
     }
     publication_dry_run_ok = [bool](
       $publicationDryRun.source_only -eq $true -and

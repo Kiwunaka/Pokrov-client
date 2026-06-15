@@ -135,8 +135,10 @@ production readiness without matching public evidence.
   maintainer artifact carries explicit no-binary release boundaries.
 - Added canonical build input roots to the release merge handoff so the final
   maintainer artifact consumes only expected prerequisite summaries.
+- Added generated-at checks to release merge handoff inputs so the final
+  maintainer artifact records when each prerequisite summary was produced.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.59.0-source` candidates.
+  `v0.60.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -201,6 +203,7 @@ production readiness without matching public evidence.
 | `v0.57.0-source` | Pending stacked PR, not tagged | PR #77 |
 | `v0.58.0-source` | Pending stacked PR, not tagged | PR #78 |
 | `v0.59.0-source` | Pending stacked PR, not tagged | PR #79 |
+| `v0.60.0-source` | Pending stacked PR, not tagged | PR #80 |
 
 ### Still Source-Only
 
