@@ -43,10 +43,10 @@ def _merge_order_summary(ok: bool = True) -> dict:
         "read_only": True,
         "merge_order_ok": ok,
         "linear_base_to_head_chain": ok,
-        "stack_count": 15,
-        "latest_pr": 75,
-        "latest_candidate": "v0.55.0-source",
-        "errors": [] if ok else ["PR #75 base must equal previous head"],
+        "stack_count": 16,
+        "latest_pr": 76,
+        "latest_candidate": "v0.56.0-source",
+        "errors": [] if ok else ["PR #76 base must equal previous head"],
     }
 
 
@@ -55,15 +55,15 @@ def _github_status_summary(ok: bool = True) -> dict:
         "schema_version": 1,
         "read_only": True,
         "github_status_ok": ok,
-        "stack_count": 15,
-        "latest_pr": 75,
-        "latest_candidate": "v0.55.0-source",
+        "stack_count": 16,
+        "latest_pr": 76,
+        "latest_candidate": "v0.56.0-source",
         "clean_pr_count": 12 if ok else 11,
         "draft_pr_count": 0,
         "unclean_pr_count": 0 if ok else 1,
-        "successful_check_count": 45 if ok else 44,
+        "successful_check_count": 48 if ok else 47,
         "failed_check_count": 0 if ok else 1,
-        "errors": [] if ok else ["PR #75 check 'Flutter analyze and tests' is FAILURE"],
+        "errors": [] if ok else ["PR #76 check 'Flutter analyze and tests' is FAILURE"],
     }
 
 
@@ -71,7 +71,7 @@ def _tag_readiness_summary(ready: bool = False) -> dict:
     return {
         "schema_version": 1,
         "read_only": True,
-        "tag": "v0.55.0-source",
+        "tag": "v0.56.0-source",
         "ready_for_tag": ready,
         "source_only": True,
         "ships_apk": False,
@@ -79,7 +79,7 @@ def _tag_readiness_summary(ready: bool = False) -> dict:
         "store_release": False,
         "trusted_signing_claim": False,
         "tag_creation_allowed": ready,
-        "latest_candidate": "v0.55.0-source",
+        "latest_candidate": "v0.56.0-source",
         "open_blocker_count": 0 if ready else 7,
         "open_blockers": []
         if ready
@@ -87,10 +87,31 @@ def _tag_readiness_summary(ready: bool = False) -> dict:
     }
 
 
+def _publication_dry_run_summary(ok: bool = True) -> dict:
+    return {
+        "schema_version": 1,
+        "tag": "v0.56.0-source",
+        "source_only": True,
+        "dry_run_only": True,
+        "ready_for_manual_review": ok,
+        "publish_performed": False,
+        "tag_push_performed": False,
+        "no_apk": True,
+        "no_exe": True,
+        "no_store_release": True,
+        "no_trusted_signing_claim": True,
+        "windows_bundle_verifier_ok": ok,
+        "windows_bundle_verifier_summary": (
+            "build/windows-bundle-verifier/windows-bundle-verifier.json" if ok else ""
+        ),
+        "errors": [] if ok else ["Windows bundle verifier proof is missing"],
+    }
+
+
 def _stale_tag_readiness_summary() -> dict:
     summary = _tag_readiness_summary()
-    summary["tag"] = "v0.54.0-source"
-    summary["latest_candidate"] = "v0.54.0-source"
+    summary["tag"] = "v0.55.0-source"
+    summary["latest_candidate"] = "v0.55.0-source"
     return summary
 
 
@@ -100,14 +121,17 @@ def _write_input_summaries(
     merge_ok: bool = True,
     github_ok: bool = True,
     tag_ready: bool = False,
-) -> tuple[Path, Path, Path]:
+    publication_ok: bool = True,
+) -> tuple[Path, Path, Path, Path]:
     merge_path = tmp_path / "release-merge-order.json"
     github_path = tmp_path / "release-stack-github-status.json"
-    tag_path = tmp_path / "v0.55.0-source-tag-readiness.json"
+    tag_path = tmp_path / "v0.56.0-source-tag-readiness.json"
+    publication_path = tmp_path / "v0.56.0-source-publication-dry-run.json"
     _write_json(merge_path, _merge_order_summary(merge_ok))
     _write_json(github_path, _github_status_summary(github_ok))
     _write_json(tag_path, _tag_readiness_summary(tag_ready))
-    return merge_path, github_path, tag_path
+    _write_json(publication_path, _publication_dry_run_summary(publication_ok))
+    return merge_path, github_path, tag_path, publication_path
 
 
 def test_release_merge_handoff_seed_defines_read_only_inputs() -> None:
@@ -123,11 +147,13 @@ def test_release_merge_handoff_seed_defines_read_only_inputs() -> None:
     assert seed["policy"]["requires_merge_order_summary"] is True
     assert seed["policy"]["requires_github_status_summary"] is True
     assert seed["policy"]["requires_tag_readiness_summary"] is True
+    assert seed["policy"]["requires_publication_dry_run_summary"] is True
     assert seed["inputs"]["merge_order"] == "build/release-merge-order/release-merge-order.json"
     assert seed["inputs"]["github_status"] == (
         "build/release-stack-github-status/release-stack-github-status.json"
     )
     assert seed["inputs"]["tag_readiness"].endswith("-tag-readiness.json")
+    assert seed["inputs"]["publication_dry_run"].endswith("-publication-dry-run.json")
 
 
 def test_release_merge_handoff_script_is_read_only() -> None:
@@ -137,7 +163,10 @@ def test_release_merge_handoff_script_is_read_only() -> None:
         "release-merge-handoff.seed.json",
         "merge_order_ok",
         "github_status_ok",
+        "publication_dry_run_ok",
         "ready_for_tag",
+        "ready_for_manual_review",
+        "windows_bundle_verifier_ok",
         "handoff_ready_for_maintainer",
         "build\\release-merge-handoff",
         "manual_merge_required = $true",
@@ -161,7 +190,9 @@ def test_release_merge_handoff_script_is_read_only() -> None:
 
 
 def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
-    merge_path, github_path, tag_path = _write_input_summaries(tmp_path)
+    merge_path, github_path, tag_path, publication_path = _write_input_summaries(
+        tmp_path
+    )
     out_dir = ROOT / "build" / "release-merge-handoff" / "test-output"
     shutil.rmtree(out_dir, ignore_errors=True)
 
@@ -179,6 +210,8 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
                 str(github_path),
                 "-TagReadinessPath",
                 str(tag_path),
+                "-PublicationDryRunPath",
+                str(publication_path),
                 "-OutDir",
                 str(out_dir),
             ],
@@ -200,9 +233,16 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
     assert summary["manual_tag_required"] is True
     assert summary["publish_performed"] is False
     assert summary["tag_push_performed"] is False
-    assert summary["latest_candidate"] == "v0.55.0-source"
-    assert summary["latest_pr"] == 75
+    assert summary["latest_candidate"] == "v0.56.0-source"
+    assert summary["latest_pr"] == 76
+    assert summary["publication_dry_run_ok"] is True
+    assert summary["publication_ready_for_manual_review"] is True
+    assert summary["windows_bundle_verifier_ok"] is True
+    assert summary["windows_bundle_verifier_summary"].endswith(
+        "windows-bundle-verifier.json"
+    )
     assert "merge stacked PRs in order" in " ".join(summary["next_manual_steps"])
+    assert "publication dry-run" in " ".join(summary["next_manual_steps"])
     assert summary["blocking_errors"] == []
 
 
@@ -220,7 +260,14 @@ def test_release_merge_handoff_uses_seed_default_input_paths() -> None:
         ROOT
         / "build"
         / "source-tag-readiness"
-        / "v0.55.0-source-tag-readiness.json"
+        / "v0.56.0-source-tag-readiness.json"
+    )
+    default_publication_path = (
+        ROOT
+        / "build"
+        / "source-release-publication"
+        / "v0.56.0-source"
+        / "v0.56.0-source-publication-dry-run.json"
     )
     out_dir = ROOT / "build" / "release-merge-handoff"
     summary_path = out_dir / "release-merge-handoff.json"
@@ -228,6 +275,7 @@ def test_release_merge_handoff_uses_seed_default_input_paths() -> None:
         default_merge_path,
         default_github_path,
         default_tag_path,
+        default_publication_path,
         summary_path,
     ]
     snapshots = _snapshot_files(touched_paths)
@@ -235,9 +283,11 @@ def test_release_merge_handoff_uses_seed_default_input_paths() -> None:
         default_merge_path.parent.mkdir(parents=True, exist_ok=True)
         default_github_path.parent.mkdir(parents=True, exist_ok=True)
         default_tag_path.parent.mkdir(parents=True, exist_ok=True)
+        default_publication_path.parent.mkdir(parents=True, exist_ok=True)
         _write_json(default_merge_path, _merge_order_summary())
         _write_json(default_github_path, _github_status_summary())
         _write_json(default_tag_path, _tag_readiness_summary())
+        _write_json(default_publication_path, _publication_dry_run_summary())
 
         result = subprocess.run(
             [
@@ -256,14 +306,15 @@ def test_release_merge_handoff_uses_seed_default_input_paths() -> None:
         assert result.returncode == 0, result.stderr + result.stdout
         summary = json.loads(summary_path.read_text(encoding="utf-8-sig"))
         assert summary["handoff_ready_for_maintainer"] is True
-        assert summary["latest_candidate"] == "v0.55.0-source"
-        assert summary["latest_pr"] == 75
+        assert summary["latest_candidate"] == "v0.56.0-source"
+        assert summary["latest_pr"] == 76
+        assert summary["publication_dry_run_ok"] is True
     finally:
         _restore_files(snapshots)
 
 
 def test_release_merge_handoff_blocks_failed_inputs(tmp_path: Path) -> None:
-    merge_path, github_path, tag_path = _write_input_summaries(
+    merge_path, github_path, tag_path, publication_path = _write_input_summaries(
         tmp_path,
         merge_ok=False,
         github_ok=False,
@@ -285,6 +336,8 @@ def test_release_merge_handoff_blocks_failed_inputs(tmp_path: Path) -> None:
                 str(github_path),
                 "-TagReadinessPath",
                 str(tag_path),
+                "-PublicationDryRunPath",
+                str(publication_path),
                 "-OutDir",
                 str(out_dir),
             ],
@@ -313,9 +366,11 @@ def test_release_merge_handoff_blocks_mismatched_input_candidates(
     merge_path = tmp_path / "release-merge-order.json"
     github_path = tmp_path / "release-stack-github-status.json"
     tag_path = tmp_path / "v0.47.0-source-tag-readiness.json"
+    publication_path = tmp_path / "v0.56.0-source-publication-dry-run.json"
     _write_json(merge_path, _merge_order_summary())
     _write_json(github_path, _github_status_summary())
     _write_json(tag_path, _stale_tag_readiness_summary())
+    _write_json(publication_path, _publication_dry_run_summary())
     out_dir = ROOT / "build" / "release-merge-handoff" / "test-output"
     shutil.rmtree(out_dir, ignore_errors=True)
 
@@ -333,6 +388,8 @@ def test_release_merge_handoff_blocks_mismatched_input_candidates(
                 str(github_path),
                 "-TagReadinessPath",
                 str(tag_path),
+                "-PublicationDryRunPath",
+                str(publication_path),
                 "-OutDir",
                 str(out_dir),
             ],
@@ -355,8 +412,61 @@ def test_release_merge_handoff_blocks_mismatched_input_candidates(
     ]
 
 
+def test_release_merge_handoff_blocks_failed_publication_dry_run(
+    tmp_path: Path,
+) -> None:
+    merge_path, github_path, tag_path, publication_path = _write_input_summaries(
+        tmp_path,
+        publication_ok=False,
+    )
+    out_dir = ROOT / "build" / "release-merge-handoff" / "test-output"
+    shutil.rmtree(out_dir, ignore_errors=True)
+
+    try:
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "prepare-release-merge-handoff.ps1"),
+                "-MergeOrderPath",
+                str(merge_path),
+                "-GithubStatusPath",
+                str(github_path),
+                "-TagReadinessPath",
+                str(tag_path),
+                "-PublicationDryRunPath",
+                str(publication_path),
+                "-OutDir",
+                str(out_dir),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        summary = json.loads(
+            (out_dir / "release-merge-handoff.json").read_text(encoding="utf-8-sig")
+        )
+    finally:
+        shutil.rmtree(out_dir, ignore_errors=True)
+
+    assert result.returncode == 2
+    assert summary["handoff_ready_for_maintainer"] is False
+    assert "publication dry-run is not ready for manual review" in summary[
+        "blocking_errors"
+    ]
+    assert "publication dry-run missing Windows bundle verifier proof" in summary[
+        "blocking_errors"
+    ]
+
+
 def test_release_merge_handoff_rejects_non_build_output(tmp_path: Path) -> None:
-    merge_path, github_path, tag_path = _write_input_summaries(tmp_path)
+    merge_path, github_path, tag_path, publication_path = _write_input_summaries(
+        tmp_path
+    )
     out_dir = tmp_path / "outside-build"
 
     result = subprocess.run(
@@ -372,6 +482,8 @@ def test_release_merge_handoff_rejects_non_build_output(tmp_path: Path) -> None:
             str(github_path),
             "-TagReadinessPath",
             str(tag_path),
+            "-PublicationDryRunPath",
+            str(publication_path),
             "-OutDir",
             str(out_dir),
         ],

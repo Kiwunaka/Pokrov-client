@@ -11,11 +11,13 @@
     "writes_only_ignored_build_output": true,
     "requires_merge_order_summary": true,
     "requires_github_status_summary": true,
-    "requires_tag_readiness_summary": true
+    "requires_tag_readiness_summary": true,
+    "requires_publication_dry_run_summary": true
   },
   "inputs": {
     "merge_order": "build/release-merge-order/release-merge-order.json",
     "github_status": "build/release-stack-github-status/release-stack-github-status.json",
-    "tag_readiness": "build/source-tag-readiness/v0.55.0-source-tag-readiness.json"
+    "tag_readiness": "build/source-tag-readiness/v0.56.0-source-tag-readiness.json",
+    "publication_dry_run": "build/source-release-publication/v0.56.0-source/v0.56.0-source-publication-dry-run.json"
   }
 }

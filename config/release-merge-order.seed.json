@@ -100,6 +100,12 @@
       "candidate": "v0.55.0-source",
       "base": "codex/v0.54-release-evidence-windows-proof",
       "head": "codex/v0.55-publication-windows-proof"
+    },
+    {
+      "pr": 76,
+      "candidate": "v0.56.0-source",
+      "base": "codex/v0.55-publication-windows-proof",
+      "head": "codex/v0.56-merge-handoff-publication-proof"
     }
   ]
 }

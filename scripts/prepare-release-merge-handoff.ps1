@@ -2,6 +2,7 @@ param(
   [string]$MergeOrderPath = "",
   [string]$GithubStatusPath = "",
   [string]$TagReadinessPath = "",
+  [string]$PublicationDryRunPath = "",
   [string]$OutDir = ""
 )
 
@@ -64,6 +65,7 @@ try {
   $mergeOrder = Read-JsonFile -Path (Get-InputPath -ProvidedPath $MergeOrderPath -DefaultPath $seed.inputs.merge_order)
   $githubStatus = Read-JsonFile -Path (Get-InputPath -ProvidedPath $GithubStatusPath -DefaultPath $seed.inputs.github_status)
   $tagReadiness = Read-JsonFile -Path (Get-InputPath -ProvidedPath $TagReadinessPath -DefaultPath $seed.inputs.tag_readiness)
+  $publicationDryRun = Read-JsonFile -Path (Get-InputPath -ProvidedPath $PublicationDryRunPath -DefaultPath $seed.inputs.publication_dry_run)
   $blockingErrors = [System.Collections.Generic.List[string]]::new()
 
   if ($mergeOrder.merge_order_ok -ne $true) {
@@ -75,11 +77,30 @@ try {
   if ($tagReadiness.source_only -ne $true) {
     $blockingErrors.Add("tag readiness summary is not source-only")
   }
+  if ($publicationDryRun.source_only -ne $true) {
+    $blockingErrors.Add("publication dry-run is not source-only")
+  }
+  if ($publicationDryRun.dry_run_only -ne $true) {
+    $blockingErrors.Add("publication dry-run is not marked dry-run only")
+  }
+  if ($publicationDryRun.ready_for_manual_review -ne $true) {
+    $blockingErrors.Add("publication dry-run is not ready for manual review")
+  }
+  if ($publicationDryRun.publish_performed -ne $false) {
+    $blockingErrors.Add("publication dry-run reports a publish action")
+  }
+  if ($publicationDryRun.tag_push_performed -ne $false) {
+    $blockingErrors.Add("publication dry-run reports a tag push action")
+  }
+  if ($publicationDryRun.windows_bundle_verifier_ok -ne $true -or [string]::IsNullOrWhiteSpace([string]$publicationDryRun.windows_bundle_verifier_summary)) {
+    $blockingErrors.Add("publication dry-run missing Windows bundle verifier proof")
+  }
   $candidateValues = @(
     [string]$mergeOrder.latest_candidate,
     [string]$githubStatus.latest_candidate,
     [string]$tagReadiness.latest_candidate,
-    [string]$tagReadiness.tag
+    [string]$tagReadiness.tag,
+    [string]$publicationDryRun.tag
   ) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Select-Object -Unique
   if (@($candidateValues).Count -ne 1) {
     $blockingErrors.Add("input summaries do not agree on latest candidate")
@@ -94,6 +115,11 @@ try {
   foreach ($field in @("ships_apk", "ships_exe", "store_release", "trusted_signing_claim")) {
     if ($tagReadiness.$field -ne $false) {
       $blockingErrors.Add("tag readiness summary has unsafe release flag '$field'")
+    }
+  }
+  foreach ($field in @("no_apk", "no_exe", "no_store_release", "no_trusted_signing_claim")) {
+    if ($publicationDryRun.$field -ne $true) {
+      $blockingErrors.Add("publication dry-run missing source-only guard '$field'")
     }
   }
 
@@ -126,16 +152,33 @@ try {
     latest_pr = if (@($prValues).Count -gt 0) { [int]@($prValues)[0] } else { 0 }
     merge_order_ok = [bool]$mergeOrder.merge_order_ok
     github_status_ok = [bool]$githubStatus.github_status_ok
+    publication_dry_run_ok = [bool](
+      $publicationDryRun.source_only -eq $true -and
+      $publicationDryRun.dry_run_only -eq $true -and
+      $publicationDryRun.ready_for_manual_review -eq $true -and
+      $publicationDryRun.publish_performed -eq $false -and
+      $publicationDryRun.tag_push_performed -eq $false -and
+      $publicationDryRun.no_apk -eq $true -and
+      $publicationDryRun.no_exe -eq $true -and
+      $publicationDryRun.no_store_release -eq $true -and
+      $publicationDryRun.no_trusted_signing_claim -eq $true -and
+      $publicationDryRun.windows_bundle_verifier_ok -eq $true -and
+      -not [string]::IsNullOrWhiteSpace([string]$publicationDryRun.windows_bundle_verifier_summary)
+    )
+    publication_ready_for_manual_review = [bool]$publicationDryRun.ready_for_manual_review
+    publication_dry_run = [string]$publicationDryRun.tag
+    windows_bundle_verifier_ok = [bool]$publicationDryRun.windows_bundle_verifier_ok
+    windows_bundle_verifier_summary = [string]$publicationDryRun.windows_bundle_verifier_summary
     open_blocker_count = [int]$tagReadiness.open_blocker_count
     blocking_errors = @($blockingErrors)
-    input_errors = @($mergeOrder.errors + $githubStatus.errors)
+    input_errors = @($mergeOrder.errors) + @($githubStatus.errors) + @($publicationDryRun.errors)
     open_blockers = @($tagReadiness.open_blockers)
     next_manual_steps = @(
       "merge stacked PRs in order after maintainer review",
       "choose and record the exact commit SHA on main",
       "create the annotated source tag only after blockers are cleared",
       "run full source-release preflight without -SkipTestCommands",
-      "review rendered release notes and evidence bundle before publishing"
+      "review the publication dry-run, rendered release notes, and evidence bundle before publishing"
     )
   }
 

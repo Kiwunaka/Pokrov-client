@@ -54,7 +54,7 @@ Use this checklist before publishing a public source or binary release.
   publish anything.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\prepare-release-merge-handoff.ps1`
   creates a release merge handoff report by bundling the release merge order,
-  release stack GitHub status, and source tag
+  release stack GitHub status, source tag readiness, and publication dry-run
   readiness summaries into an ignored `build/release-merge-handoff/` maintainer
   handoff report; it does not merge, tag, push, publish, or upload anything.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\verify-windows-bundle.ps1`
