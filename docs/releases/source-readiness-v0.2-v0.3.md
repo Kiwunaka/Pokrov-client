@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.57
+# Source Readiness: v0.2-v0.58
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -1252,6 +1252,37 @@ Required before tagging:
 - keep explicit source-only wording: no APK, EXE, store release, or trusted
   signing claim
 
+## v0.58.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #78: release merge handoff source-only summary flags for no APK, EXE,
+  store release, or trusted signing claim
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- run `scripts/prepare-release-evidence-bundle.ps1` with the exact preflight
+  summary
+- run `scripts/validate-source-release-publication.ps1` with the exact release
+  evidence bundle and rendered release notes
+- run `scripts/prepare-release-merge-handoff.ps1` with the exact merge-order,
+  GitHub-status, tag-readiness, and publication dry-run summaries
+- confirm the release merge handoff summary includes `source_only=true`,
+  `no_apk=true`, `no_exe=true`, `no_store_release=true`, and
+  `no_trusted_signing_claim=true`
+- review the publication dry-run, release evidence bundle, preflight summary,
+  proof manifest, rendered GitHub Release body, and changelog section for the
+  exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
 ## v0.57.0-source Candidate
 
 Status: stacked PR green, not tagged.
@@ -1343,6 +1374,10 @@ Required before tagging:
 
 ## Known Limitations Before the Next Tags
 
+- Release merge handoff source-only flags make no-binary boundaries explicit in
+  the maintainer artifact, but they still do not merge PRs, push tags, publish
+  releases, upload assets, build binaries, or authorize APK/EXE/installable
+  release claims.
 - Release merge handoff input fingerprints record exactly which local summaries
   were consumed, but they still do not merge PRs, push tags, publish releases,
   upload assets, build binaries, or authorize APK/EXE/installable release

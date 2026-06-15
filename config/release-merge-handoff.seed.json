@@ -13,12 +13,13 @@
     "requires_github_status_summary": true,
     "requires_tag_readiness_summary": true,
     "requires_publication_dry_run_summary": true,
-    "requires_input_fingerprints": true
+    "requires_input_fingerprints": true,
+    "requires_source_only_summary_flags": true
   },
   "inputs": {
     "merge_order": "build/release-merge-order/release-merge-order.json",
     "github_status": "build/release-stack-github-status/release-stack-github-status.json",
-    "tag_readiness": "build/source-tag-readiness/v0.57.0-source-tag-readiness.json",
-    "publication_dry_run": "build/source-release-publication/v0.57.0-source/v0.57.0-source-publication-dry-run.json"
+    "tag_readiness": "build/source-tag-readiness/v0.58.0-source-tag-readiness.json",
+    "publication_dry_run": "build/source-release-publication/v0.58.0-source/v0.58.0-source-publication-dry-run.json"
   }
 }
