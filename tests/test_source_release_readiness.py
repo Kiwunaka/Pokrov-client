@@ -107,6 +107,7 @@ def test_current_stacked_pr_milestones_are_recorded() -> None:
         "v0.66.0-source": "https://github.com/Kiwunaka/Pokrov-client/pull/86",
         "v0.67.0-source": "https://github.com/Kiwunaka/Pokrov-client/pull/87",
         "v0.68.0-source": "https://github.com/Kiwunaka/Pokrov-client/pull/88",
+        "v0.69.0-source": "https://github.com/Kiwunaka/Pokrov-client/pull/89",
     }
 
     for tag, evidence in expected.items():

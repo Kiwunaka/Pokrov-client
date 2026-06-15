@@ -61,8 +61,9 @@ Use this checklist before publishing a public source or binary release.
   stack-count consistency, error-free input summary checks, tag-readiness
   blocker-count consistency, tag-readiness blocker entry-shape checks,
   tag-readiness ready-flag consistency, tag-readiness blocker-absence
-  consistency, plus explicit source-only no-binary flags. The handoff accepts
-  prerequisite summaries only from their expected
+  consistency, and open-blocker evidence fields, plus explicit source-only
+  no-binary flags. The handoff accepts prerequisite summaries only from their
+  expected
   ignored `build/` output roots; it does not merge, tag, push, publish, or
   upload anything.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\verify-windows-bundle.ps1`

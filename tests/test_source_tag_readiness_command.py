@@ -26,6 +26,7 @@ def test_source_tag_readiness_seed_defines_read_only_command() -> None:
     assert seed["policy"]["no_git_push"] is True
     assert seed["policy"]["no_github_release_publish"] is True
     assert seed["policy"]["nonzero_when_blocked"] is True
+    assert seed["policy"]["requires_open_blocker_evidence_fields"] is True
     assert seed["inputs"]["blocker_inventory"] == (
         "config/release-blocker-inventory.seed.json"
     )
@@ -71,7 +72,7 @@ def test_source_tag_readiness_reports_current_blockers(tmp_path: Path) -> None:
             "-File",
             str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
             "-Tag",
-            "v0.68.0-source",
+            "v0.69.0-source",
             "-OutDir",
             str(out_dir),
         ],
@@ -86,11 +87,11 @@ def test_source_tag_readiness_reports_current_blockers(tmp_path: Path) -> None:
     assert "merge_stacked_pr_sequence" in result.stdout
 
     summary = json.loads(
-        (out_dir / "v0.68.0-source-tag-readiness.json").read_text(
+        (out_dir / "v0.69.0-source-tag-readiness.json").read_text(
             encoding="utf-8-sig"
         )
     )
-    assert summary["tag"] == "v0.68.0-source"
+    assert summary["tag"] == "v0.69.0-source"
     assert summary["ready_for_tag"] is False
     assert summary["source_only"] is True
     assert summary["ships_apk"] is False
@@ -98,11 +99,14 @@ def test_source_tag_readiness_reports_current_blockers(tmp_path: Path) -> None:
     assert summary["store_release"] is False
     assert summary["trusted_signing_claim"] is False
     assert summary["tag_creation_allowed"] is False
-    assert summary["latest_candidate"] == "v0.68.0-source"
+    assert summary["latest_candidate"] == "v0.69.0-source"
     assert summary["open_blocker_count"] >= 7
     assert "merge_stacked_pr_sequence" in {
         blocker["id"] for blocker in summary["open_blockers"]
     }
+    for blocker in summary["open_blockers"]:
+        assert blocker["required_before_tag"] is True
+        assert blocker["evidence"]
 
 
 def test_source_tag_readiness_is_documented_and_validated() -> None:

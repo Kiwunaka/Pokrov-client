@@ -223,6 +223,15 @@ try {
       break
     }
   }
+  foreach ($openBlocker in $tagOpenBlockers) {
+    if (
+      $openBlocker.required_before_tag -ne $true -or
+      [string]::IsNullOrWhiteSpace([string]$openBlocker.evidence)
+    ) {
+      $blockingErrors.Add("tag readiness open blockers are missing evidence fields")
+      break
+    }
+  }
   if ($tagOpenBlockerCount -gt 0 -and ($tagReadiness.ready_for_tag -eq $true -or $tagReadiness.tag_creation_allowed -eq $true)) {
     $blockingErrors.Add("tag readiness allows tag creation while blockers remain")
   }

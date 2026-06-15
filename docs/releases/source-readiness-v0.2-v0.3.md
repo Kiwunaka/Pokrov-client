@@ -1,10 +1,53 @@
-# Source Readiness: v0.2-v0.68
+# Source Readiness: v0.2-v0.69
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
 checklist is run on the exact commit. The machine-readable readiness inventory
 lives in
 [`config/source-release-readiness.seed.json`](../../config/source-release-readiness.seed.json).
+
+## v0.69.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #89: source tag-readiness open-blocker evidence fields and release merge
+  handoff validation for those fields
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- run `scripts/prepare-release-evidence-bundle.ps1` with the exact preflight
+  summary
+- run `scripts/validate-source-release-publication.ps1` with the exact release
+  evidence bundle and rendered release notes
+- run `scripts/check-release-merge-order.ps1`,
+  `scripts/check-release-stack-github-status.ps1`,
+  `scripts/check-source-tag-readiness.ps1`, and
+  `scripts/validate-source-release-publication.ps1` so each prerequisite
+  summary includes `generated_at`, `schema_version=1`, and `read_only=true`
+- confirm source tag-readiness open blockers include `required_before_tag=true`
+  and non-empty evidence
+- run `scripts/prepare-release-merge-handoff.ps1` with the exact merge-order,
+  GitHub-status, tag-readiness, and publication dry-run summaries
+- confirm the release merge handoff summary does not include
+  `tag readiness open blockers are missing evidence fields`
+- review the publication dry-run, release evidence bundle, preflight summary,
+  proof manifest, rendered GitHub Release body, and changelog section for the
+  exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
+Limitations:
+
+- Open-blocker evidence fields preserve maintainer context in generated
+  summaries; they do not clear manual maintainer blockers or authorize source
+  tags.
 
 ## v0.68.0-source Candidate
 
