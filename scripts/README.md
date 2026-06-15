@@ -22,6 +22,10 @@ Current helpers:
   mutate a device
 - `bootstrap-local.ps1`: copies example config seeds into `config/local/` without touching production paths unless explicitly forced
 - `prepare-oss-import.ps1`: runs the source-import tests and safe importer against a temporary snapshot/stage pair; rejects staging inside this public repo
+- `fetch-libcore-assets.ps1`: downloads local-only runtime archives from the
+  reviewed seed, verifies SHA-256 when public binary review has recorded one,
+  and rejects unsafe archive entries before extraction or host sync; it does
+  not commit, ship, sign, or approve runtime binaries
 - `prepare-source-release.ps1`: creates a source-only archive proof manifest with commit SHA, SHA-256, and explicit no-APK/no-EXE/no-store/no-signing flags
 - `render-source-release-notes.ps1`: renders a source-only GitHub Release body from a `prepare-source-release.ps1` proof manifest and refuses manifests that do not preserve source-only honesty flags
 - `check-source-release-copy.ps1`: checks the release policy, checklist, template, renderer, and optionally a rendered release note for source-only claim boundaries

@@ -76,6 +76,12 @@
       "candidate": "v0.51.0-source",
       "base": "codex/v0.50-android-native-ci",
       "head": "codex/v0.51-windows-bundle-verifier"
+    },
+    {
+      "pr": 72,
+      "candidate": "v0.52.0-source",
+      "base": "codex/v0.51-windows-bundle-verifier",
+      "head": "codex/v0.52-runtime-archive-hardening"
     }
   ]
 }

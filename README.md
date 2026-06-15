@@ -111,6 +111,7 @@ Source release status:
 | `v0.49.0-source` | Pending stacked PR, not tagged | Operator request trace and client-version headers are in the stacked PR queue. |
 | `v0.50.0-source` | Pending stacked PR, not tagged | Android native Gradle CI through source-only stubs is in the stacked PR queue. |
 | `v0.51.0-source` | Pending stacked PR, not tagged | Windows bundle verifier source-only proof is in the stacked PR queue. |
+| `v0.52.0-source` | Pending stacked PR, not tagged | Runtime archive extraction hardening is in the stacked PR queue. |
 
 ## Which App Should I Use?
 

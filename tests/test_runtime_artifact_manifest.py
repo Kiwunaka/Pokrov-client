@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 import json
+import io
 import re
+import shutil
+import subprocess
+import tarfile
 from pathlib import PurePosixPath, Path
 
 
@@ -100,7 +104,70 @@ def test_fetch_libcore_assets_enforces_hash_and_path_guards() -> None:
     assert "PENDING_PUBLIC_BINARY_REVIEW" in script
     assert "SHA-256 mismatch" in script
     assert "Assert-PathInsideRepo" in script
+    assert "Assert-RuntimeArchiveEntriesSafe" in script
+    assert "Unsafe runtime archive entry" in script
     assert "sync_destination" in script
+
+
+def test_fetch_libcore_assets_rejects_archive_path_traversal(tmp_path: Path) -> None:
+    tag = "vtest-unsafe-runtime-archive"
+    cache_root = ROOT / "artifacts" / "libcore" / tag
+    archive_path = cache_root / "_downloads" / "hiddify-core-windows-amd64.tar.gz"
+    escape_path = cache_root.parent / "escape.txt"
+    metadata_path = tmp_path / "release.json"
+    shutil.rmtree(cache_root, ignore_errors=True)
+    escape_path.unlink(missing_ok=True)
+
+    try:
+        archive_path.parent.mkdir(parents=True, exist_ok=True)
+        with tarfile.open(archive_path, "w:gz") as archive:
+            info = tarfile.TarInfo("../escape.txt")
+            payload = b"should not be extracted"
+            info.size = len(payload)
+            archive.addfile(info, fileobj=io.BytesIO(payload))
+
+        metadata_path.write_text(
+            json.dumps(
+                {
+                    "assets": [
+                        {
+                            "name": "hiddify-core-windows-amd64.tar.gz",
+                            "browser_download_url": "https://example.invalid/runtime.tar.gz",
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "fetch-libcore-assets.ps1"),
+                "-Tag",
+                tag,
+                "-Platforms",
+                "windows",
+                "-ReleaseMetadataPath",
+                str(metadata_path),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        output = result.stdout + result.stderr
+        assert result.returncode != 0
+        assert "Unsafe runtime archive entry" in output
+        assert "../escape.txt" in output
+        assert not escape_path.exists()
+    finally:
+        shutil.rmtree(cache_root, ignore_errors=True)
+        escape_path.unlink(missing_ok=True)
 
 
 def test_runtime_artifacts_cache_is_ignored() -> None:

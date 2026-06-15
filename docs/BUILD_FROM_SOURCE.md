@@ -209,7 +209,10 @@ Downloaded artifacts land under ignored local folders and must not be committed.
 When an asset entry still uses `PENDING_PUBLIC_BINARY_REVIEW`, the fetch helper
 prints a warning and treats the archive as local-only test material. After a
 public binary review records a real 64-character SHA-256 in the manifest, the
-helper verifies the downloaded archive before extraction or host sync.
+helper verifies the downloaded archive before extraction or host sync. Before
+extracting, it also lists archive entries and refuses absolute paths, drive
+paths, backslashes, or `..` traversal entries so local runtime archives cannot
+escape the ignored runtime cache or host sync destination.
 
 ## Tests
 
