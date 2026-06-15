@@ -99,7 +99,14 @@ Start with:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\doctor.ps1 -Json
 powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\verify-windows-bundle.ps1
 ```
+
+The Windows bundle verifier writes source-only Windows bundle proof under
+ignored `build/windows-bundle-verifier/`. It checks that required Windows shell
+source files are present and that Windows binaries, archives, signing files,
+and local runtime artifacts were not committed. It does not build, sign,
+package, publish, or download runtime artifacts.
 
 ### Clean-clone or source-boundary proof fails
 

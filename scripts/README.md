@@ -50,6 +50,11 @@ Current helpers:
   readiness summaries into an ignored
   `build/release-merge-handoff/` maintainer handoff report without merging,
   tagging, pushing, publishing, or uploading anything
+- `verify-windows-bundle.ps1`: Windows bundle verifier for source-only Windows
+  bundle proof; checks required Windows shell source paths and rejects
+  committed Windows binaries, archives, signing files, or local runtime
+  artifacts while writing ignored `build/windows-bundle-verifier/` output; it
+  does not build, sign, package, publish, or download runtime artifacts
 - `check-github-ruleset.ps1`: read-only GitHub settings verifier for repository
   rulesets or branch protection; uses `gh api`, supports `-ReportOnly -Json`,
   and does not create, edit, or delete remote settings

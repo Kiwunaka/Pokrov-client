@@ -248,6 +248,18 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run-android-native-tests.ps1
 
 Windows runtime smoke requires the fetched native runtime artifacts.
 
+Run the Windows bundle verifier before source release review:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\verify-windows-bundle.ps1
+```
+
+The Windows bundle verifier writes source-only Windows bundle proof under
+ignored `build/windows-bundle-verifier/`. It checks the public Windows shell
+source paths and refuses committed Windows binaries, archives, signing files,
+or local runtime artifacts. It does not build, sign, package, publish, or
+download runtime artifacts.
+
 ## Clean Clone Proof
 
 Maintainers can verify that the public tree works from a fresh clone and does
