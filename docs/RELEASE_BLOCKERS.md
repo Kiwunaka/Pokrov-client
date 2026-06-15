@@ -60,8 +60,9 @@ publication dry-run summaries exist. The command is read-only, writes ignored
 records input generated-at timestamps, schema versions, read-only input
 summary checks, stack-count consistency, error-free input summary checks,
 tag-readiness blocker-count consistency, tag-readiness blocker entry-shape
-checks, tag-readiness ready-flag consistency, and explicit source-only
-no-binary flags plus the next manual maintainer steps without merging,
+checks, tag-readiness ready-flag consistency, tag-readiness blocker-absence
+consistency, and explicit source-only no-binary flags plus the next manual
+maintainer steps without merging,
 tagging, pushing, publishing, or uploading anything. The input summaries must
 come from the expected ignored `build/` output roots.
 

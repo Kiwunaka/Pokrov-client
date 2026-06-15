@@ -168,6 +168,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.65.0-source` | Pending stacked PR, not tagged | Release merge handoff tag-readiness blocker-count consistency is in the stacked PR queue. |
 | `v0.66.0-source` | Pending stacked PR, not tagged | Release merge handoff tag-readiness blocker entry-shape checks are in the stacked PR queue. |
 | `v0.67.0-source` | Pending stacked PR, not tagged | Release merge handoff tag-readiness ready-flag consistency is in the stacked PR queue. |
+| `v0.68.0-source` | Pending stacked PR, not tagged | Release merge handoff tag-readiness blocker-absence consistency is in the stacked PR queue. |
 
 ## Architecture Boundary
 
