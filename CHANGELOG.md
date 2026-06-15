@@ -131,8 +131,10 @@ production readiness without matching public evidence.
   maintainer handoff cannot be ready without final no-publish review evidence.
 - Added release merge handoff input fingerprints so maintainer handoff evidence
   records SHA-256 proofs for every release summary it consumed.
+- Added source-only flags to the release merge handoff summary so the final
+  maintainer artifact carries explicit no-binary release boundaries.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.57.0-source` candidates.
+  `v0.58.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -195,6 +197,7 @@ production readiness without matching public evidence.
 | `v0.55.0-source` | Pending stacked PR, not tagged | PR #75 |
 | `v0.56.0-source` | Pending stacked PR, not tagged | PR #76 |
 | `v0.57.0-source` | Pending stacked PR, not tagged | PR #77 |
+| `v0.58.0-source` | Pending stacked PR, not tagged | PR #78 |
 
 ### Still Source-Only
 

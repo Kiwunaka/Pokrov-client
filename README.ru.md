@@ -20,6 +20,10 @@ Source readiness note: `v0.57.0-source` is a pending stacked PR for release
 merge handoff input fingerprints; it is not tagged and does not ship APK/EXE
 binaries.
 
+Source readiness note: `v0.58.0-source` is a pending stacked PR for release
+merge handoff source-only flags; it is not tagged and does not ship APK/EXE
+binaries.
+
 <p align="center">
   <img src="assets/brand/pokrov-oss-hero.png" alt="POKROV Client open-source hero artwork" width="100%">
 </p>

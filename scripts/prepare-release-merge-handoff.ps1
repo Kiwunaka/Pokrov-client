@@ -165,6 +165,11 @@ try {
     generated_at = (Get-Date).ToUniversalTime().ToString("o")
     read_only = $true
     handoff_ready_for_maintainer = [bool]$handoff_ready_for_maintainer
+    source_only = $true
+    no_apk = $true
+    no_exe = $true
+    no_store_release = $true
+    no_trusted_signing_claim = $true
     manual_merge_required = $true
     manual_tag_required = $true
     publish_performed = $false

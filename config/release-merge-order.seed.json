@@ -112,6 +112,12 @@
       "candidate": "v0.57.0-source",
       "base": "codex/v0.56-merge-handoff-publication-proof",
       "head": "codex/v0.57-merge-handoff-input-fingerprints"
+    },
+    {
+      "pr": 78,
+      "candidate": "v0.58.0-source",
+      "base": "codex/v0.57-merge-handoff-input-fingerprints",
+      "head": "codex/v0.58-merge-handoff-source-flags"
     }
   ]
 }
