@@ -34,6 +34,13 @@ try {
   $readinessPath = Join-Path $root "config\source-release-readiness.seed.json"
   $inventory = Read-JsonFile -Path $inventoryPath
   $readiness = Read-JsonFile -Path $readinessPath
+  $errors = [System.Collections.Generic.List[string]]::new()
+  $latestCandidate = [string]$inventory.tracked_candidates.latest_candidate
+  if ([string]::IsNullOrWhiteSpace($latestCandidate)) {
+    $errors.Add("latest blocker inventory candidate is missing")
+  } elseif ($Tag -ne $latestCandidate) {
+    $errors.Add("requested tag does not match latest blocker inventory candidate")
+  }
 
   $milestone = $readiness.milestones | Where-Object { $_.tag -eq $Tag } | Select-Object -First 1
   if ($null -eq $milestone) {
@@ -57,6 +64,7 @@ try {
   $readyForTag = $false
   if ($inventory.tracked_candidates.tag_creation_allowed -eq $true -and
     $openBlockers.Count -eq 0 -and
+    $errors.Count -eq 0 -and
     $milestone.status -notlike "*not_tagged*") {
     $readyForTag = $true
   }
@@ -72,11 +80,13 @@ try {
     store_release = [bool]$inventory.store_release
     trusted_signing_claim = [bool]$inventory.trusted_signing_claim
     status = $inventory.status
-    latest_candidate = $inventory.tracked_candidates.latest_candidate
+    latest_candidate = $latestCandidate
     latest_stacked_pr = [int]$inventory.tracked_candidates.latest_stacked_pr
     tag_creation_allowed = [bool]$inventory.tracked_candidates.tag_creation_allowed
     milestone_status = $milestone.status
     milestone_evidence = $milestone.evidence
+    error_count = [int]$errors.Count
+    errors = @($errors)
     open_blocker_count = [int]$openBlockers.Count
     open_blockers = @(
       $openBlockers | ForEach-Object {
@@ -105,6 +115,9 @@ try {
   }
 
   Write-Host "Source tag readiness: NOT READY" -ForegroundColor Yellow
+  foreach ($errorMessage in $errors) {
+    Write-Host "- $errorMessage"
+  }
   Write-Host "Open blockers: $($openBlockers.Count)"
   foreach ($blocker in $openBlockers) {
     Write-Host "- $($blocker.id): $($blocker.status)"

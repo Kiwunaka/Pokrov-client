@@ -202,6 +202,12 @@
       "candidate": "v0.72.0-source",
       "base": "codex/v0.71-handoff-seed-candidate-paths",
       "head": "codex/v0.72-handoff-blocker-inventory-match"
+    },
+    {
+      "pr": 93,
+      "candidate": "v0.73.0-source",
+      "base": "codex/v0.72-handoff-blocker-inventory-match",
+      "head": "codex/v0.73-tag-readiness-latest-candidate"
     }
   ]
 }
