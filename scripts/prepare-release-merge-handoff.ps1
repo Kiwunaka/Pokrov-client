@@ -144,6 +144,8 @@ Push-Location $root
 try {
   $seedPath = Join-Path $root "config\release-merge-handoff.seed.json"
   $seed = Read-JsonFile -Path $seedPath
+  $blockerInventoryPath = Join-Path $root "config\release-blocker-inventory.seed.json"
+  $blockerInventory = Read-JsonFile -Path $blockerInventoryPath
 
   $mergeOrderPath = Get-InputPath -ProvidedPath $MergeOrderPath -DefaultPath $seed.inputs.merge_order
   $githubStatusPath = Get-InputPath -ProvidedPath $GithubStatusPath -DefaultPath $seed.inputs.github_status
@@ -248,6 +250,12 @@ try {
   if (@($candidateValues).Count -ne 1) {
     $blockingErrors.Add("input summaries do not agree on latest candidate")
   }
+  $blockerInventoryLatestCandidate = [string]$blockerInventory.tracked_candidates.latest_candidate
+  if ([string]::IsNullOrWhiteSpace($blockerInventoryLatestCandidate)) {
+    $blockingErrors.Add("release blocker inventory latest candidate is missing")
+  } elseif (@($candidateValues).Count -eq 1 -and [string]@($candidateValues)[0] -ne $blockerInventoryLatestCandidate) {
+    $blockingErrors.Add("release handoff latest candidate does not match blocker inventory")
+  }
   $prValues = @(
     [int]$mergeOrder.latest_pr,
     [int]$githubStatus.latest_pr
@@ -256,6 +264,12 @@ try {
     $blockingErrors.Add("input summaries do not agree on latest PR")
   } elseif ([int]$tagReadiness.latest_stacked_pr -ne [int]@($prValues)[0]) {
     $blockingErrors.Add("tag readiness latest stacked PR mismatch")
+  }
+  $blockerInventoryLatestPr = [int]$blockerInventory.tracked_candidates.latest_stacked_pr
+  if ($blockerInventoryLatestPr -le 0) {
+    $blockingErrors.Add("release blocker inventory latest PR is missing")
+  } elseif (@($prValues).Count -eq 1 -and [int]@($prValues)[0] -ne $blockerInventoryLatestPr) {
+    $blockingErrors.Add("release handoff latest PR does not match blocker inventory")
   }
   $stackCountValues = @(
     [int]$mergeOrder.stack_count,
@@ -307,9 +321,12 @@ try {
     tag_creation_allowed = [bool]$tagReadiness.tag_creation_allowed
     latest_candidate = if (@($candidateValues).Count -gt 0) { [string]@($candidateValues)[0] } else { "" }
     latest_pr = if (@($prValues).Count -gt 0) { [int]@($prValues)[0] } else { 0 }
+    blocker_inventory_latest_candidate = [string]$blockerInventoryLatestCandidate
+    blocker_inventory_latest_pr = [int]$blockerInventoryLatestPr
     merge_order_ok = [bool]$mergeOrder.merge_order_ok
     github_status_ok = [bool]$githubStatus.github_status_ok
     input_fingerprints = [ordered]@{
+      blocker_inventory = Get-InputFingerprint -Path $blockerInventoryPath
       merge_order = Get-InputFingerprint -Path $mergeOrderPath
       github_status = Get-InputFingerprint -Path $githubStatusPath
       tag_readiness = Get-InputFingerprint -Path $tagReadinessPath
