@@ -71,19 +71,21 @@ files.
 ### Android host fails
 
 Check Android Studio or Android SDK/JDK setup first. The public source tree
-contains the Android host and Gradle wrapper, but Android Gradle unit tests need
-compatible local SDK/JDK tooling and, for runtime lanes, local-only runtime
-artifacts. Runtime artifacts are not committed to source-only releases.
+contains the Android host and Gradle wrapper. Android native Gradle unit tests
+can run in the source-only stub lane without private runtime artifacts:
 
 Useful checks:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\doctor.ps1 -Json
 powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\run-android-native-tests.ps1 -SourceOnly
 ```
 
-Only run Android Gradle runtime tests after fetching local runtime artifacts as
-described in [Build from source](BUILD_FROM_SOURCE.md).
+The source-only stub lane does not fetch or commit libcore.aar and does not
+prove APK, store, trusted signing, or runtime readiness. Only run Android
+Gradle runtime-backed tests after fetching local runtime artifacts as described
+in [Build from source](BUILD_FROM_SOURCE.md).
 
 ### Windows host fails
 

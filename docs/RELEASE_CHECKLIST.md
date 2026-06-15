@@ -64,7 +64,7 @@ Use this checklist before publishing a public source or binary release.
 - Required checks policy in [REQUIRED_CHECKS.md](REQUIRED_CHECKS.md) still
   matches `.github/workflows/ci.yml` and `config/required-checks.seed.json`,
   including `Source import and public tree checks` and
-  `Flutter analyze and tests`.
+  `Flutter analyze and tests`, and `Android native Gradle unit tests`.
 - GitHub ruleset setup in [GITHUB_RULESET_SETUP.md](GITHUB_RULESET_SETUP.md)
   still matches `config/github-ruleset.seed.json`; do not claim remote
   enforcement until GitHub settings are configured and observed.

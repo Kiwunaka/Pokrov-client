@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reviewed_at": "2026-06-14",
+  "reviewed_at": "2026-06-15",
   "workflow": ".github/workflows/ci.yml",
   "policy": {
     "pull_request_ci_required": true,
@@ -10,12 +10,14 @@
     "clean_clone_source_boundary_required": true,
     "flutter_analyze_required": true,
     "workspace_tests_required": true,
+    "android_native_gradle_required": true,
     "branch_protection_documented_not_claimed": true,
     "skip_test_commands_forbidden_for_public_release": true
   },
   "required_jobs": [
     "Source import and public tree checks",
-    "Flutter analyze and tests"
+    "Flutter analyze and tests",
+    "Android native Gradle unit tests"
   ],
   "required_steps": [
     "Run Python contract tests",
@@ -27,12 +29,14 @@
     "Export white-label token smoke",
     "Verify clean clone source boundary",
     "Analyze shared app shell",
-    "Run workspace tests"
+    "Run workspace tests",
+    "Run Android native Gradle unit tests"
   ],
   "release_required_commands": [
     "python -m pytest tests",
     "powershell -ExecutionPolicy Bypass -File .\\scripts\\validate-seed.ps1",
     "powershell -ExecutionPolicy Bypass -File .\\scripts\\run-tests.ps1",
+    "powershell -ExecutionPolicy Bypass -File .\\scripts\\run-android-native-tests.ps1 -SourceOnly",
     "powershell -ExecutionPolicy Bypass -File .\\scripts\\source-release-preflight.ps1 -RequireTag",
     "powershell -ExecutionPolicy Bypass -File .\\scripts\\verify-clean-clone.ps1"
   ],

@@ -985,7 +985,7 @@ if (Test-Path -LiteralPath $requiredChecksPath -PathType Leaf) {
     $fullDocPath = Join-Path $root $relativeDocPath
     if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
       $docText = Get-Content -Raw -LiteralPath $fullDocPath
-      foreach ($requiredPhrase in @("Required checks", "Source import and public tree checks", "Flutter analyze and tests", "-SkipTestCommands", "source-only")) {
+      foreach ($requiredPhrase in @("Required checks", "Source import and public tree checks", "Flutter analyze and tests", "Android native Gradle unit tests", "-SkipTestCommands", "source-only")) {
         if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
           $manifestErrors.Add("$docPath must include '$requiredPhrase' for required checks policy")
         }
@@ -1042,7 +1042,7 @@ if (Test-Path -LiteralPath $githubRulesetPath -PathType Leaf) {
   $githubRulesetDocPath = Join-Path $root "docs\\GITHUB_RULESET_SETUP.md"
   if (Test-Path -LiteralPath $githubRulesetDocPath -PathType Leaf) {
     $githubRulesetDoc = Get-Content -Raw -LiteralPath $githubRulesetDocPath
-    foreach ($requiredPhrase in @("not proof that remote GitHub settings are already active", "scripts/check-github-ruleset.ps1", "Source import and public tree checks", "Flutter analyze and tests", "CODEOWNERS review", "conversation resolution", "blocked force pushes", "blocked branch deletion", "a test pull request without required checks cannot be merged", "do not prove APK, EXE, store release, trusted signing")) {
+    foreach ($requiredPhrase in @("not proof that remote GitHub settings are already active", "scripts/check-github-ruleset.ps1", "Source import and public tree checks", "Flutter analyze and tests", "Android native Gradle unit tests", "CODEOWNERS review", "conversation resolution", "blocked force pushes", "blocked branch deletion", "a test pull request without required checks cannot be merged", "do not prove APK, EXE, store release, trusted signing")) {
       if ($githubRulesetDoc.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
         $manifestErrors.Add("docs\\GITHUB_RULESET_SETUP.md must include '$requiredPhrase'")
       }
@@ -1378,7 +1378,7 @@ if (Test-Path -LiteralPath $releaseStackGithubStatusPath -PathType Leaf) {
     }
   }
 
-  foreach ($requiredCheck in @("Source import and public tree checks", "Flutter analyze and tests")) {
+  foreach ($requiredCheck in @("Source import and public tree checks", "Flutter analyze and tests", "Android native Gradle unit tests")) {
     if (@($releaseStackGithubStatus.required_status_checks) -notcontains $requiredCheck) {
       $manifestErrors.Add("config\\release-stack-github-status.seed.json must require '$requiredCheck'")
     }

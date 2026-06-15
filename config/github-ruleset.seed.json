@@ -1,13 +1,14 @@
 {
   "schema_version": 1,
-  "reviewed_at": "2026-06-14",
+  "reviewed_at": "2026-06-15",
   "mode": "setup_guidance_not_remote_enforcement",
   "docs": "docs/GITHUB_RULESET_SETUP.md",
   "verifier_script": "scripts/check-github-ruleset.ps1",
   "target_branches": ["main"],
   "required_status_checks": [
     "Source import and public tree checks",
-    "Flutter analyze and tests"
+    "Flutter analyze and tests",
+    "Android native Gradle unit tests"
   ],
   "policy": {
     "repository_ruleset_preferred": true,

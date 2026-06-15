@@ -10,6 +10,10 @@ Current helpers:
 - `validate-seed.ps1`: checks the public Android/Windows scaffold, shared packages, and JSON config seeds
 - `bootstrap-workspace.ps1`: runs `flutter pub get` across the clean-room packages and available host entrypoints; pass `-OfflinePubGet` when an old Flutter/Dart pub advisory fetch breaks online dependency resolution but the local package cache is already populated
 - `run-tests.ps1`: bootstraps the workspace and runs the shared shell widget tests; accepts `-OfflinePubGet` and forwards it to bootstrap
+- `run-android-native-tests.ps1`: runs Android native Gradle unit tests for the
+  Android shell; pass `-SourceOnly` for the CI-safe source-only stub lane that
+  does not fetch or commit libcore.aar and does not prove APK, store, trusted
+  signing, or runtime readiness
 - `run-operator-fixture-smoke.ps1`: starts the local operator API fixture on a smoke-only port, checks session/profile/apps/support/error-mode responses, then stops the fixture; pass `-Port` to avoid local or CI collisions
 - `android-device-smoke.ps1`: runs the Android device validation local
   precheck against public source files and writes a claim-safe

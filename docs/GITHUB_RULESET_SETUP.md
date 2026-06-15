@@ -25,6 +25,7 @@ Require:
 - required status checks:
   - `Source import and public tree checks`
   - `Flutter analyze and tests`
+  - `Android native Gradle unit tests`
 - CODEOWNERS review for matching paths
 - conversation resolution before merge
 - blocked force pushes

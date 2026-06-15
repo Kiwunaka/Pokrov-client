@@ -226,12 +226,24 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1
 ```
 
 By default this runs Flutter tests for the shared packages and imported host
-apps. The Android Gradle unit lane requires Android SDK/JDK compatibility and
-the fetched `libcore.aar`, so it is opt-in:
+apps. CI also runs Android native Gradle unit tests through a source-only stub
+lane:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\run-android-native-tests.ps1 -SourceOnly
+```
+
+The source-only stub lane does not fetch or commit libcore.aar and does not
+prove APK, store, trusted signing, or runtime readiness. It only proves that the
+public Android Kotlin unit tests compile and pass without private runtime
+artifacts.
+
+Maintainers can run the runtime-backed Android native lane after fetching the
+local runtime artifact:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\fetch-libcore-assets.ps1 -Platforms @("android") -SyncToHosts
-powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1 -RunAndroidGradle
+powershell -ExecutionPolicy Bypass -File .\scripts\run-android-native-tests.ps1
 ```
 
 Windows runtime smoke requires the fetched native runtime artifacts.
@@ -252,8 +264,8 @@ powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1 -SkipF
 ```
 
 The GitHub Actions CI workflow runs the source-import tests, source-release
-preflight smoke, a clean-clone source-boundary pass, `flutter analyze`, and the
-workspace Flutter tests.
+preflight smoke, a clean-clone source-boundary pass, `flutter analyze`, the
+workspace Flutter tests, and the Android native Gradle source-only stub lane.
 
 ## Local Config
 

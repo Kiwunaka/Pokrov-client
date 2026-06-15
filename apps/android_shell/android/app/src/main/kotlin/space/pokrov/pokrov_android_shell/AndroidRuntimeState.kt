@@ -159,7 +159,13 @@ internal object AndroidRuntimeState {
             else -> AndroidRuntimePhase.ARTIFACT_MISSING
         }
         lastStopReason = stopReason
-        if (message == NativeBranding.message("{app} отключен на этом устройстве.") && shouldPreserveFailureMessage()) {
+        if (
+            shouldPreserveFailureMessage() &&
+                (
+                    stopReason == "service_destroyed" ||
+                        message == NativeBranding.message("{app} отключен на этом устройстве.")
+                )
+        ) {
             return
         }
         lastMessage = message
