@@ -45,7 +45,9 @@ smoke coverage and must not be used for publishing a public source release.
 Use `scripts/prepare-release-evidence-bundle.ps1` after source preflight to
 collect the preflight summary, source-only flags, proof paths, and optional
 GitHub ruleset report into one release evidence bundle under ignored `build/`
-output. The bundle is a maintainer handoff artifact, not a release publisher.
+output. The bundle requires the preflight Windows bundle verifier proof before
+it can be treated as complete release evidence. The bundle is a maintainer
+handoff artifact, not a release publisher.
 
 Use `scripts/validate-source-release-publication.ps1` as the publication dry-run
 before manual GitHub Release creation. It validates the release

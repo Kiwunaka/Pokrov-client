@@ -43,10 +43,10 @@ def _merge_order_summary(ok: bool = True) -> dict:
         "read_only": True,
         "merge_order_ok": ok,
         "linear_base_to_head_chain": ok,
-        "stack_count": 13,
-        "latest_pr": 73,
-        "latest_candidate": "v0.53.0-source",
-        "errors": [] if ok else ["PR #73 base must equal previous head"],
+        "stack_count": 14,
+        "latest_pr": 74,
+        "latest_candidate": "v0.54.0-source",
+        "errors": [] if ok else ["PR #74 base must equal previous head"],
     }
 
 
@@ -55,15 +55,15 @@ def _github_status_summary(ok: bool = True) -> dict:
         "schema_version": 1,
         "read_only": True,
         "github_status_ok": ok,
-        "stack_count": 13,
-        "latest_pr": 73,
-        "latest_candidate": "v0.53.0-source",
+        "stack_count": 14,
+        "latest_pr": 74,
+        "latest_candidate": "v0.54.0-source",
         "clean_pr_count": 12 if ok else 11,
         "draft_pr_count": 0,
         "unclean_pr_count": 0 if ok else 1,
-        "successful_check_count": 39 if ok else 38,
+        "successful_check_count": 42 if ok else 41,
         "failed_check_count": 0 if ok else 1,
-        "errors": [] if ok else ["PR #73 check 'Flutter analyze and tests' is FAILURE"],
+        "errors": [] if ok else ["PR #74 check 'Flutter analyze and tests' is FAILURE"],
     }
 
 
@@ -71,7 +71,7 @@ def _tag_readiness_summary(ready: bool = False) -> dict:
     return {
         "schema_version": 1,
         "read_only": True,
-        "tag": "v0.53.0-source",
+        "tag": "v0.54.0-source",
         "ready_for_tag": ready,
         "source_only": True,
         "ships_apk": False,
@@ -79,7 +79,7 @@ def _tag_readiness_summary(ready: bool = False) -> dict:
         "store_release": False,
         "trusted_signing_claim": False,
         "tag_creation_allowed": ready,
-        "latest_candidate": "v0.53.0-source",
+        "latest_candidate": "v0.54.0-source",
         "open_blocker_count": 0 if ready else 7,
         "open_blockers": []
         if ready
@@ -89,8 +89,8 @@ def _tag_readiness_summary(ready: bool = False) -> dict:
 
 def _stale_tag_readiness_summary() -> dict:
     summary = _tag_readiness_summary()
-    summary["tag"] = "v0.52.0-source"
-    summary["latest_candidate"] = "v0.52.0-source"
+    summary["tag"] = "v0.53.0-source"
+    summary["latest_candidate"] = "v0.53.0-source"
     return summary
 
 
@@ -103,7 +103,7 @@ def _write_input_summaries(
 ) -> tuple[Path, Path, Path]:
     merge_path = tmp_path / "release-merge-order.json"
     github_path = tmp_path / "release-stack-github-status.json"
-    tag_path = tmp_path / "v0.53.0-source-tag-readiness.json"
+    tag_path = tmp_path / "v0.54.0-source-tag-readiness.json"
     _write_json(merge_path, _merge_order_summary(merge_ok))
     _write_json(github_path, _github_status_summary(github_ok))
     _write_json(tag_path, _tag_readiness_summary(tag_ready))
@@ -200,8 +200,8 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
     assert summary["manual_tag_required"] is True
     assert summary["publish_performed"] is False
     assert summary["tag_push_performed"] is False
-    assert summary["latest_candidate"] == "v0.53.0-source"
-    assert summary["latest_pr"] == 73
+    assert summary["latest_candidate"] == "v0.54.0-source"
+    assert summary["latest_pr"] == 74
     assert "merge stacked PRs in order" in " ".join(summary["next_manual_steps"])
     assert summary["blocking_errors"] == []
 
@@ -220,7 +220,7 @@ def test_release_merge_handoff_uses_seed_default_input_paths() -> None:
         ROOT
         / "build"
         / "source-tag-readiness"
-        / "v0.53.0-source-tag-readiness.json"
+        / "v0.54.0-source-tag-readiness.json"
     )
     out_dir = ROOT / "build" / "release-merge-handoff"
     summary_path = out_dir / "release-merge-handoff.json"
@@ -256,8 +256,8 @@ def test_release_merge_handoff_uses_seed_default_input_paths() -> None:
         assert result.returncode == 0, result.stderr + result.stdout
         summary = json.loads(summary_path.read_text(encoding="utf-8-sig"))
         assert summary["handoff_ready_for_maintainer"] is True
-        assert summary["latest_candidate"] == "v0.53.0-source"
-        assert summary["latest_pr"] == 73
+        assert summary["latest_candidate"] == "v0.54.0-source"
+        assert summary["latest_pr"] == 74
     finally:
         _restore_files(snapshots)
 

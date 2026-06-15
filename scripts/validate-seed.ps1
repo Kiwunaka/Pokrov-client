@@ -1183,13 +1183,13 @@ if (Test-Path -LiteralPath $releaseEvidencePath -PathType Leaf) {
     $manifestErrors.Add("config\\release-evidence-bundle.seed.json must keep default output under ignored build/release-evidence")
   }
 
-  foreach ($field in @("source_only_boundary_required", "no_publish_side_effects", "writes_only_ignored_build_output", "ruleset_report_may_be_failing", "failing_ruleset_report_blocks_enforcement_claims", "does_not_replace_full_preflight")) {
+  foreach ($field in @("source_only_boundary_required", "no_publish_side_effects", "writes_only_ignored_build_output", "ruleset_report_may_be_failing", "failing_ruleset_report_blocks_enforcement_claims", "does_not_replace_full_preflight", "windows_bundle_verifier_required")) {
     if ($releaseEvidence.policy.$field -ne $true) {
       $manifestErrors.Add("config\\release-evidence-bundle.seed.json policy.$field must remain true")
     }
   }
 
-  foreach ($flag in @("source_only", "no_apk", "no_exe", "no_store_release", "no_trusted_signing_claim")) {
+  foreach ($flag in @("source_only", "no_apk", "no_exe", "no_store_release", "no_trusted_signing_claim", "windows_bundle_verifier_ok")) {
     if (@($releaseEvidence.required_summary_flags) -notcontains $flag) {
       $manifestErrors.Add("config\\release-evidence-bundle.seed.json must require summary flag '$flag'")
     }
@@ -1198,7 +1198,7 @@ if (Test-Path -LiteralPath $releaseEvidencePath -PathType Leaf) {
   $releaseEvidenceScriptPath = Join-Path $root "scripts\\prepare-release-evidence-bundle.ps1"
   if (Test-Path -LiteralPath $releaseEvidenceScriptPath -PathType Leaf) {
     $releaseEvidenceScript = Get-Content -Raw -LiteralPath $releaseEvidenceScriptPath
-    foreach ($requiredPhrase in @("Assert-SourceOnlySummary", "check-github-ruleset.ps1 -ReportOnly -Json", "github_enforcement_claim_allowed", "ships_apk = `$false", "ships_exe = `$false", "store_release = `$false", "trusted_signing_claim = `$false", "official_binary_claim = `$false", "build\release-evidence")) {
+    foreach ($requiredPhrase in @("Assert-SourceOnlySummary", "check-github-ruleset.ps1 -ReportOnly -Json", "github_enforcement_claim_allowed", "ships_apk = `$false", "ships_exe = `$false", "store_release = `$false", "trusted_signing_claim = `$false", "official_binary_claim = `$false", "windows_bundle_verifier_ok", "windows_bundle_verifier_summary", "build\release-evidence")) {
       if ($releaseEvidenceScript.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
         $manifestErrors.Add("scripts\\prepare-release-evidence-bundle.ps1 must include '$requiredPhrase'")
       }
