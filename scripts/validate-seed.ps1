@@ -1235,13 +1235,13 @@ if (Test-Path -LiteralPath $publicationDryRunPath -PathType Leaf) {
     $manifestErrors.Add("config\\source-release-publication-dry-run.seed.json must keep default output under ignored build/source-release-publication")
   }
 
-  foreach ($field in @("dry_run_only", "no_github_release_publish", "no_tag_push", "writes_only_ignored_build_output", "requires_source_only_evidence_bundle", "requires_release_copy_check", "github_enforcement_claim_requires_bundle_approval")) {
+  foreach ($field in @("dry_run_only", "no_github_release_publish", "no_tag_push", "writes_only_ignored_build_output", "requires_source_only_evidence_bundle", "requires_release_copy_check", "github_enforcement_claim_requires_bundle_approval", "windows_bundle_verifier_claim_requires_bundle_proof")) {
     if ($publicationDryRun.policy.$field -ne $true) {
       $manifestErrors.Add("config\\source-release-publication-dry-run.seed.json policy.$field must remain true")
     }
   }
 
-  foreach ($flag in @("source_only", "no_apk", "no_exe", "no_store_release", "no_trusted_signing_claim")) {
+  foreach ($flag in @("source_only", "no_apk", "no_exe", "no_store_release", "no_trusted_signing_claim", "windows_bundle_verifier_ok")) {
     if (@($publicationDryRun.required_evidence_flags) -notcontains $flag) {
       $manifestErrors.Add("config\\source-release-publication-dry-run.seed.json must require evidence flag '$flag'")
     }
@@ -1256,7 +1256,7 @@ if (Test-Path -LiteralPath $publicationDryRunPath -PathType Leaf) {
   $publicationDryRunScriptPath = Join-Path $root "scripts\\validate-source-release-publication.ps1"
   if (Test-Path -LiteralPath $publicationDryRunScriptPath -PathType Leaf) {
     $publicationDryRunScript = Get-Content -Raw -LiteralPath $publicationDryRunScriptPath
-    foreach ($requiredPhrase in @("check-source-release-copy.ps1", "github_enforcement_claim_allowed", "publish_performed = `$false", "tag_push_performed = `$false", "dry_run_only = `$true", "build\source-release-publication")) {
+    foreach ($requiredPhrase in @("check-source-release-copy.ps1", "github_enforcement_claim_allowed", "publish_performed = `$false", "tag_push_performed = `$false", "dry_run_only = `$true", "windows_bundle_verifier_ok", "windows_bundle_verifier_summary", "build\source-release-publication")) {
       if ($publicationDryRunScript.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
         $manifestErrors.Add("scripts\\validate-source-release-publication.ps1 must include '$requiredPhrase'")
       }

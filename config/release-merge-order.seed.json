@@ -94,6 +94,12 @@
       "candidate": "v0.54.0-source",
       "base": "codex/v0.53-windows-verifier-preflight",
       "head": "codex/v0.54-release-evidence-windows-proof"
+    },
+    {
+      "pr": 75,
+      "candidate": "v0.55.0-source",
+      "base": "codex/v0.54-release-evidence-windows-proof",
+      "head": "codex/v0.55-publication-windows-proof"
     }
   ]
 }

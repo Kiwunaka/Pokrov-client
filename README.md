@@ -114,6 +114,7 @@ Source release status:
 | `v0.52.0-source` | Pending stacked PR, not tagged | Runtime archive extraction hardening is in the stacked PR queue. |
 | `v0.53.0-source` | Pending stacked PR, not tagged | Windows verifier CI/preflight enforcement is in the stacked PR queue. |
 | `v0.54.0-source` | Pending stacked PR, not tagged | Release evidence bundle Windows proof gate is in the stacked PR queue. |
+| `v0.55.0-source` | Pending stacked PR, not tagged | Publication dry-run Windows proof gate is in the stacked PR queue. |
 
 ## Which App Should I Use?
 
