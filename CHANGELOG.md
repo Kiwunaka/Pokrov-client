@@ -129,8 +129,10 @@ production readiness without matching public evidence.
   seed default input paths.
 - Added release merge handoff enforcement for publication dry-run proof so the
   maintainer handoff cannot be ready without final no-publish review evidence.
+- Added release merge handoff input fingerprints so maintainer handoff evidence
+  records SHA-256 proofs for every release summary it consumed.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.56.0-source` candidates.
+  `v0.57.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -192,6 +194,7 @@ production readiness without matching public evidence.
 | `v0.54.0-source` | Pending stacked PR, not tagged | PR #74 |
 | `v0.55.0-source` | Pending stacked PR, not tagged | PR #75 |
 | `v0.56.0-source` | Pending stacked PR, not tagged | PR #76 |
+| `v0.57.0-source` | Pending stacked PR, not tagged | PR #77 |
 
 ### Still Source-Only
 

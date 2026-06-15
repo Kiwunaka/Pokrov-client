@@ -28,6 +28,25 @@ function Read-JsonFile {
   return Get-Content -Raw -LiteralPath $Path | ConvertFrom-Json
 }
 
+function Get-InputFingerprint {
+  param([Parameter(Mandatory = $true)][string]$Path)
+
+  $resolvedPath = [System.IO.Path]::GetFullPath($Path)
+  $stream = [System.IO.File]::OpenRead($resolvedPath)
+  $sha256 = [System.Security.Cryptography.SHA256]::Create()
+  try {
+    $hashBytes = $sha256.ComputeHash($stream)
+    $hash = [System.BitConverter]::ToString($hashBytes).Replace("-", "").ToLowerInvariant()
+  } finally {
+    $sha256.Dispose()
+    $stream.Dispose()
+  }
+  return [ordered]@{
+    path = $resolvedPath
+    sha256 = $hash
+  }
+}
+
 function Assert-BuildOutputPath {
   param([Parameter(Mandatory = $true)][string]$Path)
 
@@ -62,10 +81,14 @@ try {
   $seedPath = Join-Path $root "config\release-merge-handoff.seed.json"
   $seed = Read-JsonFile -Path $seedPath
 
-  $mergeOrder = Read-JsonFile -Path (Get-InputPath -ProvidedPath $MergeOrderPath -DefaultPath $seed.inputs.merge_order)
-  $githubStatus = Read-JsonFile -Path (Get-InputPath -ProvidedPath $GithubStatusPath -DefaultPath $seed.inputs.github_status)
-  $tagReadiness = Read-JsonFile -Path (Get-InputPath -ProvidedPath $TagReadinessPath -DefaultPath $seed.inputs.tag_readiness)
-  $publicationDryRun = Read-JsonFile -Path (Get-InputPath -ProvidedPath $PublicationDryRunPath -DefaultPath $seed.inputs.publication_dry_run)
+  $mergeOrderPath = Get-InputPath -ProvidedPath $MergeOrderPath -DefaultPath $seed.inputs.merge_order
+  $githubStatusPath = Get-InputPath -ProvidedPath $GithubStatusPath -DefaultPath $seed.inputs.github_status
+  $tagReadinessPath = Get-InputPath -ProvidedPath $TagReadinessPath -DefaultPath $seed.inputs.tag_readiness
+  $publicationDryRunPath = Get-InputPath -ProvidedPath $PublicationDryRunPath -DefaultPath $seed.inputs.publication_dry_run
+  $mergeOrder = Read-JsonFile -Path $mergeOrderPath
+  $githubStatus = Read-JsonFile -Path $githubStatusPath
+  $tagReadiness = Read-JsonFile -Path $tagReadinessPath
+  $publicationDryRun = Read-JsonFile -Path $publicationDryRunPath
   $blockingErrors = [System.Collections.Generic.List[string]]::new()
 
   if ($mergeOrder.merge_order_ok -ne $true) {
@@ -152,6 +175,12 @@ try {
     latest_pr = if (@($prValues).Count -gt 0) { [int]@($prValues)[0] } else { 0 }
     merge_order_ok = [bool]$mergeOrder.merge_order_ok
     github_status_ok = [bool]$githubStatus.github_status_ok
+    input_fingerprints = [ordered]@{
+      merge_order = Get-InputFingerprint -Path $mergeOrderPath
+      github_status = Get-InputFingerprint -Path $githubStatusPath
+      tag_readiness = Get-InputFingerprint -Path $tagReadinessPath
+      publication_dry_run = Get-InputFingerprint -Path $publicationDryRunPath
+    }
     publication_dry_run_ok = [bool](
       $publicationDryRun.source_only -eq $true -and
       $publicationDryRun.dry_run_only -eq $true -and

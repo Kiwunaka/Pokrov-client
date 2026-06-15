@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import shutil
 import subprocess
 from pathlib import Path
@@ -19,6 +20,10 @@ def _read_json(relative_path: str) -> dict:
 
 def _write_json(path: Path, payload: dict) -> None:
     path.write_text(json.dumps(payload), encoding="utf-8")
+
+
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def _snapshot_files(paths: list[Path]) -> dict[Path, bytes | None]:
@@ -43,10 +48,10 @@ def _merge_order_summary(ok: bool = True) -> dict:
         "read_only": True,
         "merge_order_ok": ok,
         "linear_base_to_head_chain": ok,
-        "stack_count": 16,
-        "latest_pr": 76,
-        "latest_candidate": "v0.56.0-source",
-        "errors": [] if ok else ["PR #76 base must equal previous head"],
+        "stack_count": 17,
+        "latest_pr": 77,
+        "latest_candidate": "v0.57.0-source",
+        "errors": [] if ok else ["PR #77 base must equal previous head"],
     }
 
 
@@ -55,15 +60,15 @@ def _github_status_summary(ok: bool = True) -> dict:
         "schema_version": 1,
         "read_only": True,
         "github_status_ok": ok,
-        "stack_count": 16,
-        "latest_pr": 76,
-        "latest_candidate": "v0.56.0-source",
+        "stack_count": 17,
+        "latest_pr": 77,
+        "latest_candidate": "v0.57.0-source",
         "clean_pr_count": 12 if ok else 11,
         "draft_pr_count": 0,
         "unclean_pr_count": 0 if ok else 1,
-        "successful_check_count": 48 if ok else 47,
+        "successful_check_count": 51 if ok else 50,
         "failed_check_count": 0 if ok else 1,
-        "errors": [] if ok else ["PR #76 check 'Flutter analyze and tests' is FAILURE"],
+        "errors": [] if ok else ["PR #77 check 'Flutter analyze and tests' is FAILURE"],
     }
 
 
@@ -71,7 +76,7 @@ def _tag_readiness_summary(ready: bool = False) -> dict:
     return {
         "schema_version": 1,
         "read_only": True,
-        "tag": "v0.56.0-source",
+        "tag": "v0.57.0-source",
         "ready_for_tag": ready,
         "source_only": True,
         "ships_apk": False,
@@ -79,7 +84,7 @@ def _tag_readiness_summary(ready: bool = False) -> dict:
         "store_release": False,
         "trusted_signing_claim": False,
         "tag_creation_allowed": ready,
-        "latest_candidate": "v0.56.0-source",
+        "latest_candidate": "v0.57.0-source",
         "open_blocker_count": 0 if ready else 7,
         "open_blockers": []
         if ready
@@ -90,7 +95,7 @@ def _tag_readiness_summary(ready: bool = False) -> dict:
 def _publication_dry_run_summary(ok: bool = True) -> dict:
     return {
         "schema_version": 1,
-        "tag": "v0.56.0-source",
+        "tag": "v0.57.0-source",
         "source_only": True,
         "dry_run_only": True,
         "ready_for_manual_review": ok,
@@ -110,8 +115,8 @@ def _publication_dry_run_summary(ok: bool = True) -> dict:
 
 def _stale_tag_readiness_summary() -> dict:
     summary = _tag_readiness_summary()
-    summary["tag"] = "v0.55.0-source"
-    summary["latest_candidate"] = "v0.55.0-source"
+    summary["tag"] = "v0.56.0-source"
+    summary["latest_candidate"] = "v0.56.0-source"
     return summary
 
 
@@ -125,8 +130,8 @@ def _write_input_summaries(
 ) -> tuple[Path, Path, Path, Path]:
     merge_path = tmp_path / "release-merge-order.json"
     github_path = tmp_path / "release-stack-github-status.json"
-    tag_path = tmp_path / "v0.56.0-source-tag-readiness.json"
-    publication_path = tmp_path / "v0.56.0-source-publication-dry-run.json"
+    tag_path = tmp_path / "v0.57.0-source-tag-readiness.json"
+    publication_path = tmp_path / "v0.57.0-source-publication-dry-run.json"
     _write_json(merge_path, _merge_order_summary(merge_ok))
     _write_json(github_path, _github_status_summary(github_ok))
     _write_json(tag_path, _tag_readiness_summary(tag_ready))
@@ -148,6 +153,7 @@ def test_release_merge_handoff_seed_defines_read_only_inputs() -> None:
     assert seed["policy"]["requires_github_status_summary"] is True
     assert seed["policy"]["requires_tag_readiness_summary"] is True
     assert seed["policy"]["requires_publication_dry_run_summary"] is True
+    assert seed["policy"]["requires_input_fingerprints"] is True
     assert seed["inputs"]["merge_order"] == "build/release-merge-order/release-merge-order.json"
     assert seed["inputs"]["github_status"] == (
         "build/release-stack-github-status/release-stack-github-status.json"
@@ -167,6 +173,9 @@ def test_release_merge_handoff_script_is_read_only() -> None:
         "ready_for_tag",
         "ready_for_manual_review",
         "windows_bundle_verifier_ok",
+        "input_fingerprints",
+        "SHA256",
+        "ComputeHash",
         "handoff_ready_for_maintainer",
         "build\\release-merge-handoff",
         "manual_merge_required = $true",
@@ -181,6 +190,7 @@ def test_release_merge_handoff_script_is_read_only() -> None:
         "gh release create",
         "gh release upload",
         "gh api",
+        "Get-FileHash",
         "-X POST",
         "-X PATCH",
         "-X PUT",
@@ -233,13 +243,28 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
     assert summary["manual_tag_required"] is True
     assert summary["publish_performed"] is False
     assert summary["tag_push_performed"] is False
-    assert summary["latest_candidate"] == "v0.56.0-source"
-    assert summary["latest_pr"] == 76
+    assert summary["latest_candidate"] == "v0.57.0-source"
+    assert summary["latest_pr"] == 77
     assert summary["publication_dry_run_ok"] is True
     assert summary["publication_ready_for_manual_review"] is True
     assert summary["windows_bundle_verifier_ok"] is True
     assert summary["windows_bundle_verifier_summary"].endswith(
         "windows-bundle-verifier.json"
+    )
+    assert summary["input_fingerprints"]["merge_order"]["sha256"] == _sha256(
+        merge_path
+    )
+    assert summary["input_fingerprints"]["github_status"]["sha256"] == _sha256(
+        github_path
+    )
+    assert summary["input_fingerprints"]["tag_readiness"]["sha256"] == _sha256(
+        tag_path
+    )
+    assert summary["input_fingerprints"]["publication_dry_run"][
+        "sha256"
+    ] == _sha256(publication_path)
+    assert summary["input_fingerprints"]["publication_dry_run"]["path"].endswith(
+        "v0.57.0-source-publication-dry-run.json"
     )
     assert "merge stacked PRs in order" in " ".join(summary["next_manual_steps"])
     assert "publication dry-run" in " ".join(summary["next_manual_steps"])
@@ -260,14 +285,14 @@ def test_release_merge_handoff_uses_seed_default_input_paths() -> None:
         ROOT
         / "build"
         / "source-tag-readiness"
-        / "v0.56.0-source-tag-readiness.json"
+        / "v0.57.0-source-tag-readiness.json"
     )
     default_publication_path = (
         ROOT
         / "build"
         / "source-release-publication"
-        / "v0.56.0-source"
-        / "v0.56.0-source-publication-dry-run.json"
+        / "v0.57.0-source"
+        / "v0.57.0-source-publication-dry-run.json"
     )
     out_dir = ROOT / "build" / "release-merge-handoff"
     summary_path = out_dir / "release-merge-handoff.json"
@@ -306,9 +331,12 @@ def test_release_merge_handoff_uses_seed_default_input_paths() -> None:
         assert result.returncode == 0, result.stderr + result.stdout
         summary = json.loads(summary_path.read_text(encoding="utf-8-sig"))
         assert summary["handoff_ready_for_maintainer"] is True
-        assert summary["latest_candidate"] == "v0.56.0-source"
-        assert summary["latest_pr"] == 76
+        assert summary["latest_candidate"] == "v0.57.0-source"
+        assert summary["latest_pr"] == 77
         assert summary["publication_dry_run_ok"] is True
+        assert summary["input_fingerprints"]["merge_order"]["sha256"] == _sha256(
+            default_merge_path
+        )
     finally:
         _restore_files(snapshots)
 
@@ -366,7 +394,7 @@ def test_release_merge_handoff_blocks_mismatched_input_candidates(
     merge_path = tmp_path / "release-merge-order.json"
     github_path = tmp_path / "release-stack-github-status.json"
     tag_path = tmp_path / "v0.47.0-source-tag-readiness.json"
-    publication_path = tmp_path / "v0.56.0-source-publication-dry-run.json"
+    publication_path = tmp_path / "v0.57.0-source-publication-dry-run.json"
     _write_json(merge_path, _merge_order_summary())
     _write_json(github_path, _github_status_summary())
     _write_json(tag_path, _stale_tag_readiness_summary())

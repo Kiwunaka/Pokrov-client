@@ -58,8 +58,9 @@ Current helpers:
 - `prepare-release-merge-handoff.ps1`: creates a release merge handoff report
   by bundling release merge order, release stack GitHub status, source tag
   readiness, and publication dry-run summaries into an ignored
-  `build/release-merge-handoff/` maintainer handoff report without merging,
-  tagging, pushing, publishing, or uploading anything
+  `build/release-merge-handoff/` maintainer handoff report with input SHA-256
+  fingerprints, without merging, tagging, pushing, publishing, or uploading
+  anything
 - `verify-windows-bundle.ps1`: Windows bundle verifier for source-only Windows
   bundle proof; checks required Windows shell source paths and rejects
   committed Windows binaries, archives, signing files, or local runtime

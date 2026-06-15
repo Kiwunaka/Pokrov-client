@@ -56,7 +56,8 @@ Use this checklist before publishing a public source or binary release.
   creates a release merge handoff report by bundling the release merge order,
   release stack GitHub status, source tag readiness, and publication dry-run
   readiness summaries into an ignored `build/release-merge-handoff/` maintainer
-  handoff report; it does not merge, tag, push, publish, or upload anything.
+  handoff report with input SHA-256 fingerprints; it does not merge, tag, push,
+  publish, or upload anything.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\verify-windows-bundle.ps1`
   runs the Windows bundle verifier and writes source-only Windows bundle proof
   under ignored `build/windows-bundle-verifier/`; it checks required Windows
