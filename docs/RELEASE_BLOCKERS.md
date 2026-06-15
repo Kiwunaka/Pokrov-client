@@ -54,10 +54,10 @@ status snapshot matches the local stack manifest, is not draft, has clean merge
 state, and has successful required CI checks.
 
 Run `scripts/prepare-release-merge-handoff.ps1` for a local release merge handoff
-summary after the merge-order, GitHub-status, and source-tag-readiness summaries
-exist. The command is read-only, writes ignored `build/release-merge-handoff/`
-output, and records the next manual maintainer steps without merging, tagging,
-pushing, publishing, or uploading anything.
+summary after the merge-order, GitHub-status, source-tag-readiness, and
+publication dry-run summaries exist. The command is read-only, writes ignored
+`build/release-merge-handoff/` output, and records the next manual maintainer
+steps without merging, tagging, pushing, publishing, or uploading anything.
 
 ## Evidence Rules
 

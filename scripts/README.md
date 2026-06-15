@@ -56,8 +56,8 @@ Current helpers:
   `build/release-stack-github-status/` output and does not merge, push, or
   publish anything
 - `prepare-release-merge-handoff.ps1`: creates a release merge handoff report
-  by bundling release merge order, release stack GitHub status, and source tag
-  readiness summaries into an ignored
+  by bundling release merge order, release stack GitHub status, source tag
+  readiness, and publication dry-run summaries into an ignored
   `build/release-merge-handoff/` maintainer handoff report without merging,
   tagging, pushing, publishing, or uploading anything
 - `verify-windows-bundle.ps1`: Windows bundle verifier for source-only Windows
