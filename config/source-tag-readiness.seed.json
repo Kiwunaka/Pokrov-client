@@ -20,6 +20,7 @@
     "requires_blocker_inventory_source_only_flags": true,
     "requires_source_readiness_milestone_source_only_flags": true,
     "requires_error_summary": true,
+    "requires_blocker_required_before_tag_flags": true,
     "requires_open_blocker_evidence_fields": true
   },
   "outputs": {

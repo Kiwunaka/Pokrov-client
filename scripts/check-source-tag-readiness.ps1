@@ -86,6 +86,15 @@ try {
       $_.status -notin @("complete", "cleared", "ready")
     }
   )
+  foreach ($blocker in @($inventory.blockers)) {
+    $blockerId = [string]$blocker.id
+    if ([string]::IsNullOrWhiteSpace($blockerId)) {
+      $blockerId = "<missing-id>"
+    }
+    if ($blocker.required_before_tag -ne $true) {
+      $errors.Add("blocker $blockerId is missing required_before_tag=true")
+    }
+  }
   foreach ($blocker in $openBlockers) {
     $blockerId = [string]$blocker.id
     if ([string]::IsNullOrWhiteSpace($blockerId)) {
