@@ -48,6 +48,10 @@ def test_source_tag_readiness_seed_defines_read_only_command() -> None:
     assert seed["policy"]["nonzero_when_blocked"] is True
     assert seed["policy"]["requires_latest_candidate_tag_match"] is True
     assert seed["policy"]["requires_latest_stacked_pr_evidence_match"] is True
+    assert (
+        seed["policy"]["requires_source_readiness_milestone_source_only_flags"]
+        is True
+    )
     assert seed["policy"]["requires_error_summary"] is True
     assert seed["policy"]["requires_open_blocker_evidence_fields"] is True
     assert seed["inputs"]["blocker_inventory"] == (
@@ -69,6 +73,7 @@ def test_source_tag_readiness_script_is_local_only() -> None:
         "error_count",
         "requested tag does not match latest blocker inventory candidate",
         "source readiness milestone evidence does not match latest stacked PR",
+        "source readiness milestone has unsafe source-only release flags",
         "build\\source-tag-readiness",
         "exit 2",
     ):
@@ -98,7 +103,7 @@ def test_source_tag_readiness_reports_current_blockers(tmp_path: Path) -> None:
             "-File",
             str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
             "-Tag",
-            "v0.74.0-source",
+            "v0.75.0-source",
             "-OutDir",
             str(out_dir),
         ],
@@ -113,11 +118,11 @@ def test_source_tag_readiness_reports_current_blockers(tmp_path: Path) -> None:
     assert "merge_stacked_pr_sequence" in result.stdout
 
     summary = json.loads(
-        (out_dir / "v0.74.0-source-tag-readiness.json").read_text(
+        (out_dir / "v0.75.0-source-tag-readiness.json").read_text(
             encoding="utf-8-sig"
         )
     )
-    assert summary["tag"] == "v0.74.0-source"
+    assert summary["tag"] == "v0.75.0-source"
     assert summary["ready_for_tag"] is False
     assert summary["source_only"] is True
     assert summary["ships_apk"] is False
@@ -125,7 +130,7 @@ def test_source_tag_readiness_reports_current_blockers(tmp_path: Path) -> None:
     assert summary["store_release"] is False
     assert summary["trusted_signing_claim"] is False
     assert summary["tag_creation_allowed"] is False
-    assert summary["latest_candidate"] == "v0.74.0-source"
+    assert summary["latest_candidate"] == "v0.75.0-source"
     assert summary["error_count"] == 0
     assert summary["errors"] == []
     assert summary["open_blocker_count"] >= 7
@@ -168,7 +173,7 @@ def test_source_tag_readiness_blocks_stale_requested_tag(tmp_path: Path) -> None
         )
     )
     assert summary["tag"] == "v0.71.0-source"
-    assert summary["latest_candidate"] == "v0.74.0-source"
+    assert summary["latest_candidate"] == "v0.75.0-source"
     assert summary["ready_for_tag"] is False
     assert "requested tag does not match latest blocker inventory candidate" in summary[
         "errors"
@@ -185,7 +190,7 @@ def test_source_tag_readiness_blocks_milestone_evidence_pr_mismatch(
     try:
         readiness = json.loads(readiness_path.read_text(encoding="utf-8"))
         for milestone in readiness["milestones"]:
-            if milestone["tag"] == "v0.74.0-source":
+            if milestone["tag"] == "v0.75.0-source":
                 milestone["evidence"] = "https://github.com/Kiwunaka/Pokrov-client/pull/92"
                 break
         _write_json(readiness_path, readiness)
@@ -198,7 +203,7 @@ def test_source_tag_readiness_blocks_milestone_evidence_pr_mismatch(
                 "-File",
                 str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
                 "-Tag",
-                "v0.74.0-source",
+                "v0.75.0-source",
                 "-OutDir",
                 str(out_dir),
             ],
@@ -209,7 +214,7 @@ def test_source_tag_readiness_blocks_milestone_evidence_pr_mismatch(
         )
 
         summary = json.loads(
-            (out_dir / "v0.74.0-source-tag-readiness.json").read_text(
+            (out_dir / "v0.75.0-source-tag-readiness.json").read_text(
                 encoding="utf-8-sig"
             )
         )
@@ -220,9 +225,60 @@ def test_source_tag_readiness_blocks_milestone_evidence_pr_mismatch(
     assert "source readiness milestone evidence does not match latest stacked PR" in (
         result.stdout + result.stderr
     )
-    assert summary["latest_stacked_pr"] == 94
+    assert summary["latest_stacked_pr"] == 95
     assert summary["milestone_evidence"].endswith("/pull/92")
     assert "source readiness milestone evidence does not match latest stacked PR" in summary[
+        "errors"
+    ]
+
+
+def test_source_tag_readiness_blocks_unsafe_milestone_release_flags(
+    tmp_path: Path,
+) -> None:
+    readiness_path = ROOT / "config" / "source-release-readiness.seed.json"
+    snapshots = _snapshot_files([readiness_path])
+    out_dir = tmp_path / "unsafe-milestone-readiness"
+
+    try:
+        readiness = json.loads(readiness_path.read_text(encoding="utf-8"))
+        for milestone in readiness["milestones"]:
+            if milestone["tag"] == "v0.75.0-source":
+                milestone["source_only"] = False
+                milestone["ships_apk"] = True
+                break
+        _write_json(readiness_path, readiness)
+
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
+                "-Tag",
+                "v0.75.0-source",
+                "-OutDir",
+                str(out_dir),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        summary = json.loads(
+            (out_dir / "v0.75.0-source-tag-readiness.json").read_text(
+                encoding="utf-8-sig"
+            )
+        )
+    finally:
+        _restore_files(snapshots)
+
+    assert result.returncode == 2
+    assert "source readiness milestone has unsafe source-only release flags" in (
+        result.stdout + result.stderr
+    )
+    assert "source readiness milestone has unsafe source-only release flags" in summary[
         "errors"
     ]
 
