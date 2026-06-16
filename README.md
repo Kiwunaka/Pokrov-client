@@ -144,6 +144,7 @@ Source release status:
 | `v0.82.0-source` | Pending stacked PR, not tagged | Source tag readiness checks source-readiness milestone evidence is present. |
 | `v0.83.0-source` | Pending stacked PR, not tagged | Source tag readiness checks source-readiness milestone scope is present. |
 | `v0.84.0-source` | Pending stacked PR, not tagged | Source tag readiness writes read-only summaries for release merge handoff. |
+| `v0.85.0-source` | Pending stacked PR, not tagged | Source tag readiness records input fingerprints for release evidence. |
 
 ## Which App Should I Use?
 

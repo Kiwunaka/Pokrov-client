@@ -186,8 +186,10 @@ production readiness without matching public evidence.
   omit what the selected source-readiness milestone actually covers.
 - Added source tag-readiness read-only summary output so release merge handoff
   can consume the real tag-readiness JSON directly.
+- Added source tag-readiness input fingerprints so release evidence can prove
+  which blocker inventory and source-readiness seeds produced the summary.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.84.0-source` candidates.
+  `v0.85.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -277,6 +279,7 @@ production readiness without matching public evidence.
 | `v0.82.0-source` | Pending stacked PR, not tagged | PR #102 |
 | `v0.83.0-source` | Pending stacked PR, not tagged | PR #103 |
 | `v0.84.0-source` | Pending stacked PR, not tagged | PR #104 |
+| `v0.85.0-source` | Pending stacked PR, not tagged | PR #105 |
 
 ### Still Source-Only
 

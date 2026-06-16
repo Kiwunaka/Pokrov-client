@@ -28,6 +28,25 @@ function Read-JsonFile {
   return Get-Content -Raw -LiteralPath $Path | ConvertFrom-Json
 }
 
+function Get-InputFingerprint {
+  param([Parameter(Mandatory = $true)][string]$Path)
+
+  $resolvedPath = [System.IO.Path]::GetFullPath($Path)
+  $stream = [System.IO.File]::OpenRead($resolvedPath)
+  $sha256 = [System.Security.Cryptography.SHA256]::Create()
+  try {
+    $hashBytes = $sha256.ComputeHash($stream)
+    $hash = [System.BitConverter]::ToString($hashBytes).Replace("-", "").ToLowerInvariant()
+  } finally {
+    $sha256.Dispose()
+    $stream.Dispose()
+  }
+  return [ordered]@{
+    path = $resolvedPath
+    sha256 = $hash
+  }
+}
+
 Push-Location $root
 try {
   $inventoryPath = Join-Path $root "config\release-blocker-inventory.seed.json"
@@ -144,6 +163,10 @@ try {
     milestone_status = $milestone.status
     milestone_evidence = $milestone.evidence
     milestone_scope = $milestone.scope
+    input_fingerprints = [ordered]@{
+      blocker_inventory = Get-InputFingerprint -Path $inventoryPath
+      source_readiness = Get-InputFingerprint -Path $readinessPath
+    }
     error_count = [int]$errors.Count
     errors = @($errors)
     open_blocker_count = [int]$openBlockers.Count
