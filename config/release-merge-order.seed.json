@@ -214,6 +214,12 @@
       "candidate": "v0.74.0-source",
       "base": "codex/v0.73-tag-readiness-latest-candidate",
       "head": "codex/v0.74-tag-readiness-evidence-pr"
+    },
+    {
+      "pr": 95,
+      "candidate": "v0.75.0-source",
+      "base": "codex/v0.74-tag-readiness-evidence-pr",
+      "head": "codex/v0.75-tag-readiness-milestone-flags"
     }
   ]
 }

@@ -53,6 +53,15 @@ try {
   } elseif ([string]$milestone.evidence -notlike "*$expectedEvidencePr*") {
     $errors.Add("source readiness milestone evidence does not match latest stacked PR")
   }
+  if (
+    $milestone.source_only -ne $true -or
+    $milestone.ships_apk -ne $false -or
+    $milestone.ships_exe -ne $false -or
+    $milestone.store_release -ne $false -or
+    $milestone.trusted_signing_claim -ne $false
+  ) {
+    $errors.Add("source readiness milestone has unsafe source-only release flags")
+  }
 
   if ([string]::IsNullOrWhiteSpace($OutDir)) {
     $OutDir = Join-Path $root (Join-Path $defaultOutputDir $Tag)
