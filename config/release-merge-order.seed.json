@@ -244,6 +244,12 @@
       "candidate": "v0.79.0-source",
       "base": "codex/v0.78-tag-readiness-blocker-id",
       "head": "codex/v0.79-tag-readiness-blocker-status"
+    },
+    {
+      "pr": 100,
+      "candidate": "v0.80.0-source",
+      "base": "codex/v0.79-tag-readiness-blocker-status",
+      "head": "codex/v0.80-tag-readiness-blocker-required-flag"
     }
   ]
 }

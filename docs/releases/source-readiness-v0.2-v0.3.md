@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.79
+# Source Readiness: v0.2-v0.80
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -6,14 +6,14 @@ checklist is run on the exact commit. The machine-readable readiness inventory
 lives in
 [`config/source-release-readiness.seed.json`](../../config/source-release-readiness.seed.json).
 
-## v0.79.0-source Candidate
+## v0.80.0-source Candidate
 
 Status: stacked PR green, not tagged.
 
 Current evidence:
 
-- PR #99: source tag readiness rejects open release blockers that are missing
-  status
+- PR #100: source tag readiness rejects release blockers that are missing
+  `required_before_tag=true`
 - GitHub CI green on the stacked PR
 
 Required before tagging:
@@ -43,9 +43,9 @@ Required before tagging:
 
 Limitations:
 
-- Candidate-path consistency prevents stale default handoff inputs from
-  becoming the maintainer path of least resistance; it does not merge PRs,
-  clear manual blockers, or authorize source tags.
+- Required-before-tag checks prevent malformed release blockers from silently
+  disappearing from tag-readiness summaries; they do not merge PRs, clear
+  manual blockers, or authorize source tags.
 
 ## v0.70.0-source Candidate
 
