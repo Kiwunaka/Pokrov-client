@@ -63,6 +63,9 @@ try {
   } elseif ([string]$milestone.evidence -notlike "*$expectedEvidencePr*") {
     $errors.Add("source readiness milestone evidence does not match latest stacked PR")
   }
+  if ([string]::IsNullOrWhiteSpace([string]$milestone.status)) {
+    $errors.Add("source readiness milestone is missing status")
+  }
   if (
     $milestone.source_only -ne $true -or
     $milestone.ships_apk -ne $false -or

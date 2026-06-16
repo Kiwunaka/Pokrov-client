@@ -178,8 +178,10 @@ production readiness without matching public evidence.
   are reported before release merge handoff review.
 - Added source tag-readiness required-before-tag checks so release blockers
   cannot silently disappear from tag-readiness summaries.
+- Added source tag-readiness milestone status checks so malformed
+  source-readiness entries block release summaries.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.80.0-source` candidates.
+  `v0.81.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -265,6 +267,7 @@ production readiness without matching public evidence.
 | `v0.78.0-source` | Pending stacked PR, not tagged | PR #98 |
 | `v0.79.0-source` | Pending stacked PR, not tagged | PR #99 |
 | `v0.80.0-source` | Pending stacked PR, not tagged | PR #100 |
+| `v0.81.0-source` | Pending stacked PR, not tagged | PR #101 |
 
 ### Still Source-Only
 
