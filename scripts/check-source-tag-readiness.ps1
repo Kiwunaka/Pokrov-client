@@ -130,6 +130,7 @@ try {
     schema_version = 1
     tag = $Tag
     generated_at = (Get-Date).ToUniversalTime().ToString("o")
+    read_only = $true
     ready_for_tag = $false
     source_only = [bool]$inventory.source_only
     ships_apk = [bool]$inventory.ships_apk

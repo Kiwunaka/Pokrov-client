@@ -1,10 +1,51 @@
-# Source Readiness: v0.2-v0.83
+# Source Readiness: v0.2-v0.84
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
 checklist is run on the exact commit. The machine-readable readiness inventory
 lives in
 [`config/source-release-readiness.seed.json`](../../config/source-release-readiness.seed.json).
+
+## v0.84.0-source Candidate
+
+Status: stacked PR green, not tagged.
+
+Current evidence:
+
+- PR #104: source tag readiness writes `read_only=true` in its generated
+  summary so release merge handoff can consume the real output directly
+- GitHub CI green on the stacked PR
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- run `scripts/prepare-release-evidence-bundle.ps1` with the exact preflight
+  summary
+- run `scripts/validate-source-release-publication.ps1` with the exact release
+  evidence bundle and rendered release notes
+- run `scripts/check-release-merge-order.ps1`,
+  `scripts/check-release-stack-github-status.ps1`,
+  `scripts/check-source-tag-readiness.ps1`, and
+  `scripts/validate-source-release-publication.ps1` so each prerequisite
+  summary includes `generated_at`, `schema_version=1`, and `read_only=true`
+- confirm `config/release-merge-handoff.seed.json` default tag-readiness and
+  publication dry-run paths include the blocker inventory `latest_candidate`
+- run `scripts/prepare-release-merge-handoff.ps1` with the exact merge-order,
+  GitHub-status, tag-readiness, and publication dry-run summaries
+- review the publication dry-run, release evidence bundle, preflight summary,
+  proof manifest, rendered GitHub Release body, and changelog section for the
+  exact release
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
+Limitations:
+
+- Read-only summary output proves the tag-readiness helper did not intend to
+  mutate GitHub, git tags, or release assets; it does not merge PRs, clear
+  manual blockers, or authorize source tags.
 
 ## v0.83.0-source Candidate
 
