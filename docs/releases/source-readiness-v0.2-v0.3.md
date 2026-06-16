@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.81
+# Source Readiness: v0.2-v0.82
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -6,14 +6,14 @@ checklist is run on the exact commit. The machine-readable readiness inventory
 lives in
 [`config/source-release-readiness.seed.json`](../../config/source-release-readiness.seed.json).
 
-## v0.81.0-source Candidate
+## v0.82.0-source Candidate
 
 Status: stacked PR green, not tagged.
 
 Current evidence:
 
-- PR #101: source tag readiness rejects the selected source-readiness
-  milestone when `status` is missing
+- PR #102: source tag readiness rejects the selected source-readiness
+  milestone when `evidence` is missing
 - GitHub CI green on the stacked PR
 
 Required before tagging:
@@ -43,7 +43,7 @@ Required before tagging:
 
 Limitations:
 
-- Milestone-status checks prevent malformed source-readiness entries from
+- Milestone-evidence checks prevent malformed source-readiness proof entries from
   reaching tag-readiness summaries; they do not merge PRs, clear manual
   blockers, or authorize source tags.
 
