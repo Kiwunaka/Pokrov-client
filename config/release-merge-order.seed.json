@@ -262,6 +262,12 @@
       "candidate": "v0.82.0-source",
       "base": "codex/v0.81-tag-readiness-milestone-status",
       "head": "codex/v0.82-tag-readiness-milestone-evidence"
+    },
+    {
+      "pr": 103,
+      "candidate": "v0.83.0-source",
+      "base": "codex/v0.82-tag-readiness-milestone-evidence",
+      "head": "codex/v0.83-tag-readiness-milestone-scope"
     }
   ]
 }
