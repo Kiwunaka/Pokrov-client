@@ -140,6 +140,7 @@ Source release status:
 | `v0.78.0-source` | Pending stacked PR, not tagged | Source tag readiness checks open blocker identifiers are present. |
 | `v0.79.0-source` | Pending stacked PR, not tagged | Source tag readiness checks open blocker status is present. |
 | `v0.80.0-source` | Pending stacked PR, not tagged | Source tag readiness checks blocker required-before-tag flags are explicit. |
+| `v0.81.0-source` | Pending stacked PR, not tagged | Source tag readiness checks source-readiness milestone status is present. |
 
 ## Which App Should I Use?
 
