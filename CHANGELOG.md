@@ -172,8 +172,10 @@ production readiness without matching public evidence.
   inventory binary/store/trusted-signing claims block readiness summaries.
 - Added source tag-readiness open-blocker evidence checks so missing blocker
   evidence is reported before release merge handoff review.
+- Added source tag-readiness open-blocker identifier checks so malformed
+  blockers are reported before release merge handoff review.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.77.0-source` candidates.
+  `v0.78.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -256,6 +258,7 @@ production readiness without matching public evidence.
 | `v0.75.0-source` | Pending stacked PR, not tagged | PR #95 |
 | `v0.76.0-source` | Pending stacked PR, not tagged | PR #96 |
 | `v0.77.0-source` | Pending stacked PR, not tagged | PR #97 |
+| `v0.78.0-source` | Pending stacked PR, not tagged | PR #98 |
 
 ### Still Source-Only
 
