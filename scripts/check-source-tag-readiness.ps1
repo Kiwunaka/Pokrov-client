@@ -69,6 +69,9 @@ try {
   if ([string]::IsNullOrWhiteSpace([string]$milestone.status)) {
     $errors.Add("source readiness milestone is missing status")
   }
+  if ([string]::IsNullOrWhiteSpace([string]$milestone.scope)) {
+    $errors.Add("source readiness milestone is missing scope")
+  }
   if (
     $milestone.source_only -ne $true -or
     $milestone.ships_apk -ne $false -or
@@ -139,6 +142,7 @@ try {
     tag_creation_allowed = [bool]$inventory.tracked_candidates.tag_creation_allowed
     milestone_status = $milestone.status
     milestone_evidence = $milestone.evidence
+    milestone_scope = $milestone.scope
     error_count = [int]$errors.Count
     errors = @($errors)
     open_blocker_count = [int]$openBlockers.Count

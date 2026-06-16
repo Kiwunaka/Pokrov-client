@@ -23,7 +23,8 @@
     "requires_blocker_required_before_tag_flags": true,
     "requires_open_blocker_evidence_fields": true,
     "requires_source_readiness_milestone_status": true,
-    "requires_source_readiness_milestone_evidence": true
+    "requires_source_readiness_milestone_evidence": true,
+    "requires_source_readiness_milestone_scope": true
   },
   "outputs": {
     "summary_suffix": "-tag-readiness.json",
