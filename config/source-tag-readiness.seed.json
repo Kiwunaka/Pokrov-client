@@ -25,7 +25,8 @@
     "requires_source_readiness_milestone_status": true,
     "requires_source_readiness_milestone_evidence": true,
     "requires_source_readiness_milestone_scope": true,
-    "requires_read_only_summary": true
+    "requires_read_only_summary": true,
+    "requires_input_fingerprints": true
   },
   "outputs": {
     "summary_suffix": "-tag-readiness.json",
