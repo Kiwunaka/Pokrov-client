@@ -226,6 +226,12 @@
       "candidate": "v0.76.0-source",
       "base": "codex/v0.75-tag-readiness-milestone-flags",
       "head": "codex/v0.76-tag-readiness-inventory-flags"
+    },
+    {
+      "pr": 97,
+      "candidate": "v0.77.0-source",
+      "base": "codex/v0.76-tag-readiness-inventory-flags",
+      "head": "codex/v0.77-tag-readiness-blocker-evidence"
     }
   ]
 }
