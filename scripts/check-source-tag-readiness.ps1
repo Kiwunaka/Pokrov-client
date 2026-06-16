@@ -86,6 +86,15 @@ try {
       $_.status -notin @("complete", "cleared", "ready")
     }
   )
+  foreach ($blocker in $openBlockers) {
+    $blockerId = [string]$blocker.id
+    if ([string]::IsNullOrWhiteSpace($blockerId)) {
+      $blockerId = "<missing-id>"
+    }
+    if ([string]::IsNullOrWhiteSpace([string]$blocker.evidence)) {
+      $errors.Add("open blocker $blockerId is missing evidence")
+    }
+  }
 
   $readyForTag = $false
   if ($inventory.tracked_candidates.tag_creation_allowed -eq $true -and

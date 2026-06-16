@@ -136,6 +136,7 @@ Source release status:
 | `v0.74.0-source` | Pending stacked PR, not tagged | Source tag readiness checks milestone evidence against blocker inventory latest PR. |
 | `v0.75.0-source` | Pending stacked PR, not tagged | Source tag readiness checks milestone release flags remain source-only. |
 | `v0.76.0-source` | Pending stacked PR, not tagged | Source tag readiness checks blocker inventory release flags remain source-only. |
+| `v0.77.0-source` | Pending stacked PR, not tagged | Source tag readiness checks open blocker evidence is present. |
 
 ## Which App Should I Use?
 
