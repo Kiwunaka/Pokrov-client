@@ -89,6 +89,7 @@ try {
   foreach ($blocker in $openBlockers) {
     $blockerId = [string]$blocker.id
     if ([string]::IsNullOrWhiteSpace($blockerId)) {
+      $errors.Add("open blocker is missing id")
       $blockerId = "<missing-id>"
     }
     if ([string]::IsNullOrWhiteSpace([string]$blocker.evidence)) {
