@@ -92,6 +92,9 @@ try {
       $errors.Add("open blocker is missing id")
       $blockerId = "<missing-id>"
     }
+    if ([string]::IsNullOrWhiteSpace([string]$blocker.status)) {
+      $errors.Add("open blocker $blockerId is missing status")
+    }
     if ([string]::IsNullOrWhiteSpace([string]$blocker.evidence)) {
       $errors.Add("open blocker $blockerId is missing evidence")
     }

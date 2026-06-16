@@ -174,8 +174,10 @@ production readiness without matching public evidence.
   evidence is reported before release merge handoff review.
 - Added source tag-readiness open-blocker identifier checks so malformed
   blockers are reported before release merge handoff review.
+- Added source tag-readiness open-blocker status checks so malformed blockers
+  are reported before release merge handoff review.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.78.0-source` candidates.
+  `v0.79.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -259,6 +261,7 @@ production readiness without matching public evidence.
 | `v0.76.0-source` | Pending stacked PR, not tagged | PR #96 |
 | `v0.77.0-source` | Pending stacked PR, not tagged | PR #97 |
 | `v0.78.0-source` | Pending stacked PR, not tagged | PR #98 |
+| `v0.79.0-source` | Pending stacked PR, not tagged | PR #99 |
 
 ### Still Source-Only
 

@@ -79,6 +79,7 @@ def test_source_tag_readiness_script_is_local_only() -> None:
         "release blocker inventory has unsafe source-only release flags",
         "source readiness milestone has unsafe source-only release flags",
         "open blocker is missing id",
+        "open blocker $blockerId is missing status",
         "open blocker $blockerId is missing evidence",
         "build\\source-tag-readiness",
         "exit 2",
@@ -109,7 +110,7 @@ def test_source_tag_readiness_reports_current_blockers(tmp_path: Path) -> None:
             "-File",
             str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
             "-Tag",
-            "v0.78.0-source",
+            "v0.79.0-source",
             "-OutDir",
             str(out_dir),
         ],
@@ -124,11 +125,11 @@ def test_source_tag_readiness_reports_current_blockers(tmp_path: Path) -> None:
     assert "merge_stacked_pr_sequence" in result.stdout
 
     summary = json.loads(
-        (out_dir / "v0.78.0-source-tag-readiness.json").read_text(
+        (out_dir / "v0.79.0-source-tag-readiness.json").read_text(
             encoding="utf-8-sig"
         )
     )
-    assert summary["tag"] == "v0.78.0-source"
+    assert summary["tag"] == "v0.79.0-source"
     assert summary["ready_for_tag"] is False
     assert summary["source_only"] is True
     assert summary["ships_apk"] is False
@@ -136,7 +137,7 @@ def test_source_tag_readiness_reports_current_blockers(tmp_path: Path) -> None:
     assert summary["store_release"] is False
     assert summary["trusted_signing_claim"] is False
     assert summary["tag_creation_allowed"] is False
-    assert summary["latest_candidate"] == "v0.78.0-source"
+    assert summary["latest_candidate"] == "v0.79.0-source"
     assert summary["error_count"] == 0
     assert summary["errors"] == []
     assert summary["open_blocker_count"] >= 7
@@ -179,7 +180,7 @@ def test_source_tag_readiness_blocks_stale_requested_tag(tmp_path: Path) -> None
         )
     )
     assert summary["tag"] == "v0.71.0-source"
-    assert summary["latest_candidate"] == "v0.78.0-source"
+    assert summary["latest_candidate"] == "v0.79.0-source"
     assert summary["ready_for_tag"] is False
     assert "requested tag does not match latest blocker inventory candidate" in summary[
         "errors"
@@ -196,7 +197,7 @@ def test_source_tag_readiness_blocks_milestone_evidence_pr_mismatch(
     try:
         readiness = json.loads(readiness_path.read_text(encoding="utf-8"))
         for milestone in readiness["milestones"]:
-            if milestone["tag"] == "v0.78.0-source":
+            if milestone["tag"] == "v0.79.0-source":
                 milestone["evidence"] = "https://github.com/Kiwunaka/Pokrov-client/pull/92"
                 break
         _write_json(readiness_path, readiness)
@@ -209,7 +210,7 @@ def test_source_tag_readiness_blocks_milestone_evidence_pr_mismatch(
                 "-File",
                 str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
                 "-Tag",
-                "v0.78.0-source",
+                "v0.79.0-source",
                 "-OutDir",
                 str(out_dir),
             ],
@@ -220,7 +221,7 @@ def test_source_tag_readiness_blocks_milestone_evidence_pr_mismatch(
         )
 
         summary = json.loads(
-            (out_dir / "v0.78.0-source-tag-readiness.json").read_text(
+            (out_dir / "v0.79.0-source-tag-readiness.json").read_text(
                 encoding="utf-8-sig"
             )
         )
@@ -231,7 +232,7 @@ def test_source_tag_readiness_blocks_milestone_evidence_pr_mismatch(
     assert "source readiness milestone evidence does not match latest stacked PR" in (
         result.stdout + result.stderr
     )
-    assert summary["latest_stacked_pr"] == 98
+    assert summary["latest_stacked_pr"] == 99
     assert summary["milestone_evidence"].endswith("/pull/92")
     assert "source readiness milestone evidence does not match latest stacked PR" in summary[
         "errors"
@@ -248,7 +249,7 @@ def test_source_tag_readiness_blocks_unsafe_milestone_release_flags(
     try:
         readiness = json.loads(readiness_path.read_text(encoding="utf-8"))
         for milestone in readiness["milestones"]:
-            if milestone["tag"] == "v0.78.0-source":
+            if milestone["tag"] == "v0.79.0-source":
                 milestone["source_only"] = False
                 milestone["ships_apk"] = True
                 break
@@ -262,7 +263,7 @@ def test_source_tag_readiness_blocks_unsafe_milestone_release_flags(
                 "-File",
                 str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
                 "-Tag",
-                "v0.78.0-source",
+                "v0.79.0-source",
                 "-OutDir",
                 str(out_dir),
             ],
@@ -273,7 +274,7 @@ def test_source_tag_readiness_blocks_unsafe_milestone_release_flags(
         )
 
         summary = json.loads(
-            (out_dir / "v0.78.0-source-tag-readiness.json").read_text(
+            (out_dir / "v0.79.0-source-tag-readiness.json").read_text(
                 encoding="utf-8-sig"
             )
         )
@@ -310,7 +311,7 @@ def test_source_tag_readiness_blocks_unsafe_inventory_release_flags(
                 "-File",
                 str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
                 "-Tag",
-                "v0.78.0-source",
+                "v0.79.0-source",
                 "-OutDir",
                 str(out_dir),
             ],
@@ -321,7 +322,7 @@ def test_source_tag_readiness_blocks_unsafe_inventory_release_flags(
         )
 
         summary = json.loads(
-            (out_dir / "v0.78.0-source-tag-readiness.json").read_text(
+            (out_dir / "v0.79.0-source-tag-readiness.json").read_text(
                 encoding="utf-8-sig"
             )
         )
@@ -357,7 +358,7 @@ def test_source_tag_readiness_blocks_open_blockers_without_evidence(
                 "-File",
                 str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
                 "-Tag",
-                "v0.78.0-source",
+                "v0.79.0-source",
                 "-OutDir",
                 str(out_dir),
             ],
@@ -368,7 +369,7 @@ def test_source_tag_readiness_blocks_open_blockers_without_evidence(
         )
 
         summary = json.loads(
-            (out_dir / "v0.78.0-source-tag-readiness.json").read_text(
+            (out_dir / "v0.79.0-source-tag-readiness.json").read_text(
                 encoding="utf-8-sig"
             )
         )
@@ -404,7 +405,7 @@ def test_source_tag_readiness_blocks_open_blockers_without_id(
                 "-File",
                 str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
                 "-Tag",
-                "v0.78.0-source",
+                "v0.79.0-source",
                 "-OutDir",
                 str(out_dir),
             ],
@@ -415,7 +416,7 @@ def test_source_tag_readiness_blocks_open_blockers_without_id(
         )
 
         summary = json.loads(
-            (out_dir / "v0.78.0-source-tag-readiness.json").read_text(
+            (out_dir / "v0.79.0-source-tag-readiness.json").read_text(
                 encoding="utf-8-sig"
             )
         )
@@ -425,6 +426,53 @@ def test_source_tag_readiness_blocks_open_blockers_without_id(
     assert result.returncode == 2
     assert "open blocker is missing id" in result.stdout + result.stderr
     assert "open blocker is missing id" in summary["errors"]
+
+
+def test_source_tag_readiness_blocks_open_blockers_without_status(
+    tmp_path: Path,
+) -> None:
+    inventory_path = ROOT / "config" / "release-blocker-inventory.seed.json"
+    snapshots = _snapshot_files([inventory_path])
+    out_dir = tmp_path / "missing-blocker-status-readiness"
+
+    try:
+        inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+        inventory["blockers"][0]["status"] = ""
+        _write_json(inventory_path, inventory)
+
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
+                "-Tag",
+                "v0.79.0-source",
+                "-OutDir",
+                str(out_dir),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        summary = json.loads(
+            (out_dir / "v0.79.0-source-tag-readiness.json").read_text(
+                encoding="utf-8-sig"
+            )
+        )
+    finally:
+        _restore_files(snapshots)
+
+    assert result.returncode == 2
+    assert "open blocker merge_stacked_pr_sequence is missing status" in (
+        result.stdout + result.stderr
+    )
+    assert "open blocker merge_stacked_pr_sequence is missing status" in summary[
+        "errors"
+    ]
 
 
 def test_source_tag_readiness_is_documented_and_validated() -> None:
