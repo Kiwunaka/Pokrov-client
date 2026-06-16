@@ -256,6 +256,12 @@
       "candidate": "v0.81.0-source",
       "base": "codex/v0.80-tag-readiness-blocker-required-flag",
       "head": "codex/v0.81-tag-readiness-milestone-status"
+    },
+    {
+      "pr": 102,
+      "candidate": "v0.82.0-source",
+      "base": "codex/v0.81-tag-readiness-milestone-status",
+      "head": "codex/v0.82-tag-readiness-milestone-evidence"
     }
   ]
 }

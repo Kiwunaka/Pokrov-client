@@ -60,7 +60,10 @@ try {
   $expectedEvidencePr = "/pull/$latestStackedPr"
   if ($latestStackedPr -le 0) {
     $errors.Add("latest blocker inventory stacked PR is missing")
-  } elseif ([string]$milestone.evidence -notlike "*$expectedEvidencePr*") {
+  }
+  if ([string]::IsNullOrWhiteSpace([string]$milestone.evidence)) {
+    $errors.Add("source readiness milestone is missing evidence")
+  } elseif ($latestStackedPr -gt 0 -and [string]$milestone.evidence -notlike "*$expectedEvidencePr*") {
     $errors.Add("source readiness milestone evidence does not match latest stacked PR")
   }
   if ([string]::IsNullOrWhiteSpace([string]$milestone.status)) {
