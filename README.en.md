@@ -179,6 +179,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.76.0-source` | Pending stacked PR, not tagged | Source tag readiness checks blocker inventory release flags remain source-only. |
 | `v0.77.0-source` | Pending stacked PR, not tagged | Source tag readiness checks open blocker evidence is present. |
 | `v0.78.0-source` | Pending stacked PR, not tagged | Source tag readiness checks open blocker identifiers are present. |
+| `v0.79.0-source` | Pending stacked PR, not tagged | Source tag readiness checks open blocker status is present. |
 
 ## Architecture Boundary
 

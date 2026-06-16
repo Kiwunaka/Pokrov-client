@@ -238,6 +238,12 @@
       "candidate": "v0.78.0-source",
       "base": "codex/v0.77-tag-readiness-blocker-evidence",
       "head": "codex/v0.78-tag-readiness-blocker-id"
+    },
+    {
+      "pr": 99,
+      "candidate": "v0.79.0-source",
+      "base": "codex/v0.78-tag-readiness-blocker-id",
+      "head": "codex/v0.79-tag-readiness-blocker-status"
     }
   ]
 }
