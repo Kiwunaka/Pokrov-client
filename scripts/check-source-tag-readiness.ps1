@@ -35,6 +35,16 @@ try {
   $inventory = Read-JsonFile -Path $inventoryPath
   $readiness = Read-JsonFile -Path $readinessPath
   $errors = [System.Collections.Generic.List[string]]::new()
+  if (
+    $inventory.source_only -ne $true -or
+    $inventory.ships_apk -ne $false -or
+    $inventory.ships_exe -ne $false -or
+    $inventory.store_release -ne $false -or
+    $inventory.trusted_signing_claim -ne $false
+  ) {
+    $errors.Add("release blocker inventory has unsafe source-only release flags")
+  }
+
   $latestCandidate = [string]$inventory.tracked_candidates.latest_candidate
   if ([string]::IsNullOrWhiteSpace($latestCandidate)) {
     $errors.Add("latest blocker inventory candidate is missing")

@@ -168,8 +168,10 @@ production readiness without matching public evidence.
   blocks evidence that points at a different stacked PR than blocker inventory.
 - Added source tag-readiness milestone source-only flag checks so unsafe
   milestone binary/store/trusted-signing claims block readiness summaries.
+- Added source tag-readiness blocker-inventory source-only flag checks so unsafe
+  inventory binary/store/trusted-signing claims block readiness summaries.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.75.0-source` candidates.
+  `v0.76.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -250,6 +252,7 @@ production readiness without matching public evidence.
 | `v0.73.0-source` | Pending stacked PR, not tagged | PR #93 |
 | `v0.74.0-source` | Pending stacked PR, not tagged | PR #94 |
 | `v0.75.0-source` | Pending stacked PR, not tagged | PR #95 |
+| `v0.76.0-source` | Pending stacked PR, not tagged | PR #96 |
 
 ### Still Source-Only
 
