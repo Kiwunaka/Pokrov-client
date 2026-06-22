@@ -70,7 +70,8 @@ Current helpers:
   expected repository PR URL consistency, including the GitHub status summary
   `expected_pr_url_prefix` matching the configured public repository prefix,
   and GitHub status clean/check-count consistency carried as
-  `github_status_counts`, plus explicit source-only no-binary flags. Seed defaults must track the
+  `github_status_counts`, with pull-request entry coverage carried as
+  `github_status_pull_request_count`, plus explicit source-only no-binary flags. Seed defaults must track the
   blocker inventory latest candidate, and prerequisite summaries must come from
   their expected ignored
   `build/` output roots; the helper does not merge, tag, push, publish, or
