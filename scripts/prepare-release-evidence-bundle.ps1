@@ -197,6 +197,14 @@ try {
   if ($LASTEXITCODE -ne 0) {
     throw "git rev-parse HEAD failed"
   }
+  $currentCommitSha = [string]($commitSha | Select-Object -First 1)
+  $preflightCommitSha = [string]$preflightSummary.commit_sha
+  if ($preflightCommitSha -notmatch "^[0-9a-fA-F]{40}$") {
+    throw "Release evidence refused preflight summary without commit_sha."
+  }
+  if ($preflightCommitSha -ne $currentCommitSha) {
+    throw "Release evidence refused preflight summary: preflight commit SHA does not match current HEAD."
+  }
 
   $rulesetOk = $null
   $rulesetClaimAllowed = $false
@@ -208,7 +216,8 @@ try {
   $bundle = [ordered]@{
     schema_version = 1
     tag = $Tag
-    commit_sha = ($commitSha | Select-Object -First 1)
+    commit_sha = $currentCommitSha
+    preflight_commit_sha = $preflightCommitSha
     generated_at = (Get-Date).ToUniversalTime().ToString("o")
     dirty_worktree = (-not [string]::IsNullOrWhiteSpace(($gitStatus -join "`n")))
     source_only = [bool]$preflightSummary.source_only

@@ -204,6 +204,15 @@ try {
   if ($publicationDryRun.windows_bundle_verifier_ok -ne $true -or [string]::IsNullOrWhiteSpace([string]$publicationDryRun.windows_bundle_verifier_summary)) {
     $blockingErrors.Add("publication dry-run missing Windows bundle verifier proof")
   }
+  $publicationDryRunCommitSha = [string]$publicationDryRun.commit_sha
+  $publicationDryRunEvidenceBundlePreflightCommitSha = [string]$publicationDryRun.evidence_bundle_preflight_commit_sha
+  if (
+    $publicationDryRunCommitSha -notmatch "^[0-9a-fA-F]{40}$" -or
+    $publicationDryRunEvidenceBundlePreflightCommitSha -notmatch "^[0-9a-fA-F]{40}$" -or
+    $publicationDryRunCommitSha -ne $publicationDryRunEvidenceBundlePreflightCommitSha
+  ) {
+    $blockingErrors.Add("publication dry-run commit SHA mismatch")
+  }
   $inputErrors = @(Get-InputErrors -Payload $mergeOrder) +
     @(Get-InputErrors -Payload $githubStatus) +
     @(Get-InputErrors -Payload $tagReadiness) +
@@ -448,6 +457,8 @@ try {
     publication_dry_run_input_fingerprints = $publicationDryRunInputFingerprints
     publication_dry_run_evidence_bundle_input_fingerprints = $publicationDryRunEvidenceBundleInputFingerprints
     publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $publicationDryRunEvidenceBundlePreflightArtifactFingerprints
+    publication_dry_run_commit_sha = $publicationDryRunCommitSha
+    publication_dry_run_evidence_bundle_preflight_commit_sha = $publicationDryRunEvidenceBundlePreflightCommitSha
     input_generated_at = [ordered]@{
       merge_order = [string]$mergeOrder.generated_at
       github_status = [string]$githubStatus.generated_at
