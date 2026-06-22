@@ -455,6 +455,8 @@ try {
               name = [string]$_.name
               status = [string]$_.status
               conclusion = [string]$_.conclusion
+              details_url = [string]$_.details_url
+              workflow_name = [string]$_.workflow_name
             }
           }
         )
@@ -630,6 +632,33 @@ try {
   }
   if ($githubStatusPrChecksMismatch) {
     $blockingErrors.Add("release stack GitHub status PR checks mismatch")
+  }
+  $githubStatusPrCheckTraceMismatch = $false
+  $githubActionsJobUrlPrefix = "https://github.com/Kiwunaka/Pokrov-client/actions/runs/"
+  if (@($githubStatusPrChecks).Count -ne @($mergeOrderStack).Count) {
+    $githubStatusPrCheckTraceMismatch = $true
+  } else {
+    foreach ($githubStatusPrCheck in $githubStatusPrChecks) {
+      foreach ($githubStatusCheck in @($githubStatusPrCheck.checks)) {
+        $detailsUrl = [string]$githubStatusCheck.details_url
+        $workflowName = [string]$githubStatusCheck.workflow_name
+        if (
+          [string]::IsNullOrWhiteSpace($detailsUrl) -or
+          -not $detailsUrl.StartsWith($githubActionsJobUrlPrefix, [System.StringComparison]::Ordinal) -or
+          $detailsUrl -notmatch "/jobs/" -or
+          [string]::IsNullOrWhiteSpace($workflowName)
+        ) {
+          $githubStatusPrCheckTraceMismatch = $true
+          break
+        }
+      }
+      if ($githubStatusPrCheckTraceMismatch) {
+        break
+      }
+    }
+  }
+  if ($githubStatusPrCheckTraceMismatch) {
+    $blockingErrors.Add("release stack GitHub status PR check trace mismatch")
   }
   $blockerInventoryLatestPr = [int]$blockerInventory.tracked_candidates.latest_stacked_pr
   if ($blockerInventoryLatestPr -le 0) {

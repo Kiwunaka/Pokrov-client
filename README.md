@@ -162,6 +162,7 @@ Source release status:
 | `v0.100.0-source` | Pending stacked PR, not tagged | Release handoff verifies every GitHub status PR URL matches the expected public repo and PR number. |
 | `v0.101.0-source` | Pending stacked PR, not tagged | Release handoff verifies every GitHub status PR is clean and not draft. |
 | `v0.102.0-source` | Pending stacked PR, not tagged | Release handoff verifies per-PR required GitHub status checks before maintainer review. |
+| `v0.103.0-source` | Pending stacked PR, not tagged | Release handoff verifies per-check GitHub Actions trace evidence before maintainer review. |
 
 ## Which App Should I Use?
 

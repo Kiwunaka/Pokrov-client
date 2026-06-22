@@ -14,7 +14,8 @@
     "requires_ci_success": true,
     "requires_pull_request_urls": true,
     "requires_expected_repository_pr_urls": true,
-    "requires_per_pr_status_check_evidence": true
+    "requires_per_pr_status_check_evidence": true,
+    "requires_per_pr_status_check_trace_evidence": true
   },
   "expected_pr_url_prefix": "https://github.com/Kiwunaka/Pokrov-client/pull/",
   "required_status_checks": [

@@ -138,6 +138,8 @@ try {
             name = [string]$checkName
             status = "MISSING"
             conclusion = "MISSING"
+            details_url = ""
+            workflow_name = ""
           })
         $prErrors.Add("PR #$prNumber check '$checkName' is missing")
         continue
@@ -145,10 +147,14 @@ try {
       $check = $checkMatches[0]
       $checkStatus = [string]$check.status
       $checkConclusion = [string]$check.conclusion
+      $checkDetailsUrl = [string]$check.detailsUrl
+      $checkWorkflowName = [string]$check.workflowName
       $prChecks.Add([ordered]@{
           name = [string]$checkName
           status = [string]$checkStatus
           conclusion = [string]$checkConclusion
+          details_url = [string]$checkDetailsUrl
+          workflow_name = [string]$checkWorkflowName
         })
       if ($checkStatus -ne "COMPLETED" -or $checkConclusion -ne "SUCCESS") {
         $failedCheckCount += 1

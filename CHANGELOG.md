@@ -229,8 +229,10 @@ production readiness without matching public evidence.
   or non-clean PR evidence before maintainer review.
 - Added GitHub status PR required-check evidence so release merge handoff
   rejects missing or stale per-PR CI check proof before maintainer review.
+- Added GitHub status PR check trace evidence so release merge handoff rejects
+  missing GitHub Actions job URLs or workflow names before maintainer review.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.102.0-source` candidates.
+  `v0.103.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -338,6 +340,7 @@ production readiness without matching public evidence.
 | `v0.100.0-source` | Pending stacked PR, not tagged | PR #121 |
 | `v0.101.0-source` | Pending stacked PR, not tagged | PR #122 |
 | `v0.102.0-source` | Pending stacked PR, not tagged | PR #123 |
+| `v0.103.0-source` | Pending stacked PR, not tagged | PR #124 |
 
 ### Still Source-Only
 
