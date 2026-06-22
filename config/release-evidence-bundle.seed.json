@@ -14,7 +14,8 @@
     "ruleset_report_may_be_failing": true,
     "failing_ruleset_report_blocks_enforcement_claims": true,
     "does_not_replace_full_preflight": true,
-    "windows_bundle_verifier_required": true
+    "windows_bundle_verifier_required": true,
+    "requires_input_fingerprints": true
   },
   "required_summary_flags": [
     "source_only",

@@ -292,6 +292,12 @@
       "candidate": "v0.87.0-source",
       "base": "codex/v0.86-handoff-tag-readiness-fingerprints",
       "head": "codex/v0.87-publication-dry-run-fingerprints"
+    },
+    {
+      "pr": 109,
+      "candidate": "v0.88.0-source",
+      "base": "codex/v0.87-publication-dry-run-fingerprints",
+      "head": "codex/v0.88-evidence-bundle-input-fingerprints"
     }
   ]
 }

@@ -263,6 +263,25 @@ try {
   if ($missingPublicationDryRunInputFingerprints) {
     $blockingErrors.Add("publication dry-run summary is missing input fingerprints")
   }
+  $publicationDryRunEvidenceBundleInputFingerprints = $null
+  $publicationDryRunEvidenceBundleInputFingerprintProperty = $publicationDryRun.PSObject.Properties["evidence_bundle_input_fingerprints"]
+  if ($null -ne $publicationDryRunEvidenceBundleInputFingerprintProperty) {
+    $publicationDryRunEvidenceBundleInputFingerprints = $publicationDryRunEvidenceBundleInputFingerprintProperty.Value
+  }
+  $publicationDryRunPreflightFingerprint = $null
+  if ($null -ne $publicationDryRunEvidenceBundleInputFingerprints) {
+    $preflightFingerprintProperty = $publicationDryRunEvidenceBundleInputFingerprints.PSObject.Properties["preflight_summary"]
+    if ($null -ne $preflightFingerprintProperty) {
+      $publicationDryRunPreflightFingerprint = $preflightFingerprintProperty.Value
+    }
+  }
+  if (
+    [string]::IsNullOrWhiteSpace([string]$publicationDryRunPreflightFingerprint.path) -or
+    [string]::IsNullOrWhiteSpace([string]$publicationDryRunPreflightFingerprint.sha256) -or
+    [string]$publicationDryRunPreflightFingerprint.sha256 -notmatch "^[0-9a-fA-F]{64}$"
+  ) {
+    $blockingErrors.Add("publication dry-run summary is missing evidence bundle input fingerprints")
+  }
   $tagOpenBlockers = @($tagReadiness.open_blockers)
   $tagOpenBlockerCount = [int]$tagReadiness.open_blocker_count
   if ($tagOpenBlockerCount -ne @($tagOpenBlockers).Count) {
@@ -386,6 +405,7 @@ try {
     }
     tag_readiness_input_fingerprints = $tagReadinessInputFingerprints
     publication_dry_run_input_fingerprints = $publicationDryRunInputFingerprints
+    publication_dry_run_evidence_bundle_input_fingerprints = $publicationDryRunEvidenceBundleInputFingerprints
     input_generated_at = [ordered]@{
       merge_order = [string]$mergeOrder.generated_at
       github_status = [string]$githubStatus.generated_at

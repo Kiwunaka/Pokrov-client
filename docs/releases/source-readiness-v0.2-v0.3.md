@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.87
+# Source Readiness: v0.2-v0.88
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -6,14 +6,15 @@ checklist is run on the exact commit. The machine-readable readiness inventory
 lives in
 [`config/source-release-readiness.seed.json`](../../config/source-release-readiness.seed.json).
 
-## v0.87.0-source Candidate
+## v0.88.0-source Candidate
 
 Status: stacked PR green, not tagged.
 
 Current evidence:
 
-- PR #108: publication dry-run records input fingerprints for the evidence
-  bundle and release notes, and release merge handoff carries them forward
+- PR #109: release evidence bundle records input fingerprints for the source
+  preflight summary, publication dry-run requires and carries them, and release
+  merge handoff carries them into maintainer evidence
 - GitHub CI green on the stacked PR
 
 Required before tagging:
