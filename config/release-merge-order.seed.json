@@ -298,6 +298,12 @@
       "candidate": "v0.88.0-source",
       "base": "codex/v0.87-publication-dry-run-fingerprints",
       "head": "codex/v0.88-evidence-bundle-input-fingerprints"
+    },
+    {
+      "pr": 110,
+      "candidate": "v0.89.0-source",
+      "base": "codex/v0.88-evidence-bundle-input-fingerprints",
+      "head": "codex/v0.89-preflight-artifact-fingerprints"
     }
   ]
 }

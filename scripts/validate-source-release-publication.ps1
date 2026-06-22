@@ -141,6 +141,33 @@ try {
     throw "Publication dry-run refused evidence bundle is missing input fingerprints."
   }
 
+  $evidenceBundlePreflightArtifactFingerprints = $null
+  $artifactFingerprintProperty = $evidence.PSObject.Properties["preflight_artifact_fingerprints"]
+  if ($null -ne $artifactFingerprintProperty) {
+    $evidenceBundlePreflightArtifactFingerprints = $artifactFingerprintProperty.Value
+  }
+  foreach ($fingerprintName in @(
+      "proof_manifest",
+      "release_notes",
+      "source_archive",
+      "windows_bundle_verifier_summary"
+    )) {
+    $fingerprintEntry = $null
+    if ($null -ne $evidenceBundlePreflightArtifactFingerprints) {
+      $fingerprintProperty = $evidenceBundlePreflightArtifactFingerprints.PSObject.Properties[$fingerprintName]
+      if ($null -ne $fingerprintProperty) {
+        $fingerprintEntry = $fingerprintProperty.Value
+      }
+    }
+    if (
+      [string]::IsNullOrWhiteSpace([string]$fingerprintEntry.path) -or
+      [string]::IsNullOrWhiteSpace([string]$fingerprintEntry.sha256) -or
+      [string]$fingerprintEntry.sha256 -notmatch "^[0-9a-fA-F]{64}$"
+    ) {
+      throw "Publication dry-run refused evidence bundle is missing preflight artifact fingerprints."
+    }
+  }
+
   powershell -ExecutionPolicy Bypass -File .\scripts\check-source-release-copy.ps1 -ReleaseNotesPath $resolvedReleaseNotesPath
   if ($LASTEXITCODE -ne 0) {
     throw "check-source-release-copy.ps1 failed for rendered release notes."
@@ -186,6 +213,7 @@ try {
       release_notes = Get-InputFingerprint -Path $resolvedReleaseNotesPath
     }
     evidence_bundle_input_fingerprints = $evidenceBundleInputFingerprints
+    evidence_bundle_preflight_artifact_fingerprints = $evidenceBundlePreflightArtifactFingerprints
     windows_bundle_verifier_ok = [bool]$evidence.windows_bundle_verifier_ok
     windows_bundle_verifier_summary = $evidence.windows_bundle_verifier_summary
     github_ruleset_ok = $evidence.github_ruleset_ok

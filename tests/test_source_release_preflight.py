@@ -69,6 +69,18 @@ def test_source_release_preflight_script_runs_smoke_and_writes_outputs(
     assert Path(summary["proof_manifest"]).name == proof_manifest.name
     assert Path(summary["release_notes"]).name == release_notes.name
     assert Path(summary["source_archive"]).name == proof["source_archive"]
+    assert summary["artifact_fingerprints"]["proof_manifest"]["sha256"] == hashlib.sha256(
+        proof_manifest.read_bytes()
+    ).hexdigest()
+    assert summary["artifact_fingerprints"]["release_notes"]["sha256"] == hashlib.sha256(
+        release_notes.read_bytes()
+    ).hexdigest()
+    assert summary["artifact_fingerprints"]["source_archive"]["sha256"] == proof[
+        "source_archive_sha256"
+    ]
+    assert summary["artifact_fingerprints"]["windows_bundle_verifier_summary"][
+        "sha256"
+    ]
 
     source_archive = out_dir / "proof" / proof["source_archive"]
     assert source_archive.is_file()
@@ -97,6 +109,9 @@ def test_source_release_preflight_script_documents_full_release_checks() -> None
     assert "verify-windows-bundle.ps1" in script
     assert "Verify Windows bundle source boundary" in script
     assert "windows_bundle_verifier_ok" in script
+    assert "artifact_fingerprints" in script
+    assert "SHA256" in script
+    assert "ComputeHash" in script
     assert "run-tests.ps1" in script
     assert "prepare-source-release.ps1" in script
     assert "render-source-release-notes.ps1" in script

@@ -36,6 +36,25 @@ function Invoke-Step {
   & $ScriptBlock
 }
 
+function Get-ArtifactFingerprint {
+  param([Parameter(Mandatory = $true)][string]$Path)
+
+  $resolvedPath = [System.IO.Path]::GetFullPath($Path)
+  $stream = [System.IO.File]::OpenRead($resolvedPath)
+  $sha256 = [System.Security.Cryptography.SHA256]::Create()
+  try {
+    $hashBytes = $sha256.ComputeHash($stream)
+    $hash = [System.BitConverter]::ToString($hashBytes).Replace("-", "").ToLowerInvariant()
+  } finally {
+    $sha256.Dispose()
+    $stream.Dispose()
+  }
+  return [ordered]@{
+    path = $resolvedPath
+    sha256 = $hash
+  }
+}
+
 function Assert-SourceOnlyProof {
   param([Parameter(Mandatory = $true)][object]$Proof)
 
@@ -183,6 +202,12 @@ try {
     source_archive_sha256 = $proof.source_archive_sha256
     proof_manifest = $manifestPath
     release_notes = $releaseNotesPath
+    artifact_fingerprints = [ordered]@{
+      proof_manifest = Get-ArtifactFingerprint -Path $manifestPath
+      release_notes = Get-ArtifactFingerprint -Path $releaseNotesPath
+      source_archive = Get-ArtifactFingerprint -Path (Join-Path $proofDir $proof.source_archive)
+      windows_bundle_verifier_summary = Get-ArtifactFingerprint -Path $windowsBundleVerifierSummaryPath
+    }
     generated_at = (Get-Date).ToUniversalTime().ToString("o")
   }
 

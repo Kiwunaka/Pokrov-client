@@ -34,6 +34,7 @@ def test_release_evidence_bundle_seed_defines_source_only_policy() -> None:
     assert seed["policy"]["does_not_replace_full_preflight"] is True
     assert seed["policy"]["windows_bundle_verifier_required"] is True
     assert seed["policy"]["requires_input_fingerprints"] is True
+    assert seed["policy"]["requires_preflight_artifact_fingerprints"] is True
 
     for flag in (
         "source_only",
@@ -61,6 +62,8 @@ def test_release_evidence_bundle_script_preserves_claim_boundaries() -> None:
         "windows_bundle_verifier_ok",
         "windows_bundle_verifier_summary",
         "input_fingerprints",
+        "preflight_artifact_fingerprints",
+        "preflight summary is missing artifact fingerprints",
         "SHA256",
         "ComputeHash",
         "build\\release-evidence",
@@ -99,6 +102,15 @@ def test_release_evidence_bundle_script_writes_bundle_from_fixture(tmp_path: Pat
                 "proof_manifest": "proof.json",
                 "release_notes": "notes.md",
                 "source_archive_sha256": "a" * 64,
+                "artifact_fingerprints": {
+                    "proof_manifest": {"path": "proof.json", "sha256": "b" * 64},
+                    "release_notes": {"path": "notes.md", "sha256": "c" * 64},
+                    "source_archive": {"path": "source.zip", "sha256": "a" * 64},
+                    "windows_bundle_verifier_summary": {
+                        "path": "windows-bundle-verifier.json",
+                        "sha256": "d" * 64,
+                    },
+                },
             }
         ),
         encoding="utf-8",
@@ -146,7 +158,73 @@ def test_release_evidence_bundle_script_writes_bundle_from_fixture(tmp_path: Pat
     assert bundle["input_fingerprints"]["preflight_summary"]["path"] == str(
         preflight.resolve()
     )
+    assert bundle["preflight_artifact_fingerprints"]["proof_manifest"][
+        "sha256"
+    ] == "b" * 64
+    assert bundle["preflight_artifact_fingerprints"]["release_notes"][
+        "sha256"
+    ] == "c" * 64
+    assert bundle["preflight_artifact_fingerprints"]["source_archive"][
+        "sha256"
+    ] == "a" * 64
+    assert bundle["preflight_artifact_fingerprints"][
+        "windows_bundle_verifier_summary"
+    ]["sha256"] == "d" * 64
     assert bundle["release_boundary"]["official_binary_claim"] is False
+
+
+def test_release_evidence_bundle_rejects_preflight_without_artifact_fingerprints(
+    tmp_path: Path,
+) -> None:
+    preflight = tmp_path / "preflight.json"
+    out_dir = tmp_path / "out"
+
+    preflight.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "tag": "v9.9.9-source",
+                "source_only": True,
+                "no_apk": True,
+                "no_exe": True,
+                "no_store_release": True,
+                "no_trusted_signing_claim": True,
+                "forbidden_file_count": 0,
+                "windows_bundle_verifier_ok": True,
+                "windows_bundle_verifier_summary": "build/windows-bundle-verifier/windows-bundle-verifier.json",
+                "proof_manifest": "proof.json",
+                "release_notes": "notes.md",
+                "source_archive_sha256": "a" * 64,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [
+            "powershell",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(ROOT / "scripts" / "prepare-release-evidence-bundle.ps1"),
+            "-Tag",
+            "v9.9.9-source",
+            "-PreflightSummaryPath",
+            str(preflight),
+            "-OutDir",
+            str(out_dir),
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode != 0
+    assert not (out_dir / "v9.9.9-source-release-evidence.json").exists()
+    assert "preflight summary is missing artifact fingerprints" in (
+        result.stderr + result.stdout
+    )
 
 
 def test_release_evidence_bundle_rejects_preflight_without_windows_proof(
