@@ -147,7 +147,8 @@ try {
   $githubStatusSeedPath = Join-Path $root "config\release-stack-github-status.seed.json"
   $githubStatusSeed = Read-JsonFile -Path $githubStatusSeedPath
   $expectedPrUrlPrefix = [string]$githubStatusSeed.expected_pr_url_prefix
-  $requiredStatusCheckCount = @($githubStatusSeed.required_status_checks).Count
+  $requiredChecks = @($githubStatusSeed.required_status_checks)
+  $requiredStatusCheckCount = @($requiredChecks).Count
   $blockerInventoryPath = Join-Path $root "config\release-blocker-inventory.seed.json"
   $blockerInventory = Read-JsonFile -Path $blockerInventoryPath
 
@@ -436,6 +437,30 @@ try {
       }
     }
   )
+  $githubStatusPrChecks = @(
+    $githubStatusPullRequests | ForEach-Object {
+      $checkEntries = @()
+      $checkEntriesProperty = $_.PSObject.Properties["checks"]
+      if ($null -ne $checkEntriesProperty -and $null -ne $checkEntriesProperty.Value) {
+        $checkEntries = @($checkEntriesProperty.Value)
+      }
+      [ordered]@{
+        pr = [int]$_.pr
+        successful_check_count = [int]$_.successful_check_count
+        failed_check_count = [int]$_.failed_check_count
+        required_status_check_count = [int]$_.required_status_check_count
+        checks = @(
+          $checkEntries | ForEach-Object {
+            [ordered]@{
+              name = [string]$_.name
+              status = [string]$_.status
+              conclusion = [string]$_.conclusion
+            }
+          }
+        )
+      }
+    }
+  )
   $mergeOrderStack = @()
   $mergeOrderStackProperty = $mergeOrder.PSObject.Properties["stack"]
   if ($null -ne $mergeOrderStackProperty -and $null -ne $mergeOrderStackProperty.Value) {
@@ -569,6 +594,43 @@ try {
   if ($githubStatusPrStatesMismatch) {
     $blockingErrors.Add("release stack GitHub status PR states mismatch")
   }
+  $githubStatusPrChecksMismatch = $false
+  if (@($githubStatusPrChecks).Count -ne @($mergeOrderStack).Count) {
+    $githubStatusPrChecksMismatch = $true
+  } else {
+    for ($index = 0; $index -lt @($mergeOrderStack).Count; $index += 1) {
+      $githubStatusPrCheck = $githubStatusPrChecks[$index]
+      $mergeOrderStackItem = $mergeOrderStack[$index]
+      if (
+        [int]$githubStatusPrCheck.pr -ne [int]$mergeOrderStackItem.pr -or
+        [int]$githubStatusPrCheck.successful_check_count -ne [int]$requiredStatusCheckCount -or
+        [int]$githubStatusPrCheck.failed_check_count -ne 0 -or
+        [int]$githubStatusPrCheck.required_status_check_count -ne [int]$requiredStatusCheckCount -or
+        @($githubStatusPrCheck.checks).Count -ne [int]$requiredStatusCheckCount
+      ) {
+        $githubStatusPrChecksMismatch = $true
+        break
+      }
+      for ($checkIndex = 0; $checkIndex -lt @($requiredChecks).Count; $checkIndex += 1) {
+        $requiredCheckName = [string]$requiredChecks[$checkIndex]
+        $githubStatusCheck = @($githubStatusPrCheck.checks)[$checkIndex]
+        if (
+          [string]$githubStatusCheck.name -ne [string]$requiredCheckName -or
+          [string]$githubStatusCheck.status -ne "COMPLETED" -or
+          [string]$githubStatusCheck.conclusion -ne "SUCCESS"
+        ) {
+          $githubStatusPrChecksMismatch = $true
+          break
+        }
+      }
+      if ($githubStatusPrChecksMismatch) {
+        break
+      }
+    }
+  }
+  if ($githubStatusPrChecksMismatch) {
+    $blockingErrors.Add("release stack GitHub status PR checks mismatch")
+  }
   $blockerInventoryLatestPr = [int]$blockerInventory.tracked_candidates.latest_stacked_pr
   if ($blockerInventoryLatestPr -le 0) {
     $blockingErrors.Add("release blocker inventory latest PR is missing")
@@ -676,6 +738,7 @@ try {
     github_status_pr_refs = @($githubStatusPrRefs)
     github_status_pr_urls = @($githubStatusPrUrls)
     github_status_pr_states = @($githubStatusPrStates)
+    github_status_pr_checks = @($githubStatusPrChecks)
     publication_dry_run_ok = [bool](
       $publicationDryRun.source_only -eq $true -and
       $publicationDryRun.dry_run_only -eq $true -and
