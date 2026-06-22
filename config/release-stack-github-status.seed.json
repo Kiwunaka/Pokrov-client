@@ -12,8 +12,10 @@
     "writes_only_ignored_build_output": true,
     "requires_clean_prs": true,
     "requires_ci_success": true,
-    "requires_pull_request_urls": true
+    "requires_pull_request_urls": true,
+    "requires_expected_repository_pr_urls": true
   },
+  "expected_pr_url_prefix": "https://github.com/Kiwunaka/Pokrov-client/pull/",
   "required_status_checks": [
     "Source import and public tree checks",
     "Flutter analyze and tests",

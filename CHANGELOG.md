@@ -209,8 +209,10 @@ production readiness without matching public evidence.
   merge handoff reject mismatched proof chains.
 - Added latest stacked PR URL handoff checks so release stack status records PR
   review links and release merge handoff carries the current top PR URL.
+- Added expected-repository PR URL checks so release stack status and release
+  merge handoff reject review links outside `Kiwunaka/Pokrov-client`.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.93.0-source` candidates.
+  `v0.94.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -309,6 +311,7 @@ production readiness without matching public evidence.
 | `v0.91.0-source` | Pending stacked PR, not tagged | PR #112 |
 | `v0.92.0-source` | Pending stacked PR, not tagged | PR #113 |
 | `v0.93.0-source` | Pending stacked PR, not tagged | PR #114 |
+| `v0.94.0-source` | Pending stacked PR, not tagged | PR #115 |
 
 ### Still Source-Only
 

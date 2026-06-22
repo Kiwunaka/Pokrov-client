@@ -76,6 +76,7 @@ try {
   $mergeOrder = Read-JsonFile -Path $mergeOrderPath
   $stack = @($mergeOrder.stack)
   $requiredChecks = @($seed.required_status_checks)
+  $expectedPrUrlPrefix = [string]$seed.expected_pr_url_prefix
   $snapshot = @(Read-PrStatusSnapshot -Path $PrStatusPath)
   $errors = [System.Collections.Generic.List[string]]::new()
   $checkedPrs = [System.Collections.Generic.List[object]]::new()
@@ -100,6 +101,8 @@ try {
     $prErrors = [System.Collections.Generic.List[string]]::new()
     if ([string]::IsNullOrWhiteSpace($prUrl)) {
       $prErrors.Add("PR #$prNumber pull request URL is missing")
+    } elseif (-not [string]::IsNullOrWhiteSpace($expectedPrUrlPrefix) -and -not $prUrl.StartsWith($expectedPrUrlPrefix, [System.StringComparison]::Ordinal)) {
+      $prErrors.Add("PR #$prNumber pull request URL does not match expected repository")
     } elseif ($prUrl -notmatch "/pull/$prNumber$") {
       $prErrors.Add("PR #$prNumber pull request URL does not match PR number")
     }
@@ -177,6 +180,7 @@ try {
     stack_count = [int]$stack.Count
     latest_pr = [int]$latestStackPr
     latest_pr_url = [string]$latestPrUrl
+    expected_pr_url_prefix = [string]$expectedPrUrlPrefix
     latest_candidate = if ($stack.Count -gt 0) { $stack[-1].candidate } else { "" }
     clean_pr_count = [int]$cleanPrCount
     draft_pr_count = [int]$draftPrCount

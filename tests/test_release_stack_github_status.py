@@ -76,6 +76,8 @@ def test_release_stack_github_status_seed_defines_read_only_policy() -> None:
     assert seed["policy"]["requires_clean_prs"] is True
     assert seed["policy"]["requires_ci_success"] is True
     assert seed["policy"]["requires_pull_request_urls"] is True
+    assert seed["policy"]["requires_expected_repository_pr_urls"] is True
+    assert seed["expected_pr_url_prefix"] == "https://github.com/Kiwunaka/Pokrov-client/pull/"
     assert seed["required_status_checks"] == [
         "Source import and public tree checks",
         "Flutter analyze and tests",
@@ -93,6 +95,8 @@ def test_release_stack_github_status_script_is_read_only() -> None:
         "url",
         "latest_pr_url",
         "pull request URL is missing",
+        "pull request URL does not match expected repository",
+        "expected_pr_url_prefix",
         "mergeStateStatus",
         "statusCheckRollup",
         "build\\release-stack-github-status",
@@ -151,8 +155,8 @@ def test_release_stack_github_status_command_accepts_clean_snapshot(
     assert summary["github_status_ok"] is True
     assert summary["read_only"] is True
     assert summary["stack_count"] >= 5
-    assert summary["latest_pr"] == 114
-    assert summary["latest_pr_url"] == "https://github.com/Kiwunaka/Pokrov-client/pull/114"
+    assert summary["latest_pr"] == 115
+    assert summary["latest_pr_url"] == "https://github.com/Kiwunaka/Pokrov-client/pull/115"
     assert summary["pull_requests"][-1]["url"] == summary["latest_pr_url"]
     assert summary["clean_pr_count"] == summary["stack_count"]
     assert summary["successful_check_count"] == summary["stack_count"] * 3
@@ -198,7 +202,54 @@ def test_release_stack_github_status_rejects_missing_pr_url(
 
     assert result.returncode == 2
     assert summary["github_status_ok"] is False
-    assert "PR #114 pull request URL is missing" in summary["errors"]
+    assert "PR #115 pull request URL is missing" in summary["errors"]
+
+
+def test_release_stack_github_status_rejects_wrong_repository_pr_url(
+    tmp_path: Path,
+) -> None:
+    snapshot = _snapshot_for_stack()
+    snapshot[-1]["url"] = "https://github.com/example/fork/pull/115"
+    snapshot_path = tmp_path / "prs.wrong-repo-url.json"
+    _write_snapshot(snapshot_path, snapshot)
+    out_dir = ROOT / "build" / "release-stack-github-status" / "test-output"
+    shutil.rmtree(out_dir, ignore_errors=True)
+
+    try:
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "check-release-stack-github-status.ps1"),
+                "-PrStatusPath",
+                str(snapshot_path),
+                "-OutDir",
+                str(out_dir),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        summary = json.loads(
+            (out_dir / "release-stack-github-status.json").read_text(
+                encoding="utf-8-sig"
+            )
+        )
+    finally:
+        shutil.rmtree(out_dir, ignore_errors=True)
+
+    assert result.returncode == 2
+    assert summary["github_status_ok"] is False
+    assert summary["expected_pr_url_prefix"] == (
+        "https://github.com/Kiwunaka/Pokrov-client/pull/"
+    )
+    assert "PR #115 pull request URL does not match expected repository" in summary[
+        "errors"
+    ]
 
 
 def test_release_stack_github_status_command_rejects_unsafe_snapshot(
