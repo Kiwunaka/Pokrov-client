@@ -280,6 +280,12 @@
       "candidate": "v0.85.0-source",
       "base": "codex/v0.84-tag-readiness-read-only-summary",
       "head": "codex/v0.85-tag-readiness-input-fingerprints"
+    },
+    {
+      "pr": 107,
+      "candidate": "v0.86.0-source",
+      "base": "codex/v0.85-tag-readiness-input-fingerprints",
+      "head": "codex/v0.86-handoff-tag-readiness-fingerprints"
     }
   ]
 }
