@@ -49,10 +49,10 @@ def _merge_order_summary(ok: bool = True) -> dict:
         "read_only": True,
         "merge_order_ok": ok,
         "linear_base_to_head_chain": ok,
-        "stack_count": 49,
-        "latest_pr": 110,
-        "latest_candidate": "v0.89.0-source",
-        "errors": [] if ok else ["PR #110 base must equal previous head"],
+        "stack_count": 50,
+        "latest_pr": 111,
+        "latest_candidate": "v0.90.0-source",
+        "errors": [] if ok else ["PR #111 base must equal previous head"],
     }
 
 
@@ -62,15 +62,15 @@ def _github_status_summary(ok: bool = True) -> dict:
         "generated_at": "2026-06-15T00:00:02Z",
         "read_only": True,
         "github_status_ok": ok,
-        "stack_count": 49,
-        "latest_pr": 110,
-        "latest_candidate": "v0.89.0-source",
-        "clean_pr_count": 43 if ok else 42,
+        "stack_count": 50,
+        "latest_pr": 111,
+        "latest_candidate": "v0.90.0-source",
+        "clean_pr_count": 44 if ok else 43,
         "draft_pr_count": 0,
         "unclean_pr_count": 0 if ok else 1,
-        "successful_check_count": 147 if ok else 146,
+        "successful_check_count": 150 if ok else 149,
         "failed_check_count": 0 if ok else 1,
-        "errors": [] if ok else ["PR #110 check 'Flutter analyze and tests' is FAILURE"],
+        "errors": [] if ok else ["PR #111 check 'Flutter analyze and tests' is FAILURE"],
     }
 
 
@@ -91,7 +91,7 @@ def _tag_readiness_summary(ready: bool = False) -> dict:
         "schema_version": 1,
         "generated_at": "2026-06-15T00:00:03Z",
         "read_only": True,
-        "tag": "v0.89.0-source",
+        "tag": "v0.90.0-source",
         "ready_for_tag": ready,
         "source_only": True,
         "ships_apk": False,
@@ -99,8 +99,8 @@ def _tag_readiness_summary(ready: bool = False) -> dict:
         "store_release": False,
         "trusted_signing_claim": False,
         "tag_creation_allowed": ready,
-        "latest_candidate": "v0.89.0-source",
-        "latest_stacked_pr": 110,
+        "latest_candidate": "v0.90.0-source",
+        "latest_stacked_pr": 111,
         "input_fingerprints": {
             "blocker_inventory": {
                 "path": "config/release-blocker-inventory.seed.json",
@@ -121,7 +121,7 @@ def _publication_dry_run_summary(ok: bool = True) -> dict:
         "schema_version": 1,
         "generated_at": "2026-06-15T00:00:04Z",
         "read_only": True,
-        "tag": "v0.89.0-source",
+        "tag": "v0.90.0-source",
         "source_only": True,
         "dry_run_only": True,
         "ready_for_manual_review": ok,
@@ -135,25 +135,29 @@ def _publication_dry_run_summary(ok: bool = True) -> dict:
         "windows_bundle_verifier_summary": (
             "build/windows-bundle-verifier/windows-bundle-verifier.json" if ok else ""
         ),
+        "source_archive_sha256": "2" * 64,
         "input_fingerprints": {
             "evidence_bundle": {
-                "path": "build/release-evidence/v0.89.0-source/release-evidence.json",
+                "path": "build/release-evidence/v0.90.0-source/release-evidence.json",
                 "sha256": "c" * 64,
             },
             "release_notes": {
-                "path": "build/source-release/v0.89.0-source/release-notes.md",
+                "path": "build/source-release/v0.90.0-source/release-notes.md",
                 "sha256": "d" * 64,
             },
         },
         "evidence_bundle_input_fingerprints": {
             "preflight_summary": {
-                "path": "build/source-release-preflight/v0.89.0-source/preflight.json",
+                "path": "build/source-release-preflight/v0.90.0-source/preflight.json",
                 "sha256": "e" * 64,
             },
         },
         "evidence_bundle_preflight_artifact_fingerprints": {
             "proof_manifest": {"path": "proof.json", "sha256": "f" * 64},
-            "release_notes": {"path": "notes.md", "sha256": "1" * 64},
+            "release_notes": {
+                "path": "build/source-release/v0.90.0-source/release-notes.md",
+                "sha256": "d" * 64,
+            },
             "source_archive": {"path": "source.zip", "sha256": "2" * 64},
             "windows_bundle_verifier_summary": {
                 "path": "windows-bundle-verifier.json",
@@ -204,7 +208,7 @@ def _write_input_summaries(
             / "source-tag-readiness"
             / "test-inputs"
             / suffix
-            / "v0.89.0-source-tag-readiness.json"
+            / "v0.90.0-source-tag-readiness.json"
         )
         publication_path = (
             ROOT
@@ -212,13 +216,13 @@ def _write_input_summaries(
             / "source-release-publication"
             / "test-inputs"
             / suffix
-            / "v0.89.0-source-publication-dry-run.json"
+            / "v0.90.0-source-publication-dry-run.json"
         )
     else:
         merge_path = tmp_path / "release-merge-order.json"
         github_path = tmp_path / "release-stack-github-status.json"
-        tag_path = tmp_path / "v0.89.0-source-tag-readiness.json"
-        publication_path = tmp_path / "v0.89.0-source-publication-dry-run.json"
+        tag_path = tmp_path / "v0.90.0-source-tag-readiness.json"
+        publication_path = tmp_path / "v0.90.0-source-publication-dry-run.json"
     for path in (merge_path, github_path, tag_path, publication_path):
         path.parent.mkdir(parents=True, exist_ok=True)
     _write_json(merge_path, _merge_order_summary(merge_ok))
@@ -258,6 +262,10 @@ def test_release_merge_handoff_seed_defines_read_only_inputs() -> None:
         seed["policy"][
             "requires_publication_dry_run_evidence_bundle_preflight_artifact_fingerprints"
         ]
+        is True
+    )
+    assert (
+        seed["policy"]["requires_publication_dry_run_artifact_fingerprint_integrity"]
         is True
     )
     assert seed["policy"]["requires_source_only_summary_flags"] is True
@@ -356,6 +364,7 @@ def test_release_merge_handoff_script_is_read_only() -> None:
         "publication dry-run summary is missing input fingerprints",
         "publication dry-run summary is missing evidence bundle input fingerprints",
         "publication dry-run summary is missing evidence bundle preflight artifact fingerprints",
+        "publication dry-run artifact fingerprints mismatch",
         "source_only = $true",
         "no_apk = $true",
         "no_exe = $true",
@@ -444,10 +453,10 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
     assert summary["manual_tag_required"] is True
     assert summary["publish_performed"] is False
     assert summary["tag_push_performed"] is False
-    assert summary["latest_candidate"] == "v0.89.0-source"
-    assert summary["latest_pr"] == 110
-    assert summary["blocker_inventory_latest_candidate"] == "v0.89.0-source"
-    assert summary["blocker_inventory_latest_pr"] == 110
+    assert summary["latest_candidate"] == "v0.90.0-source"
+    assert summary["latest_pr"] == 111
+    assert summary["blocker_inventory_latest_candidate"] == "v0.90.0-source"
+    assert summary["blocker_inventory_latest_pr"] == 111
     assert summary["source_only"] is True
     assert summary["no_apk"] is True
     assert summary["no_exe"] is True
@@ -475,7 +484,7 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
         "sha256"
     ] == _sha256(publication_path)
     assert summary["input_fingerprints"]["publication_dry_run"]["path"].endswith(
-        "v0.89.0-source-publication-dry-run.json"
+        "v0.90.0-source-publication-dry-run.json"
     )
     assert summary["tag_readiness_input_fingerprints"]["blocker_inventory"][
         "sha256"
@@ -511,8 +520,8 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
         "publication_dry_run": 1,
     }
     assert summary["input_stack_counts"] == {
-        "merge_order": 49,
-        "github_status": 49,
+        "merge_order": 50,
+        "github_status": 50,
     }
     assert summary["input_error_count"] == 0
     assert "merge stacked PRs in order" in " ".join(summary["next_manual_steps"])
@@ -534,15 +543,15 @@ def test_release_merge_handoff_uses_seed_default_input_paths() -> None:
         ROOT
         / "build"
         / "source-tag-readiness"
-        / "v0.89.0-source"
-        / "v0.89.0-source-tag-readiness.json"
+        / "v0.90.0-source"
+        / "v0.90.0-source-tag-readiness.json"
     )
     default_publication_path = (
         ROOT
         / "build"
         / "source-release-publication"
-        / "v0.89.0-source"
-        / "v0.89.0-source-publication-dry-run.json"
+        / "v0.90.0-source"
+        / "v0.90.0-source-publication-dry-run.json"
     )
     out_dir = ROOT / "build" / "release-merge-handoff"
     summary_path = out_dir / "release-merge-handoff.json"
@@ -581,10 +590,10 @@ def test_release_merge_handoff_uses_seed_default_input_paths() -> None:
         assert result.returncode == 0, result.stderr + result.stdout
         summary = json.loads(summary_path.read_text(encoding="utf-8-sig"))
         assert summary["handoff_ready_for_maintainer"] is True
-        assert summary["latest_candidate"] == "v0.89.0-source"
-        assert summary["latest_pr"] == 110
-        assert summary["blocker_inventory_latest_candidate"] == "v0.89.0-source"
-        assert summary["blocker_inventory_latest_pr"] == 110
+        assert summary["latest_candidate"] == "v0.90.0-source"
+        assert summary["latest_pr"] == 111
+        assert summary["blocker_inventory_latest_candidate"] == "v0.90.0-source"
+        assert summary["blocker_inventory_latest_pr"] == 111
         assert summary["publication_dry_run_ok"] is True
         assert summary["source_only"] is True
         assert summary["no_apk"] is True
@@ -676,7 +685,7 @@ def test_release_merge_handoff_blocks_mismatched_input_candidates(
         / "source-release-publication"
         / "test-inputs"
         / suffix
-        / "v0.89.0-source-publication-dry-run.json"
+        / "v0.90.0-source-publication-dry-run.json"
     )
     for path in (merge_path, github_path, tag_path, publication_path):
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -782,7 +791,7 @@ def test_release_merge_handoff_blocks_input_summary_errors(
         tmp_path
     )
     merge_summary = json.loads(merge_path.read_text(encoding="utf-8"))
-    merge_summary["errors"] = ["PR #110 base was stale when checked"]
+    merge_summary["errors"] = ["PR #111 base was stale when checked"]
     _write_json(merge_path, merge_summary)
     out_dir = ROOT / "build" / "release-merge-handoff" / "test-output"
     shutil.rmtree(out_dir, ignore_errors=True)
@@ -821,7 +830,7 @@ def test_release_merge_handoff_blocks_input_summary_errors(
     assert result.returncode == 2
     assert summary["handoff_ready_for_maintainer"] is False
     assert summary["input_error_count"] == 1
-    assert summary["input_errors"] == ["PR #110 base was stale when checked"]
+    assert summary["input_errors"] == ["PR #111 base was stale when checked"]
     assert "input summaries report errors" in summary["blocking_errors"]
 
 
@@ -1393,6 +1402,58 @@ def test_release_merge_handoff_blocks_missing_publication_evidence_bundle_prefli
     )
 
 
+def test_release_merge_handoff_blocks_publication_artifact_fingerprint_mismatch(
+    tmp_path: Path,
+) -> None:
+    merge_path, github_path, tag_path, publication_path = _write_input_summaries(
+        tmp_path
+    )
+    publication_summary = json.loads(publication_path.read_text(encoding="utf-8"))
+    publication_summary["evidence_bundle_preflight_artifact_fingerprints"][
+        "release_notes"
+    ]["sha256"] = "0" * 64
+    _write_json(publication_path, publication_summary)
+    out_dir = ROOT / "build" / "release-merge-handoff" / "test-output"
+    shutil.rmtree(out_dir, ignore_errors=True)
+
+    try:
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "prepare-release-merge-handoff.ps1"),
+                "-MergeOrderPath",
+                str(merge_path),
+                "-GithubStatusPath",
+                str(github_path),
+                "-TagReadinessPath",
+                str(tag_path),
+                "-PublicationDryRunPath",
+                str(publication_path),
+                "-OutDir",
+                str(out_dir),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        summary = json.loads(
+            (out_dir / "release-merge-handoff.json").read_text(encoding="utf-8-sig")
+        )
+    finally:
+        shutil.rmtree(out_dir, ignore_errors=True)
+
+    assert result.returncode == 2
+    assert summary["handoff_ready_for_maintainer"] is False
+    assert "publication dry-run artifact fingerprints mismatch" in summary[
+        "blocking_errors"
+    ]
+
+
 def test_release_merge_handoff_blocks_blocker_inventory_candidate_mismatch(
     tmp_path: Path,
 ) -> None:
@@ -1406,8 +1467,8 @@ def test_release_merge_handoff_blocks_blocker_inventory_candidate_mismatch(
 
     try:
         inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
-        inventory["tracked_candidates"]["latest_candidate"] = "v0.90.0-source"
-        inventory["tracked_candidates"]["latest_stacked_pr"] = 111
+        inventory["tracked_candidates"]["latest_candidate"] = "v0.91.0-source"
+        inventory["tracked_candidates"]["latest_stacked_pr"] = 112
         _write_json(inventory_path, inventory)
 
         result = subprocess.run(

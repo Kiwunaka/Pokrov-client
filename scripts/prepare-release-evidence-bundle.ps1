@@ -43,6 +43,41 @@ function Get-InputFingerprint {
   }
 }
 
+function Assert-ArtifactFingerprintIntegrity {
+  param(
+    [Parameter(Mandatory = $true)][object]$Fingerprint,
+    [Parameter(Mandatory = $true)][string]$ExpectedPath,
+    [Parameter(Mandatory = $true)][string]$Name,
+    [string]$ExpectedSha256 = ""
+  )
+
+  if ([string]::IsNullOrWhiteSpace($ExpectedPath)) {
+    throw "Release evidence refused preflight summary with missing artifact path for $Name."
+  }
+
+  $resolvedExpectedPath = [System.IO.Path]::GetFullPath((Resolve-RepoPath -Path $ExpectedPath))
+  $resolvedFingerprintPath = [System.IO.Path]::GetFullPath((Resolve-RepoPath -Path ([string]$Fingerprint.path)))
+  if (-not $resolvedFingerprintPath.Equals($resolvedExpectedPath, [System.StringComparison]::OrdinalIgnoreCase)) {
+    throw "Release evidence refused preflight summary with artifact fingerprint mismatch for $Name."
+  }
+
+  if (-not (Test-Path -LiteralPath $resolvedExpectedPath -PathType Leaf)) {
+    throw "Release evidence refused preflight summary with artifact fingerprint mismatch for $Name."
+  }
+
+  $actualFingerprint = Get-InputFingerprint -Path $resolvedExpectedPath
+  if ([string]$Fingerprint.sha256 -ne [string]$actualFingerprint.sha256) {
+    throw "Release evidence refused preflight summary with artifact fingerprint mismatch for $Name."
+  }
+
+  if (
+    -not [string]::IsNullOrWhiteSpace($ExpectedSha256) -and
+    [string]$Fingerprint.sha256 -ne $ExpectedSha256
+  ) {
+    throw "Release evidence refused preflight summary with artifact fingerprint mismatch for $Name."
+  }
+}
+
 function Assert-SourceOnlySummary {
   param([Parameter(Mandatory = $true)][object]$Summary)
 
@@ -96,6 +131,24 @@ function Assert-SourceOnlySummary {
       throw "Release evidence refused preflight summary is missing artifact fingerprints."
     }
   }
+
+  Assert-ArtifactFingerprintIntegrity `
+    -Fingerprint $artifactFingerprints.proof_manifest `
+    -ExpectedPath ([string]$Summary.proof_manifest) `
+    -Name "proof_manifest"
+  Assert-ArtifactFingerprintIntegrity `
+    -Fingerprint $artifactFingerprints.release_notes `
+    -ExpectedPath ([string]$Summary.release_notes) `
+    -Name "release_notes"
+  Assert-ArtifactFingerprintIntegrity `
+    -Fingerprint $artifactFingerprints.source_archive `
+    -ExpectedPath ([string]$Summary.source_archive) `
+    -ExpectedSha256 ([string]$Summary.source_archive_sha256) `
+    -Name "source_archive"
+  Assert-ArtifactFingerprintIntegrity `
+    -Fingerprint $artifactFingerprints.windows_bundle_verifier_summary `
+    -ExpectedPath ([string]$Summary.windows_bundle_verifier_summary) `
+    -Name "windows_bundle_verifier_summary"
 }
 
 Push-Location $root

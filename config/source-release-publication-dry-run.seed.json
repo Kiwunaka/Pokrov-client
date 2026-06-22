@@ -19,7 +19,8 @@
     "requires_evidence_bundle_input_fingerprints": true,
     "requires_evidence_bundle_preflight_artifact_fingerprints": true,
     "github_enforcement_claim_requires_bundle_approval": true,
-    "windows_bundle_verifier_claim_requires_bundle_proof": true
+    "windows_bundle_verifier_claim_requires_bundle_proof": true,
+    "requires_evidence_bundle_preflight_artifact_fingerprint_integrity": true
   },
   "required_evidence_flags": [
     "source_only",

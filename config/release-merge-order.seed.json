@@ -304,6 +304,12 @@
       "candidate": "v0.89.0-source",
       "base": "codex/v0.88-evidence-bundle-input-fingerprints",
       "head": "codex/v0.89-preflight-artifact-fingerprints"
+    },
+    {
+      "pr": 111,
+      "candidate": "v0.90.0-source",
+      "base": "codex/v0.89-preflight-artifact-fingerprints",
+      "head": "codex/v0.90-artifact-fingerprint-integrity"
     }
   ]
 }

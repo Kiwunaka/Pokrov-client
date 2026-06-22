@@ -198,8 +198,11 @@ production readiness without matching public evidence.
 - Added source preflight artifact fingerprints for proof manifest, release
   notes, source archive, and Windows verifier summary, then propagated them
   through release evidence, publication dry-run, and handoff evidence.
+- Added artifact fingerprint integrity checks so release evidence, publication
+  dry-run, and release merge handoff reject stale or mismatched source proof
+  artifacts.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.89.0-source` candidates.
+  `v0.90.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -294,6 +297,7 @@ production readiness without matching public evidence.
 | `v0.87.0-source` | Pending stacked PR, not tagged | PR #108 |
 | `v0.88.0-source` | Pending stacked PR, not tagged | PR #109 |
 | `v0.89.0-source` | Pending stacked PR, not tagged | PR #110 |
+| `v0.90.0-source` | Pending stacked PR, not tagged | PR #111 |
 
 ### Still Source-Only
 

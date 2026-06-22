@@ -67,6 +67,41 @@ function Get-InputFingerprint {
   }
 }
 
+function Assert-ArtifactFingerprintIntegrity {
+  param(
+    [Parameter(Mandatory = $true)][object]$Fingerprint,
+    [Parameter(Mandatory = $true)][string]$ExpectedPath,
+    [Parameter(Mandatory = $true)][string]$Name,
+    [string]$ExpectedSha256 = ""
+  )
+
+  if ([string]::IsNullOrWhiteSpace($ExpectedPath)) {
+    throw "Publication dry-run refused evidence with missing artifact path for $Name."
+  }
+
+  $resolvedExpectedPath = [System.IO.Path]::GetFullPath((Resolve-RepoPath -Path $ExpectedPath))
+  $resolvedFingerprintPath = [System.IO.Path]::GetFullPath((Resolve-RepoPath -Path ([string]$Fingerprint.path)))
+  if (-not $resolvedFingerprintPath.Equals($resolvedExpectedPath, [System.StringComparison]::OrdinalIgnoreCase)) {
+    throw "Publication dry-run refused evidence with artifact fingerprint mismatch for $Name."
+  }
+
+  if (-not (Test-Path -LiteralPath $resolvedExpectedPath -PathType Leaf)) {
+    throw "Publication dry-run refused evidence with artifact fingerprint mismatch for $Name."
+  }
+
+  $actualFingerprint = Get-InputFingerprint -Path $resolvedExpectedPath
+  if ([string]$Fingerprint.sha256 -ne [string]$actualFingerprint.sha256) {
+    throw "Publication dry-run refused evidence with artifact fingerprint mismatch for $Name."
+  }
+
+  if (
+    -not [string]::IsNullOrWhiteSpace($ExpectedSha256) -and
+    [string]$Fingerprint.sha256 -ne $ExpectedSha256
+  ) {
+    throw "Publication dry-run refused evidence with artifact fingerprint mismatch for $Name."
+  }
+}
+
 Push-Location $root
 try {
   $resolvedEvidenceBundlePath = Resolve-RepoPath -Path $EvidenceBundlePath
@@ -167,6 +202,24 @@ try {
       throw "Publication dry-run refused evidence bundle is missing preflight artifact fingerprints."
     }
   }
+
+  Assert-ArtifactFingerprintIntegrity `
+    -Fingerprint $evidenceBundlePreflightArtifactFingerprints.proof_manifest `
+    -ExpectedPath ([string]$evidenceBundlePreflightArtifactFingerprints.proof_manifest.path) `
+    -Name "proof_manifest"
+  Assert-ArtifactFingerprintIntegrity `
+    -Fingerprint $evidenceBundlePreflightArtifactFingerprints.release_notes `
+    -ExpectedPath $resolvedReleaseNotesPath `
+    -Name "release_notes"
+  Assert-ArtifactFingerprintIntegrity `
+    -Fingerprint $evidenceBundlePreflightArtifactFingerprints.source_archive `
+    -ExpectedPath ([string]$evidenceBundlePreflightArtifactFingerprints.source_archive.path) `
+    -ExpectedSha256 ([string]$evidence.source_archive_sha256) `
+    -Name "source_archive"
+  Assert-ArtifactFingerprintIntegrity `
+    -Fingerprint $evidenceBundlePreflightArtifactFingerprints.windows_bundle_verifier_summary `
+    -ExpectedPath ([string]$evidence.windows_bundle_verifier_summary) `
+    -Name "windows_bundle_verifier_summary"
 
   powershell -ExecutionPolicy Bypass -File .\scripts\check-source-release-copy.ps1 -ReleaseNotesPath $resolvedReleaseNotesPath
   if ($LASTEXITCODE -ne 0) {
