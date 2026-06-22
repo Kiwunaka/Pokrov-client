@@ -126,20 +126,38 @@ try {
       $cleanPrCount += 1
     }
 
+    $prChecks = [System.Collections.Generic.List[object]]::new()
+    $prSuccessfulCheckCount = 0
+    $prFailedCheckCount = 0
     foreach ($checkName in $requiredChecks) {
       $checkMatches = @($status.statusCheckRollup | Where-Object { $_.name -eq $checkName })
       if ($checkMatches.Count -lt 1) {
         $failedCheckCount += 1
+        $prFailedCheckCount += 1
+        $prChecks.Add([ordered]@{
+            name = [string]$checkName
+            status = "MISSING"
+            conclusion = "MISSING"
+          })
         $prErrors.Add("PR #$prNumber check '$checkName' is missing")
         continue
       }
       $check = $checkMatches[0]
-      if ($check.status -ne "COMPLETED" -or $check.conclusion -ne "SUCCESS") {
+      $checkStatus = [string]$check.status
+      $checkConclusion = [string]$check.conclusion
+      $prChecks.Add([ordered]@{
+          name = [string]$checkName
+          status = [string]$checkStatus
+          conclusion = [string]$checkConclusion
+        })
+      if ($checkStatus -ne "COMPLETED" -or $checkConclusion -ne "SUCCESS") {
         $failedCheckCount += 1
-        $detail = if ($check.conclusion) { $check.conclusion } else { $check.status }
+        $prFailedCheckCount += 1
+        $detail = if ($checkConclusion) { $checkConclusion } else { $checkStatus }
         $prErrors.Add("PR #$prNumber check '$checkName' is $detail")
       } else {
         $successfulCheckCount += 1
+        $prSuccessfulCheckCount += 1
       }
     }
 
@@ -154,6 +172,10 @@ try {
         head = $item.head
         mergeStateStatus = $status.mergeStateStatus
         isDraft = [bool]$status.isDraft
+        successful_check_count = [int]$prSuccessfulCheckCount
+        failed_check_count = [int]$prFailedCheckCount
+        required_status_check_count = [int]@($requiredChecks).Count
+        checks = @($prChecks)
         errors = @($prErrors)
       })
   }
