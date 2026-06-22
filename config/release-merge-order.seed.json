@@ -406,6 +406,12 @@
       "candidate": "v0.106.0-source",
       "base": "codex/v0.105-handoff-preflight-fingerprint",
       "head": "codex/v0.106-handoff-publication-input-fingerprints"
+    },
+    {
+      "pr": 128,
+      "candidate": "v0.107.0-source",
+      "base": "codex/v0.106-handoff-publication-input-fingerprints",
+      "head": "codex/v0.107-handoff-tag-readiness-input-fingerprints"
     }
   ]
 }

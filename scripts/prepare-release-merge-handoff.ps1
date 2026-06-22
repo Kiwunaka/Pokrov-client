@@ -276,6 +276,14 @@ try {
   }
   if ($missingTagReadinessInputFingerprints) {
     $blockingErrors.Add("tag readiness summary is missing input fingerprints")
+  } else {
+    foreach ($fingerprintName in @("blocker_inventory", "source_readiness")) {
+      $fingerprintEntry = $tagReadinessInputFingerprints.PSObject.Properties[$fingerprintName].Value
+      Assert-InputFingerprintIntegrity `
+        -Fingerprint $fingerprintEntry `
+        -ErrorMessage "tag readiness input fingerprints mismatch" `
+        -BlockingErrors $blockingErrors
+    }
   }
   $publicationDryRunInputFingerprints = $null
   $publicationDryRunInputFingerprintProperty = $publicationDryRun.PSObject.Properties["input_fingerprints"]
