@@ -214,8 +214,11 @@ production readiness without matching public evidence.
 - Added GitHub status expected PR URL prefix consistency checks so release
   merge handoff rejects stale or mixed summaries from a different repository
   boundary.
+- Added GitHub status summary count consistency checks so release merge
+  handoff rejects stale or malformed clean/check-count evidence before
+  maintainer review.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.95.0-source` candidates.
+  `v0.96.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -316,6 +319,7 @@ production readiness without matching public evidence.
 | `v0.93.0-source` | Pending stacked PR, not tagged | PR #114 |
 | `v0.94.0-source` | Pending stacked PR, not tagged | PR #115 |
 | `v0.95.0-source` | Pending stacked PR, not tagged | PR #116 |
+| `v0.96.0-source` | Pending stacked PR, not tagged | PR #117 |
 
 ### Still Source-Only
 
