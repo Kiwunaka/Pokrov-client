@@ -400,6 +400,12 @@
       "candidate": "v0.105.0-source",
       "base": "codex/v0.104-publication-preflight-fingerprint",
       "head": "codex/v0.105-handoff-preflight-fingerprint"
+    },
+    {
+      "pr": 127,
+      "candidate": "v0.106.0-source",
+      "base": "codex/v0.105-handoff-preflight-fingerprint",
+      "head": "codex/v0.106-handoff-publication-input-fingerprints"
     }
   ]
 }

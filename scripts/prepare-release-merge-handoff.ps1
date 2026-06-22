@@ -302,6 +302,14 @@ try {
   }
   if ($missingPublicationDryRunInputFingerprints) {
     $blockingErrors.Add("publication dry-run summary is missing input fingerprints")
+  } else {
+    foreach ($fingerprintName in @("evidence_bundle", "release_notes")) {
+      $fingerprintEntry = $publicationDryRunInputFingerprints.PSObject.Properties[$fingerprintName].Value
+      Assert-InputFingerprintIntegrity `
+        -Fingerprint $fingerprintEntry `
+        -ErrorMessage "publication dry-run input fingerprints mismatch" `
+        -BlockingErrors $blockingErrors
+    }
   }
   $publicationDryRunEvidenceBundleInputFingerprints = $null
   $publicationDryRunEvidenceBundleInputFingerprintProperty = $publicationDryRun.PSObject.Properties["evidence_bundle_input_fingerprints"]
