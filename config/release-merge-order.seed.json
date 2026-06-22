@@ -322,6 +322,12 @@
       "candidate": "v0.92.0-source",
       "base": "codex/v0.91-release-commit-sha-consistency",
       "head": "codex/v0.92-preflight-ref-commit-consistency"
+    },
+    {
+      "pr": 114,
+      "candidate": "v0.93.0-source",
+      "base": "codex/v0.92-preflight-ref-commit-consistency",
+      "head": "codex/v0.93-handoff-latest-pr-url"
     }
   ]
 }

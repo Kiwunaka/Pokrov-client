@@ -13,6 +13,10 @@ commit SHA consistency checks across source preflight, release evidence,
 publication dry-run, and release merge handoff; it is not tagged and does not
 ship APK/EXE binaries.
 
+Source readiness note: `v0.93.0-source` is a pending stacked PR for carrying
+the latest stacked PR URL from release stack status into release merge handoff;
+it is not tagged and does not ship APK/EXE binaries.
+
 Source readiness note: `v0.53.0-source` is a pending stacked PR for Windows
 verifier CI/preflight enforcement; it is not tagged and does not ship APK/EXE
 binaries.

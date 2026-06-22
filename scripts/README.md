@@ -52,7 +52,8 @@ Current helpers:
   `build/release-merge-order/` output and does not merge, push, or publish
   anything
 - `check-release-stack-github-status.ps1`: checks a read-only release stack GitHub status
-  snapshot against the local merge-order manifest; writes ignored
+  snapshot against the local merge-order manifest, including PR URLs for
+  maintainer review; writes ignored
   `build/release-stack-github-status/` output and does not merge, push, or
   publish anything
 - `prepare-release-merge-handoff.ps1`: creates a release merge handoff report
@@ -63,10 +64,11 @@ Current helpers:
   read-only input summary checks, stack-count consistency, error-free input
   summary checks, tag-readiness blocker-count consistency, tag-readiness
   blocker entry-shape checks, tag-readiness ready-flag consistency,
-  tag-readiness blocker-absence consistency, open-blocker evidence fields, and
-  tag-readiness latest stacked PR consistency, plus explicit source-only
-  no-binary flags. Seed defaults must track the blocker inventory latest
-  candidate, and prerequisite summaries must come from their expected ignored
+  tag-readiness blocker-absence consistency, open-blocker evidence fields,
+  tag-readiness latest stacked PR consistency, and latest PR URL consistency,
+  plus explicit source-only no-binary flags. Seed defaults must track the
+  blocker inventory latest candidate, and prerequisite summaries must come from
+  their expected ignored
   `build/` output roots; the helper does not merge, tag, push, publish, or
   upload anything
 - `verify-windows-bundle.ps1`: Windows bundle verifier for source-only Windows
