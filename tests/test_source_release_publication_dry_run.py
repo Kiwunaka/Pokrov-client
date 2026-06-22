@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import subprocess
 from pathlib import Path
 
@@ -16,6 +17,10 @@ def _read_json(relative_path: str) -> dict:
     return json.loads(_read(relative_path))
 
 
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def test_publication_dry_run_seed_defines_no_publish_policy() -> None:
     seed = _read_json("config/source-release-publication-dry-run.seed.json")
 
@@ -28,6 +33,7 @@ def test_publication_dry_run_seed_defines_no_publish_policy() -> None:
     assert seed["policy"]["writes_only_ignored_build_output"] is True
     assert seed["policy"]["requires_source_only_evidence_bundle"] is True
     assert seed["policy"]["requires_release_copy_check"] is True
+    assert seed["policy"]["requires_input_fingerprints"] is True
     assert seed["policy"]["github_enforcement_claim_requires_bundle_approval"] is True
     assert seed["policy"]["windows_bundle_verifier_claim_requires_bundle_proof"] is True
     assert "windows_bundle_verifier_ok" in seed["required_evidence_flags"]
@@ -45,6 +51,9 @@ def test_publication_dry_run_script_is_local_only() -> None:
         "dry_run_only = $true",
         "windows_bundle_verifier_ok",
         "windows_bundle_verifier_summary",
+        "input_fingerprints",
+        "SHA256",
+        "ComputeHash",
         "build\\source-release-publication",
     ):
         assert phrase in script
@@ -147,6 +156,12 @@ def test_publication_dry_run_writes_summary_from_fixtures(tmp_path: Path) -> Non
     assert summary["windows_bundle_verifier_ok"] is True
     assert summary["windows_bundle_verifier_summary"].endswith(
         "windows-bundle-verifier.json"
+    )
+    assert summary["input_fingerprints"]["evidence_bundle"]["sha256"] == _sha256(
+        evidence
+    )
+    assert summary["input_fingerprints"]["release_notes"]["sha256"] == _sha256(
+        notes
     )
     assert summary["ready_for_manual_review"] is True
 

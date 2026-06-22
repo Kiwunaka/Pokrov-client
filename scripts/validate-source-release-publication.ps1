@@ -48,6 +48,25 @@ function Assert-Contains {
   }
 }
 
+function Get-InputFingerprint {
+  param([Parameter(Mandatory = $true)][string]$Path)
+
+  $resolvedPath = [System.IO.Path]::GetFullPath($Path)
+  $stream = [System.IO.File]::OpenRead($resolvedPath)
+  $sha256 = [System.Security.Cryptography.SHA256]::Create()
+  try {
+    $hashBytes = $sha256.ComputeHash($stream)
+    $hash = [System.BitConverter]::ToString($hashBytes).Replace("-", "").ToLowerInvariant()
+  } finally {
+    $sha256.Dispose()
+    $stream.Dispose()
+  }
+  return [ordered]@{
+    path = $resolvedPath
+    sha256 = $hash
+  }
+}
+
 Push-Location $root
 try {
   $resolvedEvidenceBundlePath = Resolve-RepoPath -Path $EvidenceBundlePath
@@ -142,6 +161,10 @@ try {
     release_notes = $resolvedReleaseNotesPath
     commit_sha = $evidence.commit_sha
     source_archive_sha256 = $evidence.source_archive_sha256
+    input_fingerprints = [ordered]@{
+      evidence_bundle = Get-InputFingerprint -Path $resolvedEvidenceBundlePath
+      release_notes = Get-InputFingerprint -Path $resolvedReleaseNotesPath
+    }
     windows_bundle_verifier_ok = [bool]$evidence.windows_bundle_verifier_ok
     windows_bundle_verifier_summary = $evidence.windows_bundle_verifier_summary
     github_ruleset_ok = $evidence.github_ruleset_ok
