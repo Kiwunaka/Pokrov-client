@@ -334,6 +334,12 @@
       "candidate": "v0.94.0-source",
       "base": "codex/v0.93-handoff-latest-pr-url",
       "head": "codex/v0.94-release-pr-url-repo-boundary"
+    },
+    {
+      "pr": 116,
+      "candidate": "v0.95.0-source",
+      "base": "codex/v0.94-release-pr-url-repo-boundary",
+      "head": "codex/v0.95-handoff-pr-url-prefix-consistency"
     }
   ]
 }

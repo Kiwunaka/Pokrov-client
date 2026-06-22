@@ -392,10 +392,17 @@ try {
     [int]$githubStatus.latest_pr
   ) | Select-Object -Unique
   $githubStatusLatestPrUrl = [string]$githubStatus.latest_pr_url
+  $githubStatusExpectedPrUrlPrefix = [string]$githubStatus.expected_pr_url_prefix
   if (@($prValues).Count -ne 1) {
     $blockingErrors.Add("input summaries do not agree on latest PR")
   } elseif ([int]$tagReadiness.latest_stacked_pr -ne [int]@($prValues)[0]) {
     $blockingErrors.Add("tag readiness latest stacked PR mismatch")
+  }
+  if (
+    [string]::IsNullOrWhiteSpace($githubStatusExpectedPrUrlPrefix) -or
+    [string]$githubStatusExpectedPrUrlPrefix -ne [string]$expectedPrUrlPrefix
+  ) {
+    $blockingErrors.Add("release stack GitHub status expected PR URL prefix mismatch")
   }
   if ([string]::IsNullOrWhiteSpace($githubStatusLatestPrUrl)) {
     $blockingErrors.Add("release stack GitHub status latest PR URL is missing")
@@ -462,6 +469,7 @@ try {
     latest_pr = if (@($prValues).Count -gt 0) { [int]@($prValues)[0] } else { 0 }
     latest_pr_url = [string]$githubStatusLatestPrUrl
     expected_pr_url_prefix = [string]$expectedPrUrlPrefix
+    github_status_expected_pr_url_prefix = [string]$githubStatusExpectedPrUrlPrefix
     blocker_inventory_latest_candidate = [string]$blockerInventoryLatestCandidate
     blocker_inventory_latest_pr = [int]$blockerInventoryLatestPr
     merge_order_ok = [bool]$mergeOrder.merge_order_ok

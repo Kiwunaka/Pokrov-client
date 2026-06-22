@@ -21,6 +21,11 @@ Source readiness note: `v0.94.0-source` is a pending stacked PR for verifying
 latest stacked PR URLs stay inside the expected public repository boundary; it
 is not tagged and does not ship APK/EXE binaries.
 
+Source readiness note: `v0.95.0-source` is a pending stacked PR for verifying
+that release merge handoff consumes GitHub status summaries with the same
+expected PR URL prefix as the configured public repository boundary; it is not
+tagged and does not ship APK/EXE binaries.
+
 Source readiness note: `v0.53.0-source` is a pending stacked PR for Windows
 verifier CI/preflight enforcement; it is not tagged and does not ship APK/EXE
 binaries.
