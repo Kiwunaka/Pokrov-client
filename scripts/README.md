@@ -69,7 +69,8 @@ Current helpers:
   tag-readiness latest stacked PR consistency, latest PR URL consistency, and
   expected repository PR URL consistency, including the GitHub status summary
   `expected_pr_url_prefix` matching the configured public repository prefix,
-  plus explicit source-only no-binary flags. Seed defaults must track the
+  and GitHub status clean/check-count consistency carried as
+  `github_status_counts`, plus explicit source-only no-binary flags. Seed defaults must track the
   blocker inventory latest candidate, and prerequisite summaries must come from
   their expected ignored
   `build/` output roots; the helper does not merge, tag, push, publish, or
