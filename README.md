@@ -158,6 +158,7 @@ Source release status:
 | `v0.96.0-source` | Pending stacked PR, not tagged | Release handoff verifies GitHub status counts match the stack and required checks. |
 | `v0.97.0-source` | Pending stacked PR, not tagged | Release handoff verifies GitHub status pull request entries are present and aligned. |
 | `v0.98.0-source` | Pending stacked PR, not tagged | Release handoff verifies GitHub status PR sequence matches the merge-order stack. |
+| `v0.99.0-source` | Pending stacked PR, not tagged | Release handoff verifies GitHub status PR base/head refs match the merge-order stack. |
 
 ## Which App Should I Use?
 
