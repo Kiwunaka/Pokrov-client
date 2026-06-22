@@ -419,6 +419,14 @@ try {
       }
     }
   )
+  $githubStatusPrUrls = @(
+    $githubStatusPullRequests | ForEach-Object {
+      [ordered]@{
+        pr = [int]$_.pr
+        url = [string]$_.url
+      }
+    }
+  )
   $mergeOrderStack = @()
   $mergeOrderStackProperty = $mergeOrder.PSObject.Properties["stack"]
   if ($null -ne $mergeOrderStackProperty -and $null -ne $mergeOrderStackProperty.Value) {
@@ -511,6 +519,26 @@ try {
   }
   if ($githubStatusPrRefsMismatch) {
     $blockingErrors.Add("release stack GitHub status PR refs mismatch")
+  }
+  $githubStatusPrUrlsMismatch = $false
+  if (@($githubStatusPrUrls).Count -ne @($mergeOrderStack).Count) {
+    $githubStatusPrUrlsMismatch = $true
+  } else {
+    for ($index = 0; $index -lt @($mergeOrderStack).Count; $index += 1) {
+      $githubStatusPrUrl = $githubStatusPrUrls[$index]
+      $mergeOrderStackItem = $mergeOrderStack[$index]
+      $expectedPrUrl = "$expectedPrUrlPrefix$([int]$mergeOrderStackItem.pr)"
+      if (
+        [int]$githubStatusPrUrl.pr -ne [int]$mergeOrderStackItem.pr -or
+        [string]$githubStatusPrUrl.url -ne [string]$expectedPrUrl
+      ) {
+        $githubStatusPrUrlsMismatch = $true
+        break
+      }
+    }
+  }
+  if ($githubStatusPrUrlsMismatch) {
+    $blockingErrors.Add("release stack GitHub status PR URLs mismatch")
   }
   $blockerInventoryLatestPr = [int]$blockerInventory.tracked_candidates.latest_stacked_pr
   if ($blockerInventoryLatestPr -le 0) {
@@ -617,6 +645,7 @@ try {
     github_status_pull_request_count = [int]$githubStatusPullRequestCount
     github_status_pr_sequence = @($githubStatusPrSequence)
     github_status_pr_refs = @($githubStatusPrRefs)
+    github_status_pr_urls = @($githubStatusPrUrls)
     publication_dry_run_ok = [bool](
       $publicationDryRun.source_only -eq $true -and
       $publicationDryRun.dry_run_only -eq $true -and
