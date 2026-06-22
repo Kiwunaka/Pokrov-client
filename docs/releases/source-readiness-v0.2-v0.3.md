@@ -1,10 +1,36 @@
-# Source Readiness: v0.2-v0.94
+# Source Readiness: v0.2-v0.95
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
 checklist is run on the exact commit. The machine-readable readiness inventory
 lives in
 [`config/source-release-readiness.seed.json`](../../config/source-release-readiness.seed.json).
+
+## v0.95.0-source Candidate
+
+Status: pending stacked PR, not tagged.
+
+Current evidence:
+
+- PR #116: release merge handoff validates that the GitHub status summary
+  expected PR URL prefix matches the configured public repository PR URL
+  prefix before maintainer handoff can be marked ready
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run `scripts/check-release-stack-github-status.ps1` and confirm
+  `expected_pr_url_prefix` is `https://github.com/Kiwunaka/Pokrov-client/pull/`
+- run `scripts/prepare-release-merge-handoff.ps1` and confirm the handoff
+  carries the same `github_status_expected_pr_url_prefix`
+- run the full source release preflight on the exact annotated tag with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review source-only release notes and evidence bundle
+
+Source-only boundary:
+
+- no APK, EXE, store release, trusted signing, or official binary claim
 
 ## v0.94.0-source Candidate
 

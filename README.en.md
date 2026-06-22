@@ -195,6 +195,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.92.0-source` | Pending stacked PR, not tagged | Source preflight and handoff verify resolved ref commit SHA consistency. |
 | `v0.93.0-source` | Pending stacked PR, not tagged | Release stack status and handoff carry the latest PR URL for maintainer review. |
 | `v0.94.0-source` | Pending stacked PR, not tagged | Release stack status and handoff verify latest PR URLs stay inside the expected public repo. |
+| `v0.95.0-source` | Pending stacked PR, not tagged | Release handoff verifies GitHub status expected PR URL prefixes match the public repo boundary. |
 
 ## Architecture Boundary
 
