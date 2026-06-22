@@ -382,6 +382,12 @@
       "candidate": "v0.102.0-source",
       "base": "codex/v0.101-handoff-github-pr-states",
       "head": "codex/v0.102-handoff-github-pr-checks"
+    },
+    {
+      "pr": 124,
+      "candidate": "v0.103.0-source",
+      "base": "codex/v0.102-handoff-github-pr-checks",
+      "head": "codex/v0.103-handoff-github-pr-check-trace"
     }
   ]
 }

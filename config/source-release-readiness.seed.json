@@ -1128,6 +1128,17 @@
       "ships_exe": false,
       "store_release": false,
       "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.103.0-source",
+      "status": "stacked_pr_green_not_tagged",
+      "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/124",
+      "scope": "Release stack GitHub status records per-check GitHub Actions trace evidence, and release merge handoff validates every GitHub status PR check trace before maintainer review.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
     }
   ]
 }

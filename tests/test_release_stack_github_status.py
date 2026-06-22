@@ -18,11 +18,14 @@ def _read_json(relative_path: str) -> dict:
 
 
 def _check_run(name: str, conclusion: str = "SUCCESS") -> dict:
+    slug = name.lower().replace(" ", "-")
     return {
         "__typename": "CheckRun",
         "name": name,
         "status": "COMPLETED",
         "conclusion": conclusion,
+        "detailsUrl": f"https://github.com/Kiwunaka/Pokrov-client/actions/runs/123/jobs/{slug}",
+        "workflowName": "CI",
     }
 
 
@@ -78,6 +81,7 @@ def test_release_stack_github_status_seed_defines_read_only_policy() -> None:
     assert seed["policy"]["requires_pull_request_urls"] is True
     assert seed["policy"]["requires_expected_repository_pr_urls"] is True
     assert seed["policy"]["requires_per_pr_status_check_evidence"] is True
+    assert seed["policy"]["requires_per_pr_status_check_trace_evidence"] is True
     assert seed["expected_pr_url_prefix"] == "https://github.com/Kiwunaka/Pokrov-client/pull/"
     assert seed["required_status_checks"] == [
         "Source import and public tree checks",
@@ -102,6 +106,10 @@ def test_release_stack_github_status_script_is_read_only() -> None:
         "failed_check_count",
         "required_status_check_count",
         "checks = @($prChecks)",
+        "detailsUrl",
+        "workflowName",
+        "details_url",
+        "workflow_name",
         "mergeStateStatus",
         "statusCheckRollup",
         "build\\release-stack-github-status",
@@ -160,8 +168,8 @@ def test_release_stack_github_status_command_accepts_clean_snapshot(
     assert summary["github_status_ok"] is True
     assert summary["read_only"] is True
     assert summary["stack_count"] >= 5
-    assert summary["latest_pr"] == 123
-    assert summary["latest_pr_url"] == "https://github.com/Kiwunaka/Pokrov-client/pull/123"
+    assert summary["latest_pr"] == 124
+    assert summary["latest_pr_url"] == "https://github.com/Kiwunaka/Pokrov-client/pull/124"
     assert summary["pull_requests"][-1]["url"] == summary["latest_pr_url"]
     assert summary["pull_requests"][-1]["successful_check_count"] == 3
     assert summary["pull_requests"][-1]["failed_check_count"] == 0
@@ -171,16 +179,31 @@ def test_release_stack_github_status_command_accepts_clean_snapshot(
             "name": "Source import and public tree checks",
             "status": "COMPLETED",
             "conclusion": "SUCCESS",
+            "details_url": (
+                "https://github.com/Kiwunaka/Pokrov-client/actions/runs/123/"
+                "jobs/source-import-and-public-tree-checks"
+            ),
+            "workflow_name": "CI",
         },
         {
             "name": "Flutter analyze and tests",
             "status": "COMPLETED",
             "conclusion": "SUCCESS",
+            "details_url": (
+                "https://github.com/Kiwunaka/Pokrov-client/actions/runs/123/"
+                "jobs/flutter-analyze-and-tests"
+            ),
+            "workflow_name": "CI",
         },
         {
             "name": "Android native Gradle unit tests",
             "status": "COMPLETED",
             "conclusion": "SUCCESS",
+            "details_url": (
+                "https://github.com/Kiwunaka/Pokrov-client/actions/runs/123/"
+                "jobs/android-native-gradle-unit-tests"
+            ),
+            "workflow_name": "CI",
         },
     ]
     assert summary["clean_pr_count"] == summary["stack_count"]
@@ -227,14 +250,14 @@ def test_release_stack_github_status_rejects_missing_pr_url(
 
     assert result.returncode == 2
     assert summary["github_status_ok"] is False
-    assert "PR #123 pull request URL is missing" in summary["errors"]
+    assert "PR #124 pull request URL is missing" in summary["errors"]
 
 
 def test_release_stack_github_status_rejects_wrong_repository_pr_url(
     tmp_path: Path,
 ) -> None:
     snapshot = _snapshot_for_stack()
-    snapshot[-1]["url"] = "https://github.com/example/fork/pull/123"
+    snapshot[-1]["url"] = "https://github.com/example/fork/pull/124"
     snapshot_path = tmp_path / "prs.wrong-repo-url.json"
     _write_snapshot(snapshot_path, snapshot)
     out_dir = ROOT / "build" / "release-stack-github-status" / "test-output"
@@ -272,7 +295,7 @@ def test_release_stack_github_status_rejects_wrong_repository_pr_url(
     assert summary["expected_pr_url_prefix"] == (
         "https://github.com/Kiwunaka/Pokrov-client/pull/"
     )
-    assert "PR #123 pull request URL does not match expected repository" in summary[
+    assert "PR #124 pull request URL does not match expected repository" in summary[
         "errors"
     ]
 

@@ -76,7 +76,8 @@ Current helpers:
   `github_status_pr_refs`, plus per-PR URL evidence carried as
   `github_status_pr_urls`, plus per-PR clean/draft state evidence carried as
   `github_status_pr_states`, plus per-PR required check evidence carried as
-  `github_status_pr_checks`, plus explicit source-only no-binary flags. Seed defaults must track the
+  `github_status_pr_checks`, including per-check `details_url` and
+  `workflow_name` trace evidence, plus explicit source-only no-binary flags. Seed defaults must track the
   blocker inventory latest candidate, and prerequisite summaries must come from
   their expected ignored
   `build/` output roots; the helper does not merge, tag, push, publish, or
