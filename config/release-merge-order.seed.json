@@ -394,6 +394,12 @@
       "candidate": "v0.104.0-source",
       "base": "codex/v0.103-handoff-github-pr-check-trace",
       "head": "codex/v0.104-publication-preflight-fingerprint"
+    },
+    {
+      "pr": 126,
+      "candidate": "v0.105.0-source",
+      "base": "codex/v0.104-publication-preflight-fingerprint",
+      "head": "codex/v0.105-handoff-preflight-fingerprint"
     }
   ]
 }

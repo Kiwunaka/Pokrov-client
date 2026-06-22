@@ -47,6 +47,25 @@ function Get-InputFingerprint {
   }
 }
 
+function Assert-InputFingerprintIntegrity {
+  param(
+    [Parameter(Mandatory = $true)][object]$Fingerprint,
+    [Parameter(Mandatory = $true)][string]$ErrorMessage,
+    [Parameter(Mandatory = $true)][object]$BlockingErrors
+  )
+
+  $resolvedFingerprintPath = [System.IO.Path]::GetFullPath((Resolve-RepoPath -Path ([string]$Fingerprint.path)))
+  if (-not (Test-Path -LiteralPath $resolvedFingerprintPath -PathType Leaf)) {
+    $BlockingErrors.Add($ErrorMessage)
+    return
+  }
+
+  $actualFingerprint = Get-InputFingerprint -Path $resolvedFingerprintPath
+  if ([string]$Fingerprint.sha256 -ne [string]$actualFingerprint.sha256) {
+    $BlockingErrors.Add($ErrorMessage)
+  }
+}
+
 function Assert-BuildOutputPath {
   param([Parameter(Mandatory = $true)][string]$Path)
 
@@ -302,6 +321,11 @@ try {
     [string]$publicationDryRunPreflightFingerprint.sha256 -notmatch "^[0-9a-fA-F]{64}$"
   ) {
     $blockingErrors.Add("publication dry-run summary is missing evidence bundle input fingerprints")
+  } else {
+    Assert-InputFingerprintIntegrity `
+      -Fingerprint $publicationDryRunPreflightFingerprint `
+      -ErrorMessage "publication dry-run preflight input fingerprint mismatch" `
+      -BlockingErrors $blockingErrors
   }
   $publicationDryRunEvidenceBundlePreflightArtifactFingerprints = $null
   $publicationDryRunEvidenceBundlePreflightArtifactFingerprintProperty = $publicationDryRun.PSObject.Properties["evidence_bundle_preflight_artifact_fingerprints"]
