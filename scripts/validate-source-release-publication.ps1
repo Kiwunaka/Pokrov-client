@@ -67,6 +67,23 @@ function Get-InputFingerprint {
   }
 }
 
+function Assert-InputFingerprintIntegrity {
+  param(
+    [Parameter(Mandatory = $true)][object]$Fingerprint,
+    [Parameter(Mandatory = $true)][string]$Name
+  )
+
+  $resolvedFingerprintPath = [System.IO.Path]::GetFullPath((Resolve-RepoPath -Path ([string]$Fingerprint.path)))
+  if (-not (Test-Path -LiteralPath $resolvedFingerprintPath -PathType Leaf)) {
+    throw "Publication dry-run refused evidence bundle preflight summary fingerprint mismatch for $Name."
+  }
+
+  $actualFingerprint = Get-InputFingerprint -Path $resolvedFingerprintPath
+  if ([string]$Fingerprint.sha256 -ne [string]$actualFingerprint.sha256) {
+    throw "Publication dry-run refused evidence bundle preflight summary fingerprint mismatch for $Name."
+  }
+}
+
 function Assert-ArtifactFingerprintIntegrity {
   param(
     [Parameter(Mandatory = $true)][object]$Fingerprint,
@@ -191,6 +208,7 @@ try {
   ) {
     throw "Publication dry-run refused evidence bundle is missing input fingerprints."
   }
+  Assert-InputFingerprintIntegrity -Fingerprint $preflightFingerprint -Name "preflight_summary"
 
   $evidenceBundlePreflightArtifactFingerprints = $null
   $artifactFingerprintProperty = $evidence.PSObject.Properties["preflight_artifact_fingerprints"]

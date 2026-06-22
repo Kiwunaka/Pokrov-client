@@ -1,10 +1,32 @@
-# Source Readiness: v0.2-v0.103
+# Source Readiness: v0.2-v0.104
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
 checklist is run on the exact commit. The machine-readable readiness inventory
 lives in
 [`config/source-release-readiness.seed.json`](../../config/source-release-readiness.seed.json).
+
+## v0.104.0-source Candidate
+
+Status: pending stacked PR, not tagged.
+
+Current evidence:
+
+- PR #125: publication dry-run validates the release evidence bundle
+  `preflight_summary` input fingerprint against the real preflight summary file
+  before maintainer release review can be marked ready
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run `scripts/prepare-release-evidence-bundle.ps1` from the fresh source
+  preflight summary
+- run `scripts/validate-source-release-publication.ps1` and confirm
+  `evidence_bundle_input_fingerprints.preflight_summary` matches the preflight
+  summary file on disk
+- keep release notes source-only with no APK, EXE, store, trusted-signing, or
+  official binary claims
 
 ## v0.103.0-source Candidate
 
