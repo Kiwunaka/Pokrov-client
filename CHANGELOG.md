@@ -188,8 +188,11 @@ production readiness without matching public evidence.
   can consume the real tag-readiness JSON directly.
 - Added source tag-readiness input fingerprints so release evidence can prove
   which blocker inventory and source-readiness seeds produced the summary.
+- Added release merge handoff tag-readiness input fingerprint checks so
+  maintainer handoff evidence carries the seed fingerprints from source tag
+  readiness.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.85.0-source` candidates.
+  `v0.86.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -280,6 +283,7 @@ production readiness without matching public evidence.
 | `v0.83.0-source` | Pending stacked PR, not tagged | PR #103 |
 | `v0.84.0-source` | Pending stacked PR, not tagged | PR #104 |
 | `v0.85.0-source` | Pending stacked PR, not tagged | PR #105 |
+| `v0.86.0-source` | Pending stacked PR, not tagged | PR #107 |
 
 ### Still Source-Only
 

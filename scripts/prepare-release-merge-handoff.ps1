@@ -211,6 +211,32 @@ try {
   if (@($inputErrors).Count -gt 0) {
     $blockingErrors.Add("input summaries report errors")
   }
+  $tagReadinessInputFingerprints = $null
+  $tagReadinessInputFingerprintProperty = $tagReadiness.PSObject.Properties["input_fingerprints"]
+  if ($null -ne $tagReadinessInputFingerprintProperty) {
+    $tagReadinessInputFingerprints = $tagReadinessInputFingerprintProperty.Value
+  }
+  $missingTagReadinessInputFingerprints = $false
+  foreach ($fingerprintName in @("blocker_inventory", "source_readiness")) {
+    $fingerprintEntry = $null
+    if ($null -ne $tagReadinessInputFingerprints) {
+      $fingerprintProperty = $tagReadinessInputFingerprints.PSObject.Properties[$fingerprintName]
+      if ($null -ne $fingerprintProperty) {
+        $fingerprintEntry = $fingerprintProperty.Value
+      }
+    }
+    if (
+      [string]::IsNullOrWhiteSpace([string]$fingerprintEntry.path) -or
+      [string]::IsNullOrWhiteSpace([string]$fingerprintEntry.sha256) -or
+      [string]$fingerprintEntry.sha256 -notmatch "^[0-9a-fA-F]{64}$"
+    ) {
+      $missingTagReadinessInputFingerprints = $true
+      break
+    }
+  }
+  if ($missingTagReadinessInputFingerprints) {
+    $blockingErrors.Add("tag readiness summary is missing input fingerprints")
+  }
   $tagOpenBlockers = @($tagReadiness.open_blockers)
   $tagOpenBlockerCount = [int]$tagReadiness.open_blocker_count
   if ($tagOpenBlockerCount -ne @($tagOpenBlockers).Count) {
@@ -332,6 +358,7 @@ try {
       tag_readiness = Get-InputFingerprint -Path $tagReadinessPath
       publication_dry_run = Get-InputFingerprint -Path $publicationDryRunPath
     }
+    tag_readiness_input_fingerprints = $tagReadinessInputFingerprints
     input_generated_at = [ordered]@{
       merge_order = [string]$mergeOrder.generated_at
       github_status = [string]$githubStatus.generated_at

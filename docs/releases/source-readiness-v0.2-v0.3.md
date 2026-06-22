@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.85
+# Source Readiness: v0.2-v0.86
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -6,14 +6,14 @@ checklist is run on the exact commit. The machine-readable readiness inventory
 lives in
 [`config/source-release-readiness.seed.json`](../../config/source-release-readiness.seed.json).
 
-## v0.85.0-source Candidate
+## v0.86.0-source Candidate
 
 Status: stacked PR green, not tagged.
 
 Current evidence:
 
-- PR #105: source tag readiness records input fingerprints for the release
-  blocker inventory and source-readiness seed files
+- PR #107: release merge handoff carries tag-readiness input fingerprints from
+  source tag readiness into maintainer handoff evidence
 - GitHub CI green on the stacked PR
 
 Required before tagging:
