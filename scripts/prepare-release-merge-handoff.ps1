@@ -144,6 +144,9 @@ Push-Location $root
 try {
   $seedPath = Join-Path $root "config\release-merge-handoff.seed.json"
   $seed = Read-JsonFile -Path $seedPath
+  $githubStatusSeedPath = Join-Path $root "config\release-stack-github-status.seed.json"
+  $githubStatusSeed = Read-JsonFile -Path $githubStatusSeedPath
+  $expectedPrUrlPrefix = [string]$githubStatusSeed.expected_pr_url_prefix
   $blockerInventoryPath = Join-Path $root "config\release-blocker-inventory.seed.json"
   $blockerInventory = Read-JsonFile -Path $blockerInventoryPath
 
@@ -396,6 +399,8 @@ try {
   }
   if ([string]::IsNullOrWhiteSpace($githubStatusLatestPrUrl)) {
     $blockingErrors.Add("release stack GitHub status latest PR URL is missing")
+  } elseif (-not [string]::IsNullOrWhiteSpace($expectedPrUrlPrefix) -and -not $githubStatusLatestPrUrl.StartsWith($expectedPrUrlPrefix, [System.StringComparison]::Ordinal)) {
+    $blockingErrors.Add("release stack GitHub status latest PR URL repository mismatch")
   } elseif (@($prValues).Count -eq 1 -and $githubStatusLatestPrUrl -notmatch "/pull/$([int]@($prValues)[0])$") {
     $blockingErrors.Add("release stack GitHub status latest PR URL mismatch")
   }
@@ -456,6 +461,7 @@ try {
     latest_candidate = if (@($candidateValues).Count -gt 0) { [string]@($candidateValues)[0] } else { "" }
     latest_pr = if (@($prValues).Count -gt 0) { [int]@($prValues)[0] } else { 0 }
     latest_pr_url = [string]$githubStatusLatestPrUrl
+    expected_pr_url_prefix = [string]$expectedPrUrlPrefix
     blocker_inventory_latest_candidate = [string]$blockerInventoryLatestCandidate
     blocker_inventory_latest_pr = [int]$blockerInventoryLatestPr
     merge_order_ok = [bool]$mergeOrder.merge_order_ok

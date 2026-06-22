@@ -53,7 +53,8 @@ Current helpers:
   anything
 - `check-release-stack-github-status.ps1`: checks a read-only release stack GitHub status
   snapshot against the local merge-order manifest, including PR URLs for
-  maintainer review; writes ignored
+  maintainer review and the expected public repository URL prefix; writes
+  ignored
   `build/release-stack-github-status/` output and does not merge, push, or
   publish anything
 - `prepare-release-merge-handoff.ps1`: creates a release merge handoff report
@@ -65,8 +66,9 @@ Current helpers:
   summary checks, tag-readiness blocker-count consistency, tag-readiness
   blocker entry-shape checks, tag-readiness ready-flag consistency,
   tag-readiness blocker-absence consistency, open-blocker evidence fields,
-  tag-readiness latest stacked PR consistency, and latest PR URL consistency,
-  plus explicit source-only no-binary flags. Seed defaults must track the
+  tag-readiness latest stacked PR consistency, latest PR URL consistency, and
+  expected repository PR URL consistency, plus explicit source-only no-binary
+  flags. Seed defaults must track the
   blocker inventory latest candidate, and prerequisite summaries must come from
   their expected ignored
   `build/` output roots; the helper does not merge, tag, push, publish, or
