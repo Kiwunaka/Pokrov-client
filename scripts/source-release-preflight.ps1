@@ -176,6 +176,15 @@ try {
   $proof = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
   $windowsBundleVerifier = Get-Content -Raw -LiteralPath $windowsBundleVerifierSummaryPath | ConvertFrom-Json
   Assert-SourceOnlyProof -Proof $proof
+  $resolvedRefCommitSha = git rev-parse "${Ref}^{commit}"
+  Assert-LastExitCode "git rev-parse ${Ref}^{commit} failed"
+  $refCommitSha = [string]($resolvedRefCommitSha | Select-Object -First 1)
+  if ($refCommitSha -notmatch "^[0-9a-fA-F]{40}$") {
+    throw "Source preflight refused resolved ref without a 40-character commit SHA."
+  }
+  if ([string]$proof.commit_sha -ne $refCommitSha) {
+    throw "Source preflight refused proof manifest: proof manifest commit SHA does not match resolved ref."
+  }
   if ($windowsBundleVerifier.windows_bundle_ok -ne $true) {
     throw "Source preflight refused Windows bundle verifier summary with windows_bundle_ok not true."
   }
@@ -197,6 +206,7 @@ try {
     windows_bundle_verifier_ok = [bool]$windowsBundleVerifier.windows_bundle_ok
     windows_bundle_verifier_summary = $windowsBundleVerifierSummaryPath
     tag_object_sha = $proof.tag_object_sha
+    ref_commit_sha = $refCommitSha
     commit_sha = $proof.commit_sha
     source_archive = (Join-Path $proofDir $proof.source_archive)
     source_archive_sha256 = $proof.source_archive_sha256

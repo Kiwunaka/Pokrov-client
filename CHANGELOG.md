@@ -204,8 +204,11 @@ production readiness without matching public evidence.
 - Added commit SHA consistency checks so release evidence, publication dry-run,
   and release merge handoff cannot mix proof artifacts from a different source
   commit.
+- Added resolved ref commit SHA consistency checks so source preflight records
+  the selected ref commit and release evidence, publication dry-run, and release
+  merge handoff reject mismatched proof chains.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.91.0-source` candidates.
+  `v0.92.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -302,6 +305,7 @@ production readiness without matching public evidence.
 | `v0.89.0-source` | Pending stacked PR, not tagged | PR #110 |
 | `v0.90.0-source` | Pending stacked PR, not tagged | PR #111 |
 | `v0.91.0-source` | Pending stacked PR, not tagged | PR #112 |
+| `v0.92.0-source` | Pending stacked PR, not tagged | PR #113 |
 
 ### Still Source-Only
 

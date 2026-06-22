@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import hashlib
 import json
@@ -47,6 +47,7 @@ def test_release_evidence_bundle_seed_defines_source_only_policy() -> None:
     assert seed["policy"]["requires_preflight_artifact_fingerprints"] is True
     assert seed["policy"]["requires_preflight_artifact_fingerprint_integrity"] is True
     assert seed["policy"]["requires_preflight_commit_sha_consistency"] is True
+    assert seed["policy"]["requires_preflight_ref_commit_sha_consistency"] is True
 
     for flag in (
         "source_only",
@@ -76,7 +77,9 @@ def test_release_evidence_bundle_script_preserves_claim_boundaries() -> None:
         "input_fingerprints",
         "preflight_artifact_fingerprints",
         "preflight_commit_sha",
+        "preflight_ref_commit_sha",
         "preflight commit SHA does not match current HEAD",
+        "preflight commit SHA does not match resolved ref commit SHA",
         "preflight summary is missing artifact fingerprints",
         "artifact fingerprint mismatch",
         "SHA256",
@@ -116,6 +119,7 @@ def test_release_evidence_bundle_script_writes_bundle_from_fixture(tmp_path: Pat
                 "schema_version": 1,
                 "tag": "v9.9.9-source",
                 "commit_sha": commit_sha,
+                "ref_commit_sha": commit_sha,
                 "source_only": True,
                 "no_apk": True,
                 "no_exe": True,
@@ -172,6 +176,7 @@ def test_release_evidence_bundle_script_writes_bundle_from_fixture(tmp_path: Pat
     assert bundle["source_only"] is True
     assert bundle["commit_sha"] == commit_sha
     assert bundle["preflight_commit_sha"] == commit_sha
+    assert bundle["preflight_ref_commit_sha"] == commit_sha
     assert bundle["no_apk"] is True
     assert bundle["no_exe"] is True
     assert bundle["windows_bundle_verifier_ok"] is True
@@ -347,6 +352,7 @@ def test_release_evidence_bundle_rejects_preflight_commit_sha_mismatch(
                 "schema_version": 1,
                 "tag": "v9.9.9-source",
                 "commit_sha": "0" * 40,
+                "ref_commit_sha": "0" * 40,
                 "source_only": True,
                 "no_apk": True,
                 "no_exe": True,
@@ -396,6 +402,82 @@ def test_release_evidence_bundle_rejects_preflight_commit_sha_mismatch(
     assert result.returncode != 0
     assert not (out_dir / "v9.9.9-source-release-evidence.json").exists()
     assert "preflight commit SHA does not match current HEAD" in (
+        result.stderr + result.stdout
+    )
+
+
+def test_release_evidence_bundle_rejects_preflight_ref_commit_sha_mismatch(
+    tmp_path: Path,
+) -> None:
+    proof = tmp_path / "proof.json"
+    notes = tmp_path / "notes.md"
+    source = tmp_path / "source.zip"
+    windows = tmp_path / "windows-bundle-verifier.json"
+    preflight = tmp_path / "preflight.json"
+    out_dir = tmp_path / "out"
+
+    proof.write_text('{"source_only":true}', encoding="utf-8")
+    notes.write_text("# v9.9.9-source\nThis is a source-only release.", encoding="utf-8")
+    source.write_bytes(b"source archive")
+    windows.write_text('{"windows_bundle_ok":true}', encoding="utf-8")
+    commit_sha = _git_head()
+
+    preflight.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "tag": "v9.9.9-source",
+                "commit_sha": commit_sha,
+                "ref_commit_sha": "0" * 40,
+                "source_only": True,
+                "no_apk": True,
+                "no_exe": True,
+                "no_store_release": True,
+                "no_trusted_signing_claim": True,
+                "forbidden_file_count": 0,
+                "windows_bundle_verifier_ok": True,
+                "windows_bundle_verifier_summary": str(windows),
+                "proof_manifest": str(proof),
+                "release_notes": str(notes),
+                "source_archive": str(source),
+                "source_archive_sha256": _sha256(source),
+                "artifact_fingerprints": {
+                    "proof_manifest": {"path": str(proof), "sha256": _sha256(proof)},
+                    "release_notes": {"path": str(notes), "sha256": _sha256(notes)},
+                    "source_archive": {"path": str(source), "sha256": _sha256(source)},
+                    "windows_bundle_verifier_summary": {
+                        "path": str(windows),
+                        "sha256": _sha256(windows),
+                    },
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [
+            "powershell",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(ROOT / "scripts" / "prepare-release-evidence-bundle.ps1"),
+            "-Tag",
+            "v9.9.9-source",
+            "-PreflightSummaryPath",
+            str(preflight),
+            "-OutDir",
+            str(out_dir),
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode != 0
+    assert not (out_dir / "v9.9.9-source-release-evidence.json").exists()
+    assert "preflight commit SHA does not match resolved ref commit SHA" in (
         result.stderr + result.stdout
     )
 

@@ -9,6 +9,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def _git_head() -> str:
+    return subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+
+
 def test_source_release_preflight_script_runs_smoke_and_writes_outputs(
     tmp_path: Path,
 ) -> None:
@@ -64,6 +74,8 @@ def test_source_release_preflight_script_runs_smoke_and_writes_outputs(
     assert summary["windows_bundle_verifier_summary"].endswith(
         "windows-bundle-verifier.json"
     )
+    assert summary["ref_commit_sha"] == _git_head()
+    assert summary["ref_commit_sha"] == proof["commit_sha"]
     assert summary["commit_sha"] == proof["commit_sha"]
     assert summary["source_archive_sha256"] == proof["source_archive_sha256"]
     assert Path(summary["proof_manifest"]).name == proof_manifest.name
@@ -120,6 +132,8 @@ def test_source_release_preflight_script_documents_full_release_checks() -> None
     assert "SkipTestCommands" in script
     assert "Use this only for local/CI smoke tests, not for publishing" in script
     assert "SkipFlutterTests" in script
+    assert "ref_commit_sha" in script
+    assert "proof manifest commit SHA does not match resolved ref" in script
     assert "Source preflight refused proof manifest" in script
 
 
