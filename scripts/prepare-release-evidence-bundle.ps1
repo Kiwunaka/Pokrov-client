@@ -199,11 +199,18 @@ try {
   }
   $currentCommitSha = [string]($commitSha | Select-Object -First 1)
   $preflightCommitSha = [string]$preflightSummary.commit_sha
+  $preflightRefCommitSha = [string]$preflightSummary.ref_commit_sha
   if ($preflightCommitSha -notmatch "^[0-9a-fA-F]{40}$") {
     throw "Release evidence refused preflight summary without commit_sha."
   }
+  if ($preflightRefCommitSha -notmatch "^[0-9a-fA-F]{40}$") {
+    throw "Release evidence refused preflight summary without ref_commit_sha."
+  }
   if ($preflightCommitSha -ne $currentCommitSha) {
     throw "Release evidence refused preflight summary: preflight commit SHA does not match current HEAD."
+  }
+  if ($preflightCommitSha -ne $preflightRefCommitSha) {
+    throw "Release evidence refused preflight summary: preflight commit SHA does not match resolved ref commit SHA."
   }
 
   $rulesetOk = $null
@@ -218,6 +225,7 @@ try {
     tag = $Tag
     commit_sha = $currentCommitSha
     preflight_commit_sha = $preflightCommitSha
+    preflight_ref_commit_sha = $preflightRefCommitSha
     generated_at = (Get-Date).ToUniversalTime().ToString("o")
     dirty_worktree = (-not [string]::IsNullOrWhiteSpace(($gitStatus -join "`n")))
     source_only = [bool]$preflightSummary.source_only

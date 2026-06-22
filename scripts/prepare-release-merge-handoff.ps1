@@ -206,12 +206,19 @@ try {
   }
   $publicationDryRunCommitSha = [string]$publicationDryRun.commit_sha
   $publicationDryRunEvidenceBundlePreflightCommitSha = [string]$publicationDryRun.evidence_bundle_preflight_commit_sha
+  $publicationDryRunEvidenceBundlePreflightRefCommitSha = [string]$publicationDryRun.evidence_bundle_preflight_ref_commit_sha
   if (
     $publicationDryRunCommitSha -notmatch "^[0-9a-fA-F]{40}$" -or
     $publicationDryRunEvidenceBundlePreflightCommitSha -notmatch "^[0-9a-fA-F]{40}$" -or
     $publicationDryRunCommitSha -ne $publicationDryRunEvidenceBundlePreflightCommitSha
   ) {
     $blockingErrors.Add("publication dry-run commit SHA mismatch")
+  }
+  if (
+    $publicationDryRunEvidenceBundlePreflightRefCommitSha -notmatch "^[0-9a-fA-F]{40}$" -or
+    $publicationDryRunEvidenceBundlePreflightCommitSha -ne $publicationDryRunEvidenceBundlePreflightRefCommitSha
+  ) {
+    $blockingErrors.Add("publication dry-run ref commit SHA mismatch")
   }
   $inputErrors = @(Get-InputErrors -Payload $mergeOrder) +
     @(Get-InputErrors -Payload $githubStatus) +
@@ -459,6 +466,7 @@ try {
     publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $publicationDryRunEvidenceBundlePreflightArtifactFingerprints
     publication_dry_run_commit_sha = $publicationDryRunCommitSha
     publication_dry_run_evidence_bundle_preflight_commit_sha = $publicationDryRunEvidenceBundlePreflightCommitSha
+    publication_dry_run_evidence_bundle_preflight_ref_commit_sha = $publicationDryRunEvidenceBundlePreflightRefCommitSha
     input_generated_at = [ordered]@{
       merge_order = [string]$mergeOrder.generated_at
       github_status = [string]$githubStatus.generated_at

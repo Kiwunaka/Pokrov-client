@@ -316,6 +316,12 @@
       "candidate": "v0.91.0-source",
       "base": "codex/v0.90-artifact-fingerprint-integrity",
       "head": "codex/v0.91-release-commit-sha-consistency"
+    },
+    {
+      "pr": 113,
+      "candidate": "v0.92.0-source",
+      "base": "codex/v0.91-release-commit-sha-consistency",
+      "head": "codex/v0.92-preflight-ref-commit-consistency"
     }
   ]
 }
