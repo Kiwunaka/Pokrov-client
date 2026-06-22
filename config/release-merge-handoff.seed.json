@@ -41,13 +41,14 @@
     "requires_github_status_expected_pr_url_prefix_consistency": true,
     "requires_github_status_count_consistency": true,
     "requires_github_status_pull_request_entries": true,
-    "requires_github_status_pr_sequence": true
+    "requires_github_status_pr_sequence": true,
+    "requires_github_status_pr_refs": true
   },
   "inputs": {
     "merge_order": "build/release-merge-order/release-merge-order.json",
     "github_status": "build/release-stack-github-status/release-stack-github-status.json",
-    "tag_readiness": "build/source-tag-readiness/v0.98.0-source/v0.98.0-source-tag-readiness.json",
-    "publication_dry_run": "build/source-release-publication/v0.98.0-source/v0.98.0-source-publication-dry-run.json"
+    "tag_readiness": "build/source-tag-readiness/v0.99.0-source/v0.99.0-source-tag-readiness.json",
+    "publication_dry_run": "build/source-release-publication/v0.99.0-source/v0.99.0-source-publication-dry-run.json"
   },
   "input_roots": {
     "merge_order": "build/release-merge-order",

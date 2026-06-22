@@ -30,8 +30,8 @@ def test_release_merge_order_seed_defines_read_only_stack() -> None:
 
     stack = seed["stack"]
     assert stack[0]["pr"] == 61
-    assert stack[-1]["pr"] == 119
-    assert stack[-1]["candidate"] == "v0.98.0-source"
+    assert stack[-1]["pr"] == 120
+    assert stack[-1]["candidate"] == "v0.99.0-source"
     for previous, current in zip(stack, stack[1:]):
         assert current["base"] == previous["head"]
 
@@ -91,11 +91,11 @@ def test_release_merge_order_command_writes_summary() -> None:
     assert summary["merge_order_ok"] is True
     assert summary["read_only"] is True
     assert summary["stack_count"] >= 5
-    assert summary["latest_pr"] == 119
-    assert summary["latest_candidate"] == "v0.98.0-source"
+    assert summary["latest_pr"] == 120
+    assert summary["latest_candidate"] == "v0.99.0-source"
     assert summary["linear_base_to_head_chain"] is True
     assert summary["stack"][0]["pr"] == 61
-    assert summary["stack"][-1]["pr"] == 119
+    assert summary["stack"][-1]["pr"] == 120
 
 
 def test_release_merge_order_rejects_non_build_output(tmp_path: Path) -> None:

@@ -1,10 +1,36 @@
-# Source Readiness: v0.2-v0.98
+# Source Readiness: v0.2-v0.99
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
 checklist is run on the exact commit. The machine-readable readiness inventory
 lives in
 [`config/source-release-readiness.seed.json`](../../config/source-release-readiness.seed.json).
+
+## v0.99.0-source Candidate
+
+Status: pending stacked PR, not tagged.
+
+Current evidence:
+
+- PR #120: release merge handoff validates that GitHub status PR base/head
+  refs match the merge-order stack before maintainer handoff can be marked
+  ready
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run `scripts/check-release-stack-github-status.ps1` and confirm
+  `pull_requests` covers the release stack with expected PR refs
+- run `scripts/prepare-release-merge-handoff.ps1` and confirm the handoff
+  records `github_status_pr_refs`
+- run the full source release preflight on the exact annotated tag with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- review source-only release notes and evidence bundle
+
+Source-only boundary:
+
+- no APK, EXE, store release, trusted signing, or official binary claim
 
 ## v0.98.0-source Candidate
 

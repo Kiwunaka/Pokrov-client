@@ -40,6 +40,11 @@ that release merge handoff validates GitHub status PR sequence against the
 merge-order stack before maintainer review; it is not tagged and does not ship
 APK/EXE binaries.
 
+Source readiness note: `v0.99.0-source` is a pending stacked PR for verifying
+that release merge handoff validates GitHub status PR base/head refs against
+the merge-order stack before maintainer review; it is not tagged and does not
+ship APK/EXE binaries.
+
 Source readiness note: `v0.53.0-source` is a pending stacked PR for Windows
 verifier CI/preflight enforcement; it is not tagged and does not ship APK/EXE
 binaries.

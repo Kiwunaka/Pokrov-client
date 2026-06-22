@@ -358,6 +358,12 @@
       "candidate": "v0.98.0-source",
       "base": "codex/v0.97-handoff-github-pr-entries",
       "head": "codex/v0.98-handoff-github-pr-sequence"
+    },
+    {
+      "pr": 120,
+      "candidate": "v0.99.0-source",
+      "base": "codex/v0.98-handoff-github-pr-sequence",
+      "head": "codex/v0.99-handoff-github-pr-refs"
     }
   ]
 }
