@@ -197,6 +197,8 @@ production readiness without matching public evidence.
   preflight hash through publication dry-run and release merge handoff evidence.
 - Added publication dry-run preflight input fingerprint integrity checks so
   stale or edited evidence bundles cannot carry an unverified preflight summary.
+- Added release merge handoff preflight input fingerprint integrity checks so
+  stale publication dry-run summaries cannot reach maintainer review.
 - Added source preflight artifact fingerprints for proof manifest, release
   notes, source archive, and Windows verifier summary, then propagated them
   through release evidence, publication dry-run, and handoff evidence.
@@ -234,7 +236,7 @@ production readiness without matching public evidence.
 - Added GitHub status PR check trace evidence so release merge handoff rejects
   missing GitHub Actions job URLs or workflow names before maintainer review.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.104.0-source` candidates.
+  `v0.105.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -344,6 +346,7 @@ production readiness without matching public evidence.
 | `v0.102.0-source` | Pending stacked PR, not tagged | PR #123 |
 | `v0.103.0-source` | Pending stacked PR, not tagged | PR #124 |
 | `v0.104.0-source` | Pending stacked PR, not tagged | PR #125 |
+| `v0.105.0-source` | Pending stacked PR, not tagged | PR #126 |
 
 ### Still Source-Only
 

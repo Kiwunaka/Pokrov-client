@@ -205,6 +205,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.102.0-source` | Pending stacked PR, not tagged | Release handoff verifies per-PR required GitHub status checks before maintainer review. |
 | `v0.103.0-source` | Pending stacked PR, not tagged | Release handoff verifies per-check GitHub Actions trace evidence before maintainer review. |
 | `v0.104.0-source` | Pending stacked PR, not tagged | Publication dry-run verifies the evidence bundle preflight input fingerprint before maintainer review. |
+| `v0.105.0-source` | Pending stacked PR, not tagged | Release handoff verifies publication dry-run preflight input fingerprints before maintainer review. |
 
 ## Architecture Boundary
 
