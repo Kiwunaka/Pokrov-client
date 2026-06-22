@@ -201,8 +201,11 @@ production readiness without matching public evidence.
 - Added artifact fingerprint integrity checks so release evidence, publication
   dry-run, and release merge handoff reject stale or mismatched source proof
   artifacts.
+- Added commit SHA consistency checks so release evidence, publication dry-run,
+  and release merge handoff cannot mix proof artifacts from a different source
+  commit.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.90.0-source` candidates.
+  `v0.91.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -298,6 +301,7 @@ production readiness without matching public evidence.
 | `v0.88.0-source` | Pending stacked PR, not tagged | PR #109 |
 | `v0.89.0-source` | Pending stacked PR, not tagged | PR #110 |
 | `v0.90.0-source` | Pending stacked PR, not tagged | PR #111 |
+| `v0.91.0-source` | Pending stacked PR, not tagged | PR #112 |
 
 ### Still Source-Only
 

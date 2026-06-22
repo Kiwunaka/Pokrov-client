@@ -20,7 +20,8 @@
     "requires_evidence_bundle_preflight_artifact_fingerprints": true,
     "github_enforcement_claim_requires_bundle_approval": true,
     "windows_bundle_verifier_claim_requires_bundle_proof": true,
-    "requires_evidence_bundle_preflight_artifact_fingerprint_integrity": true
+    "requires_evidence_bundle_preflight_artifact_fingerprint_integrity": true,
+    "requires_evidence_bundle_preflight_commit_sha_consistency": true
   },
   "required_evidence_flags": [
     "source_only",

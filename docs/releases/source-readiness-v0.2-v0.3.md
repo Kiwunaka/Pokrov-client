@@ -1,10 +1,43 @@
-# Source Readiness: v0.2-v0.90
+# Source Readiness: v0.2-v0.91
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
 checklist is run on the exact commit. The machine-readable readiness inventory
 lives in
 [`config/source-release-readiness.seed.json`](../../config/source-release-readiness.seed.json).
+
+## v0.91.0-source Candidate
+
+Status: pending stacked PR, not tagged.
+
+Current evidence:
+
+- PR #112: release evidence, publication dry-run, and release merge handoff
+  reject mismatched commit SHA evidence between source preflight, release
+  evidence, publication dry-run, and maintainer handoff
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the full source release preflight on that commit with
+  `scripts/source-release-preflight.ps1 -RequireTag`
+- run `scripts/prepare-release-evidence-bundle.ps1` with the exact preflight
+  summary and confirm `preflight_commit_sha` matches the current `HEAD`
+- run `scripts/validate-source-release-publication.ps1` with the exact release
+  evidence bundle and confirm the evidence bundle commit SHA matches
+  `preflight_commit_sha`
+- run `scripts/prepare-release-merge-handoff.ps1` with the exact publication
+  dry-run summary and confirm the handoff carries matching publication and
+  evidence-bundle commit SHA fields
+- keep explicit source-only wording: no APK, EXE, store release, or trusted
+  signing claim
+
+Limitations:
+
+- Commit SHA consistency checks prove the local release proof chain points at
+  one source commit; they do not merge PRs, clear manual blockers, create tags,
+  publish GitHub Releases, or authorize binary claims.
 
 ## v0.90.0-source Candidate
 

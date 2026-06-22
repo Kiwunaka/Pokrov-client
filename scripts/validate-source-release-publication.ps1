@@ -125,6 +125,17 @@ try {
   if ($evidence.tag -ne $Tag) {
     throw "Evidence bundle tag '$($evidence.tag)' does not match $Tag."
   }
+  $evidenceCommitSha = [string]$evidence.commit_sha
+  $evidencePreflightCommitSha = [string]$evidence.preflight_commit_sha
+  if (
+    $evidenceCommitSha -notmatch "^[0-9a-fA-F]{40}$" -or
+    $evidencePreflightCommitSha -notmatch "^[0-9a-fA-F]{40}$"
+  ) {
+    throw "Publication dry-run refused evidence without commit SHA proof."
+  }
+  if ($evidenceCommitSha -ne $evidencePreflightCommitSha) {
+    throw "Publication dry-run refused evidence: evidence commit SHA does not match preflight commit SHA."
+  }
 
   foreach ($flag in @(
       "source_only",
@@ -267,6 +278,7 @@ try {
     }
     evidence_bundle_input_fingerprints = $evidenceBundleInputFingerprints
     evidence_bundle_preflight_artifact_fingerprints = $evidenceBundlePreflightArtifactFingerprints
+    evidence_bundle_preflight_commit_sha = $evidencePreflightCommitSha
     windows_bundle_verifier_ok = [bool]$evidence.windows_bundle_verifier_ok
     windows_bundle_verifier_summary = $evidence.windows_bundle_verifier_summary
     github_ruleset_ok = $evidence.github_ruleset_ok

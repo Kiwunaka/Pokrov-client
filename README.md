@@ -150,6 +150,7 @@ Source release status:
 | `v0.88.0-source` | Pending stacked PR, not tagged | Release evidence bundle records and carries source preflight input fingerprints. |
 | `v0.89.0-source` | Pending stacked PR, not tagged | Source preflight records artifact fingerprints for release proof. |
 | `v0.90.0-source` | Pending stacked PR, not tagged | Release evidence, publication dry-run, and handoff verify artifact fingerprint integrity. |
+| `v0.91.0-source` | Pending stacked PR, not tagged | Release evidence, publication dry-run, and handoff verify commit SHA consistency. |
 
 ## Which App Should I Use?
 

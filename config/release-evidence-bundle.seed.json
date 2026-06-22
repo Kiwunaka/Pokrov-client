@@ -17,7 +17,8 @@
     "windows_bundle_verifier_required": true,
     "requires_input_fingerprints": true,
     "requires_preflight_artifact_fingerprints": true,
-    "requires_preflight_artifact_fingerprint_integrity": true
+    "requires_preflight_artifact_fingerprint_integrity": true,
+    "requires_preflight_commit_sha_consistency": true
   },
   "required_summary_flags": [
     "source_only",
