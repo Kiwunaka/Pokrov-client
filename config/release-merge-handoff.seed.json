@@ -32,13 +32,14 @@
     "requires_tag_readiness_blocker_evidence_fields": true,
     "requires_tag_readiness_latest_pr_consistency": true,
     "requires_blocker_inventory_latest_candidate_consistency": true,
-    "requires_blocker_inventory_latest_pr_consistency": true
+    "requires_blocker_inventory_latest_pr_consistency": true,
+    "requires_publication_dry_run_artifact_fingerprint_integrity": true
   },
   "inputs": {
     "merge_order": "build/release-merge-order/release-merge-order.json",
     "github_status": "build/release-stack-github-status/release-stack-github-status.json",
-    "tag_readiness": "build/source-tag-readiness/v0.89.0-source/v0.89.0-source-tag-readiness.json",
-    "publication_dry_run": "build/source-release-publication/v0.89.0-source/v0.89.0-source-publication-dry-run.json"
+    "tag_readiness": "build/source-tag-readiness/v0.90.0-source/v0.90.0-source-tag-readiness.json",
+    "publication_dry_run": "build/source-release-publication/v0.90.0-source/v0.90.0-source-publication-dry-run.json"
   },
   "input_roots": {
     "merge_order": "build/release-merge-order",

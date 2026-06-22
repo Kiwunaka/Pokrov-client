@@ -309,6 +309,20 @@ try {
       break
     }
   }
+  if (
+    -not [string]::IsNullOrWhiteSpace([string]$publicationDryRunInputFingerprints.release_notes.sha256) -and
+    -not [string]::IsNullOrWhiteSpace([string]$publicationDryRunEvidenceBundlePreflightArtifactFingerprints.release_notes.sha256) -and
+    [string]$publicationDryRunInputFingerprints.release_notes.sha256 -ne [string]$publicationDryRunEvidenceBundlePreflightArtifactFingerprints.release_notes.sha256
+  ) {
+    $blockingErrors.Add("publication dry-run artifact fingerprints mismatch")
+  }
+  if (
+    -not [string]::IsNullOrWhiteSpace([string]$publicationDryRun.source_archive_sha256) -and
+    -not [string]::IsNullOrWhiteSpace([string]$publicationDryRunEvidenceBundlePreflightArtifactFingerprints.source_archive.sha256) -and
+    [string]$publicationDryRun.source_archive_sha256 -ne [string]$publicationDryRunEvidenceBundlePreflightArtifactFingerprints.source_archive.sha256
+  ) {
+    $blockingErrors.Add("publication dry-run artifact fingerprints mismatch")
+  }
   $tagOpenBlockers = @($tagReadiness.open_blockers)
   $tagOpenBlockerCount = [int]$tagReadiness.open_blocker_count
   if ($tagOpenBlockerCount -ne @($tagOpenBlockers).Count) {
