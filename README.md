@@ -152,6 +152,7 @@ Source release status:
 | `v0.90.0-source` | Pending stacked PR, not tagged | Release evidence, publication dry-run, and handoff verify artifact fingerprint integrity. |
 | `v0.91.0-source` | Pending stacked PR, not tagged | Release evidence, publication dry-run, and handoff verify commit SHA consistency. |
 | `v0.92.0-source` | Pending stacked PR, not tagged | Source preflight and handoff verify resolved ref commit SHA consistency. |
+| `v0.93.0-source` | Pending stacked PR, not tagged | Release stack status and handoff carry the latest PR URL for maintainer review. |
 
 ## Which App Should I Use?
 

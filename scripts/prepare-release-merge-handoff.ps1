@@ -388,10 +388,16 @@ try {
     [int]$mergeOrder.latest_pr,
     [int]$githubStatus.latest_pr
   ) | Select-Object -Unique
+  $githubStatusLatestPrUrl = [string]$githubStatus.latest_pr_url
   if (@($prValues).Count -ne 1) {
     $blockingErrors.Add("input summaries do not agree on latest PR")
   } elseif ([int]$tagReadiness.latest_stacked_pr -ne [int]@($prValues)[0]) {
     $blockingErrors.Add("tag readiness latest stacked PR mismatch")
+  }
+  if ([string]::IsNullOrWhiteSpace($githubStatusLatestPrUrl)) {
+    $blockingErrors.Add("release stack GitHub status latest PR URL is missing")
+  } elseif (@($prValues).Count -eq 1 -and $githubStatusLatestPrUrl -notmatch "/pull/$([int]@($prValues)[0])$") {
+    $blockingErrors.Add("release stack GitHub status latest PR URL mismatch")
   }
   $blockerInventoryLatestPr = [int]$blockerInventory.tracked_candidates.latest_stacked_pr
   if ($blockerInventoryLatestPr -le 0) {
@@ -449,6 +455,7 @@ try {
     tag_creation_allowed = [bool]$tagReadiness.tag_creation_allowed
     latest_candidate = if (@($candidateValues).Count -gt 0) { [string]@($candidateValues)[0] } else { "" }
     latest_pr = if (@($prValues).Count -gt 0) { [int]@($prValues)[0] } else { 0 }
+    latest_pr_url = [string]$githubStatusLatestPrUrl
     blocker_inventory_latest_candidate = [string]$blockerInventoryLatestCandidate
     blocker_inventory_latest_pr = [int]$blockerInventoryLatestPr
     merge_order_ok = [bool]$mergeOrder.merge_order_ok

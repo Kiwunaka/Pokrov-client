@@ -11,7 +11,8 @@
     "uses_pr_status_snapshot": true,
     "writes_only_ignored_build_output": true,
     "requires_clean_prs": true,
-    "requires_ci_success": true
+    "requires_ci_success": true,
+    "requires_pull_request_urls": true
   },
   "required_status_checks": [
     "Source import and public tree checks",

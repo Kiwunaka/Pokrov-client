@@ -58,7 +58,7 @@ function Read-PrStatusSnapshot {
     throw "GitHub CLI is required when -PrStatusPath is not provided."
   }
 
-  $json = & gh pr list --state open --json number,title,headRefName,baseRefName,mergeStateStatus,isDraft,statusCheckRollup --limit 100
+  $json = & gh pr list --state open --json number,url,title,headRefName,baseRefName,mergeStateStatus,isDraft,statusCheckRollup --limit 100
   if ($LASTEXITCODE -ne 0) {
     throw "Failed to read pull request status snapshot with gh pr list."
   }
@@ -84,6 +84,8 @@ try {
   $uncleanPrCount = 0
   $successfulCheckCount = 0
   $failedCheckCount = 0
+  $latestStackPr = if ($stack.Count -gt 0) { [int]$stack[-1].pr } else { 0 }
+  $latestPrUrl = ""
 
   foreach ($item in $stack) {
     $prNumber = [int]$item.pr
@@ -94,7 +96,16 @@ try {
     }
 
     $status = $matches[0]
+    $prUrl = [string]$status.url
     $prErrors = [System.Collections.Generic.List[string]]::new()
+    if ([string]::IsNullOrWhiteSpace($prUrl)) {
+      $prErrors.Add("PR #$prNumber pull request URL is missing")
+    } elseif ($prUrl -notmatch "/pull/$prNumber$") {
+      $prErrors.Add("PR #$prNumber pull request URL does not match PR number")
+    }
+    if ($prNumber -eq $latestStackPr) {
+      $latestPrUrl = $prUrl
+    }
     if ($status.baseRefName -ne $item.base) {
       $prErrors.Add("baseRefName is '$($status.baseRefName)' but expected '$($item.base)'")
     }
@@ -135,6 +146,7 @@ try {
 
     $checkedPrs.Add([ordered]@{
         pr = $prNumber
+        url = $prUrl
         base = $item.base
         head = $item.head
         mergeStateStatus = $status.mergeStateStatus
@@ -163,7 +175,8 @@ try {
     read_only = $true
     github_status_ok = [bool]$github_status_ok
     stack_count = [int]$stack.Count
-    latest_pr = if ($stack.Count -gt 0) { [int]$stack[-1].pr } else { 0 }
+    latest_pr = [int]$latestStackPr
+    latest_pr_url = [string]$latestPrUrl
     latest_candidate = if ($stack.Count -gt 0) { $stack[-1].candidate } else { "" }
     clean_pr_count = [int]$cleanPrCount
     draft_pr_count = [int]$draftPrCount
