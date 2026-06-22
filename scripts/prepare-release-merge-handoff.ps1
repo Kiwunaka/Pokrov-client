@@ -401,6 +401,12 @@ try {
   $githubStatusSuccessfulCheckCount = [int]$githubStatus.successful_check_count
   $githubStatusFailedCheckCount = [int]$githubStatus.failed_check_count
   $expectedSuccessfulCheckCount = $githubStatusStackCount * $requiredStatusCheckCount
+  $githubStatusPullRequests = @()
+  $githubStatusPullRequestsProperty = $githubStatus.PSObject.Properties["pull_requests"]
+  if ($null -ne $githubStatusPullRequestsProperty -and $null -ne $githubStatusPullRequestsProperty.Value) {
+    $githubStatusPullRequests = @($githubStatusPullRequestsProperty.Value)
+  }
+  $githubStatusPullRequestCount = @($githubStatusPullRequests).Count
   if (@($prValues).Count -ne 1) {
     $blockingErrors.Add("input summaries do not agree on latest PR")
   } elseif ([int]$tagReadiness.latest_stacked_pr -ne [int]@($prValues)[0]) {
@@ -427,6 +433,30 @@ try {
     $githubStatusSuccessfulCheckCount -ne $expectedSuccessfulCheckCount
   ) {
     $blockingErrors.Add("release stack GitHub status count mismatch")
+  }
+  $githubStatusPullRequestEntriesMismatch = $false
+  if ($githubStatusPullRequestCount -ne $githubStatusStackCount) {
+    $githubStatusPullRequestEntriesMismatch = $true
+  } elseif ($githubStatusPullRequestCount -gt 0) {
+    $latestGithubStatusPullRequest = $githubStatusPullRequests[-1]
+    if (
+      [int]$latestGithubStatusPullRequest.pr -ne [int]$githubStatus.latest_pr -or
+      [string]$latestGithubStatusPullRequest.url -ne [string]$githubStatusLatestPrUrl
+    ) {
+      $githubStatusPullRequestEntriesMismatch = $true
+    }
+    foreach ($githubStatusPullRequest in $githubStatusPullRequests) {
+      $pullRequestErrors = @($githubStatusPullRequest.errors) | Where-Object {
+        -not [string]::IsNullOrWhiteSpace([string]$_)
+      }
+      if (@($pullRequestErrors).Count -gt 0) {
+        $githubStatusPullRequestEntriesMismatch = $true
+        break
+      }
+    }
+  }
+  if ($githubStatusPullRequestEntriesMismatch) {
+    $blockingErrors.Add("release stack GitHub status pull request entries mismatch")
   }
   $blockerInventoryLatestPr = [int]$blockerInventory.tracked_candidates.latest_stacked_pr
   if ($blockerInventoryLatestPr -le 0) {
@@ -530,6 +560,7 @@ try {
       failed_check_count = [int]$githubStatusFailedCheckCount
       required_status_check_count = [int]$requiredStatusCheckCount
     }
+    github_status_pull_request_count = [int]$githubStatusPullRequestCount
     publication_dry_run_ok = [bool](
       $publicationDryRun.source_only -eq $true -and
       $publicationDryRun.dry_run_only -eq $true -and
