@@ -219,8 +219,10 @@ production readiness without matching public evidence.
   maintainer review.
 - Added GitHub status pull-request entry checks so release merge handoff
   rejects missing or truncated PR evidence before maintainer review.
+- Added GitHub status PR-sequence checks so release merge handoff rejects
+  reordered or mixed PR evidence before maintainer review.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.97.0-source` candidates.
+  `v0.98.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -323,6 +325,7 @@ production readiness without matching public evidence.
 | `v0.95.0-source` | Pending stacked PR, not tagged | PR #116 |
 | `v0.96.0-source` | Pending stacked PR, not tagged | PR #117 |
 | `v0.97.0-source` | Pending stacked PR, not tagged | PR #118 |
+| `v0.98.0-source` | Pending stacked PR, not tagged | PR #119 |
 
 ### Still Source-Only
 
