@@ -195,8 +195,11 @@ production readiness without matching public evidence.
   carries the evidence-bundle and release-notes hashes.
 - Added release evidence bundle input fingerprints and propagated the source
   preflight hash through publication dry-run and release merge handoff evidence.
+- Added source preflight artifact fingerprints for proof manifest, release
+  notes, source archive, and Windows verifier summary, then propagated them
+  through release evidence, publication dry-run, and handoff evidence.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.88.0-source` candidates.
+  `v0.89.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -290,6 +293,7 @@ production readiness without matching public evidence.
 | `v0.86.0-source` | Pending stacked PR, not tagged | PR #107 |
 | `v0.87.0-source` | Pending stacked PR, not tagged | PR #108 |
 | `v0.88.0-source` | Pending stacked PR, not tagged | PR #109 |
+| `v0.89.0-source` | Pending stacked PR, not tagged | PR #110 |
 
 ### Still Source-Only
 

@@ -282,6 +282,33 @@ try {
   ) {
     $blockingErrors.Add("publication dry-run summary is missing evidence bundle input fingerprints")
   }
+  $publicationDryRunEvidenceBundlePreflightArtifactFingerprints = $null
+  $publicationDryRunEvidenceBundlePreflightArtifactFingerprintProperty = $publicationDryRun.PSObject.Properties["evidence_bundle_preflight_artifact_fingerprints"]
+  if ($null -ne $publicationDryRunEvidenceBundlePreflightArtifactFingerprintProperty) {
+    $publicationDryRunEvidenceBundlePreflightArtifactFingerprints = $publicationDryRunEvidenceBundlePreflightArtifactFingerprintProperty.Value
+  }
+  foreach ($fingerprintName in @(
+      "proof_manifest",
+      "release_notes",
+      "source_archive",
+      "windows_bundle_verifier_summary"
+    )) {
+    $fingerprintEntry = $null
+    if ($null -ne $publicationDryRunEvidenceBundlePreflightArtifactFingerprints) {
+      $fingerprintProperty = $publicationDryRunEvidenceBundlePreflightArtifactFingerprints.PSObject.Properties[$fingerprintName]
+      if ($null -ne $fingerprintProperty) {
+        $fingerprintEntry = $fingerprintProperty.Value
+      }
+    }
+    if (
+      [string]::IsNullOrWhiteSpace([string]$fingerprintEntry.path) -or
+      [string]::IsNullOrWhiteSpace([string]$fingerprintEntry.sha256) -or
+      [string]$fingerprintEntry.sha256 -notmatch "^[0-9a-fA-F]{64}$"
+    ) {
+      $blockingErrors.Add("publication dry-run summary is missing evidence bundle preflight artifact fingerprints")
+      break
+    }
+  }
   $tagOpenBlockers = @($tagReadiness.open_blockers)
   $tagOpenBlockerCount = [int]$tagReadiness.open_blocker_count
   if ($tagOpenBlockerCount -ne @($tagOpenBlockers).Count) {
@@ -406,6 +433,7 @@ try {
     tag_readiness_input_fingerprints = $tagReadinessInputFingerprints
     publication_dry_run_input_fingerprints = $publicationDryRunInputFingerprints
     publication_dry_run_evidence_bundle_input_fingerprints = $publicationDryRunEvidenceBundleInputFingerprints
+    publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $publicationDryRunEvidenceBundlePreflightArtifactFingerprints
     input_generated_at = [ordered]@{
       merge_order = [string]$mergeOrder.generated_at
       github_status = [string]$githubStatus.generated_at

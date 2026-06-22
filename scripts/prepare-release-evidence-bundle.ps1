@@ -69,6 +69,33 @@ function Assert-SourceOnlySummary {
   if ([string]::IsNullOrWhiteSpace([string]$Summary.windows_bundle_verifier_summary)) {
     throw "Release evidence refused preflight summary without windows_bundle_verifier_summary."
   }
+
+  $artifactFingerprints = $null
+  $artifactFingerprintProperty = $Summary.PSObject.Properties["artifact_fingerprints"]
+  if ($null -ne $artifactFingerprintProperty) {
+    $artifactFingerprints = $artifactFingerprintProperty.Value
+  }
+  foreach ($fingerprintName in @(
+      "proof_manifest",
+      "release_notes",
+      "source_archive",
+      "windows_bundle_verifier_summary"
+    )) {
+    $fingerprintEntry = $null
+    if ($null -ne $artifactFingerprints) {
+      $fingerprintProperty = $artifactFingerprints.PSObject.Properties[$fingerprintName]
+      if ($null -ne $fingerprintProperty) {
+        $fingerprintEntry = $fingerprintProperty.Value
+      }
+    }
+    if (
+      [string]::IsNullOrWhiteSpace([string]$fingerprintEntry.path) -or
+      [string]::IsNullOrWhiteSpace([string]$fingerprintEntry.sha256) -or
+      [string]$fingerprintEntry.sha256 -notmatch "^[0-9a-fA-F]{64}$"
+    ) {
+      throw "Release evidence refused preflight summary is missing artifact fingerprints."
+    }
+  }
 }
 
 Push-Location $root
@@ -146,6 +173,7 @@ try {
     input_fingerprints = [ordered]@{
       preflight_summary = Get-InputFingerprint -Path $resolvedPreflightSummaryPath
     }
+    preflight_artifact_fingerprints = $preflightSummary.artifact_fingerprints
     github_ruleset_report = $resolvedRulesetReportPath
     github_ruleset_ok = $rulesetOk
     github_enforcement_claim_allowed = $rulesetClaimAllowed
