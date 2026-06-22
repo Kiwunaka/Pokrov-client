@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
 from pathlib import Path
@@ -16,6 +17,10 @@ def _read_json(relative_path: str) -> dict:
     return json.loads(_read(relative_path))
 
 
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def test_release_evidence_bundle_seed_defines_source_only_policy() -> None:
     seed = _read_json("config/release-evidence-bundle.seed.json")
 
@@ -28,6 +33,7 @@ def test_release_evidence_bundle_seed_defines_source_only_policy() -> None:
     assert seed["policy"]["failing_ruleset_report_blocks_enforcement_claims"] is True
     assert seed["policy"]["does_not_replace_full_preflight"] is True
     assert seed["policy"]["windows_bundle_verifier_required"] is True
+    assert seed["policy"]["requires_input_fingerprints"] is True
 
     for flag in (
         "source_only",
@@ -54,6 +60,9 @@ def test_release_evidence_bundle_script_preserves_claim_boundaries() -> None:
         "official_binary_claim = $false",
         "windows_bundle_verifier_ok",
         "windows_bundle_verifier_summary",
+        "input_fingerprints",
+        "SHA256",
+        "ComputeHash",
         "build\\release-evidence",
     ):
         assert phrase in script
@@ -131,6 +140,12 @@ def test_release_evidence_bundle_script_writes_bundle_from_fixture(tmp_path: Pat
     )
     assert bundle["github_ruleset_ok"] is False
     assert bundle["github_enforcement_claim_allowed"] is False
+    assert bundle["input_fingerprints"]["preflight_summary"]["sha256"] == _sha256(
+        preflight
+    )
+    assert bundle["input_fingerprints"]["preflight_summary"]["path"] == str(
+        preflight.resolve()
+    )
     assert bundle["release_boundary"]["official_binary_claim"] is False
 
 

@@ -147,6 +147,7 @@ Source release status:
 | `v0.85.0-source` | Pending stacked PR, not tagged | Source tag readiness records input fingerprints for release evidence. |
 | `v0.86.0-source` | Pending stacked PR, not tagged | Release merge handoff carries tag-readiness input fingerprints into maintainer evidence. |
 | `v0.87.0-source` | Pending stacked PR, not tagged | Publication dry-run fingerprints evidence bundle and release notes for handoff proof. |
+| `v0.88.0-source` | Pending stacked PR, not tagged | Release evidence bundle records and carries source preflight input fingerprints. |
 
 ## Which App Should I Use?
 

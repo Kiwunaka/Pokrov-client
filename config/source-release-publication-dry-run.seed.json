@@ -16,6 +16,7 @@
     "requires_source_only_evidence_bundle": true,
     "requires_release_copy_check": true,
     "requires_input_fingerprints": true,
+    "requires_evidence_bundle_input_fingerprints": true,
     "github_enforcement_claim_requires_bundle_approval": true,
     "windows_bundle_verifier_claim_requires_bundle_proof": true
   },

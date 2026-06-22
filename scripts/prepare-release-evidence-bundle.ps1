@@ -24,6 +24,25 @@ function Resolve-RepoPath {
   return Join-Path $root $Path
 }
 
+function Get-InputFingerprint {
+  param([Parameter(Mandatory = $true)][string]$Path)
+
+  $resolvedPath = [System.IO.Path]::GetFullPath($Path)
+  $stream = [System.IO.File]::OpenRead($resolvedPath)
+  $sha256 = [System.Security.Cryptography.SHA256]::Create()
+  try {
+    $hashBytes = $sha256.ComputeHash($stream)
+    $hash = [System.BitConverter]::ToString($hashBytes).Replace("-", "").ToLowerInvariant()
+  } finally {
+    $sha256.Dispose()
+    $stream.Dispose()
+  }
+  return [ordered]@{
+    path = $resolvedPath
+    sha256 = $hash
+  }
+}
+
 function Assert-SourceOnlySummary {
   param([Parameter(Mandatory = $true)][object]$Summary)
 
@@ -124,6 +143,9 @@ try {
     proof_manifest = $preflightSummary.proof_manifest
     release_notes = $preflightSummary.release_notes
     source_archive_sha256 = $preflightSummary.source_archive_sha256
+    input_fingerprints = [ordered]@{
+      preflight_summary = Get-InputFingerprint -Path $resolvedPreflightSummaryPath
+    }
     github_ruleset_report = $resolvedRulesetReportPath
     github_ruleset_ok = $rulesetOk
     github_enforcement_claim_allowed = $rulesetClaimAllowed
