@@ -1403,6 +1403,17 @@
       "ships_exe": false,
       "store_release": false,
       "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.128.0-source",
+      "status": "stacked_pr_pending_not_tagged",
+      "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/149",
+      "scope": "Seed validation requires the source-readiness latest candidate and evidence URL to match the blocker inventory latest source-only PR.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
     }
   ]
 }

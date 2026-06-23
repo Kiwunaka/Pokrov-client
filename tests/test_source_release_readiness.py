@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 
 
@@ -9,6 +10,25 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def _read_json(relative_path: str) -> dict:
     return json.loads((ROOT / relative_path).read_text(encoding="utf-8"))
+
+
+def _write_json(path: Path, payload: dict) -> None:
+    path.write_text(json.dumps(payload), encoding="utf-8")
+
+
+def _snapshot_files(paths: list[Path]) -> dict[Path, bytes | None]:
+    snapshots: dict[Path, bytes | None] = {}
+    for path in paths:
+        snapshots[path] = path.read_bytes() if path.exists() else None
+    return snapshots
+
+
+def _restore_files(snapshots: dict[Path, bytes | None]) -> None:
+    for path, content in snapshots.items():
+        if content is None:
+            path.unlink(missing_ok=True)
+        else:
+            path.write_bytes(content)
 
 
 def test_source_release_readiness_milestones_are_source_only() -> None:
@@ -167,3 +187,49 @@ def test_tagged_milestones_have_release_notes_and_pending_milestones_are_clear()
             assert "No APK or EXE binaries" in evidence.read_text(encoding="utf-8")
         else:
             assert "not_tagged" in milestone["status"]
+
+
+def test_validate_seed_blocks_latest_source_readiness_evidence_mismatch() -> None:
+    readiness_path = ROOT / "config" / "source-release-readiness.seed.json"
+    snapshots = _snapshot_files([readiness_path])
+
+    try:
+        readiness = json.loads(readiness_path.read_text(encoding="utf-8"))
+        latest_candidate = _read_json("config/release-blocker-inventory.seed.json")[
+            "tracked_candidates"
+        ]["latest_candidate"]
+        for milestone in readiness["milestones"]:
+            if milestone["tag"] == latest_candidate:
+                milestone["evidence"] = "https://github.com/example/fork/pull/149"
+                break
+        _write_json(readiness_path, readiness)
+
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "validate-seed.ps1"),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    finally:
+        _restore_files(snapshots)
+
+    assert result.returncode != 0
+    assert (
+        "source-release-readiness.seed.json latest_candidate evidence must match latest stacked PR URL"
+        in result.stdout + result.stderr
+    )
+
+
+def test_validate_seed_knows_latest_source_readiness_consistency() -> None:
+    validator = (ROOT / "scripts" / "validate-seed.ps1").read_text(encoding="utf-8")
+
+    assert "latest_candidate from release blocker inventory" in validator
+    assert "latest_candidate evidence must match latest stacked PR URL" in validator
+    assert "https://github.com/Kiwunaka/Pokrov-client/pull/$latestStackedPr" in validator

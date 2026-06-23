@@ -1709,6 +1709,20 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
     $manifestErrors.Add("config\\source-release-readiness.seed.json must enforce source-only binary claim boundaries")
   }
 
+  $releaseBlockerInventoryPath = Join-Path $root "config\\release-blocker-inventory.seed.json"
+  if (Test-Path -LiteralPath $releaseBlockerInventoryPath -PathType Leaf) {
+    $releaseBlockerInventory = Get-Content -Raw -LiteralPath $releaseBlockerInventoryPath | ConvertFrom-Json
+    $latestCandidate = [string]$releaseBlockerInventory.tracked_candidates.latest_candidate
+    $latestStackedPr = [int]$releaseBlockerInventory.tracked_candidates.latest_stacked_pr
+    $expectedLatestEvidence = "https://github.com/Kiwunaka/Pokrov-client/pull/$latestStackedPr"
+    $latestMilestone = @($sourceReadiness.milestones | Where-Object { $_.tag -eq $latestCandidate }) | Select-Object -First 1
+    if ($null -eq $latestMilestone) {
+      $manifestErrors.Add("config\\source-release-readiness.seed.json must include latest_candidate from release blocker inventory")
+    } elseif ([string]$latestMilestone.evidence -ne $expectedLatestEvidence) {
+      $manifestErrors.Add("config\\source-release-readiness.seed.json latest_candidate evidence must match latest stacked PR URL")
+    }
+  }
+
   foreach ($milestone in @($sourceReadiness.milestones)) {
     if ($milestone.source_only -ne $true) {
       $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$($milestone.tag)' must be source_only")

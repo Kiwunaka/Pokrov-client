@@ -532,6 +532,12 @@
       "candidate": "v0.127.0-source",
       "base": "codex/v0.126-tag-readiness-evidence-url-boundary",
       "head": "codex/v0.127-validate-tag-readiness-evidence-url-boundary"
+    },
+    {
+      "pr": 149,
+      "candidate": "v0.128.0-source",
+      "base": "codex/v0.127-validate-tag-readiness-evidence-url-boundary",
+      "head": "codex/v0.128-validate-source-readiness-latest-evidence"
     }
   ]
 }
