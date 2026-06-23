@@ -305,8 +305,10 @@ production readiness without matching public evidence.
   and PR must match the blocker inventory top source-only PR.
 - Added seed validation coverage so the release blocker inventory covered range
   must match its base and latest source-only candidates.
+- Added seed validation coverage so source-readiness milestone tags must be
+  unique.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.130.0-source` candidates.
+  `v0.131.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -442,6 +444,7 @@ production readiness without matching public evidence.
 | `v0.128.0-source` | Pending stacked PR, not tagged | PR #149 |
 | `v0.129.0-source` | Pending stacked PR, not tagged | PR #150 |
 | `v0.130.0-source` | Pending stacked PR, not tagged | PR #151 |
+| `v0.131.0-source` | Pending stacked PR, not tagged | PR #152 |
 
 ### Still Source-Only
 

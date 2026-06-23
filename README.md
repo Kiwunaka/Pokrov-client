@@ -190,6 +190,7 @@ Source release status:
 | `v0.128.0-source` | Pending stacked PR, not tagged | Seed validation requires the latest source-readiness milestone evidence to match blocker inventory. |
 | `v0.129.0-source` | Pending stacked PR, not tagged | Seed validation requires the latest merge-order PR and candidate to match blocker inventory. |
 | `v0.130.0-source` | Pending stacked PR, not tagged | Seed validation requires blocker inventory covered range to match base and latest candidates. |
+| `v0.131.0-source` | Pending stacked PR, not tagged | Seed validation requires unique source-readiness milestone tags. |
 
 ## Which App Should I Use?
 

@@ -38,7 +38,10 @@ def test_source_release_readiness_milestones_are_source_only() -> None:
     assert readiness["policy"]["source_only_milestones_must_not_claim_binaries"] is True
     assert readiness["policy"]["pending_milestones_must_not_claim_tags"] is True
     assert readiness["policy"]["release_notes_require_proof_manifest_after_v0_7"] is True
+    assert readiness["policy"]["milestone_tags_must_be_unique"] is True
     assert len(milestones) >= 50
+    tags = [milestone["tag"] for milestone in milestones]
+    assert len(tags) == len(set(tags))
 
     for milestone in milestones:
         assert milestone["tag"].startswith("v")
@@ -200,7 +203,7 @@ def test_validate_seed_blocks_latest_source_readiness_evidence_mismatch() -> Non
         ]["latest_candidate"]
         for milestone in readiness["milestones"]:
             if milestone["tag"] == latest_candidate:
-                milestone["evidence"] = "https://github.com/example/fork/pull/151"
+                milestone["evidence"] = "https://github.com/example/fork/pull/152"
                 break
         _write_json(readiness_path, readiness)
 
@@ -227,9 +230,43 @@ def test_validate_seed_blocks_latest_source_readiness_evidence_mismatch() -> Non
     )
 
 
+def test_validate_seed_blocks_duplicate_source_readiness_milestone_tags() -> None:
+    readiness_path = ROOT / "config" / "source-release-readiness.seed.json"
+    snapshots = _snapshot_files([readiness_path])
+
+    try:
+        readiness = json.loads(readiness_path.read_text(encoding="utf-8"))
+        duplicate = json.loads(json.dumps(readiness["milestones"][0]))
+        readiness["milestones"].append(duplicate)
+        _write_json(readiness_path, readiness)
+
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "validate-seed.ps1"),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    finally:
+        _restore_files(snapshots)
+
+    assert result.returncode != 0
+    assert "source-release-readiness.seed.json milestone 'v0.1.0-source' tag must be unique" in (
+        result.stdout + result.stderr
+    )
+
+
 def test_validate_seed_knows_latest_source_readiness_consistency() -> None:
     validator = (ROOT / "scripts" / "validate-seed.ps1").read_text(encoding="utf-8")
 
     assert "latest_candidate from release blocker inventory" in validator
     assert "latest_candidate evidence must match latest stacked PR URL" in validator
     assert "https://github.com/Kiwunaka/Pokrov-client/pull/$latestStackedPr" in validator
+    assert "milestone_tags_must_be_unique" in validator
+    assert "tag must be unique" in validator
