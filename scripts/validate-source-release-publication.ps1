@@ -119,6 +119,22 @@ function Assert-RulesetReportInputFingerprintIntegrity {
   if ([string]$rulesetReport.branch -ne $expectedRulesetBranch) {
     throw "Publication dry-run refused ruleset report branch mismatch."
   }
+
+  if ($rulesetReport.ok -eq $true) {
+    $rulesetChecksProperty = $rulesetReport.PSObject.Properties["checks"]
+    $rulesetChecks = @()
+    if ($null -ne $rulesetChecksProperty -and $null -ne $rulesetChecksProperty.Value) {
+      $rulesetChecks = @($rulesetChecksProperty.Value)
+    }
+    if ($rulesetChecks.Count -eq 0) {
+      throw "Publication dry-run refused ruleset report ok status without checks."
+    }
+    foreach ($check in $rulesetChecks) {
+      if ([string]$check.status -ne "pass") {
+        throw "Publication dry-run refused ruleset report ok status with failed checks."
+      }
+    }
+  }
 }
 
 function Assert-ArtifactFingerprintIntegrity {

@@ -96,6 +96,7 @@ def test_release_evidence_bundle_seed_defines_source_only_policy() -> None:
     assert seed["policy"]["requires_ruleset_report_input_fingerprint_when_present"] is True
     assert seed["policy"]["requires_ruleset_report_shape"] is True
     assert seed["policy"]["requires_ruleset_report_target"] is True
+    assert seed["policy"]["requires_ruleset_report_ok_consistency"] is True
     assert seed["policy"]["requires_preflight_artifact_fingerprints"] is True
     assert seed["policy"]["requires_preflight_artifact_fingerprint_integrity"] is True
     assert seed["policy"]["requires_preflight_commit_sha_consistency"] is True
@@ -134,6 +135,8 @@ def test_release_evidence_bundle_script_preserves_claim_boundaries() -> None:
         "ruleset report without ok status",
         "ruleset report repository mismatch",
         "ruleset report branch mismatch",
+        "ruleset report ok status without checks",
+        "ruleset report ok status with failed checks",
         "preflight_artifact_fingerprints",
         "preflight_commit_sha",
         "preflight_ref_commit_sha",
@@ -212,6 +215,7 @@ def test_release_evidence_bundle_script_writes_bundle_from_fixture(tmp_path: Pat
                 "read_only": True,
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
+                "checks": [{"name": "ruleset:active", "status": "pass"}],
             }
         ),
         encoding="utf-8",
@@ -357,6 +361,70 @@ def test_release_evidence_bundle_rejects_malformed_ruleset_report(
     ],
 )
 def test_release_evidence_bundle_rejects_wrong_ruleset_report_target(
+    tmp_path: Path,
+    ruleset_payload: dict[str, object],
+    expected_error: str,
+) -> None:
+    preflight = _write_valid_preflight_fixture(tmp_path)
+    ruleset = tmp_path / "ruleset.json"
+    out_dir = tmp_path / "out"
+
+    ruleset.write_text(json.dumps(ruleset_payload), encoding="utf-8")
+
+    result = subprocess.run(
+        [
+            "powershell",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(ROOT / "scripts" / "prepare-release-evidence-bundle.ps1"),
+            "-Tag",
+            "v9.9.9-source",
+            "-PreflightSummaryPath",
+            str(preflight),
+            "-RulesetReportPath",
+            str(ruleset),
+            "-OutDir",
+            str(out_dir),
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode != 0
+    assert not (out_dir / "v9.9.9-source-release-evidence.json").exists()
+    assert expected_error in (result.stderr + result.stdout)
+
+
+@pytest.mark.parametrize(
+    ("ruleset_payload", "expected_error"),
+    [
+        (
+            {
+                "schema_version": 1,
+                "ok": True,
+                "read_only": True,
+                "repository": "Kiwunaka/Pokrov-client",
+                "branch": "main",
+            },
+            "ruleset report ok status without checks",
+        ),
+        (
+            {
+                "schema_version": 1,
+                "ok": True,
+                "read_only": True,
+                "repository": "Kiwunaka/Pokrov-client",
+                "branch": "main",
+                "checks": [{"name": "ruleset:active", "status": "fail"}],
+            },
+            "ruleset report ok status with failed checks",
+        ),
+    ],
+)
+def test_release_evidence_bundle_rejects_inconsistent_ruleset_report_ok_status(
     tmp_path: Path,
     ruleset_payload: dict[str, object],
     expected_error: str,

@@ -175,6 +175,22 @@ function Assert-RulesetReportShape {
   if ([string]$Report.branch -ne $expectedRulesetBranch) {
     throw "Release evidence refused ruleset report branch mismatch."
   }
+
+  if ($Report.ok -eq $true) {
+    $checksProperty = $Report.PSObject.Properties["checks"]
+    $checks = @()
+    if ($null -ne $checksProperty -and $null -ne $checksProperty.Value) {
+      $checks = @($checksProperty.Value)
+    }
+    if ($checks.Count -eq 0) {
+      throw "Release evidence refused ruleset report ok status without checks."
+    }
+    foreach ($check in $checks) {
+      if ([string]$check.status -ne "pass") {
+        throw "Release evidence refused ruleset report ok status with failed checks."
+      }
+    }
+  }
 }
 
 Push-Location $root

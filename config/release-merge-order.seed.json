@@ -448,6 +448,12 @@
       "candidate": "v0.113.0-source",
       "base": "codex/v0.112-handoff-ruleset-report-shape",
       "head": "codex/v0.113-ruleset-report-target-guard"
+    },
+    {
+      "pr": 135,
+      "candidate": "v0.114.0-source",
+      "base": "codex/v0.113-ruleset-report-target-guard",
+      "head": "codex/v0.114-ruleset-report-ok-consistency"
     }
   ]
 }

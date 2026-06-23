@@ -22,7 +22,8 @@
     "requires_preflight_commit_sha_consistency": true,
     "requires_preflight_ref_commit_sha_consistency": true,
     "requires_ruleset_report_shape": true,
-    "requires_ruleset_report_target": true
+    "requires_ruleset_report_target": true,
+    "requires_ruleset_report_ok_consistency": true
   },
   "required_summary_flags": [
     "source_only",
