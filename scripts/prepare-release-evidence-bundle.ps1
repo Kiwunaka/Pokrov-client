@@ -198,6 +198,20 @@ function Assert-RulesetReportShape {
   }
 
   if ($Report.ok -eq $true) {
+    $coveredRequiredChecksProperty = $Report.PSObject.Properties["covered_required_status_checks"]
+    $actualCoveredRequiredChecks = @()
+    if ($null -ne $coveredRequiredChecksProperty -and $null -ne $coveredRequiredChecksProperty.Value) {
+      $actualCoveredRequiredChecks = @($coveredRequiredChecksProperty.Value)
+    }
+    if ($actualCoveredRequiredChecks.Count -ne $expectedRequiredChecks.Count) {
+      throw "Release evidence refused ruleset report covered required status checks mismatch."
+    }
+    for ($index = 0; $index -lt $expectedRequiredChecks.Count; $index += 1) {
+      if ([string]$actualCoveredRequiredChecks[$index] -ne [string]$expectedRequiredChecks[$index]) {
+        throw "Release evidence refused ruleset report covered required status checks mismatch."
+      }
+    }
+
     $checksProperty = $Report.PSObject.Properties["checks"]
     $checks = @()
     if ($null -ne $checksProperty -and $null -ne $checksProperty.Value) {
@@ -215,12 +229,6 @@ function Assert-RulesetReportShape {
       }
       if ([string]$check.status -ne "pass") {
         throw "Release evidence refused ruleset report ok status with failed checks."
-      }
-    }
-    $passedCheckNames = @($checks | ForEach-Object { [string]$_.name })
-    foreach ($expectedCheck in $expectedRequiredChecks) {
-      if (@($passedCheckNames | Where-Object { $_ -eq [string]$expectedCheck }).Count -eq 0) {
-        throw "Release evidence refused ruleset report required status check coverage mismatch."
       }
     }
   }

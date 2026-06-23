@@ -151,6 +151,7 @@ if ($activeRulesets.Count -gt 0) {
 
 $rulesetRuleTypes = @($activeRulesets | ForEach-Object { $_.rules } | ForEach-Object { $_.type } | Select-Object -Unique)
 $rulesetChecks = Get-RulesetCheckNames -Rulesets $activeRulesets
+$branchChecks = @()
 
 if ($rulesetRuleTypes -contains "pull_request") {
   Add-Check -Name "ruleset:pull_request" -Status "pass"
@@ -189,7 +190,6 @@ if ($null -eq $branchProtection) {
 } else {
   Add-Check -Name "branch_protection:active" -Status "pass"
 
-  $branchChecks = @()
   foreach ($context in @($branchProtection.required_status_checks.contexts)) {
     $branchChecks += [string]$context
   }
@@ -231,6 +231,9 @@ if ($null -eq $branchProtection) {
   }
 }
 
+$detectedRequiredChecks = @($rulesetChecks + $branchChecks | Select-Object -Unique)
+$coveredRequiredChecks = @($requiredChecks | Where-Object { $detectedRequiredChecks -contains $_ })
+
 $summary = [ordered]@{
   schema_version = 1
   ok = -not $failed
@@ -239,6 +242,7 @@ $summary = [ordered]@{
   repository = $Repository
   branch = $Branch
   required_status_checks = $requiredChecks
+  covered_required_status_checks = $coveredRequiredChecks
   checked_at = (Get-Date).ToUniversalTime().ToString("o")
   checks = @($checks)
 }

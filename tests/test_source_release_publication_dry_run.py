@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
 import hashlib
@@ -15,7 +15,8 @@ REQUIRED_STATUS_CHECKS = [
     "Android native Gradle unit tests",
 ]
 REQUIRED_RULESET_CHECKS = [
-    {"name": name, "status": "pass"} for name in REQUIRED_STATUS_CHECKS
+    {"name": "ruleset:required_status_checks", "status": "pass"},
+    {"name": "branch_protection:required_status_checks", "status": "pass"},
 ]
 
 
@@ -108,7 +109,7 @@ def test_publication_dry_run_seed_defines_no_publish_policy() -> None:
     )
     assert (
         seed["policy"][
-            "requires_evidence_bundle_ruleset_report_required_status_check_coverage"
+            "requires_evidence_bundle_ruleset_report_covered_required_status_checks"
         ]
         is True
     )
@@ -156,7 +157,7 @@ def test_publication_dry_run_script_is_local_only() -> None:
         "ruleset report ok status with failed checks",
         "ruleset report check entry shape mismatch",
         "ruleset report required status checks mismatch",
-        "ruleset report required status check coverage mismatch",
+        "ruleset report covered required status checks mismatch",
         "evidence_bundle_preflight_artifact_fingerprints",
         "evidence_bundle_preflight_commit_sha",
         "evidence_bundle_preflight_ref_commit_sha",
@@ -529,6 +530,7 @@ def test_publication_dry_run_rejects_stale_github_ruleset_report_input_fingerpri
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,
+                "covered_required_status_checks": REQUIRED_STATUS_CHECKS,
                 "checks": REQUIRED_RULESET_CHECKS,
             }
         ),
@@ -862,6 +864,7 @@ def test_publication_dry_run_rejects_wrong_github_ruleset_report_target(
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,
+                "covered_required_status_checks": REQUIRED_STATUS_CHECKS,
             },
             "ruleset report ok status without checks",
         ),
@@ -873,6 +876,7 @@ def test_publication_dry_run_rejects_wrong_github_ruleset_report_target(
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,
+                "covered_required_status_checks": REQUIRED_STATUS_CHECKS,
                 "checks": [{"status": "pass"}],
             },
             "ruleset report check entry shape mismatch",
@@ -885,6 +889,7 @@ def test_publication_dry_run_rejects_wrong_github_ruleset_report_target(
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,
+                "covered_required_status_checks": REQUIRED_STATUS_CHECKS,
                 "checks": [{"name": "ruleset:active", "status": "fail"}],
             },
             "ruleset report ok status with failed checks",
@@ -1022,6 +1027,7 @@ def test_publication_dry_run_rejects_github_ruleset_report_required_status_check
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": required_status_checks,
+                "covered_required_status_checks": REQUIRED_STATUS_CHECKS,
                 "checks": REQUIRED_RULESET_CHECKS,
             }
         ),
@@ -1111,7 +1117,7 @@ def test_publication_dry_run_rejects_github_ruleset_report_required_status_check
     )
 
 
-def test_publication_dry_run_rejects_github_ruleset_report_required_status_check_coverage_mismatch(
+def test_publication_dry_run_rejects_github_ruleset_report_covered_required_status_check_mismatch(
     tmp_path: Path,
 ) -> None:
     evidence = tmp_path / "evidence.json"
@@ -1132,7 +1138,8 @@ def test_publication_dry_run_rejects_github_ruleset_report_required_status_check
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,
-                "checks": REQUIRED_RULESET_CHECKS[:-1],
+                "covered_required_status_checks": REQUIRED_STATUS_CHECKS[:-1],
+                "checks": REQUIRED_RULESET_CHECKS,
             }
         ),
         encoding="utf-8",
@@ -1216,7 +1223,7 @@ def test_publication_dry_run_rejects_github_ruleset_report_required_status_check
 
     assert result.returncode != 0
     assert not (out_dir / "v9.9.9-source-publication-dry-run.json").exists()
-    assert "ruleset report required status check coverage mismatch" in (
+    assert "ruleset report covered required status checks mismatch" in (
         result.stderr + result.stdout
     )
 

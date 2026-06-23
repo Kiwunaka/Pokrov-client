@@ -142,6 +142,20 @@ function Assert-RulesetReportInputFingerprintIntegrity {
   }
 
   if ($rulesetReport.ok -eq $true) {
+    $coveredRequiredChecksProperty = $rulesetReport.PSObject.Properties["covered_required_status_checks"]
+    $actualCoveredRequiredChecks = @()
+    if ($null -ne $coveredRequiredChecksProperty -and $null -ne $coveredRequiredChecksProperty.Value) {
+      $actualCoveredRequiredChecks = @($coveredRequiredChecksProperty.Value)
+    }
+    if ($actualCoveredRequiredChecks.Count -ne $expectedRequiredChecks.Count) {
+      throw "Publication dry-run refused ruleset report covered required status checks mismatch."
+    }
+    for ($index = 0; $index -lt $expectedRequiredChecks.Count; $index += 1) {
+      if ([string]$actualCoveredRequiredChecks[$index] -ne [string]$expectedRequiredChecks[$index]) {
+        throw "Publication dry-run refused ruleset report covered required status checks mismatch."
+      }
+    }
+
     $rulesetChecksProperty = $rulesetReport.PSObject.Properties["checks"]
     $rulesetChecks = @()
     if ($null -ne $rulesetChecksProperty -and $null -ne $rulesetChecksProperty.Value) {
@@ -159,12 +173,6 @@ function Assert-RulesetReportInputFingerprintIntegrity {
       }
       if ([string]$check.status -ne "pass") {
         throw "Publication dry-run refused ruleset report ok status with failed checks."
-      }
-    }
-    $passedCheckNames = @($rulesetChecks | ForEach-Object { [string]$_.name })
-    foreach ($expectedCheck in $expectedRequiredChecks) {
-      if (@($passedCheckNames | Where-Object { $_ -eq [string]$expectedCheck }).Count -eq 0) {
-        throw "Publication dry-run refused ruleset report required status check coverage mismatch."
       }
     }
   }
