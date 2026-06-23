@@ -1726,6 +1726,9 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
   if ($sourceReadiness.policy.milestone_tags_must_be_unique -ne $true) {
     $manifestErrors.Add("config\\source-release-readiness.seed.json must require unique milestone tags")
   }
+  if ($sourceReadiness.policy.stacked_pr_milestone_evidence_must_be_canonical_pr_url -ne $true) {
+    $manifestErrors.Add("config\\source-release-readiness.seed.json must require stacked PR milestone evidence to use canonical PR URLs")
+  }
 
   $releaseBlockerInventoryPath = Join-Path $root "config\\release-blocker-inventory.seed.json"
   if (Test-Path -LiteralPath $releaseBlockerInventoryPath -PathType Leaf) {
@@ -1750,8 +1753,13 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
   $sourceReadinessTags = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
   foreach ($milestone in @($sourceReadiness.milestones)) {
     $milestoneTag = [string]$milestone.tag
+    $milestoneStatus = [string]$milestone.status
+    $milestoneEvidence = [string]$milestone.evidence
     if (-not $sourceReadinessTags.Add($milestoneTag)) {
       $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$milestoneTag' tag must be unique")
+    }
+    if ($milestoneStatus.StartsWith("stacked_pr_", [System.StringComparison]::Ordinal) -and $milestoneEvidence -notmatch "^https://github\.com/Kiwunaka/Pokrov-client/pull/[0-9]+$") {
+      $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$milestoneTag' stacked PR evidence must use canonical repository PR URL")
     }
     if ($milestone.source_only -ne $true) {
       $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$milestoneTag' must be source_only")
@@ -1761,7 +1769,7 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
         $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$milestoneTag' must keep $field false")
       }
     }
-    if ($milestone.status -ne "tagged" -and $milestone.status -notmatch "not_tagged") {
+    if ($milestoneStatus -ne "tagged" -and $milestoneStatus -notmatch "not_tagged") {
       $manifestErrors.Add("config\\source-release-readiness.seed.json pending milestone '$milestoneTag' must include not_tagged in status")
     }
   }

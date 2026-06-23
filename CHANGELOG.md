@@ -307,8 +307,10 @@ production readiness without matching public evidence.
   must match its base and latest source-only candidates.
 - Added seed validation coverage so source-readiness milestone tags must be
   unique.
+- Added seed validation coverage so stacked PR source-readiness milestone
+  evidence must use canonical public repository PR URLs.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.131.0-source` candidates.
+  `v0.132.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -445,6 +447,7 @@ production readiness without matching public evidence.
 | `v0.129.0-source` | Pending stacked PR, not tagged | PR #150 |
 | `v0.130.0-source` | Pending stacked PR, not tagged | PR #151 |
 | `v0.131.0-source` | Pending stacked PR, not tagged | PR #152 |
+| `v0.132.0-source` | Pending stacked PR, not tagged | PR #153 |
 
 ### Still Source-Only
 
