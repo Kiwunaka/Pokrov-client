@@ -343,6 +343,29 @@ try {
       -ErrorMessage "publication dry-run preflight input fingerprint mismatch" `
       -BlockingErrors $blockingErrors
   }
+  $publicationDryRunRulesetReportFingerprint = $null
+  if ($null -ne $publicationDryRunEvidenceBundleInputFingerprints) {
+    $rulesetReportFingerprintProperty = $publicationDryRunEvidenceBundleInputFingerprints.PSObject.Properties["github_ruleset_report"]
+    if ($null -ne $rulesetReportFingerprintProperty) {
+      $publicationDryRunRulesetReportFingerprint = $rulesetReportFingerprintProperty.Value
+    }
+  }
+  $publicationDryRunRulesetReportFingerprintPresent = (
+    -not [string]::IsNullOrWhiteSpace([string]$publicationDryRunRulesetReportFingerprint.path) -and
+    -not [string]::IsNullOrWhiteSpace([string]$publicationDryRunRulesetReportFingerprint.sha256) -and
+    [string]$publicationDryRunRulesetReportFingerprint.sha256 -match "^[0-9a-fA-F]{64}$"
+  )
+  if ($publicationDryRunRulesetReportFingerprintPresent) {
+    Assert-InputFingerprintIntegrity `
+      -Fingerprint $publicationDryRunRulesetReportFingerprint `
+      -ErrorMessage "publication dry-run ruleset report input fingerprint mismatch" `
+      -BlockingErrors $blockingErrors
+  } elseif (
+    $publicationDryRun.github_enforcement_claim_allowed -eq $true -or
+    -not [string]::IsNullOrWhiteSpace([string]$publicationDryRun.github_ruleset_report)
+  ) {
+    $blockingErrors.Add("publication dry-run summary is missing ruleset report input fingerprint")
+  }
   $publicationDryRunEvidenceBundlePreflightArtifactFingerprints = $null
   $publicationDryRunEvidenceBundlePreflightArtifactFingerprintProperty = $publicationDryRun.PSObject.Properties["evidence_bundle_preflight_artifact_fingerprints"]
   if ($null -ne $publicationDryRunEvidenceBundlePreflightArtifactFingerprintProperty) {

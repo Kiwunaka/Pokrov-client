@@ -84,6 +84,20 @@ function Assert-InputFingerprintIntegrity {
   }
 }
 
+function Assert-RulesetReportInputFingerprintIntegrity {
+  param([Parameter(Mandatory = $true)][object]$Fingerprint)
+
+  $resolvedFingerprintPath = [System.IO.Path]::GetFullPath((Resolve-RepoPath -Path ([string]$Fingerprint.path)))
+  if (-not (Test-Path -LiteralPath $resolvedFingerprintPath -PathType Leaf)) {
+    throw "Publication dry-run refused evidence bundle github ruleset report fingerprint mismatch."
+  }
+
+  $actualFingerprint = Get-InputFingerprint -Path $resolvedFingerprintPath
+  if ([string]$Fingerprint.sha256 -ne [string]$actualFingerprint.sha256) {
+    throw "Publication dry-run refused evidence bundle github ruleset report fingerprint mismatch."
+  }
+}
+
 function Assert-ArtifactFingerprintIntegrity {
   param(
     [Parameter(Mandatory = $true)][object]$Fingerprint,
@@ -209,6 +223,27 @@ try {
     throw "Publication dry-run refused evidence bundle is missing input fingerprints."
   }
   Assert-InputFingerprintIntegrity -Fingerprint $preflightFingerprint -Name "preflight_summary"
+
+  $rulesetFingerprint = $null
+  if ($null -ne $evidenceBundleInputFingerprints) {
+    $rulesetFingerprintProperty = $evidenceBundleInputFingerprints.PSObject.Properties["github_ruleset_report"]
+    if ($null -ne $rulesetFingerprintProperty) {
+      $rulesetFingerprint = $rulesetFingerprintProperty.Value
+    }
+  }
+  $rulesetFingerprintPresent = (
+    -not [string]::IsNullOrWhiteSpace([string]$rulesetFingerprint.path) -and
+    -not [string]::IsNullOrWhiteSpace([string]$rulesetFingerprint.sha256) -and
+    [string]$rulesetFingerprint.sha256 -match "^[0-9a-fA-F]{64}$"
+  )
+  if ($rulesetFingerprintPresent) {
+    Assert-RulesetReportInputFingerprintIntegrity -Fingerprint $rulesetFingerprint
+  } elseif (
+    $evidence.github_enforcement_claim_allowed -eq $true -or
+    -not [string]::IsNullOrWhiteSpace([string]$evidence.github_ruleset_report)
+  ) {
+    throw "Publication dry-run refused evidence bundle is missing github ruleset report input fingerprint."
+  }
 
   $evidenceBundlePreflightArtifactFingerprints = $null
   $artifactFingerprintProperty = $evidence.PSObject.Properties["preflight_artifact_fingerprints"]

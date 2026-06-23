@@ -220,6 +220,13 @@ try {
     $rulesetClaimAllowed = [bool]$rulesetReport.ok
   }
 
+  $inputFingerprints = [ordered]@{
+    preflight_summary = Get-InputFingerprint -Path $resolvedPreflightSummaryPath
+  }
+  if (-not [string]::IsNullOrWhiteSpace($resolvedRulesetReportPath)) {
+    $inputFingerprints.github_ruleset_report = Get-InputFingerprint -Path $resolvedRulesetReportPath
+  }
+
   $bundle = [ordered]@{
     schema_version = 1
     tag = $Tag
@@ -240,9 +247,7 @@ try {
     proof_manifest = $preflightSummary.proof_manifest
     release_notes = $preflightSummary.release_notes
     source_archive_sha256 = $preflightSummary.source_archive_sha256
-    input_fingerprints = [ordered]@{
-      preflight_summary = Get-InputFingerprint -Path $resolvedPreflightSummaryPath
-    }
+    input_fingerprints = $inputFingerprints
     preflight_artifact_fingerprints = $preflightSummary.artifact_fingerprints
     github_ruleset_report = $resolvedRulesetReportPath
     github_ruleset_ok = $rulesetOk
