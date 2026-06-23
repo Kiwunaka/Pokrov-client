@@ -187,6 +187,7 @@ Source release status:
 | `v0.125.0-source` | Pending stacked PR, not tagged | Source tag readiness requires an explicit ready milestone status before tag creation can be allowed. |
 | `v0.126.0-source` | Pending stacked PR, not tagged | Source tag readiness requires milestone evidence to match the canonical public repository PR URL. |
 | `v0.127.0-source` | Pending stacked PR, not tagged | Seed validation requires the source tag-readiness evidence policy and canonical PR URL guard phrases. |
+| `v0.128.0-source` | Pending stacked PR, not tagged | Seed validation requires the latest source-readiness milestone evidence to match blocker inventory. |
 
 ## Which App Should I Use?
 

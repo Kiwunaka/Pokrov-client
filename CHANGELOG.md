@@ -299,8 +299,10 @@ production readiness without matching public evidence.
   pull request URL for the current top stacked PR.
 - Added seed validation coverage for source tag-readiness milestone evidence,
   status, repository-boundary policy, and canonical PR URL guard phrases.
+- Added seed validation coverage so source-readiness latest candidate evidence
+  must match the blocker inventory latest source-only PR URL.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.127.0-source` candidates.
+  `v0.128.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -433,6 +435,7 @@ production readiness without matching public evidence.
 | `v0.125.0-source` | Pending stacked PR, not tagged | PR #146 |
 | `v0.126.0-source` | Pending stacked PR, not tagged | PR #147 |
 | `v0.127.0-source` | Pending stacked PR, not tagged | PR #148 |
+| `v0.128.0-source` | Pending stacked PR, not tagged | PR #149 |
 
 ### Still Source-Only
 
