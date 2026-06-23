@@ -352,8 +352,11 @@ production readiness without matching public evidence.
 - Added source publication packet release-note proof checks so manual GitHub
   Release review is blocked when rendered notes do not mention the selected
   source candidate tag and exact source archive SHA-256.
+- Added source publication packet proof-manifest binding checks so manual
+  GitHub Release review is blocked when the proof manifest points at a
+  different source archive SHA-256 than the selected publication dry-run.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.148.0-source` candidates.
+  `v0.149.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -507,6 +510,7 @@ production readiness without matching public evidence.
 | `v0.146.0-source` | Pending stacked PR, not tagged | PR #167 |
 | `v0.147.0-source` | Pending stacked PR, not tagged | PR #168 |
 | `v0.148.0-source` | Pending stacked PR, not tagged | PR #169 |
+| `v0.149.0-source` | Pending stacked PR, not tagged | PR #170 |
 
 ### Still Source-Only
 
