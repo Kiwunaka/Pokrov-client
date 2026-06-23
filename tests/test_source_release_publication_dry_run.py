@@ -43,6 +43,22 @@ def _stale_ruleset_checked_at() -> str:
     ).isoformat().replace("+00:00", "Z")
 
 
+def _fresh_input_generated_at() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _stale_input_generated_at() -> str:
+    return (
+        datetime.now(timezone.utc) - timedelta(hours=48)
+    ).isoformat().replace("+00:00", "Z")
+
+
+def _future_input_generated_at() -> str:
+    return (
+        datetime.now(timezone.utc) + timedelta(minutes=30)
+    ).isoformat().replace("+00:00", "Z")
+
+
 def _with_ruleset_checked_at(payload: dict[str, object]) -> dict[str, object]:
     enriched = dict(payload)
     enriched.setdefault("checked_at", _fresh_ruleset_checked_at())
@@ -97,6 +113,8 @@ def test_publication_dry_run_seed_defines_no_publish_policy() -> None:
     assert seed["policy"]["requires_source_only_evidence_bundle"] is True
     assert seed["policy"]["requires_release_copy_check"] is True
     assert seed["policy"]["requires_input_fingerprints"] is True
+    assert seed["policy"]["requires_evidence_bundle_generated_at"] is True
+    assert seed["policy"]["requires_evidence_bundle_generated_at_freshness"] is True
     assert seed["policy"]["requires_evidence_bundle_input_fingerprints"] is True
     assert (
         seed["policy"]["requires_evidence_bundle_preflight_input_fingerprint_integrity"]
@@ -248,6 +266,7 @@ def test_publication_dry_run_writes_summary_from_fixtures(tmp_path: Path) -> Non
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "commit_sha": "a" * 40,
                 "preflight_commit_sha": "a" * 40,
@@ -338,6 +357,59 @@ def test_publication_dry_run_writes_summary_from_fixtures(tmp_path: Path) -> Non
     assert summary["ready_for_manual_review"] is True
 
 
+@pytest.mark.parametrize(
+    ("evidence_payload", "expected_error"),
+    [
+        ({}, "evidence bundle without generated_at timestamp"),
+        (
+            {"generated_at": "not-a-date"},
+            "evidence bundle without parseable generated_at timestamp",
+        ),
+        (
+            {"generated_at": _stale_input_generated_at()},
+            "stale evidence bundle generated_at timestamp",
+        ),
+        (
+            {"generated_at": _future_input_generated_at()},
+            "stale evidence bundle generated_at timestamp",
+        ),
+    ],
+)
+def test_publication_dry_run_rejects_unfresh_evidence_generated_at(
+    tmp_path: Path, evidence_payload: dict[str, object], expected_error: str
+) -> None:
+    evidence = tmp_path / "evidence.json"
+    notes = tmp_path / "release-notes.md"
+    out_dir = tmp_path / "out"
+    evidence.write_text(json.dumps(evidence_payload), encoding="utf-8")
+    notes.write_text(_release_notes_text("1" * 64), encoding="utf-8")
+
+    result = subprocess.run(
+        [
+            "powershell",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(ROOT / "scripts" / "validate-source-release-publication.ps1"),
+            "-Tag",
+            "v9.9.9-source",
+            "-EvidenceBundlePath",
+            str(evidence),
+            "-ReleaseNotesPath",
+            str(notes),
+            "-OutDir",
+            str(out_dir),
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode != 0
+    assert expected_error in (result.stderr + result.stdout)
+
+
 def test_publication_dry_run_rejects_evidence_without_input_fingerprints(
     tmp_path: Path,
 ) -> None:
@@ -349,6 +421,7 @@ def test_publication_dry_run_rejects_evidence_without_input_fingerprints(
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "commit_sha": "a" * 40,
                 "preflight_commit_sha": "a" * 40,
@@ -465,6 +538,7 @@ def test_publication_dry_run_rejects_stale_preflight_input_fingerprint(
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "commit_sha": "a" * 40,
                 "preflight_commit_sha": "a" * 40,
@@ -572,6 +646,7 @@ def test_publication_dry_run_rejects_stale_github_ruleset_report_input_fingerpri
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "commit_sha": "a" * 40,
                 "preflight_commit_sha": "a" * 40,
@@ -708,6 +783,7 @@ def test_publication_dry_run_rejects_malformed_github_ruleset_report(
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "commit_sha": "a" * 40,
                 "preflight_commit_sha": "a" * 40,
@@ -832,6 +908,7 @@ def test_publication_dry_run_rejects_wrong_github_ruleset_report_target(
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "commit_sha": "a" * 40,
                 "preflight_commit_sha": "a" * 40,
@@ -975,6 +1052,7 @@ def test_publication_dry_run_rejects_inconsistent_github_ruleset_report_ok_statu
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "commit_sha": "a" * 40,
                 "preflight_commit_sha": "a" * 40,
@@ -1098,6 +1176,7 @@ def test_publication_dry_run_rejects_github_ruleset_report_required_status_check
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "commit_sha": "a" * 40,
                 "preflight_commit_sha": "a" * 40,
@@ -1210,6 +1289,7 @@ def test_publication_dry_run_rejects_github_ruleset_report_covered_required_stat
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "commit_sha": "a" * 40,
                 "preflight_commit_sha": "a" * 40,
@@ -1298,6 +1378,7 @@ def test_publication_dry_run_rejects_evidence_without_preflight_artifact_fingerp
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "commit_sha": "a" * 40,
                 "preflight_commit_sha": "a" * 40,
@@ -1415,6 +1496,7 @@ def test_publication_dry_run_rejects_stale_release_notes_artifact_fingerprint(
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "commit_sha": "a" * 40,
                 "preflight_commit_sha": "a" * 40,
@@ -1517,6 +1599,7 @@ def test_publication_dry_run_rejects_evidence_commit_sha_mismatch(
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "commit_sha": "a" * 40,
                 "preflight_commit_sha": "b" * 40,
@@ -1621,6 +1704,7 @@ def test_publication_dry_run_rejects_evidence_ref_commit_sha_mismatch(
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "commit_sha": "a" * 40,
                 "preflight_commit_sha": "a" * 40,
@@ -1698,6 +1782,7 @@ def test_publication_dry_run_rejects_evidence_without_windows_proof(
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "commit_sha": "a" * 40,
                 "preflight_commit_sha": "a" * 40,

@@ -279,8 +279,11 @@ production readiness without matching public evidence.
 - Added release merge handoff input freshness validation so stale merge order,
   GitHub status, tag readiness, or publication dry-run summaries cannot be used
   for maintainer handoff.
+- Added release evidence and publication input freshness validation so stale
+  preflight summaries or stale evidence bundles cannot feed source-release
+  maintainer review.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.120.0-source` candidates.
+  `v0.121.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -406,6 +409,7 @@ production readiness without matching public evidence.
 | `v0.118.0-source` | Pending stacked PR, not tagged | PR #139 |
 | `v0.119.0-source` | Pending stacked PR, not tagged | PR #140 |
 | `v0.120.0-source` | Pending stacked PR, not tagged | PR #141 |
+| `v0.121.0-source` | Pending stacked PR, not tagged | PR #142 |
 
 ### Still Source-Only
 

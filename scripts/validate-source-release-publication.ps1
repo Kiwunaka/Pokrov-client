@@ -19,6 +19,8 @@ $expectedRulesetRepository = "Kiwunaka/Pokrov-client"
 $expectedRulesetBranch = "main"
 $rulesetReportMaxAgeHours = 24
 $rulesetReportFutureSkewMinutes = 5
+$evidenceBundleMaxAgeHours = 24
+$evidenceBundleFutureSkewMinutes = 5
 
 function Get-RequiredStatusChecks {
   $requiredChecksPath = Join-Path $root "config\required-checks.seed.json"
@@ -55,6 +57,30 @@ function Assert-Contains {
 
   if ($Text.IndexOf($Phrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
     throw "$Label must include '$Phrase'."
+  }
+}
+
+function Assert-InputGeneratedAt {
+  param(
+    [Parameter(Mandatory = $true)][object]$Payload,
+    [Parameter(Mandatory = $true)][string]$InputName
+  )
+
+  $generatedAtText = [string]$Payload.generated_at
+  if ([string]::IsNullOrWhiteSpace($generatedAtText)) {
+    throw "Publication dry-run refused $InputName without generated_at timestamp."
+  }
+  $generatedAt = [datetimeoffset]::MinValue
+  if (-not [datetimeoffset]::TryParse($generatedAtText, [ref]$generatedAt)) {
+    throw "Publication dry-run refused $InputName without parseable generated_at timestamp."
+  }
+  $generatedAtUtc = $generatedAt.ToUniversalTime()
+  $age = [datetimeoffset]::UtcNow - $generatedAtUtc
+  if (
+    $age.TotalHours -gt $evidenceBundleMaxAgeHours -or
+    $age.TotalMinutes -lt (-1 * $evidenceBundleFutureSkewMinutes)
+  ) {
+    throw "Publication dry-run refused stale $InputName generated_at timestamp."
   }
 }
 
@@ -252,6 +278,7 @@ try {
   New-Item -ItemType Directory -Path $OutDir -Force | Out-Null
 
   $evidence = Get-Content -Raw -LiteralPath $resolvedEvidenceBundlePath | ConvertFrom-Json
+  Assert-InputGeneratedAt -Payload $evidence -InputName "evidence bundle"
   if ($evidence.tag -ne $Tag) {
     throw "Evidence bundle tag '$($evidence.tag)' does not match $Tag."
   }

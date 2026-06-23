@@ -180,6 +180,7 @@ Source release status:
 | `v0.118.0-source` | Pending stacked PR, not tagged | GitHub ruleset verifier reports covered required status checks explicitly, and release gates reject `ok` reports whose covered checks do not match the canonical CI list. |
 | `v0.119.0-source` | Pending stacked PR, not tagged | Release evidence, publication dry-run, and handoff reject GitHub ruleset reports without a fresh `checked_at` timestamp. |
 | `v0.120.0-source` | Pending stacked PR, not tagged | Release handoff rejects stale generated input summaries before maintainer review. |
+| `v0.121.0-source` | Pending stacked PR, not tagged | Release evidence and publication dry-run reject stale generated input artifacts before handoff. |
 
 ## Which App Should I Use?
 

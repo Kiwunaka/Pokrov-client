@@ -43,6 +43,22 @@ def _stale_ruleset_checked_at() -> str:
     ).isoformat().replace("+00:00", "Z")
 
 
+def _fresh_input_generated_at() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _stale_input_generated_at() -> str:
+    return (
+        datetime.now(timezone.utc) - timedelta(hours=48)
+    ).isoformat().replace("+00:00", "Z")
+
+
+def _future_input_generated_at() -> str:
+    return (
+        datetime.now(timezone.utc) + timedelta(minutes=30)
+    ).isoformat().replace("+00:00", "Z")
+
+
 def _with_ruleset_checked_at(payload: dict[str, object]) -> dict[str, object]:
     enriched = dict(payload)
     enriched.setdefault("checked_at", _fresh_ruleset_checked_at())
@@ -75,6 +91,7 @@ def _write_valid_preflight_fixture(tmp_path: Path) -> Path:
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "commit_sha": commit_sha,
                 "ref_commit_sha": commit_sha,
@@ -119,6 +136,8 @@ def test_release_evidence_bundle_seed_defines_source_only_policy() -> None:
     assert seed["policy"]["does_not_replace_full_preflight"] is True
     assert seed["policy"]["windows_bundle_verifier_required"] is True
     assert seed["policy"]["requires_input_fingerprints"] is True
+    assert seed["policy"]["requires_preflight_generated_at"] is True
+    assert seed["policy"]["requires_preflight_generated_at_freshness"] is True
     assert seed["policy"]["requires_ruleset_report_input_fingerprint_when_present"] is True
     assert seed["policy"]["requires_ruleset_report_shape"] is True
     assert seed["policy"]["requires_ruleset_report_target"] is True
@@ -218,6 +237,7 @@ def test_release_evidence_bundle_script_writes_bundle_from_fixture(tmp_path: Pat
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "commit_sha": commit_sha,
                 "ref_commit_sha": commit_sha,
@@ -323,6 +343,54 @@ def test_release_evidence_bundle_script_writes_bundle_from_fixture(tmp_path: Pat
         "windows_bundle_verifier_summary"
     ]["sha256"] == _sha256(windows)
     assert bundle["release_boundary"]["official_binary_claim"] is False
+
+
+@pytest.mark.parametrize(
+    ("generated_at", "expected_error"),
+    [
+        ("", "preflight summary without generated_at timestamp"),
+        ("not-a-date", "preflight summary without parseable generated_at timestamp"),
+        (
+            _stale_input_generated_at(),
+            "stale preflight summary generated_at timestamp",
+        ),
+        (
+            _future_input_generated_at(),
+            "stale preflight summary generated_at timestamp",
+        ),
+    ],
+)
+def test_release_evidence_bundle_rejects_unfresh_preflight_generated_at(
+    tmp_path: Path, generated_at: str, expected_error: str
+) -> None:
+    preflight = _write_valid_preflight_fixture(tmp_path)
+    preflight_payload = json.loads(preflight.read_text(encoding="utf-8"))
+    preflight_payload["generated_at"] = generated_at
+    preflight.write_text(json.dumps(preflight_payload), encoding="utf-8")
+    out_dir = tmp_path / "out"
+
+    result = subprocess.run(
+        [
+            "powershell",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(ROOT / "scripts" / "prepare-release-evidence-bundle.ps1"),
+            "-Tag",
+            "v9.9.9-source",
+            "-PreflightSummaryPath",
+            str(preflight),
+            "-OutDir",
+            str(out_dir),
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode != 0
+    assert expected_error in (result.stderr + result.stdout)
 
 
 @pytest.mark.parametrize(
@@ -678,6 +746,7 @@ def test_release_evidence_bundle_rejects_preflight_without_artifact_fingerprints
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "source_only": True,
                 "no_apk": True,
@@ -741,6 +810,7 @@ def test_release_evidence_bundle_rejects_stale_preflight_artifact_fingerprint(
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "source_only": True,
                 "no_apk": True,
@@ -812,6 +882,7 @@ def test_release_evidence_bundle_rejects_preflight_commit_sha_mismatch(
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "commit_sha": "0" * 40,
                 "ref_commit_sha": "0" * 40,
@@ -888,6 +959,7 @@ def test_release_evidence_bundle_rejects_preflight_ref_commit_sha_mismatch(
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "commit_sha": commit_sha,
                 "ref_commit_sha": "0" * 40,
@@ -954,6 +1026,7 @@ def test_release_evidence_bundle_rejects_preflight_without_windows_proof(
         json.dumps(
             {
                 "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
                 "tag": "v9.9.9-source",
                 "source_only": True,
                 "no_apk": True,

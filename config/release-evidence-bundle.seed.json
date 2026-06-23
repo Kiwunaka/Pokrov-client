@@ -16,6 +16,8 @@
     "does_not_replace_full_preflight": true,
     "windows_bundle_verifier_required": true,
     "requires_input_fingerprints": true,
+    "requires_preflight_generated_at": true,
+    "requires_preflight_generated_at_freshness": true,
     "requires_ruleset_report_input_fingerprint_when_present": true,
     "requires_preflight_artifact_fingerprints": true,
     "requires_preflight_artifact_fingerprint_integrity": true,
