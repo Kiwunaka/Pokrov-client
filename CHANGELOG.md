@@ -286,8 +286,11 @@ production readiness without matching public evidence.
   `tag_creation_allowed=true` blocker inventories cannot reach source tag
   readiness while required blockers remain open or inventory status is not
   ready.
+- Added source tag-readiness ready-status consistency checks so blocker
+  inventories cannot claim ready status while required release blockers remain
+  open.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.122.0-source` candidates.
+  `v0.123.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -415,6 +418,7 @@ production readiness without matching public evidence.
 | `v0.120.0-source` | Pending stacked PR, not tagged | PR #141 |
 | `v0.121.0-source` | Pending stacked PR, not tagged | PR #142 |
 | `v0.122.0-source` | Pending stacked PR, not tagged | PR #143 |
+| `v0.123.0-source` | Pending stacked PR, not tagged | PR #144 |
 
 ### Still Source-Only
 

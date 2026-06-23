@@ -115,6 +115,9 @@ try {
     }
   )
   $inventoryReadyStatuses = @("ready", "ready_for_tag", "cleared")
+  if ([string]$inventory.status -in $inventoryReadyStatuses -and $openBlockers.Count -gt 0) {
+    $errors.Add("release blocker inventory status is ready while required blockers remain open")
+  }
   if ($inventory.tracked_candidates.tag_creation_allowed -eq $true -and $openBlockers.Count -gt 0) {
     $errors.Add("tag creation is allowed while required blockers remain open")
   }

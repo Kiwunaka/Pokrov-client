@@ -22,6 +22,7 @@
     "requires_error_summary": true,
     "requires_blocker_required_before_tag_flags": true,
     "requires_open_blocker_evidence_fields": true,
+    "requires_ready_status_open_blocker_consistency": true,
     "requires_tag_creation_allowed_blocker_consistency": true,
     "requires_tag_creation_allowed_status_consistency": true,
     "requires_source_readiness_milestone_status": true,
