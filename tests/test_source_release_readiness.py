@@ -239,7 +239,7 @@ def test_validate_seed_blocks_latest_source_readiness_evidence_mismatch() -> Non
         ]["latest_candidate"]
         for milestone in readiness["milestones"]:
             if milestone["tag"] == latest_candidate:
-                milestone["evidence"] = "https://github.com/example/fork/pull/171"
+                milestone["evidence"] = "https://github.com/example/fork/pull/172"
                 break
         _write_json(readiness_path, readiness)
 
