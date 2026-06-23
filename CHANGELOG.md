@@ -322,8 +322,11 @@ production readiness without matching public evidence.
 - Added a read-only source publication packet that consolidates release
   handoff, publication dry-run, source proof artifacts, and source-only flags
   before manual GitHub Release review.
+- Added source publication packet generated-at freshness checks for release
+  handoff and publication dry-run summaries before manual GitHub Release
+  review.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.138.0-source` candidates.
+  `v0.139.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -467,6 +470,7 @@ production readiness without matching public evidence.
 | `v0.136.0-source` | Pending stacked PR, not tagged | PR #157 |
 | `v0.137.0-source` | Pending stacked PR, not tagged | PR #158 |
 | `v0.138.0-source` | Pending stacked PR, not tagged | PR #159 |
+| `v0.139.0-source` | Pending stacked PR, not tagged | PR #160 |
 
 ### Still Source-Only
 
