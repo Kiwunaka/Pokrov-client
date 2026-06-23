@@ -56,7 +56,9 @@ function Assert-InputFingerprintIntegrity {
     [string]$RulesetReportReadOnlyErrorMessage = "",
     [string]$RulesetReportOkStatusErrorMessage = "",
     [string]$RulesetReportRepositoryErrorMessage = "",
-    [string]$RulesetReportBranchErrorMessage = ""
+    [string]$RulesetReportBranchErrorMessage = "",
+    [string]$RulesetReportOkMissingChecksErrorMessage = "",
+    [string]$RulesetReportOkFailedChecksErrorMessage = ""
   )
 
   $resolvedFingerprintPath = [System.IO.Path]::GetFullPath((Resolve-RepoPath -Path ([string]$Fingerprint.path)))
@@ -76,7 +78,9 @@ function Assert-InputFingerprintIntegrity {
     -not [string]::IsNullOrWhiteSpace($RulesetReportReadOnlyErrorMessage) -or
     -not [string]::IsNullOrWhiteSpace($RulesetReportOkStatusErrorMessage) -or
     -not [string]::IsNullOrWhiteSpace($RulesetReportRepositoryErrorMessage) -or
-    -not [string]::IsNullOrWhiteSpace($RulesetReportBranchErrorMessage)
+    -not [string]::IsNullOrWhiteSpace($RulesetReportBranchErrorMessage) -or
+    -not [string]::IsNullOrWhiteSpace($RulesetReportOkMissingChecksErrorMessage) -or
+    -not [string]::IsNullOrWhiteSpace($RulesetReportOkFailedChecksErrorMessage)
   ) {
     $rulesetReport = Get-Content -Raw -LiteralPath $resolvedFingerprintPath | ConvertFrom-Json
     if ([int]$rulesetReport.schema_version -ne 1) {
@@ -93,6 +97,23 @@ function Assert-InputFingerprintIntegrity {
     }
     if ([string]$rulesetReport.branch -ne "main") {
       $BlockingErrors.Add($RulesetReportBranchErrorMessage)
+    }
+    if ($rulesetReport.ok -eq $true) {
+      $rulesetChecksProperty = $rulesetReport.PSObject.Properties["checks"]
+      $rulesetChecks = @()
+      if ($null -ne $rulesetChecksProperty -and $null -ne $rulesetChecksProperty.Value) {
+        $rulesetChecks = @($rulesetChecksProperty.Value)
+      }
+      if ($rulesetChecks.Count -eq 0) {
+        $BlockingErrors.Add($RulesetReportOkMissingChecksErrorMessage)
+      } else {
+        foreach ($check in $rulesetChecks) {
+          if ([string]$check.status -ne "pass") {
+            $BlockingErrors.Add($RulesetReportOkFailedChecksErrorMessage)
+            break
+          }
+        }
+      }
     }
   }
 }
@@ -395,6 +416,8 @@ try {
       -RulesetReportOkStatusErrorMessage "publication dry-run ruleset report without ok status" `
       -RulesetReportRepositoryErrorMessage "publication dry-run ruleset report repository mismatch" `
       -RulesetReportBranchErrorMessage "publication dry-run ruleset report branch mismatch" `
+      -RulesetReportOkMissingChecksErrorMessage "publication dry-run ruleset report ok status without checks" `
+      -RulesetReportOkFailedChecksErrorMessage "publication dry-run ruleset report ok status with failed checks" `
       -BlockingErrors $blockingErrors
   } elseif (
     $publicationDryRun.github_enforcement_claim_allowed -eq $true -or

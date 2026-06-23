@@ -256,8 +256,11 @@ production readiness without matching public evidence.
 - Added GitHub ruleset report repository and branch target validation across
   release evidence, publication dry-run, and release merge handoff so verifier
   JSON from another repository or branch cannot carry enforcement claims.
+- Added GitHub ruleset report `ok` consistency validation across release
+  evidence, publication dry-run, and release merge handoff so reports cannot
+  claim passing enforcement while verifier checks are missing or failed.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.113.0-source` candidates.
+  `v0.114.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -376,6 +379,7 @@ production readiness without matching public evidence.
 | `v0.111.0-source` | Pending stacked PR, not tagged | PR #132 |
 | `v0.112.0-source` | Pending stacked PR, not tagged | PR #133 |
 | `v0.113.0-source` | Pending stacked PR, not tagged | PR #134 |
+| `v0.114.0-source` | Pending stacked PR, not tagged | PR #135 |
 
 ### Still Source-Only
 

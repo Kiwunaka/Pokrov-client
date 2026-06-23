@@ -113,6 +113,11 @@ that release evidence, publication dry-run, and release merge handoff reject
 GitHub ruleset reports for the wrong repository or branch; it is not tagged
 and does not ship APK/EXE binaries.
 
+Source readiness note: `v0.114.0-source` is a pending stacked PR for verifying
+that release evidence, publication dry-run, and release merge handoff reject
+GitHub ruleset reports that claim `ok` while verifier checks are missing or
+failed; it is not tagged and does not ship APK/EXE binaries.
+
 Source readiness note: `v0.53.0-source` is a pending stacked PR for Windows
 verifier CI/preflight enforcement; it is not tagged and does not ship APK/EXE
 binaries.
