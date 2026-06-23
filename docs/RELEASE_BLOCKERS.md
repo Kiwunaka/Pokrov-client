@@ -82,9 +82,10 @@ their expected ignored `build/` output roots, and any reported release asset
 fingerprints must stay within the source-only allowlist. Release artifact file
 extensions must match the source-only artifact contract. Release artifact
 contents must also be readable: Markdown notes must be non-empty, JSON proof
-files must parse, and source archives must be valid non-empty ZIP files. The
-packet is only a manual review aid; it does not merge, tag, push, publish, or
-upload anything.
+files must parse, and source archives must be valid non-empty ZIP files. JSON
+proof artifacts must also match their expected source-only schema contracts
+before manual GitHub Release review. The packet is only a manual review aid; it
+does not merge, tag, push, publish, or upload anything.
 
 ## Evidence Rules
 

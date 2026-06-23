@@ -188,8 +188,8 @@ def test_release_stack_github_status_command_accepts_clean_snapshot(
     assert summary["github_status_ok"] is True
     assert summary["read_only"] is True
     assert summary["stack_count"] >= 5
-    assert summary["latest_pr"] == 166
-    assert summary["latest_pr_url"] == "https://github.com/Kiwunaka/Pokrov-client/pull/166"
+    assert summary["latest_pr"] == 167
+    assert summary["latest_pr_url"] == "https://github.com/Kiwunaka/Pokrov-client/pull/167"
     assert summary["pull_requests"][-1]["url"] == summary["latest_pr_url"]
     assert summary["pull_requests"][-1]["successful_check_count"] == 3
     assert summary["pull_requests"][-1]["failed_check_count"] == 0
@@ -270,14 +270,14 @@ def test_release_stack_github_status_rejects_missing_pr_url(
 
     assert result.returncode == 2
     assert summary["github_status_ok"] is False
-    assert "PR #166 pull request URL is missing" in summary["errors"]
+    assert "PR #167 pull request URL is missing" in summary["errors"]
 
 
 def test_release_stack_github_status_rejects_wrong_repository_pr_url(
     tmp_path: Path,
 ) -> None:
     snapshot = _snapshot_for_stack()
-    snapshot[-1]["url"] = "https://github.com/example/fork/pull/166"
+    snapshot[-1]["url"] = "https://github.com/example/fork/pull/167"
     snapshot_path = tmp_path / "prs.wrong-repo-url.json"
     _write_snapshot(snapshot_path, snapshot)
     out_dir = ROOT / "build" / "release-stack-github-status" / "test-output"
@@ -315,7 +315,7 @@ def test_release_stack_github_status_rejects_wrong_repository_pr_url(
     assert summary["expected_pr_url_prefix"] == (
         "https://github.com/Kiwunaka/Pokrov-client/pull/"
     )
-    assert "PR #166 pull request URL does not match expected repository" in summary[
+    assert "PR #167 pull request URL does not match expected repository" in summary[
         "errors"
     ]
 

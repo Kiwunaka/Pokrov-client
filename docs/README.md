@@ -68,7 +68,7 @@ anything.
   handoff-carried plus artifact-file fingerprint integrity checks, including
   expected build output root boundaries and source-only allowlists for release
   artifacts, source-only artifact filename contracts, and readable artifact
-  content checks.
+  content/schema checks.
 - [Required checks](REQUIRED_CHECKS.md): CI job names, branch-protection
   guidance, and source-release gates.
 - [GitHub ruleset setup](GITHUB_RULESET_SETUP.md): repository ruleset or

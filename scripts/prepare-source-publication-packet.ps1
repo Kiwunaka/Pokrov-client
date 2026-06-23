@@ -323,6 +323,139 @@ function Add-ArtifactContentErrors {
   }
 }
 
+function Test-ArtifactTruthyFlag {
+  param(
+    [object]$Payload,
+    [string]$FieldName
+  )
+
+  return ($Payload.PSObject.Properties[$FieldName] -and $Payload.$FieldName -eq $true)
+}
+
+function Test-ArtifactFalseFlag {
+  param(
+    [object]$Payload,
+    [string]$FieldName
+  )
+
+  return ($Payload.PSObject.Properties[$FieldName] -and $Payload.$FieldName -eq $false)
+}
+
+function Test-ArtifactZeroField {
+  param(
+    [object]$Payload,
+    [string]$FieldName
+  )
+
+  return ($Payload.PSObject.Properties[$FieldName] -and [int]$Payload.$FieldName -eq 0)
+}
+
+function Test-ArtifactSha256Field {
+  param(
+    [object]$Payload,
+    [string]$FieldName
+  )
+
+  return (
+    $Payload.PSObject.Properties[$FieldName] -and
+    [string]$Payload.$FieldName -match "^[0-9a-fA-F]{64}$"
+  )
+}
+
+function Test-ArtifactCommitShaField {
+  param(
+    [object]$Payload,
+    [string]$FieldName
+  )
+
+  return (
+    $Payload.PSObject.Properties[$FieldName] -and
+    [string]$Payload.$FieldName -match "^[0-9a-fA-F]{40}$"
+  )
+}
+
+function Test-SourceOnlyArtifactSchema {
+  param([object]$Payload)
+
+  foreach ($field in @("source_only", "no_apk", "no_exe", "no_store_release", "no_trusted_signing_claim")) {
+    if (-not (Test-ArtifactTruthyFlag -Payload $Payload -FieldName $field)) {
+      return $false
+    }
+  }
+  if (-not (Test-ArtifactZeroField -Payload $Payload -FieldName "forbidden_file_count")) {
+    return $false
+  }
+  return $true
+}
+
+function Add-ArtifactSchemaErrors {
+  param(
+    [System.Collections.Generic.List[string]]$Errors,
+    [object]$Fingerprint,
+    [string]$Name,
+    [string]$SchemaContract
+  )
+
+  $resolvedPath = Get-NormalizedFingerprintPath -Path ([string]$Fingerprint.path)
+  if (
+    [string]::IsNullOrWhiteSpace($resolvedPath) -or
+    [string]::IsNullOrWhiteSpace($SchemaContract) -or
+    -not (Test-Path -LiteralPath $resolvedPath -PathType Leaf)
+  ) {
+    return
+  }
+
+  try {
+    $payload = Get-Content -Raw -LiteralPath $resolvedPath | ConvertFrom-Json
+    $schemaOk = $true
+
+    if ($SchemaContract -eq "source_proof") {
+      $schemaOk = (
+        (Test-SourceOnlyArtifactSchema -Payload $payload) -and
+        (Test-ArtifactCommitShaField -Payload $payload -FieldName "commit_sha") -and
+        (Test-ArtifactSha256Field -Payload $payload -FieldName "source_archive_sha256") -and
+        -not [string]::IsNullOrWhiteSpace([string]$payload.source_archive)
+      )
+    } elseif ($SchemaContract -eq "source_evidence" -or $SchemaContract -eq "source_preflight") {
+      $schemaOk = (
+        (Test-SourceOnlyArtifactSchema -Payload $payload) -and
+        (Test-ArtifactSha256Field -Payload $payload -FieldName "source_archive_sha256") -and
+        (Test-ArtifactTruthyFlag -Payload $payload -FieldName "windows_bundle_verifier_ok")
+      )
+      if ($SchemaContract -eq "source_evidence") {
+        $schemaOk = (
+          $schemaOk -and
+          (Test-ArtifactCommitShaField -Payload $payload -FieldName "commit_sha") -and
+          (Test-ArtifactCommitShaField -Payload $payload -FieldName "preflight_commit_sha") -and
+          (Test-ArtifactCommitShaField -Payload $payload -FieldName "preflight_ref_commit_sha")
+        )
+      }
+    } elseif ($SchemaContract -eq "windows_bundle_verifier") {
+      $schemaOk = (
+        (Test-ArtifactTruthyFlag -Payload $payload -FieldName "windows_bundle_ok") -and
+        (Test-ArtifactTruthyFlag -Payload $payload -FieldName "source_only") -and
+        (Test-ArtifactFalseFlag -Payload $payload -FieldName "build_performed") -and
+        (Test-ArtifactFalseFlag -Payload $payload -FieldName "signing_performed") -and
+        (Test-ArtifactFalseFlag -Payload $payload -FieldName "publish_performed") -and
+        (Test-ArtifactFalseFlag -Payload $payload -FieldName "runtime_download_performed") -and
+        (Test-ArtifactZeroField -Payload $payload -FieldName "forbidden_artifact_count")
+      )
+    } elseif ($SchemaContract -eq "github_ruleset_report") {
+      $schemaOk = (
+        [int]$payload.schema_version -eq 1 -and
+        (Test-ArtifactTruthyFlag -Payload $payload -FieldName "read_only") -and
+        $null -ne $payload.PSObject.Properties["ok"]
+      )
+    }
+
+    if (-not $schemaOk) {
+      Add-BlockingError -Errors $Errors -Message "source publication packet artifact schema invalid for $Name"
+    }
+  } catch {
+    Add-BlockingError -Errors $Errors -Message "source publication packet artifact schema invalid for $Name"
+  }
+}
+
 function Add-ReleaseAssetAllowlistErrors {
   param(
     [System.Collections.Generic.List[string]]$Errors,
@@ -623,6 +756,27 @@ try {
       -ContentType ([string]$seed.artifact_content_types.github_ruleset_report)
   }
 
+  foreach ($artifactSchemaSpec in @(
+    [ordered]@{ name = "release_evidence_bundle"; value = $releaseEvidenceBundle; contract = [string]$seed.artifact_schema_contracts.release_evidence_bundle },
+    [ordered]@{ name = "proof_manifest"; value = $proofManifest; contract = [string]$seed.artifact_schema_contracts.proof_manifest },
+    [ordered]@{ name = "clean_clone_or_import_proof"; value = $cleanCloneOrImportProof; contract = [string]$seed.artifact_schema_contracts.clean_clone_or_import_proof },
+    [ordered]@{ name = "windows_bundle_verifier_summary"; value = Get-FingerprintObject -Container $publicationArtifactFingerprints -FieldName "windows_bundle_verifier_summary"; contract = [string]$seed.artifact_schema_contracts.windows_bundle_verifier_summary }
+  )) {
+    Add-ArtifactSchemaErrors `
+      -Errors $blockingErrors `
+      -Fingerprint $artifactSchemaSpec.value `
+      -Name $artifactSchemaSpec.name `
+      -SchemaContract $artifactSchemaSpec.contract
+  }
+
+  if (Test-FingerprintField -Container $publicationEvidenceBundleFingerprints -FieldName "github_ruleset_report") {
+    Add-ArtifactSchemaErrors `
+      -Errors $blockingErrors `
+      -Fingerprint $publicationRulesetReport `
+      -Name "github_ruleset_report" `
+      -SchemaContract ([string]$seed.artifact_schema_contracts.github_ruleset_report)
+  }
+
   $artifactFileFingerprints = [ordered]@{
     release_notes = Get-ArtifactFileFingerprint -Fingerprint $releaseNotes
     release_evidence_bundle = Get-ArtifactFileFingerprint -Fingerprint $releaseEvidenceBundle
@@ -697,6 +851,7 @@ try {
     allowed_release_assets = @($seed.allowed_release_assets)
     artifact_file_extensions = $seed.artifact_file_extensions
     artifact_content_types = $seed.artifact_content_types
+    artifact_schema_contracts = $seed.artifact_schema_contracts
     release_handoff_publication_dry_run_input_fingerprints = $releaseHandoffPublicationInputFingerprints
     release_handoff_publication_dry_run_evidence_bundle_input_fingerprints = $releaseHandoffPublicationEvidenceBundleFingerprints
     release_handoff_publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $releaseHandoffPublicationArtifactFingerprints
