@@ -77,13 +77,20 @@ try {
   }
   $latestStackedPr = [int]$inventory.tracked_candidates.latest_stacked_pr
   $expectedEvidencePr = "/pull/$latestStackedPr"
+  $expectedEvidenceUrl = "https://github.com/Kiwunaka/Pokrov-client/pull/$latestStackedPr"
+  $milestoneEvidence = [string]$milestone.evidence
   if ($latestStackedPr -le 0) {
     $errors.Add("latest blocker inventory stacked PR is missing")
   }
-  if ([string]::IsNullOrWhiteSpace([string]$milestone.evidence)) {
+  if ([string]::IsNullOrWhiteSpace($milestoneEvidence)) {
     $errors.Add("source readiness milestone is missing evidence")
-  } elseif ($latestStackedPr -gt 0 -and [string]$milestone.evidence -notlike "*$expectedEvidencePr*") {
-    $errors.Add("source readiness milestone evidence does not match latest stacked PR")
+  } elseif ($latestStackedPr -gt 0) {
+    if ($milestoneEvidence -notlike "*$expectedEvidencePr*") {
+      $errors.Add("source readiness milestone evidence does not match latest stacked PR")
+    }
+    if ($milestoneEvidence -ne $expectedEvidenceUrl) {
+      $errors.Add("source readiness milestone evidence does not match expected repository PR URL")
+    }
   }
   if ([string]::IsNullOrWhiteSpace([string]$milestone.status)) {
     $errors.Add("source readiness milestone is missing status")
@@ -186,6 +193,7 @@ try {
     status = $inventory.status
     latest_candidate = $latestCandidate
     latest_stacked_pr = $latestStackedPr
+    expected_milestone_evidence = $expectedEvidenceUrl
     tag_creation_allowed = [bool]$inventory.tracked_candidates.tag_creation_allowed
     milestone_status = $milestone.status
     milestone_evidence = $milestone.evidence
