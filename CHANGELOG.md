@@ -276,8 +276,11 @@ production readiness without matching public evidence.
 - Added GitHub ruleset report freshness validation so release evidence,
   publication dry-run, and release merge handoff reject verifier reports without
   a fresh `checked_at` timestamp before carrying enforcement claims.
+- Added release merge handoff input freshness validation so stale merge order,
+  GitHub status, tag readiness, or publication dry-run summaries cannot be used
+  for maintainer handoff.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.119.0-source` candidates.
+  `v0.120.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -402,6 +405,7 @@ production readiness without matching public evidence.
 | `v0.117.0-source` | Pending stacked PR, not tagged | PR #138 |
 | `v0.118.0-source` | Pending stacked PR, not tagged | PR #139 |
 | `v0.119.0-source` | Pending stacked PR, not tagged | PR #140 |
+| `v0.120.0-source` | Pending stacked PR, not tagged | PR #141 |
 
 ### Still Source-Only
 

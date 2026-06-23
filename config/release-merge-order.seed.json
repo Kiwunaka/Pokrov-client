@@ -484,6 +484,12 @@
       "candidate": "v0.119.0-source",
       "base": "codex/v0.118-ruleset-report-covered-required-checks",
       "head": "codex/v0.119-ruleset-report-freshness"
+    },
+    {
+      "pr": 141,
+      "candidate": "v0.120.0-source",
+      "base": "codex/v0.119-ruleset-report-freshness",
+      "head": "codex/v0.120-handoff-input-freshness"
     }
   ]
 }
