@@ -238,6 +238,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.135.0-source` | Pending stacked PR, not tagged | Seed validation requires source-readiness stacked PR evidence to match the release merge-order stack. |
 | `v0.136.0-source` | Pending stacked PR, not tagged | Seed validation requires release stack GitHub status required checks to match the canonical required-checks seed exactly. |
 | `v0.137.0-source` | Pending stacked PR, not tagged | Seed validation requires active-range source-readiness stacked PR milestones to be covered by the release merge-order stack. |
+| `v0.138.0-source` | Pending stacked PR, not tagged | Source publication packet consolidates release handoff, publication dry-run, source proof artifacts, and source-only flags for manual GitHub Release review. |
 
 ## Architecture Boundary
 

@@ -68,6 +68,14 @@ latest candidate, and the helper does not merge, tag, push, publish, or upload
 anything. The input summaries must come from the expected ignored `build/`
 output roots.
 
+Run `scripts/prepare-source-publication-packet.ps1` for a local source publication packet
+after the release handoff and publication dry-run summaries exist. The command is read-only, writes ignored
+`build/source-publication-packet/` output, records input SHA-256 fingerprints,
+and consolidates release notes, proof manifest, source archive, release
+evidence bundle, clean-clone/import proof, source-only no-binary flags, and the
+next manual maintainer steps. The packet is only a manual review aid; it does
+not merge, tag, push, publish, or upload anything.
+
 ## Evidence Rules
 
 Do not mark a blocker complete from intent or memory. Use current evidence:

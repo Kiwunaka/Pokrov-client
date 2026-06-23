@@ -55,6 +55,13 @@ evidence bundle and rendered release notes, writes ignored local output, and
 requires the release evidence bundle's Windows verifier proof. It does not
 publish, push tags, or upload assets.
 
+Use `scripts/prepare-source-publication-packet.ps1` after the release merge
+handoff and publication dry-run exist. The source publication packet
+consolidates release notes, proof manifest, source archive, release evidence
+bundle, clean-clone/import proof, input fingerprints, and source-only
+no-binary flags for final manual review. It is not a publisher and does not
+merge, tag, push, publish, or upload assets.
+
 Required checks and release gates are summarized in
 [REQUIRED_CHECKS.md](REQUIRED_CHECKS.md). That page documents the expected
 GitHub check names, including `Source import and public tree checks` and

@@ -59,6 +59,7 @@ $requiredFiles = @(
   "config\\release-merge-order.seed.json",
   "config\\release-stack-github-status.seed.json",
   "config\\release-merge-handoff.seed.json",
+  "config\\source-publication-packet.seed.json",
   "config\\required-checks.seed.json",
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
@@ -148,6 +149,7 @@ $requiredFiles = @(
   "scripts\\check-release-merge-order.ps1",
   "scripts\\check-release-stack-github-status.ps1",
   "scripts\\prepare-release-merge-handoff.ps1",
+  "scripts\\prepare-source-publication-packet.ps1",
   "scripts\\verify-windows-bundle.ps1",
   "scripts\\prepare-source-release.ps1",
   "scripts\\render-source-release-notes.ps1",
@@ -175,6 +177,7 @@ $jsonFiles = @(
   "config\\release-merge-order.seed.json",
   "config\\release-stack-github-status.seed.json",
   "config\\release-merge-handoff.seed.json",
+  "config\\source-publication-packet.seed.json",
   "config\\required-checks.seed.json",
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
@@ -1551,6 +1554,94 @@ if (Test-Path -LiteralPath $releaseMergeHandoffPath -PathType Leaf) {
     if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
       $docText = Get-Content -Raw -LiteralPath $fullDocPath
       foreach ($requiredPhrase in @("prepare-release-merge-handoff.ps1", "release merge handoff")) {
+        if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+          $manifestErrors.Add("$docPath must include '$requiredPhrase'")
+        }
+      }
+    }
+  }
+}
+
+$sourcePublicationPacketPath = Join-Path $root "config\\source-publication-packet.seed.json"
+if (Test-Path -LiteralPath $sourcePublicationPacketPath -PathType Leaf) {
+  $sourcePublicationPacket = Get-Content -Raw -LiteralPath $sourcePublicationPacketPath | ConvertFrom-Json
+
+  if ($sourcePublicationPacket.script -ne "scripts/prepare-source-publication-packet.ps1") {
+    $manifestErrors.Add("config\\source-publication-packet.seed.json must point to scripts/prepare-source-publication-packet.ps1")
+  }
+
+  if ($sourcePublicationPacket.default_output_dir -ne "build/source-publication-packet") {
+    $manifestErrors.Add("config\\source-publication-packet.seed.json must keep default output under ignored build/source-publication-packet")
+  }
+
+  foreach ($field in @("read_only", "source_only", "manual_publish_only", "no_merge", "no_tag_creation", "no_tag_push", "no_github_release_publish", "no_asset_upload", "no_apk", "no_exe", "no_store_release", "no_trusted_signing_claim", "requires_release_handoff_summary", "requires_publication_dry_run_summary", "requires_release_handoff_ready", "requires_publication_dry_run_ready", "requires_rendered_release_notes", "requires_proof_manifest", "requires_source_archive", "requires_release_evidence_bundle", "requires_clean_clone_or_import_proof", "requires_artifact_fingerprints", "requires_input_fingerprints", "requires_source_only_flags", "writes_only_ignored_build_output")) {
+    if ($sourcePublicationPacket.policy.$field -ne $true) {
+      $manifestErrors.Add("config\\source-publication-packet.seed.json policy.$field must remain true")
+    }
+  }
+
+  if ($sourcePublicationPacket.inputs.release_handoff -ne "build/release-merge-handoff/release-merge-handoff.json") {
+    $manifestErrors.Add("config\\source-publication-packet.seed.json must read the release merge handoff summary")
+  }
+  if ($sourcePublicationPacket.inputs.publication_dry_run -notmatch "-publication-dry-run\.json$") {
+    $manifestErrors.Add("config\\source-publication-packet.seed.json must read a source publication dry-run summary")
+  }
+
+  $releaseBlockerInventoryPath = Join-Path $root "config\\release-blocker-inventory.seed.json"
+  if (Test-Path -LiteralPath $releaseBlockerInventoryPath -PathType Leaf) {
+    $releaseBlockerInventory = Get-Content -Raw -LiteralPath $releaseBlockerInventoryPath | ConvertFrom-Json
+    $latestCandidate = [string]$releaseBlockerInventory.tracked_candidates.latest_candidate
+    if (
+      [string]::IsNullOrWhiteSpace($latestCandidate) -or
+      $sourcePublicationPacket.inputs.publication_dry_run.IndexOf($latestCandidate, [System.StringComparison]::OrdinalIgnoreCase) -lt 0 -or
+      $sourcePublicationPacket.output.packet.IndexOf($latestCandidate, [System.StringComparison]::OrdinalIgnoreCase) -lt 0
+    ) {
+      $manifestErrors.Add("config\\source-publication-packet.seed.json inputs and output must track latest_candidate from config\\release-blocker-inventory.seed.json")
+    }
+  }
+
+  $expectedPublicationPacketInputRoots = @{
+    release_handoff = "build/release-merge-handoff"
+    publication_dry_run = "build/source-release-publication"
+  }
+  foreach ($inputRootName in $expectedPublicationPacketInputRoots.Keys) {
+    if ($sourcePublicationPacket.input_roots.$inputRootName -ne $expectedPublicationPacketInputRoots[$inputRootName]) {
+      $manifestErrors.Add("config\\source-publication-packet.seed.json input_roots.$inputRootName must stay under $($expectedPublicationPacketInputRoots[$inputRootName])")
+    }
+  }
+
+  foreach ($flag in @("source_only", "no_apk", "no_exe", "no_store_release", "no_trusted_signing_claim")) {
+    if (@($sourcePublicationPacket.required_source_only_flags) -notcontains $flag) {
+      $manifestErrors.Add("config\\source-publication-packet.seed.json must require source-only flag '$flag'")
+    }
+  }
+
+  foreach ($artifact in @("release_notes", "proof_manifest", "source_archive", "release_evidence_bundle", "clean_clone_or_import_proof")) {
+    if (@($sourcePublicationPacket.required_artifacts) -notcontains $artifact) {
+      $manifestErrors.Add("config\\source-publication-packet.seed.json must require artifact '$artifact'")
+    }
+  }
+
+  $sourcePublicationPacketScriptPath = Join-Path $root "scripts\\prepare-source-publication-packet.ps1"
+  if (Test-Path -LiteralPath $sourcePublicationPacketScriptPath -PathType Leaf) {
+    $sourcePublicationPacketScript = Get-Content -Raw -LiteralPath $sourcePublicationPacketScriptPath
+    foreach ($requiredPhrase in @("source-publication-packet.seed.json", "release_handoff", "publication_dry_run", "handoff_ready_for_maintainer", "ready_for_manual_review", "packet_ready_for_manual_publish_review", "manual_publish_only", "asset_upload_performed = `$false", "release_notes", "proof_manifest", "source_archive", "release_evidence_bundle", "clean_clone_or_import_proof", "input_fingerprints", "publication_dry_run_evidence_bundle_preflight_artifact_fingerprints", "Assert-BuildInputPath", "SHA256", "ComputeHash", "build\source-publication-packet")) {
+      if ($sourcePublicationPacketScript.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add("scripts\\prepare-source-publication-packet.ps1 must include '$requiredPhrase'")
+      }
+    }
+    foreach ($forbiddenPhrase in @("git merge", "git push", "git tag", "gh pr merge", "gh release create", "gh release upload", "gh api", "-X POST", "-X PATCH", "-X PUT", "-X DELETE")) {
+      if ($sourcePublicationPacketScript.IndexOf($forbiddenPhrase, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+        $manifestErrors.Add("scripts\\prepare-source-publication-packet.ps1 must remain read-only and must not include '$forbiddenPhrase'")
+      }
+    }
+  }
+
+  foreach ($docPath in @("docs\\README.md", "docs\\RELEASE_BLOCKERS.md", "docs\\RELEASE_CHECKLIST.md", "scripts\\README.md")) {
+    $fullDocPath = Join-Path $root $docPath
+    if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
+      $docText = Get-Content -Raw -LiteralPath $fullDocPath
+      foreach ($requiredPhrase in @("prepare-source-publication-packet.ps1", "source publication packet")) {
         if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
           $manifestErrors.Add("$docPath must include '$requiredPhrase'")
         }

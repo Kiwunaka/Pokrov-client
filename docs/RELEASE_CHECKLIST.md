@@ -68,6 +68,14 @@ Use this checklist before publishing a public source or binary release.
   expected
   ignored `build/` output roots; it does not merge, tag, push, publish, or
   upload anything.
+- `powershell -ExecutionPolicy Bypass -File .\scripts\prepare-source-publication-packet.ps1`
+  creates a source publication packet by bundling the release merge handoff
+  and publication dry-run summaries into ignored
+  `build/source-publication-packet/` output. The packet carries release notes,
+  proof manifest, source archive, release evidence bundle, clean-clone/import
+  proof, input SHA-256 fingerprints, and explicit source-only no-binary flags
+  for manual GitHub Release review. It does not merge, tag, push, publish, or
+  upload anything.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\verify-windows-bundle.ps1`
   runs the Windows bundle verifier and writes source-only Windows bundle proof
   under ignored `build/windows-bundle-verifier/`; it checks required Windows

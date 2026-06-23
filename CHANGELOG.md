@@ -319,8 +319,11 @@ production readiness without matching public evidence.
   must exactly match the canonical required-checks seed.
 - Added seed validation coverage so active-range source-readiness stacked PR
   milestones must be covered by the release merge-order stack.
+- Added a read-only source publication packet that consolidates release
+  handoff, publication dry-run, source proof artifacts, and source-only flags
+  before manual GitHub Release review.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.137.0-source` candidates.
+  `v0.138.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -463,6 +466,7 @@ production readiness without matching public evidence.
 | `v0.135.0-source` | Pending stacked PR, not tagged | PR #156 |
 | `v0.136.0-source` | Pending stacked PR, not tagged | PR #157 |
 | `v0.137.0-source` | Pending stacked PR, not tagged | PR #158 |
+| `v0.138.0-source` | Pending stacked PR, not tagged | PR #159 |
 
 ### Still Source-Only
 
