@@ -40,12 +40,13 @@
     "requires_publication_artifact_schema_validation": true,
     "requires_release_notes_claim_guard": true,
     "forbids_release_notes_tbd_placeholders": true,
+    "requires_release_notes_proof_values": true,
     "requires_source_only_flags": true,
     "writes_only_ignored_build_output": true
   },
   "inputs": {
     "release_handoff": "build/release-merge-handoff/release-merge-handoff.json",
-    "publication_dry_run": "build/source-release-publication/v0.147.0-source/v0.147.0-source-publication-dry-run.json"
+    "publication_dry_run": "build/source-release-publication/v0.148.0-source/v0.148.0-source-publication-dry-run.json"
   },
   "input_roots": {
     "release_handoff": "build/release-merge-handoff",
@@ -105,8 +106,12 @@
     "No trusted Windows signing claim",
     "official binary"
   ],
+  "release_notes_proof_requirements": [
+    "publication_dry_run.tag",
+    "publication_dry_run.source_archive_sha256"
+  ],
   "output": {
-    "packet": "build/source-publication-packet/v0.147.0-source/source-publication-packet.json"
+    "packet": "build/source-publication-packet/v0.148.0-source/source-publication-packet.json"
   },
   "required_source_only_flags": [
     "source_only",

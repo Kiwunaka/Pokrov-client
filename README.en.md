@@ -248,6 +248,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.145.0-source` | Pending stacked PR, not tagged | Source publication packet validates source release artifact contents before manual GitHub Release review. |
 | `v0.146.0-source` | Pending stacked PR, not tagged | Source publication packet validates source release artifact JSON schemas before manual GitHub Release review. |
 | `v0.147.0-source` | Pending stacked PR, not tagged | Source publication packet validates release notes claim and known-limitation markers before manual GitHub Release review. |
+| `v0.148.0-source` | Pending stacked PR, not tagged | Source publication packet validates release notes tag and source archive SHA proof before manual GitHub Release review. |
 
 ## Architecture Boundary
 

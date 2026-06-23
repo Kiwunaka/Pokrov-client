@@ -349,8 +349,11 @@ production readiness without matching public evidence.
 - Added source publication packet release-note claim checks so manual GitHub
   Release review is blocked when rendered notes omit required source-only,
   no-binary, and known-limitation markers or still contain `TBD` placeholders.
+- Added source publication packet release-note proof checks so manual GitHub
+  Release review is blocked when rendered notes do not mention the selected
+  source candidate tag and exact source archive SHA-256.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.147.0-source` candidates.
+  `v0.148.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -503,6 +506,7 @@ production readiness without matching public evidence.
 | `v0.145.0-source` | Pending stacked PR, not tagged | PR #166 |
 | `v0.146.0-source` | Pending stacked PR, not tagged | PR #167 |
 | `v0.147.0-source` | Pending stacked PR, not tagged | PR #168 |
+| `v0.148.0-source` | Pending stacked PR, not tagged | PR #169 |
 
 ### Still Source-Only
 

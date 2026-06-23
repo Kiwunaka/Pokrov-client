@@ -356,6 +356,34 @@ function Add-ReleaseNotesClaimErrors {
   }
 }
 
+function Add-ReleaseNotesProofErrors {
+  param(
+    [System.Collections.Generic.List[string]]$Errors,
+    [object]$Fingerprint,
+    [string]$Tag,
+    [string]$SourceArchiveSha256
+  )
+
+  $resolvedPath = Get-NormalizedFingerprintPath -Path ([string]$Fingerprint.path)
+  if (
+    [string]::IsNullOrWhiteSpace($resolvedPath) -or
+    -not (Test-Path -LiteralPath $resolvedPath -PathType Leaf)
+  ) {
+    return
+  }
+
+  $releaseNotesText = Get-Content -Raw -LiteralPath $resolvedPath
+  foreach ($proofMarker in @($Tag, $SourceArchiveSha256)) {
+    if (
+      [string]::IsNullOrWhiteSpace([string]$proofMarker) -or
+      $releaseNotesText.IndexOf([string]$proofMarker, [System.StringComparison]::OrdinalIgnoreCase) -lt 0
+    ) {
+      Add-BlockingError -Errors $Errors -Message "source publication packet release notes proof mismatch"
+      return
+    }
+  }
+}
+
 function Test-ArtifactTruthyFlag {
   param(
     [object]$Payload,
@@ -794,6 +822,12 @@ try {
     -Fingerprint $releaseNotes `
     -RequiredMarkers @($seed.release_notes_required_markers)
 
+  Add-ReleaseNotesProofErrors `
+    -Errors $blockingErrors `
+    -Fingerprint $releaseNotes `
+    -Tag ([string]$publicationDryRun.tag) `
+    -SourceArchiveSha256 ([string]$publicationDryRun.source_archive_sha256)
+
   foreach ($artifactSchemaSpec in @(
     [ordered]@{ name = "release_evidence_bundle"; value = $releaseEvidenceBundle; contract = [string]$seed.artifact_schema_contracts.release_evidence_bundle },
     [ordered]@{ name = "proof_manifest"; value = $proofManifest; contract = [string]$seed.artifact_schema_contracts.proof_manifest },
@@ -891,6 +925,7 @@ try {
     artifact_content_types = $seed.artifact_content_types
     artifact_schema_contracts = $seed.artifact_schema_contracts
     release_notes_required_markers = @($seed.release_notes_required_markers)
+    release_notes_proof_requirements = @("publication_dry_run.tag", "publication_dry_run.source_archive_sha256")
     release_handoff_publication_dry_run_input_fingerprints = $releaseHandoffPublicationInputFingerprints
     release_handoff_publication_dry_run_evidence_bundle_input_fingerprints = $releaseHandoffPublicationEvidenceBundleFingerprints
     release_handoff_publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $releaseHandoffPublicationArtifactFingerprints
