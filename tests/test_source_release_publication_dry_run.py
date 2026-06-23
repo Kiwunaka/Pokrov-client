@@ -14,6 +14,9 @@ REQUIRED_STATUS_CHECKS = [
     "Flutter analyze and tests",
     "Android native Gradle unit tests",
 ]
+REQUIRED_RULESET_CHECKS = [
+    {"name": name, "status": "pass"} for name in REQUIRED_STATUS_CHECKS
+]
 
 
 def _read(relative_path: str) -> str:
@@ -103,6 +106,12 @@ def test_publication_dry_run_seed_defines_no_publish_policy() -> None:
         ]
         is True
     )
+    assert (
+        seed["policy"][
+            "requires_evidence_bundle_ruleset_report_required_status_check_coverage"
+        ]
+        is True
+    )
     assert seed["policy"]["requires_evidence_bundle_preflight_artifact_fingerprints"] is True
     assert (
         seed["policy"]["requires_evidence_bundle_preflight_artifact_fingerprint_integrity"]
@@ -147,6 +156,7 @@ def test_publication_dry_run_script_is_local_only() -> None:
         "ruleset report ok status with failed checks",
         "ruleset report check entry shape mismatch",
         "ruleset report required status checks mismatch",
+        "ruleset report required status check coverage mismatch",
         "evidence_bundle_preflight_artifact_fingerprints",
         "evidence_bundle_preflight_commit_sha",
         "evidence_bundle_preflight_ref_commit_sha",
@@ -519,7 +529,7 @@ def test_publication_dry_run_rejects_stale_github_ruleset_report_input_fingerpri
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,
-                "checks": [{"name": "ruleset:active", "status": "pass"}],
+                "checks": REQUIRED_RULESET_CHECKS,
             }
         ),
         encoding="utf-8",
@@ -1012,7 +1022,7 @@ def test_publication_dry_run_rejects_github_ruleset_report_required_status_check
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": required_status_checks,
-                "checks": [{"name": "ruleset:active", "status": "pass"}],
+                "checks": REQUIRED_RULESET_CHECKS,
             }
         ),
         encoding="utf-8",
@@ -1097,6 +1107,116 @@ def test_publication_dry_run_rejects_github_ruleset_report_required_status_check
     assert result.returncode != 0
     assert not (out_dir / "v9.9.9-source-publication-dry-run.json").exists()
     assert "ruleset report required status checks mismatch" in (
+        result.stderr + result.stdout
+    )
+
+
+def test_publication_dry_run_rejects_github_ruleset_report_required_status_check_coverage_mismatch(
+    tmp_path: Path,
+) -> None:
+    evidence = tmp_path / "evidence.json"
+    notes = tmp_path / "release-notes.md"
+    preflight = _write_preflight_fixture(tmp_path)
+    ruleset = tmp_path / "ruleset.json"
+    proof = tmp_path / "proof.json"
+    source = tmp_path / "source.zip"
+    windows = tmp_path / "windows-bundle-verifier.json"
+    out_dir = tmp_path / "out"
+
+    ruleset.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "ok": True,
+                "read_only": True,
+                "repository": "Kiwunaka/Pokrov-client",
+                "branch": "main",
+                "required_status_checks": REQUIRED_STATUS_CHECKS,
+                "checks": REQUIRED_RULESET_CHECKS[:-1],
+            }
+        ),
+        encoding="utf-8",
+    )
+    proof.write_text('{"source_only":true}', encoding="utf-8")
+    source.write_bytes(b"source archive")
+    windows.write_text('{"windows_bundle_ok":true}', encoding="utf-8")
+    notes.write_text(_release_notes_text(_sha256(source)), encoding="utf-8")
+    evidence.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "tag": "v9.9.9-source",
+                "commit_sha": "a" * 40,
+                "preflight_commit_sha": "a" * 40,
+                "preflight_ref_commit_sha": "a" * 40,
+                "source_only": True,
+                "no_apk": True,
+                "no_exe": True,
+                "no_store_release": True,
+                "no_trusted_signing_claim": True,
+                "forbidden_file_count": 0,
+                "source_archive_sha256": _sha256(source),
+                "windows_bundle_verifier_ok": True,
+                "windows_bundle_verifier_summary": str(windows),
+                "github_ruleset_ok": True,
+                "github_enforcement_claim_allowed": True,
+                "github_ruleset_report": str(ruleset),
+                "input_fingerprints": {
+                    "preflight_summary": {
+                        "path": str(preflight),
+                        "sha256": _sha256(preflight),
+                    },
+                    "github_ruleset_report": {
+                        "path": str(ruleset),
+                        "sha256": _sha256(ruleset),
+                    },
+                },
+                "preflight_artifact_fingerprints": {
+                    "proof_manifest": {"path": str(proof), "sha256": _sha256(proof)},
+                    "release_notes": {"path": str(notes), "sha256": _sha256(notes)},
+                    "source_archive": {"path": str(source), "sha256": _sha256(source)},
+                    "windows_bundle_verifier_summary": {
+                        "path": str(windows),
+                        "sha256": _sha256(windows),
+                    },
+                },
+                "release_boundary": {
+                    "ships_apk": False,
+                    "ships_exe": False,
+                    "store_release": False,
+                    "trusted_signing_claim": False,
+                    "official_binary_claim": False,
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [
+            "powershell",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(ROOT / "scripts" / "validate-source-release-publication.ps1"),
+            "-Tag",
+            "v9.9.9-source",
+            "-EvidenceBundlePath",
+            str(evidence),
+            "-ReleaseNotesPath",
+            str(notes),
+            "-OutDir",
+            str(out_dir),
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode != 0
+    assert not (out_dir / "v9.9.9-source-publication-dry-run.json").exists()
+    assert "ruleset report required status check coverage mismatch" in (
         result.stderr + result.stdout
     )
 

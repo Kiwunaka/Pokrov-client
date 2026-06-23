@@ -66,7 +66,8 @@ function Assert-InputFingerprintIntegrity {
     [string]$RulesetReportOkMissingChecksErrorMessage = "",
     [string]$RulesetReportOkFailedChecksErrorMessage = "",
     [string]$RulesetReportCheckEntryShapeErrorMessage = "",
-    [string]$RulesetReportRequiredStatusChecksErrorMessage = ""
+    [string]$RulesetReportRequiredStatusChecksErrorMessage = "",
+    [string]$RulesetReportRequiredStatusCheckCoverageErrorMessage = ""
   )
 
   $resolvedFingerprintPath = [System.IO.Path]::GetFullPath((Resolve-RepoPath -Path ([string]$Fingerprint.path)))
@@ -90,7 +91,8 @@ function Assert-InputFingerprintIntegrity {
     -not [string]::IsNullOrWhiteSpace($RulesetReportOkMissingChecksErrorMessage) -or
     -not [string]::IsNullOrWhiteSpace($RulesetReportOkFailedChecksErrorMessage) -or
     -not [string]::IsNullOrWhiteSpace($RulesetReportCheckEntryShapeErrorMessage) -or
-    -not [string]::IsNullOrWhiteSpace($RulesetReportRequiredStatusChecksErrorMessage)
+    -not [string]::IsNullOrWhiteSpace($RulesetReportRequiredStatusChecksErrorMessage) -or
+    -not [string]::IsNullOrWhiteSpace($RulesetReportRequiredStatusCheckCoverageErrorMessage)
   ) {
     $rulesetReport = Get-Content -Raw -LiteralPath $resolvedFingerprintPath | ConvertFrom-Json
     if ([int]$rulesetReport.schema_version -ne 1) {
@@ -143,6 +145,13 @@ function Assert-InputFingerprintIntegrity {
           }
           if ([string]$check.status -ne "pass") {
             $BlockingErrors.Add($RulesetReportOkFailedChecksErrorMessage)
+            break
+          }
+        }
+        $passedCheckNames = @($rulesetChecks | ForEach-Object { [string]$_.name })
+        foreach ($expectedCheck in $expectedRequiredChecks) {
+          if (@($passedCheckNames | Where-Object { $_ -eq [string]$expectedCheck }).Count -eq 0) {
+            $BlockingErrors.Add($RulesetReportRequiredStatusCheckCoverageErrorMessage)
             break
           }
         }
@@ -453,6 +462,7 @@ try {
       -RulesetReportOkFailedChecksErrorMessage "publication dry-run ruleset report ok status with failed checks" `
       -RulesetReportCheckEntryShapeErrorMessage "publication dry-run ruleset report check entry shape mismatch" `
       -RulesetReportRequiredStatusChecksErrorMessage "publication dry-run ruleset report required status checks mismatch" `
+      -RulesetReportRequiredStatusCheckCoverageErrorMessage "publication dry-run ruleset report required status check coverage mismatch" `
       -BlockingErrors $blockingErrors
   } elseif (
     $publicationDryRun.github_enforcement_claim_allowed -eq $true -or

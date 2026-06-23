@@ -161,6 +161,12 @@ function Assert-RulesetReportInputFingerprintIntegrity {
         throw "Publication dry-run refused ruleset report ok status with failed checks."
       }
     }
+    $passedCheckNames = @($rulesetChecks | ForEach-Object { [string]$_.name })
+    foreach ($expectedCheck in $expectedRequiredChecks) {
+      if (@($passedCheckNames | Where-Object { $_ -eq [string]$expectedCheck }).Count -eq 0) {
+        throw "Publication dry-run refused ruleset report required status check coverage mismatch."
+      }
+    }
   }
 }
 

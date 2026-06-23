@@ -466,6 +466,12 @@
       "candidate": "v0.116.0-source",
       "base": "codex/v0.115-ruleset-report-check-shape",
       "head": "codex/v0.116-ruleset-report-required-checks"
+    },
+    {
+      "pr": 138,
+      "candidate": "v0.117.0-source",
+      "base": "codex/v0.116-ruleset-report-required-checks",
+      "head": "codex/v0.117-ruleset-report-required-check-coverage"
     }
   ]
 }
