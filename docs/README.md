@@ -63,7 +63,8 @@ anything.
 - [Release blockers](RELEASE_BLOCKERS.md): machine-readable blocker inventory
   and manual maintainer steps before a source tag, including source tag
   readiness, release merge order, release stack GitHub status, and release
-  merge handoff helpers.
+  merge handoff helpers, plus `scripts/prepare-source-publication-packet.ps1`
+  for the source publication packet final manual GitHub Release review.
 - [Required checks](REQUIRED_CHECKS.md): CI job names, branch-protection
   guidance, and source-release gates.
 - [GitHub ruleset setup](GITHUB_RULESET_SETUP.md): repository ruleset or

@@ -592,6 +592,12 @@
       "candidate": "v0.137.0-source",
       "base": "codex/v0.136-validate-stack-status-required-checks",
       "head": "codex/v0.137-validate-source-readiness-merge-coverage"
+    },
+    {
+      "pr": 159,
+      "candidate": "v0.138.0-source",
+      "base": "codex/v0.137-validate-source-readiness-merge-coverage",
+      "head": "codex/v0.138-source-publication-packet"
     }
   ]
 }

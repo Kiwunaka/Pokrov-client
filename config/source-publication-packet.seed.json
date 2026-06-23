@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "script": "scripts/prepare-source-publication-packet.ps1",
+  "default_output_dir": "build/source-publication-packet",
+  "policy": {
+    "read_only": true,
+    "source_only": true,
+    "manual_publish_only": true,
+    "no_merge": true,
+    "no_tag_creation": true,
+    "no_tag_push": true,
+    "no_github_release_publish": true,
+    "no_asset_upload": true,
+    "no_apk": true,
+    "no_exe": true,
+    "no_store_release": true,
+    "no_trusted_signing_claim": true,
+    "requires_release_handoff_summary": true,
+    "requires_publication_dry_run_summary": true,
+    "requires_release_handoff_ready": true,
+    "requires_publication_dry_run_ready": true,
+    "requires_rendered_release_notes": true,
+    "requires_proof_manifest": true,
+    "requires_source_archive": true,
+    "requires_release_evidence_bundle": true,
+    "requires_clean_clone_or_import_proof": true,
+    "requires_artifact_fingerprints": true,
+    "requires_input_fingerprints": true,
+    "requires_source_only_flags": true,
+    "writes_only_ignored_build_output": true
+  },
+  "inputs": {
+    "release_handoff": "build/release-merge-handoff/release-merge-handoff.json",
+    "publication_dry_run": "build/source-release-publication/v0.138.0-source/v0.138.0-source-publication-dry-run.json"
+  },
+  "input_roots": {
+    "release_handoff": "build/release-merge-handoff",
+    "publication_dry_run": "build/source-release-publication"
+  },
+  "output": {
+    "packet": "build/source-publication-packet/v0.138.0-source/source-publication-packet.json"
+  },
+  "required_source_only_flags": [
+    "source_only",
+    "no_apk",
+    "no_exe",
+    "no_store_release",
+    "no_trusted_signing_claim"
+  ],
+  "required_artifacts": [
+    "release_notes",
+    "proof_manifest",
+    "source_archive",
+    "release_evidence_bundle",
+    "clean_clone_or_import_proof"
+  ]
+}

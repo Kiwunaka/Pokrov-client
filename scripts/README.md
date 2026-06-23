@@ -82,6 +82,13 @@ Current helpers:
   their expected ignored
   `build/` output roots; the helper does not merge, tag, push, publish, or
   upload anything
+- `prepare-source-publication-packet.ps1`: creates a source publication packet
+  by bundling the release merge handoff and publication dry-run summaries into
+  ignored `build/source-publication-packet/` output for manual GitHub Release
+  review; it carries release notes, proof manifest, source archive, release
+  evidence bundle, clean-clone/import proof, input SHA-256 fingerprints, and
+  explicit source-only no-binary flags, and it does not merge, tag, push,
+  publish, or upload anything
 - `verify-windows-bundle.ps1`: Windows bundle verifier for source-only Windows
   bundle proof; checks required Windows shell source paths and rejects
   committed Windows binaries, archives, signing files, or local runtime
