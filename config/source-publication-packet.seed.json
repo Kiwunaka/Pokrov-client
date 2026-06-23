@@ -42,6 +42,7 @@
     "forbids_release_notes_tbd_placeholders": true,
     "requires_release_notes_proof_values": true,
     "requires_release_evidence_bundle_tag_binding": true,
+    "requires_release_evidence_bundle_commit_sha_binding": true,
     "requires_proof_manifest_tag_binding": true,
     "requires_proof_manifest_commit_sha_binding": true,
     "requires_proof_manifest_source_archive_sha_binding": true,
@@ -51,7 +52,7 @@
   },
   "inputs": {
     "release_handoff": "build/release-merge-handoff/release-merge-handoff.json",
-    "publication_dry_run": "build/source-release-publication/v0.153.0-source/v0.153.0-source-publication-dry-run.json"
+    "publication_dry_run": "build/source-release-publication/v0.154.0-source/v0.154.0-source-publication-dry-run.json"
   },
   "input_roots": {
     "release_handoff": "build/release-merge-handoff",
@@ -126,10 +127,12 @@
   ],
   "release_evidence_bundle_proof_requirements": [
     "release_evidence_bundle.tag",
-    "publication_dry_run.tag"
+    "release_evidence_bundle.commit_sha",
+    "publication_dry_run.tag",
+    "publication_dry_run.commit_sha"
   ],
   "output": {
-    "packet": "build/source-publication-packet/v0.153.0-source/source-publication-packet.json"
+    "packet": "build/source-publication-packet/v0.154.0-source/source-publication-packet.json"
   },
   "required_source_only_flags": [
     "source_only",

@@ -688,6 +688,12 @@
       "candidate": "v0.153.0-source",
       "base": "codex/v0.152-source-publication-packet-proof-tag",
       "head": "codex/v0.153-source-publication-packet-evidence-tag"
+    },
+    {
+      "pr": 175,
+      "candidate": "v0.154.0-source",
+      "base": "codex/v0.153-source-publication-packet-evidence-tag",
+      "head": "codex/v0.154-source-publication-packet-evidence-commit"
     }
   ]
 }
