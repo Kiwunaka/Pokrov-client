@@ -208,6 +208,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.105.0-source` | Pending stacked PR, not tagged | Release handoff verifies publication dry-run preflight input fingerprints before maintainer review. |
 | `v0.106.0-source` | Pending stacked PR, not tagged | Release handoff verifies publication dry-run evidence-bundle and release-notes input fingerprints before maintainer review. |
 | `v0.107.0-source` | Pending stacked PR, not tagged | Release handoff verifies tag readiness blocker-inventory and source-readiness input fingerprints before maintainer review. |
+| `v0.108.0-source` | Pending stacked PR, not tagged | Release handoff verifies publication dry-run artifact fingerprints against the real proof files before maintainer review. |
 
 ## Architecture Boundary
 
