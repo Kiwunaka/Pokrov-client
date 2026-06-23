@@ -574,6 +574,12 @@
       "candidate": "v0.134.0-source",
       "base": "codex/v0.133-validate-source-readiness-unique-evidence",
       "head": "codex/v0.134-validate-source-readiness-pr-sequence"
+    },
+    {
+      "pr": 156,
+      "candidate": "v0.135.0-source",
+      "base": "codex/v0.134-validate-source-readiness-pr-sequence",
+      "head": "codex/v0.135-validate-source-readiness-merge-order"
     }
   ]
 }

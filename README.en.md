@@ -235,6 +235,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.132.0-source` | Pending stacked PR, not tagged | Seed validation requires stacked PR milestone evidence to use canonical repository PR URLs. |
 | `v0.133.0-source` | Pending stacked PR, not tagged | Seed validation requires unique stacked PR milestone evidence URLs. |
 | `v0.134.0-source` | Pending stacked PR, not tagged | Seed validation requires stacked PR milestone evidence PR numbers to increase with the candidate sequence. |
+| `v0.135.0-source` | Pending stacked PR, not tagged | Seed validation requires source-readiness stacked PR evidence to match the release merge-order stack. |
 
 ## Architecture Boundary
 

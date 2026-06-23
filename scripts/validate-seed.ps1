@@ -1735,6 +1735,9 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
   if ($sourceReadiness.policy.stacked_pr_milestone_evidence_pr_numbers_must_increase -ne $true) {
     $manifestErrors.Add("config\\source-release-readiness.seed.json must require stacked PR milestone evidence PR numbers to increase")
   }
+  if ($sourceReadiness.policy.stacked_pr_milestones_must_match_merge_order_stack -ne $true) {
+    $manifestErrors.Add("config\\source-release-readiness.seed.json must require stacked PR milestones to match release merge-order stack")
+  }
 
   $releaseBlockerInventoryPath = Join-Path $root "config\\release-blocker-inventory.seed.json"
   if (Test-Path -LiteralPath $releaseBlockerInventoryPath -PathType Leaf) {
@@ -1760,10 +1763,12 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
   $sourceReadinessTags = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
   $sourceReadinessStackedEvidenceUrls = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
   $sourceReadinessPreviousStackedPrNumber = 0
+  $sourceReadinessMilestonesByTag = @{}
   foreach ($milestone in @($sourceReadiness.milestones)) {
     $milestoneTag = [string]$milestone.tag
     $milestoneStatus = [string]$milestone.status
     $milestoneEvidence = [string]$milestone.evidence
+    $sourceReadinessMilestonesByTag[$milestoneTag] = $milestone
     if (-not $sourceReadinessTags.Add($milestoneTag)) {
       $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$milestoneTag' tag must be unique")
     }
@@ -1803,6 +1808,22 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
     }
     if ($milestoneStatus -ne "tagged" -and $milestoneStatus -notmatch "not_tagged") {
       $manifestErrors.Add("config\\source-release-readiness.seed.json pending milestone '$milestoneTag' must include not_tagged in status")
+    }
+  }
+
+  $releaseMergeOrderPath = Join-Path $root "config\\release-merge-order.seed.json"
+  if (Test-Path -LiteralPath $releaseMergeOrderPath -PathType Leaf) {
+    $releaseMergeOrder = Get-Content -Raw -LiteralPath $releaseMergeOrderPath | ConvertFrom-Json
+    foreach ($stackEntry in @($releaseMergeOrder.stack)) {
+      $stackCandidate = [string]$stackEntry.candidate
+      $stackPr = [int]$stackEntry.pr
+      $expectedStackEvidence = "$sourceReadinessCanonicalPrPrefix$stackPr"
+      $stackMilestone = $sourceReadinessMilestonesByTag[$stackCandidate]
+      if ($null -eq $stackMilestone) {
+        $manifestErrors.Add("config\\source-release-readiness.seed.json must include release merge-order candidate '$stackCandidate'")
+      } elseif ([string]$stackMilestone.evidence -ne $expectedStackEvidence) {
+        $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$stackCandidate' evidence must match release merge-order PR #$stackPr")
+      }
     }
   }
 }

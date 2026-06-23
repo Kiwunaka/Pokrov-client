@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.134
+# Source Readiness: v0.2-v0.135
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -6,14 +6,14 @@ checklist is run on the exact commit. The machine-readable readiness inventory
 lives in
 [`config/source-release-readiness.seed.json`](../../config/source-release-readiness.seed.json).
 
-## v0.134.0-source Candidate
+## v0.135.0-source Candidate
 
 Status: pending stacked PR, not tagged.
 
 Current evidence:
 
-- PR #155: seed validation requires stacked PR source-readiness milestone
-  evidence PR numbers to increase with the release candidate sequence
+- PR #156: seed validation requires source-readiness stacked PR evidence to
+  match the release merge-order stack for every tracked candidate
 
 Required before tagging:
 
@@ -21,8 +21,8 @@ Required before tagging:
 - choose the exact commit SHA
 - run the source preflight, release evidence bundle, publication dry-run, tag
   readiness, and release merge handoff commands from the same candidate
-- confirm `scripts/validate-seed.ps1` rejects stacked source-readiness PR
-  evidence that moves backward in the release candidate sequence
+- confirm `scripts/validate-seed.ps1` rejects source-readiness milestone
+  evidence drift from `config/release-merge-order.seed.json`
 - keep release notes source-only with no APK, EXE, store, trusted-signing, or
   official binary claims
 

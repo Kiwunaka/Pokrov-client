@@ -213,6 +213,10 @@ that seed validation requires stacked PR milestone evidence PR numbers to
 increase with the candidate sequence; it is not tagged and does not ship
 APK/EXE binaries.
 
+Source readiness note: `v0.135.0-source` is a pending stacked PR for verifying
+that seed validation requires source-readiness stacked PR evidence to match the
+release merge-order stack; it is not tagged and does not ship APK/EXE binaries.
+
 Source readiness note: `v0.53.0-source` is a pending stacked PR for Windows
 verifier CI/preflight enforcement; it is not tagged and does not ship APK/EXE
 binaries.
