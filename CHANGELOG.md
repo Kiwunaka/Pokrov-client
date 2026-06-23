@@ -346,8 +346,11 @@ production readiness without matching public evidence.
 - Added source publication packet schema checks so source proof, evidence,
   preflight, Windows verifier, and optional ruleset JSON artifacts must carry
   their expected source-only proof fields before manual GitHub Release review.
+- Added source publication packet release-note claim checks so manual GitHub
+  Release review is blocked when rendered notes omit required source-only,
+  no-binary, and known-limitation markers or still contain `TBD` placeholders.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.146.0-source` candidates.
+  `v0.147.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -499,6 +502,7 @@ production readiness without matching public evidence.
 | `v0.144.0-source` | Pending stacked PR, not tagged | PR #165 |
 | `v0.145.0-source` | Pending stacked PR, not tagged | PR #166 |
 | `v0.146.0-source` | Pending stacked PR, not tagged | PR #167 |
+| `v0.147.0-source` | Pending stacked PR, not tagged | PR #168 |
 
 ### Still Source-Only
 

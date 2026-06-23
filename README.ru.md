@@ -272,6 +272,11 @@ that the source publication packet validates source release artifact JSON
 schemas before manual GitHub Release review; it is not tagged and does not ship
 APK/EXE binaries.
 
+Source readiness note: `v0.147.0-source` is a pending stacked PR for verifying
+that the source publication packet validates release notes claim and
+known-limitation markers before manual GitHub Release review; it is not tagged
+and does not ship APK/EXE binaries.
+
 Source readiness note: `v0.53.0-source` is a pending stacked PR for Windows
 verifier CI/preflight enforcement; it is not tagged and does not ship APK/EXE
 binaries.
