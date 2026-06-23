@@ -15,6 +15,8 @@ param(
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $defaultOutputDir = "build\source-release-publication"
+$expectedRulesetRepository = "Kiwunaka/Pokrov-client"
+$expectedRulesetBranch = "main"
 
 function Resolve-RepoPath {
   param([Parameter(Mandatory = $true)][string]$Path)
@@ -108,6 +110,14 @@ function Assert-RulesetReportInputFingerprintIntegrity {
 
   if ($null -eq $rulesetReport.PSObject.Properties["ok"]) {
     throw "Publication dry-run refused ruleset report without ok status."
+  }
+
+  if ([string]$rulesetReport.repository -ne $expectedRulesetRepository) {
+    throw "Publication dry-run refused ruleset report repository mismatch."
+  }
+
+  if ([string]$rulesetReport.branch -ne $expectedRulesetBranch) {
+    throw "Publication dry-run refused ruleset report branch mismatch."
   }
 }
 

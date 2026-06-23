@@ -54,7 +54,9 @@ function Assert-InputFingerprintIntegrity {
     [Parameter(Mandatory = $true)][object]$BlockingErrors,
     [string]$RulesetReportSchemaVersionErrorMessage = "",
     [string]$RulesetReportReadOnlyErrorMessage = "",
-    [string]$RulesetReportOkStatusErrorMessage = ""
+    [string]$RulesetReportOkStatusErrorMessage = "",
+    [string]$RulesetReportRepositoryErrorMessage = "",
+    [string]$RulesetReportBranchErrorMessage = ""
   )
 
   $resolvedFingerprintPath = [System.IO.Path]::GetFullPath((Resolve-RepoPath -Path ([string]$Fingerprint.path)))
@@ -72,7 +74,9 @@ function Assert-InputFingerprintIntegrity {
   if (
     -not [string]::IsNullOrWhiteSpace($RulesetReportSchemaVersionErrorMessage) -or
     -not [string]::IsNullOrWhiteSpace($RulesetReportReadOnlyErrorMessage) -or
-    -not [string]::IsNullOrWhiteSpace($RulesetReportOkStatusErrorMessage)
+    -not [string]::IsNullOrWhiteSpace($RulesetReportOkStatusErrorMessage) -or
+    -not [string]::IsNullOrWhiteSpace($RulesetReportRepositoryErrorMessage) -or
+    -not [string]::IsNullOrWhiteSpace($RulesetReportBranchErrorMessage)
   ) {
     $rulesetReport = Get-Content -Raw -LiteralPath $resolvedFingerprintPath | ConvertFrom-Json
     if ([int]$rulesetReport.schema_version -ne 1) {
@@ -83,6 +87,12 @@ function Assert-InputFingerprintIntegrity {
     }
     if ($null -eq $rulesetReport.PSObject.Properties["ok"]) {
       $BlockingErrors.Add($RulesetReportOkStatusErrorMessage)
+    }
+    if ([string]$rulesetReport.repository -ne "Kiwunaka/Pokrov-client") {
+      $BlockingErrors.Add($RulesetReportRepositoryErrorMessage)
+    }
+    if ([string]$rulesetReport.branch -ne "main") {
+      $BlockingErrors.Add($RulesetReportBranchErrorMessage)
     }
   }
 }
@@ -383,6 +393,8 @@ try {
       -RulesetReportSchemaVersionErrorMessage "publication dry-run ruleset report without schema_version 1" `
       -RulesetReportReadOnlyErrorMessage "publication dry-run ruleset report that is not read-only" `
       -RulesetReportOkStatusErrorMessage "publication dry-run ruleset report without ok status" `
+      -RulesetReportRepositoryErrorMessage "publication dry-run ruleset report repository mismatch" `
+      -RulesetReportBranchErrorMessage "publication dry-run ruleset report branch mismatch" `
       -BlockingErrors $blockingErrors
   } elseif (
     $publicationDryRun.github_enforcement_claim_allowed -eq $true -or
