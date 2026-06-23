@@ -262,6 +262,11 @@ that the source publication packet rejects release artifact files whose
 extensions do not match the source-only artifact contract; it is not tagged and
 does not ship APK/EXE binaries.
 
+Source readiness note: `v0.145.0-source` is a pending stacked PR for verifying
+that the source publication packet validates source release artifact contents
+before manual GitHub Release review; it is not tagged and does not ship APK/EXE
+binaries.
+
 Source readiness note: `v0.53.0-source` is a pending stacked PR for Windows
 verifier CI/preflight enforcement; it is not tagged and does not ship APK/EXE
 binaries.

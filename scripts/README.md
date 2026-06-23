@@ -93,7 +93,8 @@ Current helpers:
   file fingerprints that no longer match files on disk, rejects release
   artifact paths outside their expected ignored `build/` output roots, rejects
   release asset fingerprints outside the source-only allowlist, rejects release
-  artifact file extensions outside the source-only artifact contract, and it does not
+  artifact file extensions outside the source-only artifact contract, rejects
+  unreadable release artifact contents, and it does not
   merge, tag, push, publish, or upload anything
 - `verify-windows-bundle.ps1`: Windows bundle verifier for source-only Windows
   bundle proof; checks required Windows shell source paths and rejects

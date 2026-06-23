@@ -10,6 +10,7 @@ $seedPath = Join-Path $root "config\source-publication-packet.seed.json"
 $defaultOutputDir = "build\source-publication-packet"
 $inputMaxAgeHours = 24
 $inputFutureSkewMinutes = 5
+Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 function Resolve-RepoPath {
   param([Parameter(Mandatory = $true)][string]$Path)
@@ -268,6 +269,57 @@ function Add-ArtifactFileExtensionErrors {
   $actualExtension = [System.IO.Path]::GetExtension($resolvedPath)
   if (-not $ExpectedExtension.Equals($actualExtension, [System.StringComparison]::OrdinalIgnoreCase)) {
     Add-BlockingError -Errors $Errors -Message "source publication packet artifact file extension mismatch for $Name"
+  }
+}
+
+function Add-ArtifactContentErrors {
+  param(
+    [System.Collections.Generic.List[string]]$Errors,
+    [object]$Fingerprint,
+    [string]$Name,
+    [string]$ContentType
+  )
+
+  $resolvedPath = Get-NormalizedFingerprintPath -Path ([string]$Fingerprint.path)
+  if (
+    [string]::IsNullOrWhiteSpace($resolvedPath) -or
+    [string]::IsNullOrWhiteSpace($ContentType) -or
+    -not (Test-Path -LiteralPath $resolvedPath -PathType Leaf)
+  ) {
+    return
+  }
+
+  try {
+    if ($ContentType -eq "json") {
+      $jsonText = Get-Content -Raw -LiteralPath $resolvedPath
+      if ([string]::IsNullOrWhiteSpace($jsonText)) {
+        throw "empty json artifact"
+      }
+      $null = $jsonText | ConvertFrom-Json
+      return
+    }
+
+    if ($ContentType -eq "markdown") {
+      $markdownText = Get-Content -Raw -LiteralPath $resolvedPath
+      if ([string]::IsNullOrWhiteSpace($markdownText)) {
+        throw "empty markdown artifact"
+      }
+      return
+    }
+
+    if ($ContentType -eq "zip") {
+      $zip = [System.IO.Compression.ZipFile]::OpenRead($resolvedPath)
+      try {
+        if ($zip.Entries.Count -lt 1) {
+          throw "empty zip artifact"
+        }
+      } finally {
+        $zip.Dispose()
+      }
+      return
+    }
+  } catch {
+    Add-BlockingError -Errors $Errors -Message "source publication packet artifact content invalid for $Name"
   }
 }
 
@@ -548,6 +600,29 @@ try {
       -ExpectedExtension ([string]$seed.artifact_file_extensions.github_ruleset_report)
   }
 
+  foreach ($artifactContentSpec in @(
+    [ordered]@{ name = "release_notes"; value = $releaseNotes; content_type = [string]$seed.artifact_content_types.release_notes },
+    [ordered]@{ name = "release_evidence_bundle"; value = $releaseEvidenceBundle; content_type = [string]$seed.artifact_content_types.release_evidence_bundle },
+    [ordered]@{ name = "proof_manifest"; value = $proofManifest; content_type = [string]$seed.artifact_content_types.proof_manifest },
+    [ordered]@{ name = "source_archive"; value = $sourceArchive; content_type = [string]$seed.artifact_content_types.source_archive },
+    [ordered]@{ name = "clean_clone_or_import_proof"; value = $cleanCloneOrImportProof; content_type = [string]$seed.artifact_content_types.clean_clone_or_import_proof },
+    [ordered]@{ name = "windows_bundle_verifier_summary"; value = Get-FingerprintObject -Container $publicationArtifactFingerprints -FieldName "windows_bundle_verifier_summary"; content_type = [string]$seed.artifact_content_types.windows_bundle_verifier_summary }
+  )) {
+    Add-ArtifactContentErrors `
+      -Errors $blockingErrors `
+      -Fingerprint $artifactContentSpec.value `
+      -Name $artifactContentSpec.name `
+      -ContentType $artifactContentSpec.content_type
+  }
+
+  if (Test-FingerprintField -Container $publicationEvidenceBundleFingerprints -FieldName "github_ruleset_report") {
+    Add-ArtifactContentErrors `
+      -Errors $blockingErrors `
+      -Fingerprint $publicationRulesetReport `
+      -Name "github_ruleset_report" `
+      -ContentType ([string]$seed.artifact_content_types.github_ruleset_report)
+  }
+
   $artifactFileFingerprints = [ordered]@{
     release_notes = Get-ArtifactFileFingerprint -Fingerprint $releaseNotes
     release_evidence_bundle = Get-ArtifactFileFingerprint -Fingerprint $releaseEvidenceBundle
@@ -621,6 +696,7 @@ try {
     publication_dry_run_release_asset_fingerprints = $publicationReleaseAssetFingerprints
     allowed_release_assets = @($seed.allowed_release_assets)
     artifact_file_extensions = $seed.artifact_file_extensions
+    artifact_content_types = $seed.artifact_content_types
     release_handoff_publication_dry_run_input_fingerprints = $releaseHandoffPublicationInputFingerprints
     release_handoff_publication_dry_run_evidence_bundle_input_fingerprints = $releaseHandoffPublicationEvidenceBundleFingerprints
     release_handoff_publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $releaseHandoffPublicationArtifactFingerprints

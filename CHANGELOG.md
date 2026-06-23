@@ -340,8 +340,11 @@ production readiness without matching public evidence.
 - Added source publication packet artifact extension checks so source archives,
   release notes, manifests, evidence bundles, and verifier summaries must keep
   source-only artifact filename contracts.
+- Added source publication packet content checks so release notes, JSON proof
+  files, and source archives must be readable before manual GitHub Release
+  review.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.144.0-source` candidates.
+  `v0.145.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -491,6 +494,7 @@ production readiness without matching public evidence.
 | `v0.142.0-source` | Pending stacked PR, not tagged | PR #163 |
 | `v0.143.0-source` | Pending stacked PR, not tagged | PR #164 |
 | `v0.144.0-source` | Pending stacked PR, not tagged | PR #165 |
+| `v0.145.0-source` | Pending stacked PR, not tagged | PR #166 |
 
 ### Still Source-Only
 
