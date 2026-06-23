@@ -460,6 +460,12 @@
       "candidate": "v0.115.0-source",
       "base": "codex/v0.114-ruleset-report-ok-consistency",
       "head": "codex/v0.115-ruleset-report-check-shape"
+    },
+    {
+      "pr": 137,
+      "candidate": "v0.116.0-source",
+      "base": "codex/v0.115-ruleset-report-check-shape",
+      "head": "codex/v0.116-ruleset-report-required-checks"
     }
   ]
 }

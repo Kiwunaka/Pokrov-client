@@ -10,6 +10,12 @@ $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $defaultOutputDir = "build\release-merge-handoff"
 
+function Get-RequiredStatusChecks {
+  $requiredChecksPath = Join-Path $root "config\required-checks.seed.json"
+  $requiredChecksSeed = Get-Content -Raw -LiteralPath $requiredChecksPath | ConvertFrom-Json
+  return @($requiredChecksSeed.required_jobs)
+}
+
 function Resolve-RepoPath {
   param([Parameter(Mandatory = $true)][string]$Path)
 
@@ -59,7 +65,8 @@ function Assert-InputFingerprintIntegrity {
     [string]$RulesetReportBranchErrorMessage = "",
     [string]$RulesetReportOkMissingChecksErrorMessage = "",
     [string]$RulesetReportOkFailedChecksErrorMessage = "",
-    [string]$RulesetReportCheckEntryShapeErrorMessage = ""
+    [string]$RulesetReportCheckEntryShapeErrorMessage = "",
+    [string]$RulesetReportRequiredStatusChecksErrorMessage = ""
   )
 
   $resolvedFingerprintPath = [System.IO.Path]::GetFullPath((Resolve-RepoPath -Path ([string]$Fingerprint.path)))
@@ -82,7 +89,8 @@ function Assert-InputFingerprintIntegrity {
     -not [string]::IsNullOrWhiteSpace($RulesetReportBranchErrorMessage) -or
     -not [string]::IsNullOrWhiteSpace($RulesetReportOkMissingChecksErrorMessage) -or
     -not [string]::IsNullOrWhiteSpace($RulesetReportOkFailedChecksErrorMessage) -or
-    -not [string]::IsNullOrWhiteSpace($RulesetReportCheckEntryShapeErrorMessage)
+    -not [string]::IsNullOrWhiteSpace($RulesetReportCheckEntryShapeErrorMessage) -or
+    -not [string]::IsNullOrWhiteSpace($RulesetReportRequiredStatusChecksErrorMessage)
   ) {
     $rulesetReport = Get-Content -Raw -LiteralPath $resolvedFingerprintPath | ConvertFrom-Json
     if ([int]$rulesetReport.schema_version -ne 1) {
@@ -99,6 +107,22 @@ function Assert-InputFingerprintIntegrity {
     }
     if ([string]$rulesetReport.branch -ne "main") {
       $BlockingErrors.Add($RulesetReportBranchErrorMessage)
+    }
+    $expectedRequiredChecks = Get-RequiredStatusChecks
+    $requiredChecksProperty = $rulesetReport.PSObject.Properties["required_status_checks"]
+    $actualRequiredChecks = @()
+    if ($null -ne $requiredChecksProperty -and $null -ne $requiredChecksProperty.Value) {
+      $actualRequiredChecks = @($requiredChecksProperty.Value)
+    }
+    if ($actualRequiredChecks.Count -ne $expectedRequiredChecks.Count) {
+      $BlockingErrors.Add($RulesetReportRequiredStatusChecksErrorMessage)
+    } else {
+      for ($index = 0; $index -lt $expectedRequiredChecks.Count; $index += 1) {
+        if ([string]$actualRequiredChecks[$index] -ne [string]$expectedRequiredChecks[$index]) {
+          $BlockingErrors.Add($RulesetReportRequiredStatusChecksErrorMessage)
+          break
+        }
+      }
     }
     if ($rulesetReport.ok -eq $true) {
       $rulesetChecksProperty = $rulesetReport.PSObject.Properties["checks"]
@@ -428,6 +452,7 @@ try {
       -RulesetReportOkMissingChecksErrorMessage "publication dry-run ruleset report ok status without checks" `
       -RulesetReportOkFailedChecksErrorMessage "publication dry-run ruleset report ok status with failed checks" `
       -RulesetReportCheckEntryShapeErrorMessage "publication dry-run ruleset report check entry shape mismatch" `
+      -RulesetReportRequiredStatusChecksErrorMessage "publication dry-run ruleset report required status checks mismatch" `
       -BlockingErrors $blockingErrors
   } elseif (
     $publicationDryRun.github_enforcement_claim_allowed -eq $true -or

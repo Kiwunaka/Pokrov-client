@@ -262,8 +262,11 @@ production readiness without matching public evidence.
 - Added GitHub ruleset report check-entry shape validation across release
   evidence, publication dry-run, and release merge handoff so passing verifier
   checks must retain traceable name and status fields.
+- Added GitHub ruleset report required-status-check validation across release
+  evidence, publication dry-run, and release merge handoff so enforcement
+  claims must match the canonical required CI job list.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.115.0-source` candidates.
+  `v0.116.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -384,6 +387,7 @@ production readiness without matching public evidence.
 | `v0.113.0-source` | Pending stacked PR, not tagged | PR #134 |
 | `v0.114.0-source` | Pending stacked PR, not tagged | PR #135 |
 | `v0.115.0-source` | Pending stacked PR, not tagged | PR #136 |
+| `v0.116.0-source` | Pending stacked PR, not tagged | PR #137 |
 
 ### Still Source-Only
 
