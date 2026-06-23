@@ -424,6 +424,12 @@
       "candidate": "v0.109.0-source",
       "base": "codex/v0.108-handoff-publication-artifact-fingerprints",
       "head": "codex/v0.109-ruleset-report-input-fingerprints"
+    },
+    {
+      "pr": 131,
+      "candidate": "v0.110.0-source",
+      "base": "codex/v0.109-ruleset-report-input-fingerprints",
+      "head": "codex/v0.110-ruleset-report-shape-guard"
     }
   ]
 }

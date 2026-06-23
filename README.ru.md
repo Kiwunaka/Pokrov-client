@@ -93,6 +93,11 @@ that optional GitHub ruleset report input fingerprints are carried through
 release evidence, publication dry-run, and release merge handoff before
 maintainer review; it is not tagged and does not ship APK/EXE binaries.
 
+Source readiness note: `v0.110.0-source` is a pending stacked PR for verifying
+that malformed GitHub ruleset reports are rejected before enforcement claims
+can reach publication dry-run or release merge handoff; it is not tagged and
+does not ship APK/EXE binaries.
+
 Source readiness note: `v0.53.0-source` is a pending stacked PR for Windows
 verifier CI/preflight enforcement; it is not tagged and does not ship APK/EXE
 binaries.

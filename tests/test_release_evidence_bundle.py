@@ -5,6 +5,8 @@ import json
 import subprocess
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -31,6 +33,53 @@ def _git_head() -> str:
     ).stdout.strip()
 
 
+def _write_valid_preflight_fixture(tmp_path: Path) -> Path:
+    proof = tmp_path / "proof.json"
+    notes = tmp_path / "notes.md"
+    source = tmp_path / "source.zip"
+    windows = tmp_path / "windows-bundle-verifier.json"
+    preflight = tmp_path / "preflight.json"
+
+    proof.write_text('{"source_only":true}', encoding="utf-8")
+    notes.write_text("# v9.9.9-source\nThis is a source-only release.", encoding="utf-8")
+    source.write_bytes(b"source archive")
+    windows.write_text('{"windows_bundle_ok":true}', encoding="utf-8")
+    commit_sha = _git_head()
+    preflight.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "tag": "v9.9.9-source",
+                "commit_sha": commit_sha,
+                "ref_commit_sha": commit_sha,
+                "source_only": True,
+                "no_apk": True,
+                "no_exe": True,
+                "no_store_release": True,
+                "no_trusted_signing_claim": True,
+                "forbidden_file_count": 0,
+                "windows_bundle_verifier_ok": True,
+                "windows_bundle_verifier_summary": str(windows),
+                "proof_manifest": str(proof),
+                "release_notes": str(notes),
+                "source_archive": str(source),
+                "source_archive_sha256": _sha256(source),
+                "artifact_fingerprints": {
+                    "proof_manifest": {"path": str(proof), "sha256": _sha256(proof)},
+                    "release_notes": {"path": str(notes), "sha256": _sha256(notes)},
+                    "source_archive": {"path": str(source), "sha256": _sha256(source)},
+                    "windows_bundle_verifier_summary": {
+                        "path": str(windows),
+                        "sha256": _sha256(windows),
+                    },
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    return preflight
+
+
 def test_release_evidence_bundle_seed_defines_source_only_policy() -> None:
     seed = _read_json("config/release-evidence-bundle.seed.json")
 
@@ -45,6 +94,7 @@ def test_release_evidence_bundle_seed_defines_source_only_policy() -> None:
     assert seed["policy"]["windows_bundle_verifier_required"] is True
     assert seed["policy"]["requires_input_fingerprints"] is True
     assert seed["policy"]["requires_ruleset_report_input_fingerprint_when_present"] is True
+    assert seed["policy"]["requires_ruleset_report_shape"] is True
     assert seed["policy"]["requires_preflight_artifact_fingerprints"] is True
     assert seed["policy"]["requires_preflight_artifact_fingerprint_integrity"] is True
     assert seed["policy"]["requires_preflight_commit_sha_consistency"] is True
@@ -77,6 +127,10 @@ def test_release_evidence_bundle_script_preserves_claim_boundaries() -> None:
         "windows_bundle_verifier_summary",
         "input_fingerprints",
         "github_ruleset_report",
+        "Assert-RulesetReportShape",
+        "ruleset report without schema_version 1",
+        "ruleset report that is not read-only",
+        "ruleset report without ok status",
         "preflight_artifact_fingerprints",
         "preflight_commit_sha",
         "preflight_ref_commit_sha",
@@ -212,6 +266,58 @@ def test_release_evidence_bundle_script_writes_bundle_from_fixture(tmp_path: Pat
         "windows_bundle_verifier_summary"
     ]["sha256"] == _sha256(windows)
     assert bundle["release_boundary"]["official_binary_claim"] is False
+
+
+@pytest.mark.parametrize(
+    ("ruleset_payload", "expected_error"),
+    [
+        ({"ok": True}, "ruleset report without schema_version 1"),
+        (
+            {"schema_version": 1, "ok": True, "read_only": False},
+            "ruleset report that is not read-only",
+        ),
+        (
+            {"schema_version": 1, "read_only": True},
+            "ruleset report without ok status",
+        ),
+    ],
+)
+def test_release_evidence_bundle_rejects_malformed_ruleset_report(
+    tmp_path: Path,
+    ruleset_payload: dict[str, object],
+    expected_error: str,
+) -> None:
+    preflight = _write_valid_preflight_fixture(tmp_path)
+    ruleset = tmp_path / "ruleset.json"
+    out_dir = tmp_path / "out"
+
+    ruleset.write_text(json.dumps(ruleset_payload), encoding="utf-8")
+
+    result = subprocess.run(
+        [
+            "powershell",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(ROOT / "scripts" / "prepare-release-evidence-bundle.ps1"),
+            "-Tag",
+            "v9.9.9-source",
+            "-PreflightSummaryPath",
+            str(preflight),
+            "-RulesetReportPath",
+            str(ruleset),
+            "-OutDir",
+            str(out_dir),
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode != 0
+    assert not (out_dir / "v9.9.9-source-release-evidence.json").exists()
+    assert expected_error in (result.stderr + result.stdout)
 
 
 def test_release_evidence_bundle_rejects_preflight_without_artifact_fingerprints(

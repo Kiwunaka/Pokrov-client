@@ -151,6 +151,22 @@ function Assert-SourceOnlySummary {
     -Name "windows_bundle_verifier_summary"
 }
 
+function Assert-RulesetReportShape {
+  param([Parameter(Mandatory = $true)][object]$Report)
+
+  if ([int]$Report.schema_version -ne 1) {
+    throw "Release evidence refused ruleset report without schema_version 1."
+  }
+
+  if ($Report.read_only -ne $true) {
+    throw "Release evidence refused ruleset report that is not read-only."
+  }
+
+  if ($null -eq $Report.PSObject.Properties["ok"]) {
+    throw "Release evidence refused ruleset report without ok status."
+  }
+}
+
 Push-Location $root
 try {
   $resolvedPreflightSummaryPath = Resolve-RepoPath -Path $PreflightSummaryPath
@@ -216,6 +232,7 @@ try {
   $rulesetOk = $null
   $rulesetClaimAllowed = $false
   if ($null -ne $rulesetReport) {
+    Assert-RulesetReportShape -Report $rulesetReport
     $rulesetOk = [bool]$rulesetReport.ok
     $rulesetClaimAllowed = [bool]$rulesetReport.ok
   }
