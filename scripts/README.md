@@ -90,7 +90,8 @@ Current helpers:
   explicit source-only no-binary flags, rejects missing, malformed, stale, or
   too-far-future generated-at timestamps on direct inputs, rejects mismatched
   handoff-carried publication dry-run fingerprints, rejects release artifact
-  file fingerprints that no longer match files on disk, and it does not
+  file fingerprints that no longer match files on disk, rejects release
+  artifact paths outside their expected ignored `build/` output roots, and it does not
   merge, tag, push, publish, or upload anything
 - `verify-windows-bundle.ps1`: Windows bundle verifier for source-only Windows
   bundle proof; checks required Windows shell source paths and rejects

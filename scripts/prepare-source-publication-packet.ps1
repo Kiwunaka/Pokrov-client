@@ -139,6 +139,21 @@ function Get-NormalizedFingerprintPath {
   return [System.IO.Path]::GetFullPath((Resolve-RepoPath -Path $Path))
 }
 
+function Test-PathUnderRoot {
+  param(
+    [Parameter(Mandatory = $true)][string]$Path,
+    [Parameter(Mandatory = $true)][string]$AllowedRoot
+  )
+
+  $resolvedPath = [System.IO.Path]::GetFullPath($Path)
+  $resolvedRoot = [System.IO.Path]::GetFullPath((Resolve-RepoPath -Path $AllowedRoot))
+  $rootWithSeparator = $resolvedRoot.TrimEnd([System.IO.Path]::DirectorySeparatorChar, [System.IO.Path]::AltDirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
+  return (
+    $resolvedPath.Equals($resolvedRoot, [System.StringComparison]::OrdinalIgnoreCase) -or
+    $resolvedPath.StartsWith($rootWithSeparator, [System.StringComparison]::OrdinalIgnoreCase)
+  )
+}
+
 function Add-FingerprintIntegrityErrors {
   param(
     [System.Collections.Generic.List[string]]$Errors,
@@ -171,6 +186,24 @@ function Add-FingerprintIntegrityErrors {
     -not $expectedSha.Equals($actualSha, [System.StringComparison]::OrdinalIgnoreCase)
   ) {
     Add-BlockingError -Errors $Errors -Message "$Label fingerprint mismatch"
+  }
+}
+
+function Add-ArtifactRootErrors {
+  param(
+    [System.Collections.Generic.List[string]]$Errors,
+    [object]$Fingerprint,
+    [string]$Name,
+    [string]$AllowedRoot
+  )
+
+  $resolvedPath = Get-NormalizedFingerprintPath -Path ([string]$Fingerprint.path)
+  if ([string]::IsNullOrWhiteSpace($resolvedPath)) {
+    Add-BlockingError -Errors $Errors -Message "source publication packet artifact path is missing for $Name"
+    return
+  }
+  if (-not (Test-PathUnderRoot -Path $resolvedPath -AllowedRoot $AllowedRoot)) {
+    Add-BlockingError -Errors $Errors -Message "source publication packet artifact path outside expected root for $Name"
   }
 }
 
@@ -399,6 +432,30 @@ try {
     Add-BlockingError -Errors $blockingErrors -Message "release handoff latest candidate must match publication dry-run tag"
   }
 
+  $artifactRootSpecs = @(
+    [ordered]@{ name = "release_notes"; value = $releaseNotes; root = [string]$seed.artifact_roots.release_notes },
+    [ordered]@{ name = "release_evidence_bundle"; value = $releaseEvidenceBundle; root = [string]$seed.artifact_roots.release_evidence_bundle },
+    [ordered]@{ name = "proof_manifest"; value = $proofManifest; root = [string]$seed.artifact_roots.proof_manifest },
+    [ordered]@{ name = "source_archive"; value = $sourceArchive; root = [string]$seed.artifact_roots.source_archive },
+    [ordered]@{ name = "clean_clone_or_import_proof"; value = $cleanCloneOrImportProof; root = [string]$seed.artifact_roots.clean_clone_or_import_proof },
+    [ordered]@{ name = "windows_bundle_verifier_summary"; value = Get-FingerprintObject -Container $publicationArtifactFingerprints -FieldName "windows_bundle_verifier_summary"; root = [string]$seed.artifact_roots.windows_bundle_verifier_summary }
+  )
+  foreach ($artifactRootSpec in $artifactRootSpecs) {
+    Add-ArtifactRootErrors `
+      -Errors $blockingErrors `
+      -Fingerprint $artifactRootSpec.value `
+      -Name $artifactRootSpec.name `
+      -AllowedRoot $artifactRootSpec.root
+  }
+  $publicationRulesetReport = Get-FingerprintObject -Container $publicationEvidenceBundleFingerprints -FieldName "github_ruleset_report"
+  if (Test-FingerprintField -Container $publicationEvidenceBundleFingerprints -FieldName "github_ruleset_report") {
+    Add-ArtifactRootErrors `
+      -Errors $blockingErrors `
+      -Fingerprint $publicationRulesetReport `
+      -Name "github_ruleset_report" `
+      -AllowedRoot ([string]$seed.artifact_roots.github_ruleset_report)
+  }
+
   foreach ($artifactFileSpec in @(
     [ordered]@{ name = "release_notes"; value = $releaseNotes },
     [ordered]@{ name = "release_evidence_bundle"; value = $releaseEvidenceBundle },
@@ -410,7 +467,6 @@ try {
     Add-ArtifactFileFingerprintErrors -Errors $blockingErrors -Fingerprint $artifactFileSpec.value -Name $artifactFileSpec.name
   }
 
-  $publicationRulesetReport = Get-FingerprintObject -Container $publicationEvidenceBundleFingerprints -FieldName "github_ruleset_report"
   if (Test-FingerprintField -Container $publicationEvidenceBundleFingerprints -FieldName "github_ruleset_report") {
     Add-ArtifactFileFingerprintErrors -Errors $blockingErrors -Fingerprint $publicationRulesetReport -Name "github_ruleset_report"
   }

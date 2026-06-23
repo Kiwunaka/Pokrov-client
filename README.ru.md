@@ -247,6 +247,11 @@ that the source publication packet recalculates release artifact file
 fingerprints before manual GitHub Release review; it is not tagged and does not
 ship APK/EXE binaries.
 
+Source readiness note: `v0.142.0-source` is a pending stacked PR for verifying
+that the source publication packet rejects release artifact paths outside the
+expected build output roots before manual GitHub Release review; it is not
+tagged and does not ship APK/EXE binaries.
+
 Source readiness note: `v0.53.0-source` is a pending stacked PR for Windows
 verifier CI/preflight enforcement; it is not tagged and does not ship APK/EXE
 binaries.

@@ -33,19 +33,29 @@
     "requires_publication_dry_run_carried_input_fingerprint_integrity": true,
     "requires_publication_dry_run_carried_artifact_fingerprint_integrity": true,
     "requires_publication_artifact_file_fingerprint_integrity": true,
+    "requires_publication_artifact_root_boundaries": true,
     "requires_source_only_flags": true,
     "writes_only_ignored_build_output": true
   },
   "inputs": {
     "release_handoff": "build/release-merge-handoff/release-merge-handoff.json",
-    "publication_dry_run": "build/source-release-publication/v0.141.0-source/v0.141.0-source-publication-dry-run.json"
+    "publication_dry_run": "build/source-release-publication/v0.142.0-source/v0.142.0-source-publication-dry-run.json"
   },
   "input_roots": {
     "release_handoff": "build/release-merge-handoff",
     "publication_dry_run": "build/source-release-publication"
   },
+  "artifact_roots": {
+    "release_notes": "build/source-release-preflight",
+    "release_evidence_bundle": "build/release-evidence",
+    "proof_manifest": "build/source-release-preflight",
+    "source_archive": "build/source-release-preflight",
+    "clean_clone_or_import_proof": "build/source-release-preflight",
+    "windows_bundle_verifier_summary": "build/windows-bundle-verifier",
+    "github_ruleset_report": "build/release-evidence"
+  },
   "output": {
-    "packet": "build/source-publication-packet/v0.141.0-source/source-publication-packet.json"
+    "packet": "build/source-publication-packet/v0.142.0-source/source-publication-packet.json"
   },
   "required_source_only_flags": [
     "source_only",
