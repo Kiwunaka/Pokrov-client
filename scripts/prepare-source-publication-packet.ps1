@@ -472,6 +472,36 @@ function Add-ReleaseEvidenceBundleTagErrors {
   }
 }
 
+function Add-ReleaseEvidenceBundleCommitShaErrors {
+  param(
+    [System.Collections.Generic.List[string]]$Errors,
+    [object]$Fingerprint,
+    [string]$CommitSha
+  )
+
+  $resolvedPath = Get-NormalizedFingerprintPath -Path ([string]$Fingerprint.path)
+  if (
+    [string]::IsNullOrWhiteSpace($resolvedPath) -or
+    -not (Test-Path -LiteralPath $resolvedPath -PathType Leaf)
+  ) {
+    return
+  }
+
+  try {
+    $evidenceBundlePayload = Get-Content -Raw -LiteralPath $resolvedPath | ConvertFrom-Json
+    $evidenceBundleCommitSha = [string]$evidenceBundlePayload.commit_sha
+    if (
+      [string]::IsNullOrWhiteSpace($evidenceBundleCommitSha) -or
+      [string]::IsNullOrWhiteSpace($CommitSha) -or
+      -not $evidenceBundleCommitSha.Equals($CommitSha, [System.StringComparison]::OrdinalIgnoreCase)
+    ) {
+      Add-BlockingError -Errors $Errors -Message "source publication packet release evidence bundle commit SHA mismatch"
+    }
+  } catch {
+    Add-BlockingError -Errors $Errors -Message "source publication packet release evidence bundle commit SHA mismatch"
+  }
+}
+
 function Test-ArtifactTruthyFlag {
   param(
     [object]$Payload,
@@ -929,6 +959,11 @@ try {
     -Fingerprint $releaseEvidenceBundle `
     -Tag ([string]$publicationDryRun.tag)
 
+  Add-ReleaseEvidenceBundleCommitShaErrors `
+    -Errors $blockingErrors `
+    -Fingerprint $releaseEvidenceBundle `
+    -CommitSha ([string]$publicationDryRun.commit_sha)
+
   foreach ($artifactSchemaSpec in @(
     [ordered]@{ name = "release_evidence_bundle"; value = $releaseEvidenceBundle; contract = [string]$seed.artifact_schema_contracts.release_evidence_bundle },
     [ordered]@{ name = "proof_manifest"; value = $proofManifest; contract = [string]$seed.artifact_schema_contracts.proof_manifest },
@@ -1028,7 +1063,7 @@ try {
     release_notes_required_markers = @($seed.release_notes_required_markers)
     release_notes_proof_requirements = @("publication_dry_run.tag", "publication_dry_run.source_archive_sha256")
     proof_manifest_proof_requirements = @("proof_manifest.tag", "proof_manifest.commit_sha", "proof_manifest.source_archive", "proof_manifest.source_archive_sha256", "publication_dry_run.tag", "publication_dry_run.commit_sha", "publication_dry_run.source_archive_sha256")
-    release_evidence_bundle_proof_requirements = @("release_evidence_bundle.tag", "publication_dry_run.tag")
+    release_evidence_bundle_proof_requirements = @("release_evidence_bundle.tag", "release_evidence_bundle.commit_sha", "publication_dry_run.tag", "publication_dry_run.commit_sha")
     release_handoff_publication_dry_run_input_fingerprints = $releaseHandoffPublicationInputFingerprints
     release_handoff_publication_dry_run_evidence_bundle_input_fingerprints = $releaseHandoffPublicationEvidenceBundleFingerprints
     release_handoff_publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $releaseHandoffPublicationArtifactFingerprints
