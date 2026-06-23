@@ -616,6 +616,12 @@
       "candidate": "v0.141.0-source",
       "base": "codex/v0.140-source-publication-packet-fingerprint-integrity",
       "head": "codex/v0.141-source-publication-packet-artifact-integrity"
+    },
+    {
+      "pr": 163,
+      "candidate": "v0.142.0-source",
+      "base": "codex/v0.141-source-publication-packet-artifact-integrity",
+      "head": "codex/v0.142-source-publication-packet-artifact-roots"
     }
   ]
 }

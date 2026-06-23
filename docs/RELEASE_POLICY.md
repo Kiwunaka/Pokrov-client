@@ -63,7 +63,8 @@ no-binary flags for final manual review. It rejects missing, malformed, stale,
 or too-far-future generated-at timestamps on its direct input summaries, and
 handoff-carried publication dry-run fingerprints that do not match the direct
 publication dry-run summary, or release artifact file fingerprints that no
-longer match the files on disk. It is
+longer match the files on disk. Release artifact paths must also stay under
+their expected ignored `build/` output roots. It is
 not a publisher and does not merge, tag, push, publish, or upload assets.
 
 Required checks and release gates are summarized in
