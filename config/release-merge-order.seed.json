@@ -514,6 +514,12 @@
       "candidate": "v0.124.0-source",
       "base": "codex/v0.123-tag-readiness-ready-status-consistency",
       "head": "codex/v0.124-tag-readiness-milestone-status-consistency"
+    },
+    {
+      "pr": 146,
+      "candidate": "v0.125.0-source",
+      "base": "codex/v0.124-tag-readiness-milestone-status-consistency",
+      "head": "codex/v0.125-tag-readiness-milestone-status-allowlist"
     }
   ]
 }
