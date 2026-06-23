@@ -586,6 +586,12 @@
       "candidate": "v0.136.0-source",
       "base": "codex/v0.135-validate-source-readiness-merge-order",
       "head": "codex/v0.136-validate-stack-status-required-checks"
+    },
+    {
+      "pr": 158,
+      "candidate": "v0.137.0-source",
+      "base": "codex/v0.136-validate-stack-status-required-checks",
+      "head": "codex/v0.137-validate-source-readiness-merge-coverage"
     }
   ]
 }

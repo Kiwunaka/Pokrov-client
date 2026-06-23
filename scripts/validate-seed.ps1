@@ -1745,6 +1745,9 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
   if ($sourceReadiness.policy.stacked_pr_milestones_must_match_merge_order_stack -ne $true) {
     $manifestErrors.Add("config\\source-release-readiness.seed.json must require stacked PR milestones to match release merge-order stack")
   }
+  if ($sourceReadiness.policy.stacked_pr_milestones_must_be_covered_by_merge_order_stack -ne $true) {
+    $manifestErrors.Add("config\\source-release-readiness.seed.json must require stacked PR milestones to be covered by release merge-order stack")
+  }
 
   $releaseBlockerInventoryPath = Join-Path $root "config\\release-blocker-inventory.seed.json"
   if (Test-Path -LiteralPath $releaseBlockerInventoryPath -PathType Leaf) {
@@ -1821,15 +1824,47 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
   $releaseMergeOrderPath = Join-Path $root "config\\release-merge-order.seed.json"
   if (Test-Path -LiteralPath $releaseMergeOrderPath -PathType Leaf) {
     $releaseMergeOrder = Get-Content -Raw -LiteralPath $releaseMergeOrderPath | ConvertFrom-Json
+    $releaseMergeOrderPrNumbers = [System.Collections.Generic.HashSet[int]]::new()
+    $releaseMergeOrderPrNumbersSorted = [System.Collections.Generic.List[int]]::new()
     foreach ($stackEntry in @($releaseMergeOrder.stack)) {
       $stackCandidate = [string]$stackEntry.candidate
       $stackPr = [int]$stackEntry.pr
+      [void]$releaseMergeOrderPrNumbers.Add($stackPr)
+      $releaseMergeOrderPrNumbersSorted.Add($stackPr)
       $expectedStackEvidence = "$sourceReadinessCanonicalPrPrefix$stackPr"
       $stackMilestone = $sourceReadinessMilestonesByTag[$stackCandidate]
       if ($null -eq $stackMilestone) {
         $manifestErrors.Add("config\\source-release-readiness.seed.json must include release merge-order candidate '$stackCandidate'")
       } elseif ([string]$stackMilestone.evidence -ne $expectedStackEvidence) {
         $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$stackCandidate' evidence must match release merge-order PR #$stackPr")
+      }
+    }
+    if ($releaseMergeOrderPrNumbersSorted.Count -gt 0) {
+      $releaseMergeOrderPrNumbersSorted.Sort()
+      $releaseMergeOrderFirstPr = [int]$releaseMergeOrderPrNumbersSorted[0]
+      $releaseMergeOrderLatestPr = [int]$releaseMergeOrderPrNumbersSorted[$releaseMergeOrderPrNumbersSorted.Count - 1]
+      foreach ($milestone in @($sourceReadiness.milestones)) {
+        $milestoneTag = [string]$milestone.tag
+        $milestoneStatus = [string]$milestone.status
+        $milestoneEvidence = [string]$milestone.evidence
+        if (-not $milestoneStatus.StartsWith("stacked_pr_", [System.StringComparison]::Ordinal)) {
+          continue
+        }
+        if (-not $milestoneEvidence.StartsWith($sourceReadinessCanonicalPrPrefix, [System.StringComparison]::Ordinal)) {
+          continue
+        }
+        $sourceReadinessPrSuffix = $milestoneEvidence.Substring($sourceReadinessCanonicalPrPrefix.Length)
+        $sourceReadinessPrNumber = 0
+        if (
+          ([int]::TryParse($sourceReadinessPrSuffix, [ref]$sourceReadinessPrNumber) -ne $true) -or
+          $sourceReadinessPrNumber -lt $releaseMergeOrderFirstPr -or
+          $sourceReadinessPrNumber -gt $releaseMergeOrderLatestPr
+        ) {
+          continue
+        }
+        if (-not $releaseMergeOrderPrNumbers.Contains($sourceReadinessPrNumber)) {
+          $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$milestoneTag' stacked PR must be covered by release merge-order stack")
+        }
       }
     }
   }

@@ -54,6 +54,12 @@ def test_source_release_readiness_milestones_are_source_only() -> None:
         readiness["policy"]["stacked_pr_milestones_must_match_merge_order_stack"]
         is True
     )
+    assert (
+        readiness["policy"][
+            "stacked_pr_milestones_must_be_covered_by_merge_order_stack"
+        ]
+        is True
+    )
     assert len(milestones) >= 50
     tags = [milestone["tag"] for milestone in milestones]
     assert len(tags) == len(set(tags))
@@ -233,7 +239,7 @@ def test_validate_seed_blocks_latest_source_readiness_evidence_mismatch() -> Non
         ]["latest_candidate"]
         for milestone in readiness["milestones"]:
             if milestone["tag"] == latest_candidate:
-                milestone["evidence"] = "https://github.com/example/fork/pull/157"
+                milestone["evidence"] = "https://github.com/example/fork/pull/158"
                 break
         _write_json(readiness_path, readiness)
 
@@ -433,6 +439,46 @@ def test_validate_seed_blocks_source_readiness_merge_order_evidence_mismatch() -
     )
 
 
+def test_validate_seed_blocks_source_readiness_missing_merge_order_coverage() -> None:
+    merge_order_path = ROOT / "config" / "release-merge-order.seed.json"
+    snapshots = _snapshot_files([merge_order_path])
+
+    try:
+        merge_order = json.loads(merge_order_path.read_text(encoding="utf-8"))
+        stack = merge_order["stack"]
+        removed_index = next(
+            index
+            for index, entry in enumerate(stack)
+            if entry["candidate"] == "v0.90.0-source"
+        )
+        if removed_index + 1 < len(stack):
+            stack[removed_index + 1]["base"] = stack[removed_index]["base"]
+        stack.pop(removed_index)
+        _write_json(merge_order_path, merge_order)
+
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "validate-seed.ps1"),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    finally:
+        _restore_files(snapshots)
+
+    assert result.returncode != 0
+    assert (
+        "source-release-readiness.seed.json milestone 'v0.90.0-source' stacked PR must be covered by release merge-order stack"
+        in result.stdout + result.stderr
+    )
+
+
 def test_validate_seed_knows_latest_source_readiness_consistency() -> None:
     validator = (ROOT / "scripts" / "validate-seed.ps1").read_text(encoding="utf-8")
 
@@ -449,3 +495,5 @@ def test_validate_seed_knows_latest_source_readiness_consistency() -> None:
     assert "stacked PR evidence PR number must increase" in validator
     assert "stacked_pr_milestones_must_match_merge_order_stack" in validator
     assert "evidence must match release merge-order PR" in validator
+    assert "stacked_pr_milestones_must_be_covered_by_merge_order_stack" in validator
+    assert "stacked PR must be covered by release merge-order stack" in validator
