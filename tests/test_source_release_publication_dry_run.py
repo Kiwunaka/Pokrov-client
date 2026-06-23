@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import hashlib
 import subprocess
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -30,6 +31,22 @@ def _read_json(relative_path: str) -> dict:
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _fresh_ruleset_checked_at() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _stale_ruleset_checked_at() -> str:
+    return (
+        datetime.now(timezone.utc) - timedelta(hours=48)
+    ).isoformat().replace("+00:00", "Z")
+
+
+def _with_ruleset_checked_at(payload: dict[str, object]) -> dict[str, object]:
+    enriched = dict(payload)
+    enriched.setdefault("checked_at", _fresh_ruleset_checked_at())
+    return enriched
 
 
 def _write_preflight_fixture(tmp_path: Path) -> Path:
@@ -98,6 +115,14 @@ def test_publication_dry_run_seed_defines_no_publish_policy() -> None:
         is True
     )
     assert (
+        seed["policy"]["requires_evidence_bundle_ruleset_report_checked_at"]
+        is True
+    )
+    assert (
+        seed["policy"]["requires_evidence_bundle_ruleset_report_freshness"]
+        is True
+    )
+    assert (
         seed["policy"]["requires_evidence_bundle_ruleset_report_check_entry_shape"]
         is True
     )
@@ -151,6 +176,8 @@ def test_publication_dry_run_script_is_local_only() -> None:
         "ruleset report without schema_version 1",
         "ruleset report that is not read-only",
         "ruleset report without ok status",
+        "ruleset report without checked_at timestamp",
+        "stale ruleset report checked_at timestamp",
         "ruleset report repository mismatch",
         "ruleset report branch mismatch",
         "ruleset report ok status without checks",
@@ -527,6 +554,7 @@ def test_publication_dry_run_rejects_stale_github_ruleset_report_input_fingerpri
                 "schema_version": 1,
                 "ok": True,
                 "read_only": True,
+                "checked_at": _fresh_ruleset_checked_at(),
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,
@@ -631,6 +659,29 @@ def test_publication_dry_run_rejects_stale_github_ruleset_report_input_fingerpri
         (
             {"schema_version": 1, "read_only": True},
             "ruleset report without ok status",
+        ),
+        (
+            {
+                "schema_version": 1,
+                "ok": True,
+                "read_only": True,
+                "repository": "Kiwunaka/Pokrov-client",
+                "branch": "main",
+                "required_status_checks": REQUIRED_STATUS_CHECKS,
+            },
+            "ruleset report without checked_at timestamp",
+        ),
+        (
+            {
+                "schema_version": 1,
+                "ok": True,
+                "read_only": True,
+                "checked_at": _stale_ruleset_checked_at(),
+                "repository": "Kiwunaka/Pokrov-client",
+                "branch": "main",
+                "required_status_checks": REQUIRED_STATUS_CHECKS,
+            },
+            "stale ruleset report checked_at timestamp",
         ),
     ],
 )
@@ -739,6 +790,7 @@ def test_publication_dry_run_rejects_malformed_github_ruleset_report(
                 "schema_version": 1,
                 "ok": True,
                 "read_only": True,
+                "checked_at": _fresh_ruleset_checked_at(),
                 "repository": "example/fork",
                 "branch": "main",
             },
@@ -749,6 +801,7 @@ def test_publication_dry_run_rejects_malformed_github_ruleset_report(
                 "schema_version": 1,
                 "ok": True,
                 "read_only": True,
+                "checked_at": _fresh_ruleset_checked_at(),
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "release",
             },
@@ -861,6 +914,7 @@ def test_publication_dry_run_rejects_wrong_github_ruleset_report_target(
                 "schema_version": 1,
                 "ok": True,
                 "read_only": True,
+                "checked_at": _fresh_ruleset_checked_at(),
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,
@@ -873,6 +927,7 @@ def test_publication_dry_run_rejects_wrong_github_ruleset_report_target(
                 "schema_version": 1,
                 "ok": True,
                 "read_only": True,
+                "checked_at": _fresh_ruleset_checked_at(),
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,
@@ -886,6 +941,7 @@ def test_publication_dry_run_rejects_wrong_github_ruleset_report_target(
                 "schema_version": 1,
                 "ok": True,
                 "read_only": True,
+                "checked_at": _fresh_ruleset_checked_at(),
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,
@@ -1024,6 +1080,7 @@ def test_publication_dry_run_rejects_github_ruleset_report_required_status_check
                 "schema_version": 1,
                 "ok": True,
                 "read_only": True,
+                "checked_at": _fresh_ruleset_checked_at(),
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": required_status_checks,
@@ -1135,6 +1192,7 @@ def test_publication_dry_run_rejects_github_ruleset_report_covered_required_stat
                 "schema_version": 1,
                 "ok": True,
                 "read_only": True,
+                "checked_at": _fresh_ruleset_checked_at(),
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,

@@ -28,6 +28,8 @@
     "requires_evidence_bundle_ruleset_report_shape": true,
     "requires_evidence_bundle_ruleset_report_target": true,
     "requires_evidence_bundle_ruleset_report_ok_consistency": true,
+    "requires_evidence_bundle_ruleset_report_checked_at": true,
+    "requires_evidence_bundle_ruleset_report_freshness": true,
     "requires_evidence_bundle_ruleset_report_check_entry_shape": true,
     "requires_evidence_bundle_ruleset_report_required_status_checks": true,
     "requires_evidence_bundle_ruleset_report_covered_required_status_checks": true

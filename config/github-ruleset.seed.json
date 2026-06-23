@@ -24,6 +24,7 @@
     "verifier_is_read_only": true,
     "verifier_report_only_supported": true,
     "verifier_not_required_in_ci_until_remote_settings_exist": true,
+    "verifier_reports_checked_at": true,
     "verifier_reports_covered_required_status_checks": true
   },
   "manual_verification_required": [

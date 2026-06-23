@@ -273,8 +273,11 @@ production readiness without matching public evidence.
   release evidence, publication dry-run, and release merge handoff require
   `covered_required_status_checks` to match the canonical CI job list when a
   verifier report claims `ok: true`.
+- Added GitHub ruleset report freshness validation so release evidence,
+  publication dry-run, and release merge handoff reject verifier reports without
+  a fresh `checked_at` timestamp before carrying enforcement claims.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.118.0-source` candidates.
+  `v0.119.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -398,6 +401,7 @@ production readiness without matching public evidence.
 | `v0.116.0-source` | Pending stacked PR, not tagged | PR #137 |
 | `v0.117.0-source` | Pending stacked PR, not tagged | PR #138 |
 | `v0.118.0-source` | Pending stacked PR, not tagged | PR #139 |
+| `v0.119.0-source` | Pending stacked PR, not tagged | PR #140 |
 
 ### Still Source-Only
 

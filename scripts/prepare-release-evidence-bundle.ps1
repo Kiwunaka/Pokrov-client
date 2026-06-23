@@ -16,6 +16,8 @@ $root = Split-Path -Parent $PSScriptRoot
 $defaultOutputDir = "build\release-evidence"
 $expectedRulesetRepository = "Kiwunaka/Pokrov-client"
 $expectedRulesetBranch = "main"
+$rulesetReportMaxAgeHours = 24
+$rulesetReportFutureSkewMinutes = 5
 
 function Get-RequiredStatusChecks {
   $requiredChecksPath = Join-Path $root "config\required-checks.seed.json"
@@ -172,6 +174,23 @@ function Assert-RulesetReportShape {
 
   if ($null -eq $Report.PSObject.Properties["ok"]) {
     throw "Release evidence refused ruleset report without ok status."
+  }
+
+  $checkedAtText = [string]$Report.checked_at
+  $checkedAt = [datetimeoffset]::MinValue
+  if (
+    [string]::IsNullOrWhiteSpace($checkedAtText) -or
+    -not [datetimeoffset]::TryParse($checkedAtText, [ref]$checkedAt)
+  ) {
+    throw "Release evidence refused ruleset report without checked_at timestamp."
+  }
+  $checkedAtUtc = $checkedAt.ToUniversalTime()
+  $age = [datetimeoffset]::UtcNow - $checkedAtUtc
+  if (
+    $age.TotalHours -gt $rulesetReportMaxAgeHours -or
+    $age.TotalMinutes -lt (-1 * $rulesetReportFutureSkewMinutes)
+  ) {
+    throw "Release evidence refused stale ruleset report checked_at timestamp."
   }
 
   if ([string]$Report.repository -ne $expectedRulesetRepository) {

@@ -35,6 +35,7 @@ def test_github_ruleset_seed_defines_manual_enforcement_contract() -> None:
     assert seed["policy"]["verifier_is_read_only"] is True
     assert seed["policy"]["verifier_report_only_supported"] is True
     assert seed["policy"]["verifier_not_required_in_ci_until_remote_settings_exist"] is True
+    assert seed["policy"]["verifier_reports_checked_at"] is True
     assert seed["policy"]["verifier_reports_covered_required_status_checks"] is True
 
 
@@ -88,6 +89,7 @@ def test_github_ruleset_verifier_script_is_read_only() -> None:
         "gh api",
         "ReportOnly",
         "read_only",
+        "checked_at",
         "required_status_checks",
         "covered_required_status_checks",
         "coveredRequiredChecks",
@@ -122,6 +124,7 @@ def test_validate_seed_knows_github_ruleset_setup() -> None:
     assert "scripts\\\\check-github-ruleset.ps1" in validator
     assert "GITHUB_RULESET_SETUP.md" in validator
     assert "required_status_checks" in validator
+    assert "verifier_reports_checked_at" in validator
     assert "covered_required_status_checks" in validator
     assert "remote_enforcement_not_claimed" in validator
     assert "verifier_is_read_only" in validator
