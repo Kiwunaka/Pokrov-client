@@ -388,6 +388,7 @@ function Add-ProofManifestSourceArchiveShaErrors {
   param(
     [System.Collections.Generic.List[string]]$Errors,
     [object]$Fingerprint,
+    [string]$Tag,
     [string]$CommitSha,
     [string]$SourceArchiveSha256,
     [string]$SourceArchivePath
@@ -403,10 +404,18 @@ function Add-ProofManifestSourceArchiveShaErrors {
 
   try {
     $proofManifestPayload = Get-Content -Raw -LiteralPath $resolvedPath | ConvertFrom-Json
+    $proofManifestTag = [string]$proofManifestPayload.tag
     $proofManifestCommitSha = [string]$proofManifestPayload.commit_sha
     $proofManifestSourceArchiveSha256 = [string]$proofManifestPayload.source_archive_sha256
     $proofManifestSourceArchiveName = [string]$proofManifestPayload.source_archive
     $sourceArchiveName = [System.IO.Path]::GetFileName((Get-NormalizedFingerprintPath -Path $SourceArchivePath))
+    if (
+      [string]::IsNullOrWhiteSpace($proofManifestTag) -or
+      [string]::IsNullOrWhiteSpace($Tag) -or
+      -not $proofManifestTag.Equals($Tag, [System.StringComparison]::OrdinalIgnoreCase)
+    ) {
+      Add-BlockingError -Errors $Errors -Message "source publication packet proof manifest tag mismatch"
+    }
     if (
       [string]::IsNullOrWhiteSpace($proofManifestCommitSha) -or
       [string]::IsNullOrWhiteSpace($CommitSha) -or
@@ -880,6 +889,7 @@ try {
   Add-ProofManifestSourceArchiveShaErrors `
     -Errors $blockingErrors `
     -Fingerprint $proofManifest `
+    -Tag ([string]$publicationDryRun.tag) `
     -CommitSha ([string]$publicationDryRun.commit_sha) `
     -SourceArchiveSha256 ([string]$publicationDryRun.source_archive_sha256) `
     -SourceArchivePath ([string]$sourceArchive.path)
@@ -982,7 +992,7 @@ try {
     artifact_schema_contracts = $seed.artifact_schema_contracts
     release_notes_required_markers = @($seed.release_notes_required_markers)
     release_notes_proof_requirements = @("publication_dry_run.tag", "publication_dry_run.source_archive_sha256")
-    proof_manifest_proof_requirements = @("proof_manifest.commit_sha", "proof_manifest.source_archive", "proof_manifest.source_archive_sha256", "publication_dry_run.commit_sha", "publication_dry_run.source_archive_sha256")
+    proof_manifest_proof_requirements = @("proof_manifest.tag", "proof_manifest.commit_sha", "proof_manifest.source_archive", "proof_manifest.source_archive_sha256", "publication_dry_run.tag", "publication_dry_run.commit_sha", "publication_dry_run.source_archive_sha256")
     release_handoff_publication_dry_run_input_fingerprints = $releaseHandoffPublicationInputFingerprints
     release_handoff_publication_dry_run_evidence_bundle_input_fingerprints = $releaseHandoffPublicationEvidenceBundleFingerprints
     release_handoff_publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $releaseHandoffPublicationArtifactFingerprints

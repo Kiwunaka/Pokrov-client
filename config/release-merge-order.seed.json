@@ -676,6 +676,12 @@
       "candidate": "v0.151.0-source",
       "base": "codex/v0.150-source-publication-packet-proof-archive-name",
       "head": "codex/v0.151-source-publication-packet-proof-commit-sha"
+    },
+    {
+      "pr": 173,
+      "candidate": "v0.152.0-source",
+      "base": "codex/v0.151-source-publication-packet-proof-commit-sha",
+      "head": "codex/v0.152-source-publication-packet-proof-tag"
     }
   ]
 }
