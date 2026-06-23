@@ -430,6 +430,12 @@
       "candidate": "v0.110.0-source",
       "base": "codex/v0.109-ruleset-report-input-fingerprints",
       "head": "codex/v0.110-ruleset-report-shape-guard"
+    },
+    {
+      "pr": 132,
+      "candidate": "v0.111.0-source",
+      "base": "codex/v0.110-ruleset-report-shape-guard",
+      "head": "codex/v0.111-publication-ruleset-report-shape"
     }
   ]
 }
