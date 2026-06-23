@@ -364,8 +364,11 @@ production readiness without matching public evidence.
 - Added source publication packet proof-manifest tag checks so manual GitHub
   Release review is blocked when the proof manifest points at a different
   source tag than the selected publication dry-run.
+- Added source publication packet release-evidence tag checks so manual GitHub
+  Release review is blocked when the evidence bundle points at a different
+  source tag than the selected publication dry-run.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.152.0-source` candidates.
+  `v0.153.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -523,6 +526,7 @@ production readiness without matching public evidence.
 | `v0.150.0-source` | Pending stacked PR, not tagged | PR #171 |
 | `v0.151.0-source` | Pending stacked PR, not tagged | PR #172 |
 | `v0.152.0-source` | Pending stacked PR, not tagged | PR #173 |
+| `v0.153.0-source` | Pending stacked PR, not tagged | PR #174 |
 
 ### Still Source-Only
 
