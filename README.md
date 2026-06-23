@@ -199,6 +199,7 @@ Source release status:
 | `v0.137.0-source` | Pending stacked PR, not tagged | Seed validation requires active-range source-readiness stacked PR milestones to be covered by the release merge-order stack. |
 | `v0.138.0-source` | Pending stacked PR, not tagged | Source publication packet consolidates release handoff, publication dry-run, source proof artifacts, and source-only flags for manual GitHub Release review. |
 | `v0.139.0-source` | Pending stacked PR, not tagged | Source publication packet validates release handoff and publication dry-run generated_at timestamps before manual GitHub Release review. |
+| `v0.140.0-source` | Pending stacked PR, not tagged | Source publication packet validates handoff-carried publication dry-run fingerprints against the direct dry-run summary before manual release review. |
 
 ## Which App Should I Use?
 

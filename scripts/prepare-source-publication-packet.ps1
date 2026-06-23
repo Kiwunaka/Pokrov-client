@@ -121,6 +121,59 @@ function Get-FingerprintObject {
   }
 }
 
+function Test-FingerprintField {
+  param(
+    [object]$Container,
+    [string]$FieldName
+  )
+
+  return ($null -ne $Container -and $null -ne $Container.PSObject.Properties[$FieldName])
+}
+
+function Get-NormalizedFingerprintPath {
+  param([string]$Path)
+
+  if ([string]::IsNullOrWhiteSpace($Path)) {
+    return ""
+  }
+  return [System.IO.Path]::GetFullPath((Resolve-RepoPath -Path $Path))
+}
+
+function Add-FingerprintIntegrityErrors {
+  param(
+    [System.Collections.Generic.List[string]]$Errors,
+    [object]$Expected,
+    [object]$Actual,
+    [string]$Label
+  )
+
+  $expectedPath = Get-NormalizedFingerprintPath -Path ([string]$Expected.path)
+  $actualPath = Get-NormalizedFingerprintPath -Path ([string]$Actual.path)
+  $expectedSha = [string]$Expected.sha256
+  $actualSha = [string]$Actual.sha256
+
+  if (
+    [string]::IsNullOrWhiteSpace($expectedPath) -or
+    [string]::IsNullOrWhiteSpace($expectedSha)
+  ) {
+    Add-BlockingError -Errors $Errors -Message "$Label fingerprint is missing path or sha256"
+    return
+  }
+  if (
+    [string]::IsNullOrWhiteSpace($actualPath) -or
+    [string]::IsNullOrWhiteSpace($actualSha)
+  ) {
+    Add-BlockingError -Errors $Errors -Message "$Label comparison fingerprint is missing path or sha256"
+    return
+  }
+  if (
+    -not $expectedPath.Equals($actualPath, [System.StringComparison]::OrdinalIgnoreCase) -or
+    -not $expectedSha.Equals($actualSha, [System.StringComparison]::OrdinalIgnoreCase)
+  ) {
+    Add-BlockingError -Errors $Errors -Message "$Label fingerprint mismatch"
+  }
+}
+
 function Add-InputGeneratedAtErrors {
   param(
     [System.Collections.Generic.List[string]]$Errors,
@@ -217,6 +270,59 @@ try {
     Add-BlockingError -Errors $blockingErrors -Message "publication dry-run summary is missing evidence bundle input fingerprints"
   }
 
+  $releaseHandoffInputFingerprints = $releaseHandoff.PSObject.Properties["input_fingerprints"].Value
+  if ($null -eq $releaseHandoffInputFingerprints) {
+    Add-BlockingError -Errors $blockingErrors -Message "release handoff summary is missing input_fingerprints"
+  }
+  $releaseHandoffPublicationInputFingerprints = $releaseHandoff.PSObject.Properties["publication_dry_run_input_fingerprints"].Value
+  if ($null -eq $releaseHandoffPublicationInputFingerprints) {
+    Add-BlockingError -Errors $blockingErrors -Message "release handoff summary is missing publication_dry_run_input_fingerprints"
+  }
+  $releaseHandoffPublicationEvidenceBundleFingerprints = $releaseHandoff.PSObject.Properties["publication_dry_run_evidence_bundle_input_fingerprints"].Value
+  if ($null -eq $releaseHandoffPublicationEvidenceBundleFingerprints) {
+    Add-BlockingError -Errors $blockingErrors -Message "release handoff summary is missing publication_dry_run_evidence_bundle_input_fingerprints"
+  }
+  $releaseHandoffPublicationArtifactFingerprints = $releaseHandoff.PSObject.Properties["publication_dry_run_evidence_bundle_preflight_artifact_fingerprints"].Value
+  if ($null -eq $releaseHandoffPublicationArtifactFingerprints) {
+    Add-BlockingError -Errors $blockingErrors -Message "release handoff summary is missing publication_dry_run_evidence_bundle_preflight_artifact_fingerprints"
+  }
+
+  $publicationDryRunActualFingerprint = Get-InputFingerprint -Path $publicationDryRunPath
+  Add-FingerprintIntegrityErrors `
+    -Errors $blockingErrors `
+    -Expected (Get-FingerprintObject -Container $releaseHandoffInputFingerprints -FieldName "publication_dry_run") `
+    -Actual $publicationDryRunActualFingerprint `
+    -Label "release handoff publication dry-run input"
+
+  foreach ($fieldName in @("evidence_bundle", "release_notes")) {
+    Add-FingerprintIntegrityErrors `
+      -Errors $blockingErrors `
+      -Expected (Get-FingerprintObject -Container $releaseHandoffPublicationInputFingerprints -FieldName $fieldName) `
+      -Actual (Get-FingerprintObject -Container $publicationInputFingerprints -FieldName $fieldName) `
+      -Label "handoff-carried publication dry-run $fieldName input"
+  }
+
+  foreach ($fieldName in @("preflight_summary", "github_ruleset_report")) {
+    $handoffHasField = Test-FingerprintField -Container $releaseHandoffPublicationEvidenceBundleFingerprints -FieldName $fieldName
+    $publicationHasField = Test-FingerprintField -Container $publicationEvidenceBundleFingerprints -FieldName $fieldName
+    if ($fieldName -eq "github_ruleset_report" -and -not $handoffHasField -and -not $publicationHasField) {
+      continue
+    }
+    Add-FingerprintIntegrityErrors `
+      -Errors $blockingErrors `
+      -Expected (Get-FingerprintObject -Container $releaseHandoffPublicationEvidenceBundleFingerprints -FieldName $fieldName) `
+      -Actual (Get-FingerprintObject -Container $publicationEvidenceBundleFingerprints -FieldName $fieldName) `
+      -Label "handoff-carried publication dry-run $fieldName evidence input"
+  }
+
+  foreach ($fieldName in @("proof_manifest", "release_notes", "source_archive", "windows_bundle_verifier_summary")) {
+    Add-FingerprintIntegrityErrors `
+      -Errors $blockingErrors `
+      -Expected (Get-FingerprintObject -Container $releaseHandoffPublicationArtifactFingerprints -FieldName $fieldName) `
+      -Actual (Get-FingerprintObject -Container $publicationArtifactFingerprints -FieldName $fieldName) `
+      -Label "handoff-carried publication dry-run $fieldName artifact"
+  }
+
   $releaseNotes = Get-FingerprintObject -Container $publicationInputFingerprints -FieldName "release_notes"
   $releaseEvidenceBundle = Get-FingerprintObject -Container $publicationInputFingerprints -FieldName "evidence_bundle"
   $proofManifest = Get-FingerprintObject -Container $publicationArtifactFingerprints -FieldName "proof_manifest"
@@ -299,7 +405,7 @@ try {
     windows_bundle_verifier_summary = [string]$publicationDryRun.windows_bundle_verifier_summary
     input_fingerprints = [ordered]@{
       release_handoff = Get-InputFingerprint -Path $releaseHandoffPath
-      publication_dry_run = Get-InputFingerprint -Path $publicationDryRunPath
+      publication_dry_run = $publicationDryRunActualFingerprint
     }
     input_generated_at = [ordered]@{
       release_handoff = [string]$releaseHandoff.generated_at
@@ -308,6 +414,9 @@ try {
     publication_dry_run_input_fingerprints = $publicationInputFingerprints
     publication_dry_run_evidence_bundle_input_fingerprints = $publicationEvidenceBundleFingerprints
     publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $publicationArtifactFingerprints
+    release_handoff_publication_dry_run_input_fingerprints = $releaseHandoffPublicationInputFingerprints
+    release_handoff_publication_dry_run_evidence_bundle_input_fingerprints = $releaseHandoffPublicationEvidenceBundleFingerprints
+    release_handoff_publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $releaseHandoffPublicationArtifactFingerprints
     blocking_error_count = [int]$blockingErrors.Count
     blocking_errors = @($blockingErrors)
     next_manual_steps = @(

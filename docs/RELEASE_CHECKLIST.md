@@ -75,7 +75,9 @@ Use this checklist before publishing a public source or binary release.
   proof manifest, source archive, release evidence bundle, clean-clone/import
   proof, input SHA-256 fingerprints, and explicit source-only no-binary flags
   for manual GitHub Release review. It also rejects missing, malformed, stale,
-  or too-far-future generated-at timestamps on its direct input summaries. It
+  or too-far-future generated-at timestamps on its direct input summaries, and
+  handoff-carried publication dry-run fingerprints that do not match the direct
+  publication dry-run summary. It
   does not merge, tag, push, publish, or upload anything.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\verify-windows-bundle.ps1`
   runs the Windows bundle verifier and writes source-only Windows bundle proof

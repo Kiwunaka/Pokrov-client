@@ -29,19 +29,22 @@
     "requires_input_generated_at": true,
     "requires_input_generated_at_parseable": true,
     "requires_input_generated_at_freshness": true,
+    "requires_release_handoff_publication_dry_run_input_fingerprint_integrity": true,
+    "requires_publication_dry_run_carried_input_fingerprint_integrity": true,
+    "requires_publication_dry_run_carried_artifact_fingerprint_integrity": true,
     "requires_source_only_flags": true,
     "writes_only_ignored_build_output": true
   },
   "inputs": {
     "release_handoff": "build/release-merge-handoff/release-merge-handoff.json",
-    "publication_dry_run": "build/source-release-publication/v0.139.0-source/v0.139.0-source-publication-dry-run.json"
+    "publication_dry_run": "build/source-release-publication/v0.140.0-source/v0.140.0-source-publication-dry-run.json"
   },
   "input_roots": {
     "release_handoff": "build/release-merge-handoff",
     "publication_dry_run": "build/source-release-publication"
   },
   "output": {
-    "packet": "build/source-publication-packet/v0.139.0-source/source-publication-packet.json"
+    "packet": "build/source-publication-packet/v0.140.0-source/source-publication-packet.json"
   },
   "required_source_only_flags": [
     "source_only",
