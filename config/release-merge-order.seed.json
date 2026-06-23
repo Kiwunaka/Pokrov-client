@@ -550,6 +550,12 @@
       "candidate": "v0.130.0-source",
       "base": "codex/v0.129-validate-merge-order-latest-candidate",
       "head": "codex/v0.130-validate-blocker-covered-range"
+    },
+    {
+      "pr": 152,
+      "candidate": "v0.131.0-source",
+      "base": "codex/v0.130-validate-blocker-covered-range",
+      "head": "codex/v0.131-validate-source-readiness-unique-tags"
     }
   ]
 }

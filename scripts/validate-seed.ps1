@@ -1723,6 +1723,9 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
   if ($sourceReadiness.policy.source_only_milestones_must_not_claim_binaries -ne $true) {
     $manifestErrors.Add("config\\source-release-readiness.seed.json must enforce source-only binary claim boundaries")
   }
+  if ($sourceReadiness.policy.milestone_tags_must_be_unique -ne $true) {
+    $manifestErrors.Add("config\\source-release-readiness.seed.json must require unique milestone tags")
+  }
 
   $releaseBlockerInventoryPath = Join-Path $root "config\\release-blocker-inventory.seed.json"
   if (Test-Path -LiteralPath $releaseBlockerInventoryPath -PathType Leaf) {
@@ -1744,17 +1747,22 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
     }
   }
 
+  $sourceReadinessTags = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
   foreach ($milestone in @($sourceReadiness.milestones)) {
+    $milestoneTag = [string]$milestone.tag
+    if (-not $sourceReadinessTags.Add($milestoneTag)) {
+      $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$milestoneTag' tag must be unique")
+    }
     if ($milestone.source_only -ne $true) {
-      $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$($milestone.tag)' must be source_only")
+      $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$milestoneTag' must be source_only")
     }
     foreach ($field in @("ships_apk", "ships_exe", "store_release", "trusted_signing_claim")) {
       if ($milestone.$field -ne $false) {
-        $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$($milestone.tag)' must keep $field false")
+        $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$milestoneTag' must keep $field false")
       }
     }
     if ($milestone.status -ne "tagged" -and $milestone.status -notmatch "not_tagged") {
-      $manifestErrors.Add("config\\source-release-readiness.seed.json pending milestone '$($milestone.tag)' must include not_tagged in status")
+      $manifestErrors.Add("config\\source-release-readiness.seed.json pending milestone '$milestoneTag' must include not_tagged in status")
     }
   }
 }
