@@ -186,6 +186,12 @@ function Assert-RulesetReportShape {
       throw "Release evidence refused ruleset report ok status without checks."
     }
     foreach ($check in $checks) {
+      if (
+        [string]::IsNullOrWhiteSpace([string]$check.name) -or
+        [string]::IsNullOrWhiteSpace([string]$check.status)
+      ) {
+        throw "Release evidence refused ruleset report check entry shape mismatch."
+      }
       if ([string]$check.status -ne "pass") {
         throw "Release evidence refused ruleset report ok status with failed checks."
       }

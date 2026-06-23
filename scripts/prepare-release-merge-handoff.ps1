@@ -58,7 +58,8 @@ function Assert-InputFingerprintIntegrity {
     [string]$RulesetReportRepositoryErrorMessage = "",
     [string]$RulesetReportBranchErrorMessage = "",
     [string]$RulesetReportOkMissingChecksErrorMessage = "",
-    [string]$RulesetReportOkFailedChecksErrorMessage = ""
+    [string]$RulesetReportOkFailedChecksErrorMessage = "",
+    [string]$RulesetReportCheckEntryShapeErrorMessage = ""
   )
 
   $resolvedFingerprintPath = [System.IO.Path]::GetFullPath((Resolve-RepoPath -Path ([string]$Fingerprint.path)))
@@ -80,7 +81,8 @@ function Assert-InputFingerprintIntegrity {
     -not [string]::IsNullOrWhiteSpace($RulesetReportRepositoryErrorMessage) -or
     -not [string]::IsNullOrWhiteSpace($RulesetReportBranchErrorMessage) -or
     -not [string]::IsNullOrWhiteSpace($RulesetReportOkMissingChecksErrorMessage) -or
-    -not [string]::IsNullOrWhiteSpace($RulesetReportOkFailedChecksErrorMessage)
+    -not [string]::IsNullOrWhiteSpace($RulesetReportOkFailedChecksErrorMessage) -or
+    -not [string]::IsNullOrWhiteSpace($RulesetReportCheckEntryShapeErrorMessage)
   ) {
     $rulesetReport = Get-Content -Raw -LiteralPath $resolvedFingerprintPath | ConvertFrom-Json
     if ([int]$rulesetReport.schema_version -ne 1) {
@@ -108,6 +110,13 @@ function Assert-InputFingerprintIntegrity {
         $BlockingErrors.Add($RulesetReportOkMissingChecksErrorMessage)
       } else {
         foreach ($check in $rulesetChecks) {
+          if (
+            [string]::IsNullOrWhiteSpace([string]$check.name) -or
+            [string]::IsNullOrWhiteSpace([string]$check.status)
+          ) {
+            $BlockingErrors.Add($RulesetReportCheckEntryShapeErrorMessage)
+            break
+          }
           if ([string]$check.status -ne "pass") {
             $BlockingErrors.Add($RulesetReportOkFailedChecksErrorMessage)
             break
@@ -418,6 +427,7 @@ try {
       -RulesetReportBranchErrorMessage "publication dry-run ruleset report branch mismatch" `
       -RulesetReportOkMissingChecksErrorMessage "publication dry-run ruleset report ok status without checks" `
       -RulesetReportOkFailedChecksErrorMessage "publication dry-run ruleset report ok status with failed checks" `
+      -RulesetReportCheckEntryShapeErrorMessage "publication dry-run ruleset report check entry shape mismatch" `
       -BlockingErrors $blockingErrors
   } elseif (
     $publicationDryRun.github_enforcement_claim_allowed -eq $true -or

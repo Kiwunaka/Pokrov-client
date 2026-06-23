@@ -454,6 +454,12 @@
       "candidate": "v0.114.0-source",
       "base": "codex/v0.113-ruleset-report-target-guard",
       "head": "codex/v0.114-ruleset-report-ok-consistency"
+    },
+    {
+      "pr": 136,
+      "candidate": "v0.115.0-source",
+      "base": "codex/v0.114-ruleset-report-ok-consistency",
+      "head": "codex/v0.115-ruleset-report-check-shape"
     }
   ]
 }

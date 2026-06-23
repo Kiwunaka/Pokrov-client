@@ -130,6 +130,12 @@ function Assert-RulesetReportInputFingerprintIntegrity {
       throw "Publication dry-run refused ruleset report ok status without checks."
     }
     foreach ($check in $rulesetChecks) {
+      if (
+        [string]::IsNullOrWhiteSpace([string]$check.name) -or
+        [string]::IsNullOrWhiteSpace([string]$check.status)
+      ) {
+        throw "Publication dry-run refused ruleset report check entry shape mismatch."
+      }
       if ([string]$check.status -ne "pass") {
         throw "Publication dry-run refused ruleset report ok status with failed checks."
       }
