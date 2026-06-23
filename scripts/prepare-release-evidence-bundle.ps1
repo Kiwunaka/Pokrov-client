@@ -14,6 +14,8 @@ param(
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $defaultOutputDir = "build\release-evidence"
+$expectedRulesetRepository = "Kiwunaka/Pokrov-client"
+$expectedRulesetBranch = "main"
 
 function Resolve-RepoPath {
   param([Parameter(Mandatory = $true)][string]$Path)
@@ -164,6 +166,14 @@ function Assert-RulesetReportShape {
 
   if ($null -eq $Report.PSObject.Properties["ok"]) {
     throw "Release evidence refused ruleset report without ok status."
+  }
+
+  if ([string]$Report.repository -ne $expectedRulesetRepository) {
+    throw "Release evidence refused ruleset report repository mismatch."
+  }
+
+  if ([string]$Report.branch -ne $expectedRulesetBranch) {
+    throw "Release evidence refused ruleset report branch mismatch."
   }
 }
 

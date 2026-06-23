@@ -442,6 +442,12 @@
       "candidate": "v0.112.0-source",
       "base": "codex/v0.111-publication-ruleset-report-shape",
       "head": "codex/v0.112-handoff-ruleset-report-shape"
+    },
+    {
+      "pr": 134,
+      "candidate": "v0.113.0-source",
+      "base": "codex/v0.112-handoff-ruleset-report-shape",
+      "head": "codex/v0.113-ruleset-report-target-guard"
     }
   ]
 }

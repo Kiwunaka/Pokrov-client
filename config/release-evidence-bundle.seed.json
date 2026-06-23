@@ -21,7 +21,8 @@
     "requires_preflight_artifact_fingerprint_integrity": true,
     "requires_preflight_commit_sha_consistency": true,
     "requires_preflight_ref_commit_sha_consistency": true,
-    "requires_ruleset_report_shape": true
+    "requires_ruleset_report_shape": true,
+    "requires_ruleset_report_target": true
   },
   "required_summary_flags": [
     "source_only",
