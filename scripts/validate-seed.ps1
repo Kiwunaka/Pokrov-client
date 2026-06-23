@@ -1357,6 +1357,21 @@ if (Test-Path -LiteralPath $releaseMergeOrderPath -PathType Leaf) {
   if ($stack.Count -lt 2) {
     $manifestErrors.Add("config\\release-merge-order.seed.json must contain at least two stacked PR entries")
   }
+  if ($stack.Count -gt 0) {
+    $releaseBlockerInventoryPath = Join-Path $root "config\\release-blocker-inventory.seed.json"
+    if (Test-Path -LiteralPath $releaseBlockerInventoryPath -PathType Leaf) {
+      $releaseBlockerInventory = Get-Content -Raw -LiteralPath $releaseBlockerInventoryPath | ConvertFrom-Json
+      $latestCandidate = [string]$releaseBlockerInventory.tracked_candidates.latest_candidate
+      $latestStackedPr = [int]$releaseBlockerInventory.tracked_candidates.latest_stacked_pr
+      $latestStackEntry = $stack[-1]
+      if ([string]$latestStackEntry.candidate -ne $latestCandidate) {
+        $manifestErrors.Add("config\\release-merge-order.seed.json latest candidate must match release blocker inventory")
+      }
+      if ([int]$latestStackEntry.pr -ne $latestStackedPr) {
+        $manifestErrors.Add("config\\release-merge-order.seed.json latest PR must match release blocker inventory")
+      }
+    }
+  }
   for ($index = 1; $index -lt $stack.Count; $index += 1) {
     $previous = $stack[$index - 1]
     $current = $stack[$index]
