@@ -568,6 +568,12 @@
       "candidate": "v0.133.0-source",
       "base": "codex/v0.132-validate-source-readiness-evidence-boundary",
       "head": "codex/v0.133-validate-source-readiness-unique-evidence"
+    },
+    {
+      "pr": 155,
+      "candidate": "v0.134.0-source",
+      "base": "codex/v0.133-validate-source-readiness-unique-evidence",
+      "head": "codex/v0.134-validate-source-readiness-pr-sequence"
     }
   ]
 }

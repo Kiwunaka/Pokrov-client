@@ -1732,6 +1732,9 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
   if ($sourceReadiness.policy.stacked_pr_milestone_evidence_urls_must_be_unique -ne $true) {
     $manifestErrors.Add("config\\source-release-readiness.seed.json must require unique stacked PR milestone evidence URLs")
   }
+  if ($sourceReadiness.policy.stacked_pr_milestone_evidence_pr_numbers_must_increase -ne $true) {
+    $manifestErrors.Add("config\\source-release-readiness.seed.json must require stacked PR milestone evidence PR numbers to increase")
+  }
 
   $releaseBlockerInventoryPath = Join-Path $root "config\\release-blocker-inventory.seed.json"
   if (Test-Path -LiteralPath $releaseBlockerInventoryPath -PathType Leaf) {
@@ -1756,6 +1759,7 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
   $sourceReadinessCanonicalPrPrefix = "https://github.com/Kiwunaka/Pokrov-client/pull/"
   $sourceReadinessTags = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
   $sourceReadinessStackedEvidenceUrls = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+  $sourceReadinessPreviousStackedPrNumber = 0
   foreach ($milestone in @($sourceReadiness.milestones)) {
     $milestoneTag = [string]$milestone.tag
     $milestoneStatus = [string]$milestone.status
@@ -1769,6 +1773,7 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
         $sourceReadinessPrSuffix = $milestoneEvidence.Substring($sourceReadinessCanonicalPrPrefix.Length)
       }
       $sourceReadinessPrNumber = 0
+      $sourceReadinessCanonicalPrEvidence = $true
       if (
         [string]::IsNullOrWhiteSpace($sourceReadinessPrSuffix) -or
         ([int]::TryParse($sourceReadinessPrSuffix, [ref]$sourceReadinessPrNumber) -ne $true) -or
@@ -1776,6 +1781,13 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
         $sourceReadinessPrSuffix -ne ([string]$sourceReadinessPrNumber)
       ) {
         $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$milestoneTag' stacked PR evidence must use canonical repository PR URL")
+        $sourceReadinessCanonicalPrEvidence = $false
+      }
+      if ($sourceReadinessCanonicalPrEvidence) {
+        if ($sourceReadinessPrNumber -le $sourceReadinessPreviousStackedPrNumber) {
+          $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$milestoneTag' stacked PR evidence PR number must increase")
+        }
+        $sourceReadinessPreviousStackedPrNumber = $sourceReadinessPrNumber
       }
     }
     if ($milestoneStatus.StartsWith("stacked_pr_", [System.StringComparison]::Ordinal) -and -not $sourceReadinessStackedEvidenceUrls.Add($milestoneEvidence)) {

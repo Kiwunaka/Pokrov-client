@@ -7,7 +7,8 @@
     "release_notes_require_proof_manifest_after_v0_7": true,
     "milestone_tags_must_be_unique": true,
     "stacked_pr_milestone_evidence_must_be_canonical_pr_url": true,
-    "stacked_pr_milestone_evidence_urls_must_be_unique": true
+    "stacked_pr_milestone_evidence_urls_must_be_unique": true,
+    "stacked_pr_milestone_evidence_pr_numbers_must_increase": true
   },
   "milestones": [
     {
@@ -1467,6 +1468,17 @@
       "status": "stacked_pr_pending_not_tagged",
       "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/154",
       "scope": "Seed validation requires stacked PR source-readiness milestone evidence URLs to be unique so two release candidates cannot claim the same PR proof.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.134.0-source",
+      "status": "stacked_pr_pending_not_tagged",
+      "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/155",
+      "scope": "Seed validation requires stacked PR source-readiness milestone evidence PR numbers to increase with the release candidate sequence.",
       "source_only": true,
       "ships_apk": false,
       "ships_exe": false,

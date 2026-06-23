@@ -193,6 +193,7 @@ Source release status:
 | `v0.131.0-source` | Pending stacked PR, not tagged | Seed validation requires unique source-readiness milestone tags. |
 | `v0.132.0-source` | Pending stacked PR, not tagged | Seed validation requires stacked PR milestone evidence to use canonical repository PR URLs. |
 | `v0.133.0-source` | Pending stacked PR, not tagged | Seed validation requires unique stacked PR milestone evidence URLs. |
+| `v0.134.0-source` | Pending stacked PR, not tagged | Seed validation requires stacked PR milestone evidence PR numbers to increase with the candidate sequence. |
 
 ## Which App Should I Use?
 
