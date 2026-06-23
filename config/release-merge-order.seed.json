@@ -526,6 +526,12 @@
       "candidate": "v0.126.0-source",
       "base": "codex/v0.125-tag-readiness-milestone-status-allowlist",
       "head": "codex/v0.126-tag-readiness-evidence-url-boundary"
+    },
+    {
+      "pr": 148,
+      "candidate": "v0.127.0-source",
+      "base": "codex/v0.126-tag-readiness-evidence-url-boundary",
+      "head": "codex/v0.127-validate-tag-readiness-evidence-url-boundary"
     }
   ]
 }

@@ -176,6 +176,11 @@ Source readiness note: `v0.126.0-source` is a pending stacked PR for verifying
 that source tag readiness requires milestone evidence to match the canonical
 public repository PR URL; it is not tagged and does not ship APK/EXE binaries.
 
+Source readiness note: `v0.127.0-source` is a pending stacked PR for verifying
+that seed validation requires the source tag-readiness evidence policy and
+canonical PR URL guard phrases; it is not tagged and does not ship APK/EXE
+binaries.
+
 Source readiness note: `v0.53.0-source` is a pending stacked PR for Windows
 verifier CI/preflight enforcement; it is not tagged and does not ship APK/EXE
 binaries.

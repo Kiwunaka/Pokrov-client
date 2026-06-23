@@ -297,8 +297,10 @@ production readiness without matching public evidence.
 - Added a source tag-readiness milestone evidence repository-boundary check so
   the selected milestone must point at the canonical `Kiwunaka/Pokrov-client`
   pull request URL for the current top stacked PR.
+- Added seed validation coverage for source tag-readiness milestone evidence,
+  status, repository-boundary policy, and canonical PR URL guard phrases.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.126.0-source` candidates.
+  `v0.127.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -430,6 +432,7 @@ production readiness without matching public evidence.
 | `v0.124.0-source` | Pending stacked PR, not tagged | PR #145 |
 | `v0.125.0-source` | Pending stacked PR, not tagged | PR #146 |
 | `v0.126.0-source` | Pending stacked PR, not tagged | PR #147 |
+| `v0.127.0-source` | Pending stacked PR, not tagged | PR #148 |
 
 ### Still Source-Only
 

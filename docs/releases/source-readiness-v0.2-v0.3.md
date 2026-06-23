@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.126
+# Source Readiness: v0.2-v0.127
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -6,15 +6,15 @@ checklist is run on the exact commit. The machine-readable readiness inventory
 lives in
 [`config/source-release-readiness.seed.json`](../../config/source-release-readiness.seed.json).
 
-## v0.126.0-source Candidate
+## v0.127.0-source Candidate
 
 Status: pending stacked PR, not tagged.
 
 Current evidence:
 
-- PR #147: source tag readiness requires the selected milestone evidence to
-  match the canonical `Kiwunaka/Pokrov-client` pull request URL for the current
-  top stacked PR
+- PR #148: seed validation requires source tag-readiness milestone evidence,
+  milestone status, repository-boundary policy, and canonical PR URL guard
+  phrases to remain enforced
 
 Required before tagging:
 
@@ -22,8 +22,8 @@ Required before tagging:
 - choose the exact commit SHA
 - run the source preflight, release evidence bundle, publication dry-run, tag
   readiness, and release merge handoff commands from the same candidate
-- confirm source tag readiness reports an error if the selected milestone
-  evidence points outside the canonical public repository PR URL
+- confirm `scripts/validate-seed.ps1` rejects missing source tag-readiness
+  evidence policy or canonical PR URL guard phrases
 - keep release notes source-only with no APK, EXE, store, trusted-signing, or
   official binary claims
 
