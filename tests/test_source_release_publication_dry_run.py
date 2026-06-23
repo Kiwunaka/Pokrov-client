@@ -88,6 +88,10 @@ def test_publication_dry_run_seed_defines_no_publish_policy() -> None:
         seed["policy"]["requires_evidence_bundle_ruleset_report_ok_consistency"]
         is True
     )
+    assert (
+        seed["policy"]["requires_evidence_bundle_ruleset_report_check_entry_shape"]
+        is True
+    )
     assert seed["policy"]["requires_evidence_bundle_preflight_artifact_fingerprints"] is True
     assert (
         seed["policy"]["requires_evidence_bundle_preflight_artifact_fingerprint_integrity"]
@@ -130,6 +134,7 @@ def test_publication_dry_run_script_is_local_only() -> None:
         "ruleset report branch mismatch",
         "ruleset report ok status without checks",
         "ruleset report ok status with failed checks",
+        "ruleset report check entry shape mismatch",
         "evidence_bundle_preflight_artifact_fingerprints",
         "evidence_bundle_preflight_commit_sha",
         "evidence_bundle_preflight_ref_commit_sha",
@@ -835,6 +840,17 @@ def test_publication_dry_run_rejects_wrong_github_ruleset_report_target(
                 "branch": "main",
             },
             "ruleset report ok status without checks",
+        ),
+        (
+            {
+                "schema_version": 1,
+                "ok": True,
+                "read_only": True,
+                "repository": "Kiwunaka/Pokrov-client",
+                "branch": "main",
+                "checks": [{"status": "pass"}],
+            },
+            "ruleset report check entry shape mismatch",
         ),
         (
             {

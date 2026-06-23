@@ -97,6 +97,7 @@ def test_release_evidence_bundle_seed_defines_source_only_policy() -> None:
     assert seed["policy"]["requires_ruleset_report_shape"] is True
     assert seed["policy"]["requires_ruleset_report_target"] is True
     assert seed["policy"]["requires_ruleset_report_ok_consistency"] is True
+    assert seed["policy"]["requires_ruleset_report_check_entry_shape"] is True
     assert seed["policy"]["requires_preflight_artifact_fingerprints"] is True
     assert seed["policy"]["requires_preflight_artifact_fingerprint_integrity"] is True
     assert seed["policy"]["requires_preflight_commit_sha_consistency"] is True
@@ -137,6 +138,7 @@ def test_release_evidence_bundle_script_preserves_claim_boundaries() -> None:
         "ruleset report branch mismatch",
         "ruleset report ok status without checks",
         "ruleset report ok status with failed checks",
+        "ruleset report check entry shape mismatch",
         "preflight_artifact_fingerprints",
         "preflight_commit_sha",
         "preflight_ref_commit_sha",
@@ -410,6 +412,17 @@ def test_release_evidence_bundle_rejects_wrong_ruleset_report_target(
                 "branch": "main",
             },
             "ruleset report ok status without checks",
+        ),
+        (
+            {
+                "schema_version": 1,
+                "ok": True,
+                "read_only": True,
+                "repository": "Kiwunaka/Pokrov-client",
+                "branch": "main",
+                "checks": [{"status": "pass"}],
+            },
+            "ruleset report check entry shape mismatch",
         ),
         (
             {

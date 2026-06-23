@@ -174,6 +174,7 @@ Source release status:
 | `v0.112.0-source` | Pending stacked PR, not tagged | Release handoff rejects malformed GitHub ruleset reports before maintainer handoff. |
 | `v0.113.0-source` | Pending stacked PR, not tagged | Release evidence, publication dry-run, and handoff reject GitHub ruleset reports for the wrong repository or branch. |
 | `v0.114.0-source` | Pending stacked PR, not tagged | Release evidence, publication dry-run, and handoff reject `ok` ruleset reports with missing or failed verifier checks. |
+| `v0.115.0-source` | Pending stacked PR, not tagged | Release evidence, publication dry-run, and handoff reject ruleset report checks without traceable name or status fields. |
 
 ## Which App Should I Use?
 
