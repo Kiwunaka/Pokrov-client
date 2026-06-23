@@ -65,7 +65,8 @@ handoff-carried publication dry-run fingerprints that do not match the direct
 publication dry-run summary, or release artifact file fingerprints that no
 longer match the files on disk. Release artifact paths must also stay under
 their expected ignored `build/` output roots, and any reported release asset
-fingerprints must stay within the source-only allowlist. It is
+fingerprints must stay within the source-only allowlist. Release artifact file
+extensions must match the source-only artifact contract. It is
 not a publisher and does not merge, tag, push, publish, or upload assets.
 
 Required checks and release gates are summarized in

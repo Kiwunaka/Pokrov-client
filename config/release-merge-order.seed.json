@@ -628,6 +628,12 @@
       "candidate": "v0.143.0-source",
       "base": "codex/v0.142-source-publication-packet-artifact-roots",
       "head": "codex/v0.143-source-publication-packet-asset-allowlist"
+    },
+    {
+      "pr": 165,
+      "candidate": "v0.144.0-source",
+      "base": "codex/v0.143-source-publication-packet-asset-allowlist",
+      "head": "codex/v0.144-source-publication-packet-artifact-filenames"
     }
   ]
 }

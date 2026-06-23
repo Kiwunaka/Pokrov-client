@@ -80,7 +80,8 @@ Use this checklist before publishing a public source or binary release.
   publication dry-run summary, or release artifact file fingerprints that no
   longer match the files on disk. Release artifact paths must also stay under
   their expected ignored `build/` output roots, and any reported release asset
-  fingerprints must stay within the source-only allowlist. It
+  fingerprints must stay within the source-only allowlist. Release artifact file
+  extensions must match the source-only artifact contract. It
   does not merge, tag, push, publish, or upload anything.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\verify-windows-bundle.ps1`
   runs the Windows bundle verifier and writes source-only Windows bundle proof
