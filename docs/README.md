@@ -66,7 +66,8 @@ anything.
   merge handoff helpers, plus `scripts/prepare-source-publication-packet.ps1`
   for the source publication packet final manual GitHub Release review and
   handoff-carried plus artifact-file fingerprint integrity checks, including
-  expected build output root boundaries for release artifacts.
+  expected build output root boundaries and source-only allowlists for release
+  artifacts.
 - [Required checks](REQUIRED_CHECKS.md): CI job names, branch-protection
   guidance, and source-release gates.
 - [GitHub ruleset setup](GITHUB_RULESET_SETUP.md): repository ruleset or

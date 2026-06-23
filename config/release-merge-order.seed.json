@@ -622,6 +622,12 @@
       "candidate": "v0.142.0-source",
       "base": "codex/v0.141-source-publication-packet-artifact-integrity",
       "head": "codex/v0.142-source-publication-packet-artifact-roots"
+    },
+    {
+      "pr": 164,
+      "candidate": "v0.143.0-source",
+      "base": "codex/v0.142-source-publication-packet-artifact-roots",
+      "head": "codex/v0.143-source-publication-packet-asset-allowlist"
     }
   ]
 }

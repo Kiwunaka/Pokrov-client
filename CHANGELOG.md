@@ -334,8 +334,11 @@ production readiness without matching public evidence.
 - Added source publication packet artifact root-boundary checks so release
   artifact paths outside the expected build output roots block manual GitHub
   Release review.
+- Added source publication packet source-only release asset allowlist checks so
+  unexpected APK, EXE, installer, or other non-source asset fingerprints block
+  manual GitHub Release review.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.142.0-source` candidates.
+  `v0.143.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -483,6 +486,7 @@ production readiness without matching public evidence.
 | `v0.140.0-source` | Pending stacked PR, not tagged | PR #161 |
 | `v0.141.0-source` | Pending stacked PR, not tagged | PR #162 |
 | `v0.142.0-source` | Pending stacked PR, not tagged | PR #163 |
+| `v0.143.0-source` | Pending stacked PR, not tagged | PR #164 |
 
 ### Still Source-Only
 

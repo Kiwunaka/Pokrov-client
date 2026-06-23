@@ -79,7 +79,8 @@ Use this checklist before publishing a public source or binary release.
   handoff-carried publication dry-run fingerprints that do not match the direct
   publication dry-run summary, or release artifact file fingerprints that no
   longer match the files on disk. Release artifact paths must also stay under
-  their expected ignored `build/` output roots. It
+  their expected ignored `build/` output roots, and any reported release asset
+  fingerprints must stay within the source-only allowlist. It
   does not merge, tag, push, publish, or upload anything.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\verify-windows-bundle.ps1`
   runs the Windows bundle verifier and writes source-only Windows bundle proof
