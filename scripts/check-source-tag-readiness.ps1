@@ -114,6 +114,16 @@ try {
       $_.status -notin @("complete", "cleared", "ready")
     }
   )
+  $inventoryReadyStatuses = @("ready", "ready_for_tag", "cleared")
+  if ($inventory.tracked_candidates.tag_creation_allowed -eq $true -and $openBlockers.Count -gt 0) {
+    $errors.Add("tag creation is allowed while required blockers remain open")
+  }
+  if (
+    $inventory.tracked_candidates.tag_creation_allowed -eq $true -and
+    [string]$inventory.status -notin $inventoryReadyStatuses
+  ) {
+    $errors.Add("tag creation is allowed while release blocker inventory status is not ready")
+  }
   foreach ($blocker in @($inventory.blockers)) {
     $blockerId = [string]$blocker.id
     if ([string]::IsNullOrWhiteSpace($blockerId)) {
@@ -139,6 +149,7 @@ try {
 
   $readyForTag = $false
   if ($inventory.tracked_candidates.tag_creation_allowed -eq $true -and
+    [string]$inventory.status -in $inventoryReadyStatuses -and
     $openBlockers.Count -eq 0 -and
     $errors.Count -eq 0 -and
     $milestone.status -notlike "*not_tagged*") {

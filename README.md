@@ -181,6 +181,7 @@ Source release status:
 | `v0.119.0-source` | Pending stacked PR, not tagged | Release evidence, publication dry-run, and handoff reject GitHub ruleset reports without a fresh `checked_at` timestamp. |
 | `v0.120.0-source` | Pending stacked PR, not tagged | Release handoff rejects stale generated input summaries before maintainer review. |
 | `v0.121.0-source` | Pending stacked PR, not tagged | Release evidence and publication dry-run reject stale generated input artifacts before handoff. |
+| `v0.122.0-source` | Pending stacked PR, not tagged | Source tag readiness rejects contradictory blocker inventories that allow tags while blockers or unready status remain. |
 
 ## Which App Should I Use?
 
