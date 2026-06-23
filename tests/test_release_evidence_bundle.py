@@ -44,6 +44,7 @@ def test_release_evidence_bundle_seed_defines_source_only_policy() -> None:
     assert seed["policy"]["does_not_replace_full_preflight"] is True
     assert seed["policy"]["windows_bundle_verifier_required"] is True
     assert seed["policy"]["requires_input_fingerprints"] is True
+    assert seed["policy"]["requires_ruleset_report_input_fingerprint_when_present"] is True
     assert seed["policy"]["requires_preflight_artifact_fingerprints"] is True
     assert seed["policy"]["requires_preflight_artifact_fingerprint_integrity"] is True
     assert seed["policy"]["requires_preflight_commit_sha_consistency"] is True
@@ -75,6 +76,7 @@ def test_release_evidence_bundle_script_preserves_claim_boundaries() -> None:
         "windows_bundle_verifier_ok",
         "windows_bundle_verifier_summary",
         "input_fingerprints",
+        "github_ruleset_report",
         "preflight_artifact_fingerprints",
         "preflight_commit_sha",
         "preflight_ref_commit_sha",
@@ -190,6 +192,12 @@ def test_release_evidence_bundle_script_writes_bundle_from_fixture(tmp_path: Pat
     )
     assert bundle["input_fingerprints"]["preflight_summary"]["path"] == str(
         preflight.resolve()
+    )
+    assert bundle["input_fingerprints"]["github_ruleset_report"]["sha256"] == _sha256(
+        ruleset
+    )
+    assert bundle["input_fingerprints"]["github_ruleset_report"]["path"] == str(
+        ruleset.resolve()
     )
     assert bundle["preflight_artifact_fingerprints"]["proof_manifest"][
         "sha256"

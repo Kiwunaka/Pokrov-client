@@ -244,8 +244,11 @@ production readiness without matching public evidence.
 - Added publication dry-run artifact fingerprint integrity checks so release
   merge handoff rejects stale proof manifest, source archive, release notes, or
   Windows verifier artifact evidence before maintainer review.
+- Added GitHub ruleset report input fingerprint integrity checks so release
+  evidence, publication dry-run, and release merge handoff reject stale optional
+  ruleset report evidence before maintainer review.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.108.0-source` candidates.
+  `v0.109.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -359,6 +362,7 @@ production readiness without matching public evidence.
 | `v0.106.0-source` | Pending stacked PR, not tagged | PR #127 |
 | `v0.107.0-source` | Pending stacked PR, not tagged | PR #128 |
 | `v0.108.0-source` | Pending stacked PR, not tagged | PR #129 |
+| `v0.109.0-source` | Pending stacked PR, not tagged | PR #130 |
 
 ### Still Source-Only
 
