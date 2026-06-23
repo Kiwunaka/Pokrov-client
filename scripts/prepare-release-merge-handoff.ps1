@@ -11,6 +11,8 @@ $root = Split-Path -Parent $PSScriptRoot
 $defaultOutputDir = "build\release-merge-handoff"
 $rulesetReportMaxAgeHours = 24
 $rulesetReportFutureSkewMinutes = 5
+$inputSummaryMaxAgeHours = 24
+$inputSummaryFutureSkewMinutes = 5
 
 function Get-RequiredStatusChecks {
   $requiredChecksPath = Join-Path $root "config\required-checks.seed.json"
@@ -234,8 +236,21 @@ function Assert-InputGeneratedAt {
     [Parameter(Mandatory = $true)][string]$InputName
   )
 
-  if ([string]::IsNullOrWhiteSpace([string]$Payload.generated_at)) {
+  $generatedAtText = [string]$Payload.generated_at
+  if ([string]::IsNullOrWhiteSpace($generatedAtText)) {
     throw "Release merge handoff input '$InputName' must include generated_at."
+  }
+  $generatedAt = [datetimeoffset]::MinValue
+  if (-not [datetimeoffset]::TryParse($generatedAtText, [ref]$generatedAt)) {
+    throw "Release merge handoff input '$InputName' must include parseable generated_at."
+  }
+  $generatedAtUtc = $generatedAt.ToUniversalTime()
+  $age = [datetimeoffset]::UtcNow - $generatedAtUtc
+  if (
+    $age.TotalHours -gt $inputSummaryMaxAgeHours -or
+    $age.TotalMinutes -lt (-1 * $inputSummaryFutureSkewMinutes)
+  ) {
+    throw "Release merge handoff input '$InputName' has stale generated_at."
   }
 }
 

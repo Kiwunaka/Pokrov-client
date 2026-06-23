@@ -27,6 +27,7 @@ def test_source_release_readiness_milestones_are_source_only() -> None:
             "tagged",
             "not_tagged",
             "stacked_pr_green_not_tagged",
+            "stacked_pr_pending_not_tagged",
         }
         assert milestone["source_only"] is True
         assert milestone["ships_apk"] is False
