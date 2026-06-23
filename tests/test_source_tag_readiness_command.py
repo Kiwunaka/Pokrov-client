@@ -68,6 +68,14 @@ def test_source_tag_readiness_seed_defines_read_only_command() -> None:
     assert seed["policy"]["requires_source_readiness_milestone_status"] is True
     assert seed["policy"]["requires_blocker_required_before_tag_flags"] is True
     assert seed["policy"]["requires_open_blocker_evidence_fields"] is True
+    assert (
+        seed["policy"]["requires_tag_creation_allowed_blocker_consistency"]
+        is True
+    )
+    assert (
+        seed["policy"]["requires_tag_creation_allowed_status_consistency"]
+        is True
+    )
     assert seed["inputs"]["blocker_inventory"] == (
         "config/release-blocker-inventory.seed.json"
     )
@@ -96,6 +104,8 @@ def test_source_tag_readiness_script_is_local_only() -> None:
         "source readiness milestone is missing scope",
         "release blocker inventory has unsafe source-only release flags",
         "source readiness milestone has unsafe source-only release flags",
+        "tag creation is allowed while required blockers remain open",
+        "tag creation is allowed while release blocker inventory status is not ready",
         "open blocker is missing id",
         "blocker $blockerId is missing required_before_tag=true",
         "open blocker $blockerId is missing status",
@@ -129,7 +139,7 @@ def test_source_tag_readiness_reports_current_blockers(tmp_path: Path) -> None:
             "-File",
             str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
             "-Tag",
-            "v0.121.0-source",
+            "v0.122.0-source",
             "-OutDir",
             str(out_dir),
         ],
@@ -144,11 +154,11 @@ def test_source_tag_readiness_reports_current_blockers(tmp_path: Path) -> None:
     assert "merge_stacked_pr_sequence" in result.stdout
 
     summary = json.loads(
-        (out_dir / "v0.121.0-source-tag-readiness.json").read_text(
+        (out_dir / "v0.122.0-source-tag-readiness.json").read_text(
             encoding="utf-8-sig"
         )
     )
-    assert summary["tag"] == "v0.121.0-source"
+    assert summary["tag"] == "v0.122.0-source"
     assert summary["read_only"] is True
     assert summary["ready_for_tag"] is False
     assert summary["source_only"] is True
@@ -157,7 +167,7 @@ def test_source_tag_readiness_reports_current_blockers(tmp_path: Path) -> None:
     assert summary["store_release"] is False
     assert summary["trusted_signing_claim"] is False
     assert summary["tag_creation_allowed"] is False
-    assert summary["latest_candidate"] == "v0.121.0-source"
+    assert summary["latest_candidate"] == "v0.122.0-source"
     assert summary["milestone_scope"]
     assert summary["input_fingerprints"]["blocker_inventory"]["sha256"] == _sha256(
         ROOT / "config" / "release-blocker-inventory.seed.json"
@@ -207,7 +217,7 @@ def test_source_tag_readiness_blocks_stale_requested_tag(tmp_path: Path) -> None
         )
     )
     assert summary["tag"] == "v0.71.0-source"
-    assert summary["latest_candidate"] == "v0.121.0-source"
+    assert summary["latest_candidate"] == "v0.122.0-source"
     assert summary["ready_for_tag"] is False
     assert "requested tag does not match latest blocker inventory candidate" in summary[
         "errors"
@@ -224,7 +234,7 @@ def test_source_tag_readiness_blocks_milestone_evidence_pr_mismatch(
     try:
         readiness = json.loads(readiness_path.read_text(encoding="utf-8"))
         for milestone in readiness["milestones"]:
-            if milestone["tag"] == "v0.121.0-source":
+            if milestone["tag"] == "v0.122.0-source":
                 milestone["evidence"] = "https://github.com/Kiwunaka/Pokrov-client/pull/92"
                 break
         _write_json(readiness_path, readiness)
@@ -237,7 +247,7 @@ def test_source_tag_readiness_blocks_milestone_evidence_pr_mismatch(
                 "-File",
                 str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
                 "-Tag",
-                "v0.121.0-source",
+                "v0.122.0-source",
                 "-OutDir",
                 str(out_dir),
             ],
@@ -248,7 +258,7 @@ def test_source_tag_readiness_blocks_milestone_evidence_pr_mismatch(
         )
 
         summary = json.loads(
-            (out_dir / "v0.121.0-source-tag-readiness.json").read_text(
+            (out_dir / "v0.122.0-source-tag-readiness.json").read_text(
                 encoding="utf-8-sig"
             )
         )
@@ -259,7 +269,7 @@ def test_source_tag_readiness_blocks_milestone_evidence_pr_mismatch(
     assert "source readiness milestone evidence does not match latest stacked PR" in (
         result.stdout + result.stderr
     )
-    assert summary["latest_stacked_pr"] == 142
+    assert summary["latest_stacked_pr"] == 143
     assert summary["milestone_evidence"].endswith("/pull/92")
     assert "source readiness milestone evidence does not match latest stacked PR" in summary[
         "errors"
@@ -276,7 +286,7 @@ def test_source_tag_readiness_blocks_milestone_without_evidence(
     try:
         readiness = json.loads(readiness_path.read_text(encoding="utf-8"))
         for milestone in readiness["milestones"]:
-            if milestone["tag"] == "v0.121.0-source":
+            if milestone["tag"] == "v0.122.0-source":
                 milestone["evidence"] = ""
                 break
         _write_json(readiness_path, readiness)
@@ -289,7 +299,7 @@ def test_source_tag_readiness_blocks_milestone_without_evidence(
                 "-File",
                 str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
                 "-Tag",
-                "v0.121.0-source",
+                "v0.122.0-source",
                 "-OutDir",
                 str(out_dir),
             ],
@@ -300,7 +310,7 @@ def test_source_tag_readiness_blocks_milestone_without_evidence(
         )
 
         summary = json.loads(
-            (out_dir / "v0.121.0-source-tag-readiness.json").read_text(
+            (out_dir / "v0.122.0-source-tag-readiness.json").read_text(
                 encoding="utf-8-sig"
             )
         )
@@ -324,7 +334,7 @@ def test_source_tag_readiness_blocks_unsafe_milestone_release_flags(
     try:
         readiness = json.loads(readiness_path.read_text(encoding="utf-8"))
         for milestone in readiness["milestones"]:
-            if milestone["tag"] == "v0.121.0-source":
+            if milestone["tag"] == "v0.122.0-source":
                 milestone["source_only"] = False
                 milestone["ships_apk"] = True
                 break
@@ -338,7 +348,7 @@ def test_source_tag_readiness_blocks_unsafe_milestone_release_flags(
                 "-File",
                 str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
                 "-Tag",
-                "v0.121.0-source",
+                "v0.122.0-source",
                 "-OutDir",
                 str(out_dir),
             ],
@@ -349,7 +359,7 @@ def test_source_tag_readiness_blocks_unsafe_milestone_release_flags(
         )
 
         summary = json.loads(
-            (out_dir / "v0.121.0-source-tag-readiness.json").read_text(
+            (out_dir / "v0.122.0-source-tag-readiness.json").read_text(
                 encoding="utf-8-sig"
             )
         )
@@ -375,7 +385,7 @@ def test_source_tag_readiness_blocks_milestone_without_status(
     try:
         readiness = json.loads(readiness_path.read_text(encoding="utf-8"))
         for milestone in readiness["milestones"]:
-            if milestone["tag"] == "v0.121.0-source":
+            if milestone["tag"] == "v0.122.0-source":
                 milestone["status"] = ""
                 break
         _write_json(readiness_path, readiness)
@@ -388,7 +398,7 @@ def test_source_tag_readiness_blocks_milestone_without_status(
                 "-File",
                 str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
                 "-Tag",
-                "v0.121.0-source",
+                "v0.122.0-source",
                 "-OutDir",
                 str(out_dir),
             ],
@@ -399,7 +409,7 @@ def test_source_tag_readiness_blocks_milestone_without_status(
         )
 
         summary = json.loads(
-            (out_dir / "v0.121.0-source-tag-readiness.json").read_text(
+            (out_dir / "v0.122.0-source-tag-readiness.json").read_text(
                 encoding="utf-8-sig"
             )
         )
@@ -423,7 +433,7 @@ def test_source_tag_readiness_blocks_milestone_without_scope(
     try:
         readiness = json.loads(readiness_path.read_text(encoding="utf-8"))
         for milestone in readiness["milestones"]:
-            if milestone["tag"] == "v0.121.0-source":
+            if milestone["tag"] == "v0.122.0-source":
                 milestone["scope"] = ""
                 break
         _write_json(readiness_path, readiness)
@@ -436,7 +446,7 @@ def test_source_tag_readiness_blocks_milestone_without_scope(
                 "-File",
                 str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
                 "-Tag",
-                "v0.121.0-source",
+                "v0.122.0-source",
                 "-OutDir",
                 str(out_dir),
             ],
@@ -447,7 +457,7 @@ def test_source_tag_readiness_blocks_milestone_without_scope(
         )
 
         summary = json.loads(
-            (out_dir / "v0.121.0-source-tag-readiness.json").read_text(
+            (out_dir / "v0.122.0-source-tag-readiness.json").read_text(
                 encoding="utf-8-sig"
             )
         )
@@ -482,7 +492,7 @@ def test_source_tag_readiness_blocks_unsafe_inventory_release_flags(
                 "-File",
                 str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
                 "-Tag",
-                "v0.121.0-source",
+                "v0.122.0-source",
                 "-OutDir",
                 str(out_dir),
             ],
@@ -493,7 +503,7 @@ def test_source_tag_readiness_blocks_unsafe_inventory_release_flags(
         )
 
         summary = json.loads(
-            (out_dir / "v0.121.0-source-tag-readiness.json").read_text(
+            (out_dir / "v0.122.0-source-tag-readiness.json").read_text(
                 encoding="utf-8-sig"
             )
         )
@@ -529,7 +539,7 @@ def test_source_tag_readiness_blocks_open_blockers_without_evidence(
                 "-File",
                 str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
                 "-Tag",
-                "v0.121.0-source",
+                "v0.122.0-source",
                 "-OutDir",
                 str(out_dir),
             ],
@@ -540,7 +550,7 @@ def test_source_tag_readiness_blocks_open_blockers_without_evidence(
         )
 
         summary = json.loads(
-            (out_dir / "v0.121.0-source-tag-readiness.json").read_text(
+            (out_dir / "v0.122.0-source-tag-readiness.json").read_text(
                 encoding="utf-8-sig"
             )
         )
@@ -554,6 +564,115 @@ def test_source_tag_readiness_blocks_open_blockers_without_evidence(
     assert "open blocker merge_stacked_pr_sequence is missing evidence" in summary[
         "errors"
     ]
+
+
+def test_source_tag_readiness_blocks_tag_creation_allowed_with_open_blockers(
+    tmp_path: Path,
+) -> None:
+    inventory_path = ROOT / "config" / "release-blocker-inventory.seed.json"
+    snapshots = _snapshot_files([inventory_path])
+    out_dir = tmp_path / "tag-creation-open-blockers-readiness"
+
+    try:
+        inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+        inventory["tracked_candidates"]["tag_creation_allowed"] = True
+        _write_json(inventory_path, inventory)
+
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
+                "-Tag",
+                "v0.122.0-source",
+                "-OutDir",
+                str(out_dir),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        summary = json.loads(
+            (out_dir / "v0.122.0-source-tag-readiness.json").read_text(
+                encoding="utf-8-sig"
+            )
+        )
+    finally:
+        _restore_files(snapshots)
+
+    assert result.returncode == 2
+    assert "tag creation is allowed while required blockers remain open" in (
+        result.stdout + result.stderr
+    )
+    assert "tag creation is allowed while required blockers remain open" in summary[
+        "errors"
+    ]
+    assert summary["ready_for_tag"] is False
+
+
+def test_source_tag_readiness_blocks_tag_creation_allowed_with_unready_status(
+    tmp_path: Path,
+) -> None:
+    inventory_path = ROOT / "config" / "release-blocker-inventory.seed.json"
+    readiness_path = ROOT / "config" / "source-release-readiness.seed.json"
+    snapshots = _snapshot_files([inventory_path, readiness_path])
+    out_dir = tmp_path / "tag-creation-unready-status-readiness"
+
+    try:
+        inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+        inventory["tracked_candidates"]["tag_creation_allowed"] = True
+        for blocker in inventory["blockers"]:
+            blocker["status"] = "complete"
+        _write_json(inventory_path, inventory)
+
+        readiness = json.loads(readiness_path.read_text(encoding="utf-8"))
+        for milestone in readiness["milestones"]:
+            if milestone["tag"] == "v0.122.0-source":
+                milestone["status"] = "tagged"
+                break
+        _write_json(readiness_path, readiness)
+
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
+                "-Tag",
+                "v0.122.0-source",
+                "-OutDir",
+                str(out_dir),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        summary = json.loads(
+            (out_dir / "v0.122.0-source-tag-readiness.json").read_text(
+                encoding="utf-8-sig"
+            )
+        )
+    finally:
+        _restore_files(snapshots)
+
+    assert result.returncode == 2
+    assert (
+        "tag creation is allowed while release blocker inventory status is not ready"
+        in result.stdout + result.stderr
+    )
+    assert (
+        "tag creation is allowed while release blocker inventory status is not ready"
+        in summary["errors"]
+    )
+    assert summary["open_blocker_count"] == 0
+    assert summary["ready_for_tag"] is False
 
 
 def test_source_tag_readiness_blocks_open_blockers_without_id(
@@ -576,7 +695,7 @@ def test_source_tag_readiness_blocks_open_blockers_without_id(
                 "-File",
                 str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
                 "-Tag",
-                "v0.121.0-source",
+                "v0.122.0-source",
                 "-OutDir",
                 str(out_dir),
             ],
@@ -587,7 +706,7 @@ def test_source_tag_readiness_blocks_open_blockers_without_id(
         )
 
         summary = json.loads(
-            (out_dir / "v0.121.0-source-tag-readiness.json").read_text(
+            (out_dir / "v0.122.0-source-tag-readiness.json").read_text(
                 encoding="utf-8-sig"
             )
         )
@@ -619,7 +738,7 @@ def test_source_tag_readiness_blocks_open_blockers_without_status(
                 "-File",
                 str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
                 "-Tag",
-                "v0.121.0-source",
+                "v0.122.0-source",
                 "-OutDir",
                 str(out_dir),
             ],
@@ -630,7 +749,7 @@ def test_source_tag_readiness_blocks_open_blockers_without_status(
         )
 
         summary = json.loads(
-            (out_dir / "v0.121.0-source-tag-readiness.json").read_text(
+            (out_dir / "v0.122.0-source-tag-readiness.json").read_text(
                 encoding="utf-8-sig"
             )
         )
@@ -666,7 +785,7 @@ def test_source_tag_readiness_blocks_blockers_without_required_before_tag(
                 "-File",
                 str(ROOT / "scripts" / "check-source-tag-readiness.ps1"),
                 "-Tag",
-                "v0.121.0-source",
+                "v0.122.0-source",
                 "-OutDir",
                 str(out_dir),
             ],
@@ -677,7 +796,7 @@ def test_source_tag_readiness_blocks_blockers_without_required_before_tag(
         )
 
         summary = json.loads(
-            (out_dir / "v0.121.0-source-tag-readiness.json").read_text(
+            (out_dir / "v0.122.0-source-tag-readiness.json").read_text(
                 encoding="utf-8-sig"
             )
         )
