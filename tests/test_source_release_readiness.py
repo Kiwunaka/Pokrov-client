@@ -50,6 +50,10 @@ def test_source_release_readiness_milestones_are_source_only() -> None:
         ]
         is True
     )
+    assert (
+        readiness["policy"]["stacked_pr_milestones_must_match_merge_order_stack"]
+        is True
+    )
     assert len(milestones) >= 50
     tags = [milestone["tag"] for milestone in milestones]
     assert len(tags) == len(set(tags))
@@ -229,7 +233,7 @@ def test_validate_seed_blocks_latest_source_readiness_evidence_mismatch() -> Non
         ]["latest_candidate"]
         for milestone in readiness["milestones"]:
             if milestone["tag"] == latest_candidate:
-                milestone["evidence"] = "https://github.com/example/fork/pull/155"
+                milestone["evidence"] = "https://github.com/example/fork/pull/156"
                 break
         _write_json(readiness_path, readiness)
 
@@ -394,6 +398,41 @@ def test_validate_seed_blocks_decreasing_stacked_pr_source_readiness_evidence() 
     )
 
 
+def test_validate_seed_blocks_source_readiness_merge_order_evidence_mismatch() -> None:
+    readiness_path = ROOT / "config" / "source-release-readiness.seed.json"
+    snapshots = _snapshot_files([readiness_path])
+
+    try:
+        readiness = json.loads(readiness_path.read_text(encoding="utf-8"))
+        for milestone in readiness["milestones"]:
+            if milestone["tag"] == "v0.90.0-source":
+                milestone["evidence"] = "https://github.com/Kiwunaka/Pokrov-client/pull/110"
+                break
+        _write_json(readiness_path, readiness)
+
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "validate-seed.ps1"),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    finally:
+        _restore_files(snapshots)
+
+    assert result.returncode != 0
+    assert (
+        "source-release-readiness.seed.json milestone 'v0.90.0-source' evidence must match release merge-order PR #111"
+        in result.stdout + result.stderr
+    )
+
+
 def test_validate_seed_knows_latest_source_readiness_consistency() -> None:
     validator = (ROOT / "scripts" / "validate-seed.ps1").read_text(encoding="utf-8")
 
@@ -408,3 +447,5 @@ def test_validate_seed_knows_latest_source_readiness_consistency() -> None:
     assert "stacked PR evidence URL must be unique" in validator
     assert "stacked_pr_milestone_evidence_pr_numbers_must_increase" in validator
     assert "stacked PR evidence PR number must increase" in validator
+    assert "stacked_pr_milestones_must_match_merge_order_stack" in validator
+    assert "evidence must match release merge-order PR" in validator
