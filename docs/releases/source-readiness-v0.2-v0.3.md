@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.135
+# Source Readiness: v0.2-v0.136
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -6,14 +6,14 @@ checklist is run on the exact commit. The machine-readable readiness inventory
 lives in
 [`config/source-release-readiness.seed.json`](../../config/source-release-readiness.seed.json).
 
-## v0.135.0-source Candidate
+## v0.136.0-source Candidate
 
 Status: pending stacked PR, not tagged.
 
 Current evidence:
 
-- PR #156: seed validation requires source-readiness stacked PR evidence to
-  match the release merge-order stack for every tracked candidate
+- PR #157: seed validation requires release stack GitHub status required checks
+  to match `config/required-checks.seed.json` exactly
 
 Required before tagging:
 
