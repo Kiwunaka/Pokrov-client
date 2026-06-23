@@ -598,6 +598,12 @@
       "candidate": "v0.138.0-source",
       "base": "codex/v0.137-validate-source-readiness-merge-coverage",
       "head": "codex/v0.138-source-publication-packet"
+    },
+    {
+      "pr": 160,
+      "candidate": "v0.139.0-source",
+      "base": "codex/v0.138-source-publication-packet",
+      "head": "codex/v0.139-source-publication-packet-input-freshness"
     }
   ]
 }

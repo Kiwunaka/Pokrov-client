@@ -8,6 +8,8 @@ $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $seedPath = Join-Path $root "config\source-publication-packet.seed.json"
 $defaultOutputDir = "build\source-publication-packet"
+$inputMaxAgeHours = 24
+$inputFutureSkewMinutes = 5
 
 function Resolve-RepoPath {
   param([Parameter(Mandatory = $true)][string]$Path)
@@ -119,6 +121,35 @@ function Get-FingerprintObject {
   }
 }
 
+function Add-InputGeneratedAtErrors {
+  param(
+    [System.Collections.Generic.List[string]]$Errors,
+    [Parameter(Mandatory = $true)][object]$Payload,
+    [Parameter(Mandatory = $true)][string]$InputName
+  )
+
+  $generatedAtText = [string]$Payload.generated_at
+  if ([string]::IsNullOrWhiteSpace($generatedAtText)) {
+    Add-BlockingError -Errors $Errors -Message "$InputName must include generated_at timestamp"
+    return
+  }
+
+  $generatedAt = [datetimeoffset]::MinValue
+  if (-not [datetimeoffset]::TryParse($generatedAtText, [ref]$generatedAt)) {
+    Add-BlockingError -Errors $Errors -Message "$InputName must include parseable generated_at timestamp"
+    return
+  }
+
+  $generatedAtUtc = $generatedAt.ToUniversalTime()
+  $age = [datetimeoffset]::UtcNow - $generatedAtUtc
+  if (
+    $age.TotalHours -gt $inputMaxAgeHours -or
+    $age.TotalMinutes -lt (-1 * $inputFutureSkewMinutes)
+  ) {
+    Add-BlockingError -Errors $Errors -Message "$InputName has stale generated_at timestamp"
+  }
+}
+
 Push-Location $root
 try {
   $seed = Get-Content -Raw -LiteralPath $seedPath | ConvertFrom-Json
@@ -154,6 +185,8 @@ try {
   if ($publicationDryRun.dry_run_only -ne $true) {
     Add-BlockingError -Errors $blockingErrors -Message "publication dry-run must be dry-run only"
   }
+  Add-InputGeneratedAtErrors -Errors $blockingErrors -Payload $releaseHandoff -InputName "release handoff"
+  Add-InputGeneratedAtErrors -Errors $blockingErrors -Payload $publicationDryRun -InputName "publication dry-run"
 
   foreach ($payloadSpec in @(
     [ordered]@{ name = "release handoff"; payload = $releaseHandoff },
@@ -267,6 +300,10 @@ try {
     input_fingerprints = [ordered]@{
       release_handoff = Get-InputFingerprint -Path $releaseHandoffPath
       publication_dry_run = Get-InputFingerprint -Path $publicationDryRunPath
+    }
+    input_generated_at = [ordered]@{
+      release_handoff = [string]$releaseHandoff.generated_at
+      publication_dry_run = [string]$publicationDryRun.generated_at
     }
     publication_dry_run_input_fingerprints = $publicationInputFingerprints
     publication_dry_run_evidence_bundle_input_fingerprints = $publicationEvidenceBundleFingerprints

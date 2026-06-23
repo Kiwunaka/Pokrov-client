@@ -73,8 +73,10 @@ after the release handoff and publication dry-run summaries exist. The command i
 `build/source-publication-packet/` output, records input SHA-256 fingerprints,
 and consolidates release notes, proof manifest, source archive, release
 evidence bundle, clean-clone/import proof, source-only no-binary flags, and the
-next manual maintainer steps. The packet is only a manual review aid; it does
-not merge, tag, push, publish, or upload anything.
+next manual maintainer steps. It also rejects missing, malformed, stale, or
+too-far-future generated-at timestamps on its direct input summaries. The packet
+is only a manual review aid; it does not merge, tag, push, publish, or upload
+anything.
 
 ## Evidence Rules
 

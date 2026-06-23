@@ -87,8 +87,9 @@ Current helpers:
   ignored `build/source-publication-packet/` output for manual GitHub Release
   review; it carries release notes, proof manifest, source archive, release
   evidence bundle, clean-clone/import proof, input SHA-256 fingerprints, and
-  explicit source-only no-binary flags, and it does not merge, tag, push,
-  publish, or upload anything
+  explicit source-only no-binary flags, rejects missing, malformed, stale, or
+  too-far-future generated-at timestamps on direct inputs, and it does not
+  merge, tag, push, publish, or upload anything
 - `verify-windows-bundle.ps1`: Windows bundle verifier for source-only Windows
   bundle proof; checks required Windows shell source paths and rejects
   committed Windows binaries, archives, signing files, or local runtime

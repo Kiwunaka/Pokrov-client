@@ -4,7 +4,7 @@ import hashlib
 import json
 import shutil
 import subprocess
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 
@@ -32,6 +32,12 @@ def _fresh_generated_at() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
+def _stale_generated_at() -> str:
+    return (
+        datetime.now(timezone.utc) - timedelta(hours=48)
+    ).isoformat().replace("+00:00", "Z")
+
+
 def _release_handoff_summary(ready: bool = True) -> dict:
     return {
         "schema_version": 1,
@@ -49,9 +55,9 @@ def _release_handoff_summary(ready: bool = True) -> dict:
         "tag_push_performed": False,
         "ready_for_tag": False,
         "tag_creation_allowed": False,
-        "latest_candidate": "v0.138.0-source",
-        "latest_pr": 159,
-        "latest_pr_url": "https://github.com/Kiwunaka/Pokrov-client/pull/159",
+        "latest_candidate": "v0.139.0-source",
+        "latest_pr": 160,
+        "latest_pr_url": "https://github.com/Kiwunaka/Pokrov-client/pull/160",
         "publication_dry_run_ok": True,
         "blocking_errors": [] if ready else ["release stack is not clean"],
     }
@@ -59,7 +65,7 @@ def _release_handoff_summary(ready: bool = True) -> dict:
 
 def _publication_dry_run_summary(tmp_path: Path, ready: bool = True) -> dict:
     release_notes = tmp_path / "release-notes.md"
-    release_notes.write_text("# v0.138.0-source\n", encoding="utf-8")
+    release_notes.write_text("# v0.139.0-source\n", encoding="utf-8")
     evidence_bundle = tmp_path / "release-evidence.json"
     evidence_bundle.write_text('{"source_only":true}', encoding="utf-8")
     proof_manifest = tmp_path / "proof.json"
@@ -75,7 +81,7 @@ def _publication_dry_run_summary(tmp_path: Path, ready: bool = True) -> dict:
         "schema_version": 1,
         "generated_at": _fresh_generated_at(),
         "read_only": True,
-        "tag": "v0.138.0-source",
+        "tag": "v0.139.0-source",
         "commit_sha": "a" * 40,
         "source_only": True,
         "dry_run_only": True,
@@ -148,7 +154,7 @@ def _write_input_summaries(
         / "source-release-publication"
         / "test-inputs"
         / suffix
-        / "v0.138.0-source-publication-dry-run.json"
+        / "v0.139.0-source-publication-dry-run.json"
     )
     _write_json(handoff_path, _release_handoff_summary(handoff_ready))
     _write_json(publication_path, _publication_dry_run_summary(tmp_path, publication_ready))
@@ -170,12 +176,15 @@ def test_source_publication_packet_seed_defines_manual_publish_policy() -> None:
     assert seed["policy"]["requires_release_handoff_summary"] is True
     assert seed["policy"]["requires_publication_dry_run_summary"] is True
     assert seed["policy"]["requires_artifact_fingerprints"] is True
+    assert seed["policy"]["requires_input_generated_at"] is True
+    assert seed["policy"]["requires_input_generated_at_parseable"] is True
+    assert seed["policy"]["requires_input_generated_at_freshness"] is True
     assert seed["policy"]["writes_only_ignored_build_output"] is True
     assert seed["inputs"]["release_handoff"] == (
         "build/release-merge-handoff/release-merge-handoff.json"
     )
     assert seed["inputs"]["publication_dry_run"].endswith(
-        "v0.138.0-source-publication-dry-run.json"
+        "v0.139.0-source-publication-dry-run.json"
     )
 
 
@@ -199,6 +208,10 @@ def test_source_publication_packet_script_is_read_only() -> None:
         "release_evidence_bundle",
         "clean_clone_or_import_proof",
         "input_fingerprints",
+        "input_generated_at",
+        "must include generated_at timestamp",
+        "must include parseable generated_at timestamp",
+        "has stale generated_at timestamp",
         "ComputeHash",
         "packet_ready_for_manual_publish_review",
         "asset_upload_performed = $false",
@@ -252,7 +265,7 @@ def test_source_publication_packet_command_writes_review_packet(
 
         packet = json.loads(
             (
-                out_dir / "v0.138.0-source" / "source-publication-packet.json"
+                out_dir / "v0.139.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -269,9 +282,9 @@ def test_source_publication_packet_command_writes_review_packet(
     assert packet["no_exe"] is True
     assert packet["no_store_release"] is True
     assert packet["no_trusted_signing_claim"] is True
-    assert packet["latest_candidate"] == "v0.138.0-source"
-    assert packet["latest_pr"] == 159
-    assert packet["latest_pr_url"] == "https://github.com/Kiwunaka/Pokrov-client/pull/159"
+    assert packet["latest_candidate"] == "v0.139.0-source"
+    assert packet["latest_pr"] == 160
+    assert packet["latest_pr_url"] == "https://github.com/Kiwunaka/Pokrov-client/pull/160"
     assert packet["release_notes"]["sha256"]
     assert packet["proof_manifest"]["sha256"]
     assert packet["source_archive"]["sha256"] == packet["source_archive_sha256"]
@@ -283,6 +296,14 @@ def test_source_publication_packet_command_writes_review_packet(
     assert packet["input_fingerprints"]["publication_dry_run"]["sha256"] == _sha256(
         publication_path
     )
+    assert packet["input_generated_at"] == {
+        "release_handoff": json.loads(handoff_path.read_text(encoding="utf-8"))[
+            "generated_at"
+        ],
+        "publication_dry_run": json.loads(
+            publication_path.read_text(encoding="utf-8")
+        )["generated_at"],
+    }
     assert packet["blocking_errors"] == []
 
 
@@ -317,7 +338,7 @@ def test_source_publication_packet_rejects_blocked_inputs(tmp_path: Path) -> Non
         )
         packet = json.loads(
             (
-                out_dir / "v0.138.0-source" / "source-publication-packet.json"
+                out_dir / "v0.139.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -367,7 +388,7 @@ def test_source_publication_packet_rejects_missing_artifact_fingerprint(
         )
         packet = json.loads(
             (
-                out_dir / "v0.138.0-source" / "source-publication-packet.json"
+                out_dir / "v0.139.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -377,6 +398,60 @@ def test_source_publication_packet_rejects_missing_artifact_fingerprint(
     assert "source publication packet is missing proof_manifest fingerprint" in packet[
         "blocking_errors"
     ]
+
+
+def test_source_publication_packet_rejects_stale_or_unparseable_input_generated_at(
+    tmp_path: Path,
+) -> None:
+    handoff_path, publication_path = _write_input_summaries(tmp_path)
+    handoff = json.loads(handoff_path.read_text(encoding="utf-8"))
+    publication = json.loads(publication_path.read_text(encoding="utf-8"))
+    handoff["generated_at"] = _stale_generated_at()
+    publication["generated_at"] = "not-a-timestamp"
+    _write_json(handoff_path, handoff)
+    _write_json(publication_path, publication)
+    out_dir = ROOT / "build" / "source-publication-packet" / "test-stale-inputs"
+    shutil.rmtree(out_dir, ignore_errors=True)
+
+    try:
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "prepare-source-publication-packet.ps1"),
+                "-ReleaseHandoffPath",
+                str(handoff_path),
+                "-PublicationDryRunPath",
+                str(publication_path),
+                "-OutDir",
+                str(out_dir),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        packet = json.loads(
+            (
+                out_dir / "v0.139.0-source" / "source-publication-packet.json"
+            ).read_text(encoding="utf-8-sig")
+        )
+    finally:
+        shutil.rmtree(out_dir, ignore_errors=True)
+
+    assert result.returncode == 2
+    assert "release handoff has stale generated_at timestamp" in packet[
+        "blocking_errors"
+    ]
+    assert "publication dry-run must include parseable generated_at timestamp" in packet[
+        "blocking_errors"
+    ]
+    assert packet["input_generated_at"] == {
+        "release_handoff": handoff["generated_at"],
+        "publication_dry_run": publication["generated_at"],
+    }
 
 
 def test_source_publication_packet_rejects_non_build_output(tmp_path: Path) -> None:
@@ -404,7 +479,7 @@ def test_source_publication_packet_rejects_non_build_output(tmp_path: Path) -> N
     )
 
     assert result.returncode != 0
-    assert not (out_dir / "v0.138.0-source" / "source-publication-packet.json").exists()
+    assert not (out_dir / "v0.139.0-source" / "source-publication-packet.json").exists()
     assert "build\\source-publication-packet" in (result.stderr + result.stdout)
 
 
