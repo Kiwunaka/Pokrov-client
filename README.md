@@ -182,6 +182,7 @@ Source release status:
 | `v0.120.0-source` | Pending stacked PR, not tagged | Release handoff rejects stale generated input summaries before maintainer review. |
 | `v0.121.0-source` | Pending stacked PR, not tagged | Release evidence and publication dry-run reject stale generated input artifacts before handoff. |
 | `v0.122.0-source` | Pending stacked PR, not tagged | Source tag readiness rejects contradictory blocker inventories that allow tags while blockers or unready status remain. |
+| `v0.123.0-source` | Pending stacked PR, not tagged | Source tag readiness rejects blocker inventories that claim ready status while required blockers remain open. |
 
 ## Which App Should I Use?
 
