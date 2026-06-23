@@ -544,6 +544,12 @@
       "candidate": "v0.129.0-source",
       "base": "codex/v0.128-validate-source-readiness-latest-evidence",
       "head": "codex/v0.129-validate-merge-order-latest-candidate"
+    },
+    {
+      "pr": 151,
+      "candidate": "v0.130.0-source",
+      "base": "codex/v0.129-validate-merge-order-latest-candidate",
+      "head": "codex/v0.130-validate-blocker-covered-range"
     }
   ]
 }

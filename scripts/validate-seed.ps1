@@ -1727,10 +1727,16 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
   $releaseBlockerInventoryPath = Join-Path $root "config\\release-blocker-inventory.seed.json"
   if (Test-Path -LiteralPath $releaseBlockerInventoryPath -PathType Leaf) {
     $releaseBlockerInventory = Get-Content -Raw -LiteralPath $releaseBlockerInventoryPath | ConvertFrom-Json
+    $baseCandidate = [string]$releaseBlockerInventory.tracked_candidates.base_candidate
     $latestCandidate = [string]$releaseBlockerInventory.tracked_candidates.latest_candidate
     $latestStackedPr = [int]$releaseBlockerInventory.tracked_candidates.latest_stacked_pr
+    $coveredRange = [string]$releaseBlockerInventory.tracked_candidates.covered_range
+    $expectedCoveredRange = "$baseCandidate through $latestCandidate"
     $expectedLatestEvidence = "https://github.com/Kiwunaka/Pokrov-client/pull/$latestStackedPr"
     $latestMilestone = @($sourceReadiness.milestones | Where-Object { $_.tag -eq $latestCandidate }) | Select-Object -First 1
+    if ($coveredRange -ne $expectedCoveredRange) {
+      $manifestErrors.Add("config\\release-blocker-inventory.seed.json covered_range must match base_candidate through latest_candidate")
+    }
     if ($null -eq $latestMilestone) {
       $manifestErrors.Add("config\\source-release-readiness.seed.json must include latest_candidate from release blocker inventory")
     } elseif ([string]$latestMilestone.evidence -ne $expectedLatestEvidence) {

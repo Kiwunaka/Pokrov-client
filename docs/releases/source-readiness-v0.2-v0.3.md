@@ -1,4 +1,4 @@
-# Source Readiness: v0.2-v0.129
+# Source Readiness: v0.2-v0.130
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
@@ -6,14 +6,14 @@ checklist is run on the exact commit. The machine-readable readiness inventory
 lives in
 [`config/source-release-readiness.seed.json`](../../config/source-release-readiness.seed.json).
 
-## v0.129.0-source Candidate
+## v0.130.0-source Candidate
 
 Status: pending stacked PR, not tagged.
 
 Current evidence:
 
-- PR #150: seed validation requires the release merge-order latest candidate
-  and PR to match the blocker inventory latest source-only PR
+- PR #151: seed validation requires the release blocker inventory covered range
+  to match its base and latest source-only candidates
 
 Required before tagging:
 

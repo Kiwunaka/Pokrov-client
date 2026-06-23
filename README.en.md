@@ -230,6 +230,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.127.0-source` | Pending stacked PR, not tagged | Seed validation requires the source tag-readiness evidence policy and canonical PR URL guard phrases. |
 | `v0.128.0-source` | Pending stacked PR, not tagged | Seed validation requires the latest source-readiness milestone evidence to match blocker inventory. |
 | `v0.129.0-source` | Pending stacked PR, not tagged | Seed validation requires the latest merge-order PR and candidate to match blocker inventory. |
+| `v0.130.0-source` | Pending stacked PR, not tagged | Seed validation requires blocker inventory covered range to match base and latest candidates. |
 
 ## Architecture Boundary
 
