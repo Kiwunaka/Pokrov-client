@@ -241,8 +241,11 @@ production readiness without matching public evidence.
 - Added tag readiness direct input fingerprint integrity checks so release
   merge handoff rejects stale blocker-inventory or source-readiness inputs
   before maintainer review.
+- Added publication dry-run artifact fingerprint integrity checks so release
+  merge handoff rejects stale proof manifest, source archive, release notes, or
+  Windows verifier artifact evidence before maintainer review.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.107.0-source` candidates.
+  `v0.108.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -355,6 +358,7 @@ production readiness without matching public evidence.
 | `v0.105.0-source` | Pending stacked PR, not tagged | PR #126 |
 | `v0.106.0-source` | Pending stacked PR, not tagged | PR #127 |
 | `v0.107.0-source` | Pending stacked PR, not tagged | PR #128 |
+| `v0.108.0-source` | Pending stacked PR, not tagged | PR #129 |
 
 ### Still Source-Only
 

@@ -348,6 +348,7 @@ try {
   if ($null -ne $publicationDryRunEvidenceBundlePreflightArtifactFingerprintProperty) {
     $publicationDryRunEvidenceBundlePreflightArtifactFingerprints = $publicationDryRunEvidenceBundlePreflightArtifactFingerprintProperty.Value
   }
+  $missingPublicationDryRunEvidenceBundlePreflightArtifactFingerprints = $false
   foreach ($fingerprintName in @(
       "proof_manifest",
       "release_notes",
@@ -366,8 +367,24 @@ try {
       [string]::IsNullOrWhiteSpace([string]$fingerprintEntry.sha256) -or
       [string]$fingerprintEntry.sha256 -notmatch "^[0-9a-fA-F]{64}$"
     ) {
-      $blockingErrors.Add("publication dry-run summary is missing evidence bundle preflight artifact fingerprints")
+      $missingPublicationDryRunEvidenceBundlePreflightArtifactFingerprints = $true
       break
+    }
+  }
+  if ($missingPublicationDryRunEvidenceBundlePreflightArtifactFingerprints) {
+    $blockingErrors.Add("publication dry-run summary is missing evidence bundle preflight artifact fingerprints")
+  } else {
+    foreach ($fingerprintName in @(
+        "proof_manifest",
+        "release_notes",
+        "source_archive",
+        "windows_bundle_verifier_summary"
+      )) {
+      $fingerprintEntry = $publicationDryRunEvidenceBundlePreflightArtifactFingerprints.PSObject.Properties[$fingerprintName].Value
+      Assert-InputFingerprintIntegrity `
+        -Fingerprint $fingerprintEntry `
+        -ErrorMessage "publication dry-run artifact fingerprints mismatch" `
+        -BlockingErrors $blockingErrors
     }
   }
   if (
