@@ -250,6 +250,31 @@ function Add-ArtifactFileFingerprintErrors {
   }
 }
 
+function Add-ReleaseAssetAllowlistErrors {
+  param(
+    [System.Collections.Generic.List[string]]$Errors,
+    [object]$ReleaseAssetFingerprints,
+    [object[]]$AllowedReleaseAssets
+  )
+
+  if ($null -eq $ReleaseAssetFingerprints) {
+    return
+  }
+
+  $allowedAssetSet = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+  foreach ($assetName in @($AllowedReleaseAssets)) {
+    if (-not [string]::IsNullOrWhiteSpace([string]$assetName)) {
+      [void]$allowedAssetSet.Add([string]$assetName)
+    }
+  }
+
+  foreach ($assetProperty in @($ReleaseAssetFingerprints.PSObject.Properties)) {
+    if (-not $allowedAssetSet.Contains([string]$assetProperty.Name)) {
+      Add-BlockingError -Errors $Errors -Message "source publication packet unexpected release asset fingerprint: $($assetProperty.Name)"
+    }
+  }
+}
+
 function Add-InputGeneratedAtErrors {
   param(
     [System.Collections.Generic.List[string]]$Errors,
@@ -345,6 +370,14 @@ try {
   if ($null -eq $publicationEvidenceBundleFingerprints) {
     Add-BlockingError -Errors $blockingErrors -Message "publication dry-run summary is missing evidence bundle input fingerprints"
   }
+  $publicationReleaseAssetFingerprints = $null
+  if ($null -ne $publicationDryRun.PSObject.Properties["release_asset_fingerprints"]) {
+    $publicationReleaseAssetFingerprints = $publicationDryRun.PSObject.Properties["release_asset_fingerprints"].Value
+  }
+  Add-ReleaseAssetAllowlistErrors `
+    -Errors $blockingErrors `
+    -ReleaseAssetFingerprints $publicationReleaseAssetFingerprints `
+    -AllowedReleaseAssets @($seed.allowed_release_assets)
 
   $releaseHandoffInputFingerprints = $releaseHandoff.PSObject.Properties["input_fingerprints"].Value
   if ($null -eq $releaseHandoffInputFingerprints) {
@@ -541,6 +574,8 @@ try {
     publication_dry_run_input_fingerprints = $publicationInputFingerprints
     publication_dry_run_evidence_bundle_input_fingerprints = $publicationEvidenceBundleFingerprints
     publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $publicationArtifactFingerprints
+    publication_dry_run_release_asset_fingerprints = $publicationReleaseAssetFingerprints
+    allowed_release_assets = @($seed.allowed_release_assets)
     release_handoff_publication_dry_run_input_fingerprints = $releaseHandoffPublicationInputFingerprints
     release_handoff_publication_dry_run_evidence_bundle_input_fingerprints = $releaseHandoffPublicationEvidenceBundleFingerprints
     release_handoff_publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $releaseHandoffPublicationArtifactFingerprints
