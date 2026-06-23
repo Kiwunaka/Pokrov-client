@@ -508,6 +508,12 @@
       "candidate": "v0.123.0-source",
       "base": "codex/v0.122-tag-readiness-inventory-consistency",
       "head": "codex/v0.123-tag-readiness-ready-status-consistency"
+    },
+    {
+      "pr": 145,
+      "candidate": "v0.124.0-source",
+      "base": "codex/v0.123-tag-readiness-ready-status-consistency",
+      "head": "codex/v0.124-tag-readiness-milestone-status-consistency"
     }
   ]
 }

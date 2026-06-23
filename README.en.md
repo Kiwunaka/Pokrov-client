@@ -224,6 +224,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.121.0-source` | Pending stacked PR, not tagged | Release evidence and publication dry-run reject stale generated input artifacts before handoff. |
 | `v0.122.0-source` | Pending stacked PR, not tagged | Source tag readiness rejects contradictory blocker inventories that allow tags while blockers or unready status remain. |
 | `v0.123.0-source` | Pending stacked PR, not tagged | Source tag readiness rejects blocker inventories that claim ready status while required blockers remain open. |
+| `v0.124.0-source` | Pending stacked PR, not tagged | Source tag readiness rejects tag allowance while the selected source-readiness milestone is still pending or not tagged. |
 
 ## Architecture Boundary
 
