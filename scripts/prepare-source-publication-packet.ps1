@@ -384,6 +384,36 @@ function Add-ReleaseNotesProofErrors {
   }
 }
 
+function Add-ProofManifestSourceArchiveShaErrors {
+  param(
+    [System.Collections.Generic.List[string]]$Errors,
+    [object]$Fingerprint,
+    [string]$SourceArchiveSha256
+  )
+
+  $resolvedPath = Get-NormalizedFingerprintPath -Path ([string]$Fingerprint.path)
+  if (
+    [string]::IsNullOrWhiteSpace($resolvedPath) -or
+    -not (Test-Path -LiteralPath $resolvedPath -PathType Leaf)
+  ) {
+    return
+  }
+
+  try {
+    $proofManifestPayload = Get-Content -Raw -LiteralPath $resolvedPath | ConvertFrom-Json
+    $proofManifestSourceArchiveSha256 = [string]$proofManifestPayload.source_archive_sha256
+    if (
+      [string]::IsNullOrWhiteSpace($proofManifestSourceArchiveSha256) -or
+      [string]::IsNullOrWhiteSpace($SourceArchiveSha256) -or
+      -not $proofManifestSourceArchiveSha256.Equals($SourceArchiveSha256, [System.StringComparison]::OrdinalIgnoreCase)
+    ) {
+      Add-BlockingError -Errors $Errors -Message "source publication packet proof manifest source archive SHA mismatch"
+    }
+  } catch {
+    Add-BlockingError -Errors $Errors -Message "source publication packet proof manifest source archive SHA mismatch"
+  }
+}
+
 function Test-ArtifactTruthyFlag {
   param(
     [object]$Payload,
@@ -828,6 +858,11 @@ try {
     -Tag ([string]$publicationDryRun.tag) `
     -SourceArchiveSha256 ([string]$publicationDryRun.source_archive_sha256)
 
+  Add-ProofManifestSourceArchiveShaErrors `
+    -Errors $blockingErrors `
+    -Fingerprint $proofManifest `
+    -SourceArchiveSha256 ([string]$publicationDryRun.source_archive_sha256)
+
   foreach ($artifactSchemaSpec in @(
     [ordered]@{ name = "release_evidence_bundle"; value = $releaseEvidenceBundle; contract = [string]$seed.artifact_schema_contracts.release_evidence_bundle },
     [ordered]@{ name = "proof_manifest"; value = $proofManifest; contract = [string]$seed.artifact_schema_contracts.proof_manifest },
@@ -926,6 +961,7 @@ try {
     artifact_schema_contracts = $seed.artifact_schema_contracts
     release_notes_required_markers = @($seed.release_notes_required_markers)
     release_notes_proof_requirements = @("publication_dry_run.tag", "publication_dry_run.source_archive_sha256")
+    proof_manifest_proof_requirements = @("proof_manifest.source_archive_sha256", "publication_dry_run.source_archive_sha256")
     release_handoff_publication_dry_run_input_fingerprints = $releaseHandoffPublicationInputFingerprints
     release_handoff_publication_dry_run_evidence_bundle_input_fingerprints = $releaseHandoffPublicationEvidenceBundleFingerprints
     release_handoff_publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $releaseHandoffPublicationArtifactFingerprints

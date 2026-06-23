@@ -658,6 +658,12 @@
       "candidate": "v0.148.0-source",
       "base": "codex/v0.147-source-publication-packet-release-notes-claims",
       "head": "codex/v0.148-source-publication-packet-release-notes-proof"
+    },
+    {
+      "pr": 170,
+      "candidate": "v0.149.0-source",
+      "base": "codex/v0.148-source-publication-packet-release-notes-proof",
+      "head": "codex/v0.149-source-publication-packet-proof-manifest-sha"
     }
   ]
 }
