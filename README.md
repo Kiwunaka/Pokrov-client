@@ -203,6 +203,7 @@ Source release status:
 | `v0.141.0-source` | Pending stacked PR, not tagged | Source publication packet recalculates release artifact file fingerprints before manual GitHub Release review. |
 | `v0.142.0-source` | Pending stacked PR, not tagged | Source publication packet rejects release artifact paths outside the expected build output roots before manual GitHub Release review. |
 | `v0.143.0-source` | Pending stacked PR, not tagged | Source publication packet rejects unexpected non-source release asset fingerprints before manual GitHub Release review. |
+| `v0.144.0-source` | Pending stacked PR, not tagged | Source publication packet rejects release artifact files whose extensions do not match the source-only artifact contract. |
 
 ## Which App Should I Use?
 

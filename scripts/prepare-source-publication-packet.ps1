@@ -250,6 +250,27 @@ function Add-ArtifactFileFingerprintErrors {
   }
 }
 
+function Add-ArtifactFileExtensionErrors {
+  param(
+    [System.Collections.Generic.List[string]]$Errors,
+    [object]$Fingerprint,
+    [string]$Name,
+    [string]$ExpectedExtension
+  )
+
+  $resolvedPath = Get-NormalizedFingerprintPath -Path ([string]$Fingerprint.path)
+  if (
+    [string]::IsNullOrWhiteSpace($resolvedPath) -or
+    [string]::IsNullOrWhiteSpace($ExpectedExtension)
+  ) {
+    return
+  }
+  $actualExtension = [System.IO.Path]::GetExtension($resolvedPath)
+  if (-not $ExpectedExtension.Equals($actualExtension, [System.StringComparison]::OrdinalIgnoreCase)) {
+    Add-BlockingError -Errors $Errors -Message "source publication packet artifact file extension mismatch for $Name"
+  }
+}
+
 function Add-ReleaseAssetAllowlistErrors {
   param(
     [System.Collections.Generic.List[string]]$Errors,
@@ -504,6 +525,29 @@ try {
     Add-ArtifactFileFingerprintErrors -Errors $blockingErrors -Fingerprint $publicationRulesetReport -Name "github_ruleset_report"
   }
 
+  foreach ($artifactExtensionSpec in @(
+    [ordered]@{ name = "release_notes"; value = $releaseNotes; extension = [string]$seed.artifact_file_extensions.release_notes },
+    [ordered]@{ name = "release_evidence_bundle"; value = $releaseEvidenceBundle; extension = [string]$seed.artifact_file_extensions.release_evidence_bundle },
+    [ordered]@{ name = "proof_manifest"; value = $proofManifest; extension = [string]$seed.artifact_file_extensions.proof_manifest },
+    [ordered]@{ name = "source_archive"; value = $sourceArchive; extension = [string]$seed.artifact_file_extensions.source_archive },
+    [ordered]@{ name = "clean_clone_or_import_proof"; value = $cleanCloneOrImportProof; extension = [string]$seed.artifact_file_extensions.clean_clone_or_import_proof },
+    [ordered]@{ name = "windows_bundle_verifier_summary"; value = Get-FingerprintObject -Container $publicationArtifactFingerprints -FieldName "windows_bundle_verifier_summary"; extension = [string]$seed.artifact_file_extensions.windows_bundle_verifier_summary }
+  )) {
+    Add-ArtifactFileExtensionErrors `
+      -Errors $blockingErrors `
+      -Fingerprint $artifactExtensionSpec.value `
+      -Name $artifactExtensionSpec.name `
+      -ExpectedExtension $artifactExtensionSpec.extension
+  }
+
+  if (Test-FingerprintField -Container $publicationEvidenceBundleFingerprints -FieldName "github_ruleset_report") {
+    Add-ArtifactFileExtensionErrors `
+      -Errors $blockingErrors `
+      -Fingerprint $publicationRulesetReport `
+      -Name "github_ruleset_report" `
+      -ExpectedExtension ([string]$seed.artifact_file_extensions.github_ruleset_report)
+  }
+
   $artifactFileFingerprints = [ordered]@{
     release_notes = Get-ArtifactFileFingerprint -Fingerprint $releaseNotes
     release_evidence_bundle = Get-ArtifactFileFingerprint -Fingerprint $releaseEvidenceBundle
@@ -576,6 +620,7 @@ try {
     publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $publicationArtifactFingerprints
     publication_dry_run_release_asset_fingerprints = $publicationReleaseAssetFingerprints
     allowed_release_assets = @($seed.allowed_release_assets)
+    artifact_file_extensions = $seed.artifact_file_extensions
     release_handoff_publication_dry_run_input_fingerprints = $releaseHandoffPublicationInputFingerprints
     release_handoff_publication_dry_run_evidence_bundle_input_fingerprints = $releaseHandoffPublicationEvidenceBundleFingerprints
     release_handoff_publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $releaseHandoffPublicationArtifactFingerprints
