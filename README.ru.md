@@ -167,6 +167,11 @@ that source tag readiness rejects tag allowance while the selected
 source-readiness milestone is still pending or not tagged; it is not tagged and
 does not ship APK/EXE binaries.
 
+Source readiness note: `v0.125.0-source` is a pending stacked PR for verifying
+that source tag readiness requires an explicit ready milestone status before
+tag creation can be allowed; it is not tagged and does not ship APK/EXE
+binaries.
+
 Source readiness note: `v0.53.0-source` is a pending stacked PR for Windows
 verifier CI/preflight enforcement; it is not tagged and does not ship APK/EXE
 binaries.

@@ -292,8 +292,10 @@ production readiness without matching public evidence.
 - Added source tag-readiness milestone-status consistency checks so tag
   creation cannot be allowed while the selected source-readiness milestone is
   still pending or not tagged.
+- Added a source tag-readiness milestone ready-status allowlist so tag creation
+  requires an explicitly ready selected source-readiness milestone status.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.124.0-source` candidates.
+  `v0.125.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -423,6 +425,7 @@ production readiness without matching public evidence.
 | `v0.122.0-source` | Pending stacked PR, not tagged | PR #143 |
 | `v0.123.0-source` | Pending stacked PR, not tagged | PR #144 |
 | `v0.124.0-source` | Pending stacked PR, not tagged | PR #145 |
+| `v0.125.0-source` | Pending stacked PR, not tagged | PR #146 |
 
 ### Still Source-Only
 
