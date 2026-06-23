@@ -217,6 +217,12 @@ function Assert-RulesetReportShape {
         throw "Release evidence refused ruleset report ok status with failed checks."
       }
     }
+    $passedCheckNames = @($checks | ForEach-Object { [string]$_.name })
+    foreach ($expectedCheck in $expectedRequiredChecks) {
+      if (@($passedCheckNames | Where-Object { $_ -eq [string]$expectedCheck }).Count -eq 0) {
+        throw "Release evidence refused ruleset report required status check coverage mismatch."
+      }
+    }
   }
 }
 
