@@ -232,6 +232,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.129.0-source` | Pending stacked PR, not tagged | Seed validation requires the latest merge-order PR and candidate to match blocker inventory. |
 | `v0.130.0-source` | Pending stacked PR, not tagged | Seed validation requires blocker inventory covered range to match base and latest candidates. |
 | `v0.131.0-source` | Pending stacked PR, not tagged | Seed validation requires unique source-readiness milestone tags. |
+| `v0.132.0-source` | Pending stacked PR, not tagged | Seed validation requires stacked PR milestone evidence to use canonical repository PR URLs. |
 
 ## Architecture Boundary
 

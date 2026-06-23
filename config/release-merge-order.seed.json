@@ -556,6 +556,12 @@
       "candidate": "v0.131.0-source",
       "base": "codex/v0.130-validate-blocker-covered-range",
       "head": "codex/v0.131-validate-source-readiness-unique-tags"
+    },
+    {
+      "pr": 153,
+      "candidate": "v0.132.0-source",
+      "base": "codex/v0.131-validate-source-readiness-unique-tags",
+      "head": "codex/v0.132-validate-source-readiness-evidence-boundary"
     }
   ]
 }
