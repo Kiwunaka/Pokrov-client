@@ -251,6 +251,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.148.0-source` | Pending stacked PR, not tagged | Source publication packet validates release notes tag and source archive SHA proof before manual GitHub Release review. |
 | `v0.149.0-source` | Pending stacked PR, not tagged | Source publication packet validates proof manifest source archive SHA binding before manual GitHub Release review. |
 | `v0.150.0-source` | Pending stacked PR, not tagged | Source publication packet validates proof manifest source archive filename binding before manual GitHub Release review. |
+| `v0.151.0-source` | Pending stacked PR, not tagged | Source publication packet validates proof manifest commit SHA binding before manual GitHub Release review. |
 
 ## Architecture Boundary
 
