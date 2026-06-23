@@ -1750,6 +1750,7 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
     }
   }
 
+  $sourceReadinessCanonicalPrPrefix = "https://github.com/Kiwunaka/Pokrov-client/pull/"
   $sourceReadinessTags = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
   foreach ($milestone in @($sourceReadiness.milestones)) {
     $milestoneTag = [string]$milestone.tag
@@ -1758,8 +1759,20 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
     if (-not $sourceReadinessTags.Add($milestoneTag)) {
       $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$milestoneTag' tag must be unique")
     }
-    if ($milestoneStatus.StartsWith("stacked_pr_", [System.StringComparison]::Ordinal) -and $milestoneEvidence -notmatch "^https://github\.com/Kiwunaka/Pokrov-client/pull/[0-9]+$") {
-      $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$milestoneTag' stacked PR evidence must use canonical repository PR URL")
+    if ($milestoneStatus.StartsWith("stacked_pr_", [System.StringComparison]::Ordinal)) {
+      $sourceReadinessPrSuffix = ""
+      if ($milestoneEvidence.StartsWith($sourceReadinessCanonicalPrPrefix, [System.StringComparison]::Ordinal)) {
+        $sourceReadinessPrSuffix = $milestoneEvidence.Substring($sourceReadinessCanonicalPrPrefix.Length)
+      }
+      $sourceReadinessPrNumber = 0
+      if (
+        [string]::IsNullOrWhiteSpace($sourceReadinessPrSuffix) -or
+        ([int]::TryParse($sourceReadinessPrSuffix, [ref]$sourceReadinessPrNumber) -ne $true) -or
+        $sourceReadinessPrNumber -le 0 -or
+        $sourceReadinessPrSuffix -ne ([string]$sourceReadinessPrNumber)
+      ) {
+        $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$milestoneTag' stacked PR evidence must use canonical repository PR URL")
+      }
     }
     if ($milestone.source_only -ne $true) {
       $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$milestoneTag' must be source_only")
