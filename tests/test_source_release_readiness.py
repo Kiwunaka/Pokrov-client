@@ -44,15 +44,27 @@ def test_source_release_readiness_milestones_are_source_only() -> None:
         is True
     )
     assert readiness["policy"]["stacked_pr_milestone_evidence_urls_must_be_unique"] is True
+    assert (
+        readiness["policy"][
+            "stacked_pr_milestone_evidence_pr_numbers_must_increase"
+        ]
+        is True
+    )
     assert len(milestones) >= 50
     tags = [milestone["tag"] for milestone in milestones]
     assert len(tags) == len(set(tags))
+    canonical_pr_prefix = "https://github.com/Kiwunaka/Pokrov-client/pull/"
     stacked_evidence_urls = [
         milestone["evidence"]
         for milestone in milestones
         if milestone["status"].startswith("stacked_pr_")
     ]
     assert len(stacked_evidence_urls) == len(set(stacked_evidence_urls))
+    stacked_pr_numbers = [
+        int(evidence.removeprefix(canonical_pr_prefix))
+        for evidence in stacked_evidence_urls
+    ]
+    assert stacked_pr_numbers == sorted(stacked_pr_numbers)
 
     for milestone in milestones:
         assert milestone["tag"].startswith("v")
@@ -217,7 +229,7 @@ def test_validate_seed_blocks_latest_source_readiness_evidence_mismatch() -> Non
         ]["latest_candidate"]
         for milestone in readiness["milestones"]:
             if milestone["tag"] == latest_candidate:
-                milestone["evidence"] = "https://github.com/example/fork/pull/154"
+                milestone["evidence"] = "https://github.com/example/fork/pull/155"
                 break
         _write_json(readiness_path, readiness)
 
@@ -347,6 +359,41 @@ def test_validate_seed_blocks_duplicate_stacked_pr_source_readiness_evidence() -
     )
 
 
+def test_validate_seed_blocks_decreasing_stacked_pr_source_readiness_evidence() -> None:
+    readiness_path = ROOT / "config" / "source-release-readiness.seed.json"
+    snapshots = _snapshot_files([readiness_path])
+
+    try:
+        readiness = json.loads(readiness_path.read_text(encoding="utf-8"))
+        for milestone in readiness["milestones"]:
+            if milestone["tag"] == "v0.44.0-source":
+                milestone["evidence"] = "https://github.com/Kiwunaka/Pokrov-client/pull/62"
+                break
+        _write_json(readiness_path, readiness)
+
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "validate-seed.ps1"),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    finally:
+        _restore_files(snapshots)
+
+    assert result.returncode != 0
+    assert (
+        "source-release-readiness.seed.json milestone 'v0.44.0-source' stacked PR evidence PR number must increase"
+        in result.stdout + result.stderr
+    )
+
+
 def test_validate_seed_knows_latest_source_readiness_consistency() -> None:
     validator = (ROOT / "scripts" / "validate-seed.ps1").read_text(encoding="utf-8")
 
@@ -359,3 +406,5 @@ def test_validate_seed_knows_latest_source_readiness_consistency() -> None:
     assert "stacked PR evidence must use canonical repository PR URL" in validator
     assert "stacked_pr_milestone_evidence_urls_must_be_unique" in validator
     assert "stacked PR evidence URL must be unique" in validator
+    assert "stacked_pr_milestone_evidence_pr_numbers_must_increase" in validator
+    assert "stacked PR evidence PR number must increase" in validator
