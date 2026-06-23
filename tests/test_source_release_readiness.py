@@ -43,9 +43,16 @@ def test_source_release_readiness_milestones_are_source_only() -> None:
         readiness["policy"]["stacked_pr_milestone_evidence_must_be_canonical_pr_url"]
         is True
     )
+    assert readiness["policy"]["stacked_pr_milestone_evidence_urls_must_be_unique"] is True
     assert len(milestones) >= 50
     tags = [milestone["tag"] for milestone in milestones]
     assert len(tags) == len(set(tags))
+    stacked_evidence_urls = [
+        milestone["evidence"]
+        for milestone in milestones
+        if milestone["status"].startswith("stacked_pr_")
+    ]
+    assert len(stacked_evidence_urls) == len(set(stacked_evidence_urls))
 
     for milestone in milestones:
         assert milestone["tag"].startswith("v")
@@ -210,7 +217,7 @@ def test_validate_seed_blocks_latest_source_readiness_evidence_mismatch() -> Non
         ]["latest_candidate"]
         for milestone in readiness["milestones"]:
             if milestone["tag"] == latest_candidate:
-                milestone["evidence"] = "https://github.com/example/fork/pull/153"
+                milestone["evidence"] = "https://github.com/example/fork/pull/154"
                 break
         _write_json(readiness_path, readiness)
 
@@ -304,6 +311,42 @@ def test_validate_seed_blocks_stacked_pr_source_readiness_evidence_boundary() ->
     )
 
 
+def test_validate_seed_blocks_duplicate_stacked_pr_source_readiness_evidence() -> None:
+    readiness_path = ROOT / "config" / "source-release-readiness.seed.json"
+    snapshots = _snapshot_files([readiness_path])
+
+    try:
+        readiness = json.loads(readiness_path.read_text(encoding="utf-8"))
+        duplicate_evidence = "https://github.com/Kiwunaka/Pokrov-client/pull/63"
+        for milestone in readiness["milestones"]:
+            if milestone["tag"] == "v0.44.0-source":
+                milestone["evidence"] = duplicate_evidence
+                break
+        _write_json(readiness_path, readiness)
+
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "validate-seed.ps1"),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    finally:
+        _restore_files(snapshots)
+
+    assert result.returncode != 0
+    assert (
+        "source-release-readiness.seed.json milestone 'v0.44.0-source' stacked PR evidence URL must be unique"
+        in result.stdout + result.stderr
+    )
+
+
 def test_validate_seed_knows_latest_source_readiness_consistency() -> None:
     validator = (ROOT / "scripts" / "validate-seed.ps1").read_text(encoding="utf-8")
 
@@ -314,3 +357,5 @@ def test_validate_seed_knows_latest_source_readiness_consistency() -> None:
     assert "tag must be unique" in validator
     assert "stacked_pr_milestone_evidence_must_be_canonical_pr_url" in validator
     assert "stacked PR evidence must use canonical repository PR URL" in validator
+    assert "stacked_pr_milestone_evidence_urls_must_be_unique" in validator
+    assert "stacked PR evidence URL must be unique" in validator
