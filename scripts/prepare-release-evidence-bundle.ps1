@@ -18,6 +18,8 @@ $expectedRulesetRepository = "Kiwunaka/Pokrov-client"
 $expectedRulesetBranch = "main"
 $rulesetReportMaxAgeHours = 24
 $rulesetReportFutureSkewMinutes = 5
+$preflightSummaryMaxAgeHours = 24
+$preflightSummaryFutureSkewMinutes = 5
 
 function Get-RequiredStatusChecks {
   $requiredChecksPath = Join-Path $root "config\required-checks.seed.json"
@@ -161,6 +163,30 @@ function Assert-SourceOnlySummary {
     -Name "windows_bundle_verifier_summary"
 }
 
+function Assert-InputGeneratedAt {
+  param(
+    [Parameter(Mandatory = $true)][object]$Payload,
+    [Parameter(Mandatory = $true)][string]$InputName
+  )
+
+  $generatedAtText = [string]$Payload.generated_at
+  if ([string]::IsNullOrWhiteSpace($generatedAtText)) {
+    throw "Release evidence refused $InputName without generated_at timestamp."
+  }
+  $generatedAt = [datetimeoffset]::MinValue
+  if (-not [datetimeoffset]::TryParse($generatedAtText, [ref]$generatedAt)) {
+    throw "Release evidence refused $InputName without parseable generated_at timestamp."
+  }
+  $generatedAtUtc = $generatedAt.ToUniversalTime()
+  $age = [datetimeoffset]::UtcNow - $generatedAtUtc
+  if (
+    $age.TotalHours -gt $preflightSummaryMaxAgeHours -or
+    $age.TotalMinutes -lt (-1 * $preflightSummaryFutureSkewMinutes)
+  ) {
+    throw "Release evidence refused stale $InputName generated_at timestamp."
+  }
+}
+
 function Assert-RulesetReportShape {
   param([Parameter(Mandatory = $true)][object]$Report)
 
@@ -271,6 +297,7 @@ try {
   $bundlePath = Join-Path $OutDir "$Tag-release-evidence.json"
 
   $preflightSummary = Get-Content -Raw -LiteralPath $resolvedPreflightSummaryPath | ConvertFrom-Json
+  Assert-InputGeneratedAt -Payload $preflightSummary -InputName "preflight summary"
   Assert-SourceOnlySummary -Summary $preflightSummary
 
   $resolvedRulesetReportPath = ""

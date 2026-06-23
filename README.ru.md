@@ -148,6 +148,10 @@ Source readiness note: `v0.120.0-source` is a pending stacked PR for verifying
 that release merge handoff rejects stale generated input summaries before
 maintainer review; it is not tagged and does not ship APK/EXE binaries.
 
+Source readiness note: `v0.121.0-source` is a pending stacked PR for verifying
+that release evidence and publication dry-run reject stale generated input
+artifacts before handoff; it is not tagged and does not ship APK/EXE binaries.
+
 Source readiness note: `v0.53.0-source` is a pending stacked PR for Windows
 verifier CI/preflight enforcement; it is not tagged and does not ship APK/EXE
 binaries.

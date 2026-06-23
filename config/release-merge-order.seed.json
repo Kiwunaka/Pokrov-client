@@ -490,6 +490,12 @@
       "candidate": "v0.120.0-source",
       "base": "codex/v0.119-ruleset-report-freshness",
       "head": "codex/v0.120-handoff-input-freshness"
+    },
+    {
+      "pr": 142,
+      "candidate": "v0.121.0-source",
+      "base": "codex/v0.120-handoff-input-freshness",
+      "head": "codex/v0.121-evidence-publication-input-freshness"
     }
   ]
 }
