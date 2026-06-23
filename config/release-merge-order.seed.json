@@ -538,6 +538,12 @@
       "candidate": "v0.128.0-source",
       "base": "codex/v0.127-validate-tag-readiness-evidence-url-boundary",
       "head": "codex/v0.128-validate-source-readiness-latest-evidence"
+    },
+    {
+      "pr": 150,
+      "candidate": "v0.129.0-source",
+      "base": "codex/v0.128-validate-source-readiness-latest-evidence",
+      "head": "codex/v0.129-validate-merge-order-latest-candidate"
     }
   ]
 }

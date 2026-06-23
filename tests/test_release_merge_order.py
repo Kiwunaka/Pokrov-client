@@ -17,6 +17,25 @@ def _read_json(relative_path: str) -> dict:
     return json.loads(_read(relative_path))
 
 
+def _write_json(path: Path, payload: dict) -> None:
+    path.write_text(json.dumps(payload), encoding="utf-8")
+
+
+def _snapshot_files(paths: list[Path]) -> dict[Path, bytes | None]:
+    snapshots: dict[Path, bytes | None] = {}
+    for path in paths:
+        snapshots[path] = path.read_bytes() if path.exists() else None
+    return snapshots
+
+
+def _restore_files(snapshots: dict[Path, bytes | None]) -> None:
+    for path, content in snapshots.items():
+        if content is None:
+            path.unlink(missing_ok=True)
+        else:
+            path.write_bytes(content)
+
+
 def test_release_merge_order_seed_defines_read_only_stack() -> None:
     seed = _read_json("config/release-merge-order.seed.json")
 
@@ -30,8 +49,8 @@ def test_release_merge_order_seed_defines_read_only_stack() -> None:
 
     stack = seed["stack"]
     assert stack[0]["pr"] == 61
-    assert stack[-1]["pr"] == 149
-    assert stack[-1]["candidate"] == "v0.128.0-source"
+    assert stack[-1]["pr"] == 150
+    assert stack[-1]["candidate"] == "v0.129.0-source"
     for previous, current in zip(stack, stack[1:]):
         assert current["base"] == previous["head"]
 
@@ -91,11 +110,11 @@ def test_release_merge_order_command_writes_summary() -> None:
     assert summary["merge_order_ok"] is True
     assert summary["read_only"] is True
     assert summary["stack_count"] >= 5
-    assert summary["latest_pr"] == 149
-    assert summary["latest_candidate"] == "v0.128.0-source"
+    assert summary["latest_pr"] == 150
+    assert summary["latest_candidate"] == "v0.129.0-source"
     assert summary["linear_base_to_head_chain"] is True
     assert summary["stack"][0]["pr"] == 61
-    assert summary["stack"][-1]["pr"] == 149
+    assert summary["stack"][-1]["pr"] == 150
 
 
 def test_release_merge_order_rejects_non_build_output(tmp_path: Path) -> None:
@@ -137,4 +156,38 @@ def test_release_merge_order_is_documented_and_validated() -> None:
     assert "release merge order" in docs
     assert "config\\\\release-merge-order.seed.json" in validator
     assert "scripts\\\\check-release-merge-order.ps1" in validator
+    assert "latest candidate must match release blocker inventory" in validator
+    assert "latest PR must match release blocker inventory" in validator
     assert "release merge-order verifier" in changelog.lower()
+
+
+def test_validate_seed_blocks_merge_order_latest_candidate_mismatch() -> None:
+    merge_order_path = ROOT / "config" / "release-merge-order.seed.json"
+    snapshots = _snapshot_files([merge_order_path])
+
+    try:
+        merge_order = json.loads(merge_order_path.read_text(encoding="utf-8"))
+        merge_order["stack"][-1]["candidate"] = "v0.1.0-source"
+        merge_order["stack"][-1]["pr"] = 1
+        _write_json(merge_order_path, merge_order)
+
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "validate-seed.ps1"),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    finally:
+        _restore_files(snapshots)
+
+    assert result.returncode != 0
+    output = result.stdout + result.stderr
+    assert "release-merge-order.seed.json latest candidate must match" in output
+    assert "release-merge-order.seed.json latest PR must match" in output

@@ -186,6 +186,11 @@ that seed validation requires the latest source-readiness milestone evidence to
 match the blocker inventory latest candidate and PR; it is not tagged and does
 not ship APK/EXE binaries.
 
+Source readiness note: `v0.129.0-source` is a pending stacked PR for verifying
+that seed validation requires the latest release merge-order PR and candidate
+to match the blocker inventory latest candidate and PR; it is not tagged and
+does not ship APK/EXE binaries.
+
 Source readiness note: `v0.53.0-source` is a pending stacked PR for Windows
 verifier CI/preflight enforcement; it is not tagged and does not ship APK/EXE
 binaries.
