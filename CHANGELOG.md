@@ -289,8 +289,11 @@ production readiness without matching public evidence.
 - Added source tag-readiness ready-status consistency checks so blocker
   inventories cannot claim ready status while required release blockers remain
   open.
+- Added source tag-readiness milestone-status consistency checks so tag
+  creation cannot be allowed while the selected source-readiness milestone is
+  still pending or not tagged.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.123.0-source` candidates.
+  `v0.124.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -419,6 +422,7 @@ production readiness without matching public evidence.
 | `v0.121.0-source` | Pending stacked PR, not tagged | PR #142 |
 | `v0.122.0-source` | Pending stacked PR, not tagged | PR #143 |
 | `v0.123.0-source` | Pending stacked PR, not tagged | PR #144 |
+| `v0.124.0-source` | Pending stacked PR, not tagged | PR #145 |
 
 ### Still Source-Only
 

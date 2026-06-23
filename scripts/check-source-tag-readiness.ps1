@@ -127,6 +127,12 @@ try {
   ) {
     $errors.Add("tag creation is allowed while release blocker inventory status is not ready")
   }
+  if (
+    $inventory.tracked_candidates.tag_creation_allowed -eq $true -and
+    [string]$milestone.status -like "*not_tagged*"
+  ) {
+    $errors.Add("tag creation is allowed while source readiness milestone is not tagged")
+  }
   foreach ($blocker in @($inventory.blockers)) {
     $blockerId = [string]$blocker.id
     if ([string]::IsNullOrWhiteSpace($blockerId)) {

@@ -26,6 +26,7 @@
     "requires_tag_creation_allowed_blocker_consistency": true,
     "requires_tag_creation_allowed_status_consistency": true,
     "requires_source_readiness_milestone_status": true,
+    "requires_tag_creation_allowed_milestone_status_consistency": true,
     "requires_source_readiness_milestone_evidence": true,
     "requires_source_readiness_milestone_scope": true,
     "requires_read_only_summary": true,
