@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -30,6 +31,22 @@ def _read_json(relative_path: str) -> dict:
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _fresh_ruleset_checked_at() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _stale_ruleset_checked_at() -> str:
+    return (
+        datetime.now(timezone.utc) - timedelta(hours=48)
+    ).isoformat().replace("+00:00", "Z")
+
+
+def _with_ruleset_checked_at(payload: dict[str, object]) -> dict[str, object]:
+    enriched = dict(payload)
+    enriched.setdefault("checked_at", _fresh_ruleset_checked_at())
+    return enriched
 
 
 def _git_head() -> str:
@@ -106,6 +123,8 @@ def test_release_evidence_bundle_seed_defines_source_only_policy() -> None:
     assert seed["policy"]["requires_ruleset_report_shape"] is True
     assert seed["policy"]["requires_ruleset_report_target"] is True
     assert seed["policy"]["requires_ruleset_report_ok_consistency"] is True
+    assert seed["policy"]["requires_ruleset_report_checked_at"] is True
+    assert seed["policy"]["requires_ruleset_report_freshness"] is True
     assert seed["policy"]["requires_ruleset_report_check_entry_shape"] is True
     assert seed["policy"]["requires_ruleset_report_required_status_checks"] is True
     assert (
@@ -148,6 +167,8 @@ def test_release_evidence_bundle_script_preserves_claim_boundaries() -> None:
         "ruleset report without schema_version 1",
         "ruleset report that is not read-only",
         "ruleset report without ok status",
+        "ruleset report without checked_at timestamp",
+        "stale ruleset report checked_at timestamp",
         "ruleset report repository mismatch",
         "ruleset report branch mismatch",
         "ruleset report ok status without checks",
@@ -231,6 +252,7 @@ def test_release_evidence_bundle_script_writes_bundle_from_fixture(tmp_path: Pat
                 "schema_version": 1,
                 "ok": False,
                 "read_only": True,
+                "checked_at": _fresh_ruleset_checked_at(),
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,
@@ -315,6 +337,29 @@ def test_release_evidence_bundle_script_writes_bundle_from_fixture(tmp_path: Pat
             {"schema_version": 1, "read_only": True},
             "ruleset report without ok status",
         ),
+        (
+            {
+                "schema_version": 1,
+                "ok": True,
+                "read_only": True,
+                "repository": "Kiwunaka/Pokrov-client",
+                "branch": "main",
+                "required_status_checks": REQUIRED_STATUS_CHECKS,
+            },
+            "ruleset report without checked_at timestamp",
+        ),
+        (
+            {
+                "schema_version": 1,
+                "ok": True,
+                "read_only": True,
+                "checked_at": _stale_ruleset_checked_at(),
+                "repository": "Kiwunaka/Pokrov-client",
+                "branch": "main",
+                "required_status_checks": REQUIRED_STATUS_CHECKS,
+            },
+            "stale ruleset report checked_at timestamp",
+        ),
     ],
 )
 def test_release_evidence_bundle_rejects_malformed_ruleset_report(
@@ -363,6 +408,7 @@ def test_release_evidence_bundle_rejects_malformed_ruleset_report(
                 "schema_version": 1,
                 "ok": True,
                 "read_only": True,
+                "checked_at": _fresh_ruleset_checked_at(),
                 "repository": "example/fork",
                 "branch": "main",
             },
@@ -373,6 +419,7 @@ def test_release_evidence_bundle_rejects_malformed_ruleset_report(
                 "schema_version": 1,
                 "ok": True,
                 "read_only": True,
+                "checked_at": _fresh_ruleset_checked_at(),
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "release",
             },
@@ -426,6 +473,7 @@ def test_release_evidence_bundle_rejects_wrong_ruleset_report_target(
                 "schema_version": 1,
                 "ok": True,
                 "read_only": True,
+                "checked_at": _fresh_ruleset_checked_at(),
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,
@@ -438,6 +486,7 @@ def test_release_evidence_bundle_rejects_wrong_ruleset_report_target(
                 "schema_version": 1,
                 "ok": True,
                 "read_only": True,
+                "checked_at": _fresh_ruleset_checked_at(),
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,
@@ -451,6 +500,7 @@ def test_release_evidence_bundle_rejects_wrong_ruleset_report_target(
                 "schema_version": 1,
                 "ok": True,
                 "read_only": True,
+                "checked_at": _fresh_ruleset_checked_at(),
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,
@@ -525,6 +575,7 @@ def test_release_evidence_bundle_rejects_ruleset_report_required_status_check_mi
                 "schema_version": 1,
                 "ok": True,
                 "read_only": True,
+                "checked_at": _fresh_ruleset_checked_at(),
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": required_status_checks,
@@ -577,6 +628,7 @@ def test_release_evidence_bundle_rejects_ruleset_report_covered_required_status_
                 "schema_version": 1,
                 "ok": True,
                 "read_only": True,
+                "checked_at": _fresh_ruleset_checked_at(),
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,

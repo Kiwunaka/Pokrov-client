@@ -54,6 +54,8 @@
     "requires_publication_dry_run_ruleset_report_shape": true,
     "requires_publication_dry_run_ruleset_report_target": true,
     "requires_publication_dry_run_ruleset_report_ok_consistency": true,
+    "requires_publication_dry_run_ruleset_report_checked_at": true,
+    "requires_publication_dry_run_ruleset_report_freshness": true,
     "requires_publication_dry_run_ruleset_report_check_entry_shape": true,
     "requires_publication_dry_run_ruleset_report_required_status_checks": true,
     "requires_publication_dry_run_ruleset_report_covered_required_status_checks": true
@@ -61,8 +63,8 @@
   "inputs": {
     "merge_order": "build/release-merge-order/release-merge-order.json",
     "github_status": "build/release-stack-github-status/release-stack-github-status.json",
-    "tag_readiness": "build/source-tag-readiness/v0.118.0-source/v0.118.0-source-tag-readiness.json",
-    "publication_dry_run": "build/source-release-publication/v0.118.0-source/v0.118.0-source-publication-dry-run.json"
+    "tag_readiness": "build/source-tag-readiness/v0.119.0-source/v0.119.0-source-tag-readiness.json",
+    "publication_dry_run": "build/source-release-publication/v0.119.0-source/v0.119.0-source-publication-dry-run.json"
   },
   "input_roots": {
     "merge_order": "build/release-merge-order",

@@ -9,6 +9,8 @@ param(
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $defaultOutputDir = "build\release-merge-handoff"
+$rulesetReportMaxAgeHours = 24
+$rulesetReportFutureSkewMinutes = 5
 
 function Get-RequiredStatusChecks {
   $requiredChecksPath = Join-Path $root "config\required-checks.seed.json"
@@ -60,6 +62,8 @@ function Assert-InputFingerprintIntegrity {
     [Parameter(Mandatory = $true)][object]$BlockingErrors,
     [string]$RulesetReportSchemaVersionErrorMessage = "",
     [string]$RulesetReportReadOnlyErrorMessage = "",
+    [string]$RulesetReportCheckedAtErrorMessage = "",
+    [string]$RulesetReportStaleCheckedAtErrorMessage = "",
     [string]$RulesetReportOkStatusErrorMessage = "",
     [string]$RulesetReportRepositoryErrorMessage = "",
     [string]$RulesetReportBranchErrorMessage = "",
@@ -85,6 +89,8 @@ function Assert-InputFingerprintIntegrity {
   if (
     -not [string]::IsNullOrWhiteSpace($RulesetReportSchemaVersionErrorMessage) -or
     -not [string]::IsNullOrWhiteSpace($RulesetReportReadOnlyErrorMessage) -or
+    -not [string]::IsNullOrWhiteSpace($RulesetReportCheckedAtErrorMessage) -or
+    -not [string]::IsNullOrWhiteSpace($RulesetReportStaleCheckedAtErrorMessage) -or
     -not [string]::IsNullOrWhiteSpace($RulesetReportOkStatusErrorMessage) -or
     -not [string]::IsNullOrWhiteSpace($RulesetReportRepositoryErrorMessage) -or
     -not [string]::IsNullOrWhiteSpace($RulesetReportBranchErrorMessage) -or
@@ -103,6 +109,23 @@ function Assert-InputFingerprintIntegrity {
     }
     if ($null -eq $rulesetReport.PSObject.Properties["ok"]) {
       $BlockingErrors.Add($RulesetReportOkStatusErrorMessage)
+    }
+    $checkedAtText = [string]$rulesetReport.checked_at
+    $checkedAt = [datetimeoffset]::MinValue
+    if (
+      [string]::IsNullOrWhiteSpace($checkedAtText) -or
+      -not [datetimeoffset]::TryParse($checkedAtText, [ref]$checkedAt)
+    ) {
+      $BlockingErrors.Add($RulesetReportCheckedAtErrorMessage)
+    } else {
+      $checkedAtUtc = $checkedAt.ToUniversalTime()
+      $age = [datetimeoffset]::UtcNow - $checkedAtUtc
+      if (
+        $age.TotalHours -gt $rulesetReportMaxAgeHours -or
+        $age.TotalMinutes -lt (-1 * $rulesetReportFutureSkewMinutes)
+      ) {
+        $BlockingErrors.Add($RulesetReportStaleCheckedAtErrorMessage)
+      }
     }
     if ([string]$rulesetReport.repository -ne "Kiwunaka/Pokrov-client") {
       $BlockingErrors.Add($RulesetReportRepositoryErrorMessage)
@@ -464,6 +487,8 @@ try {
       -ErrorMessage "publication dry-run ruleset report input fingerprint mismatch" `
       -RulesetReportSchemaVersionErrorMessage "publication dry-run ruleset report without schema_version 1" `
       -RulesetReportReadOnlyErrorMessage "publication dry-run ruleset report that is not read-only" `
+      -RulesetReportCheckedAtErrorMessage "publication dry-run ruleset report without checked_at timestamp" `
+      -RulesetReportStaleCheckedAtErrorMessage "publication dry-run stale ruleset report checked_at timestamp" `
       -RulesetReportOkStatusErrorMessage "publication dry-run ruleset report without ok status" `
       -RulesetReportRepositoryErrorMessage "publication dry-run ruleset report repository mismatch" `
       -RulesetReportBranchErrorMessage "publication dry-run ruleset report branch mismatch" `

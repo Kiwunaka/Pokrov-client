@@ -478,6 +478,12 @@
       "candidate": "v0.118.0-source",
       "base": "codex/v0.117-ruleset-report-required-check-coverage",
       "head": "codex/v0.118-ruleset-report-covered-required-checks"
+    },
+    {
+      "pr": 140,
+      "candidate": "v0.119.0-source",
+      "base": "codex/v0.118-ruleset-report-covered-required-checks",
+      "head": "codex/v0.119-ruleset-report-freshness"
     }
   ]
 }

@@ -17,6 +17,8 @@ $root = Split-Path -Parent $PSScriptRoot
 $defaultOutputDir = "build\source-release-publication"
 $expectedRulesetRepository = "Kiwunaka/Pokrov-client"
 $expectedRulesetBranch = "main"
+$rulesetReportMaxAgeHours = 24
+$rulesetReportFutureSkewMinutes = 5
 
 function Get-RequiredStatusChecks {
   $requiredChecksPath = Join-Path $root "config\required-checks.seed.json"
@@ -116,6 +118,23 @@ function Assert-RulesetReportInputFingerprintIntegrity {
 
   if ($null -eq $rulesetReport.PSObject.Properties["ok"]) {
     throw "Publication dry-run refused ruleset report without ok status."
+  }
+
+  $checkedAtText = [string]$rulesetReport.checked_at
+  $checkedAt = [datetimeoffset]::MinValue
+  if (
+    [string]::IsNullOrWhiteSpace($checkedAtText) -or
+    -not [datetimeoffset]::TryParse($checkedAtText, [ref]$checkedAt)
+  ) {
+    throw "Publication dry-run refused ruleset report without checked_at timestamp."
+  }
+  $checkedAtUtc = $checkedAt.ToUniversalTime()
+  $age = [datetimeoffset]::UtcNow - $checkedAtUtc
+  if (
+    $age.TotalHours -gt $rulesetReportMaxAgeHours -or
+    $age.TotalMinutes -lt (-1 * $rulesetReportFutureSkewMinutes)
+  ) {
+    throw "Publication dry-run refused stale ruleset report checked_at timestamp."
   }
 
   if ([string]$rulesetReport.repository -ne $expectedRulesetRepository) {
