@@ -10,6 +10,11 @@ import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
+REQUIRED_STATUS_CHECKS = [
+    "Source import and public tree checks",
+    "Flutter analyze and tests",
+    "Android native Gradle unit tests",
+]
 
 
 def _read(relative_path: str) -> str:
@@ -52,7 +57,7 @@ def _merge_order_summary(ok: bool = True) -> dict:
             "base": f"codex/v0.{pr_number - 22}-source",
             "head": f"codex/v0.{pr_number - 21}-source",
         }
-        for pr_number in range(62, 137)
+        for pr_number in range(62, 138)
     ]
     return {
         "schema_version": 1,
@@ -60,10 +65,10 @@ def _merge_order_summary(ok: bool = True) -> dict:
         "read_only": True,
         "merge_order_ok": ok,
         "linear_base_to_head_chain": ok,
-        "stack_count": 75,
-        "latest_pr": 136,
-        "latest_candidate": "v0.115.0-source",
-        "errors": [] if ok else ["PR #136 base must equal previous head"],
+        "stack_count": 76,
+        "latest_pr": 137,
+        "latest_candidate": "v0.116.0-source",
+        "errors": [] if ok else ["PR #137 base must equal previous head"],
         "stack": stack,
     }
 
@@ -118,25 +123,25 @@ def _github_status_summary(ok: bool = True) -> dict:
             "checks": _github_status_pr_checks(),
             "errors": [],
         }
-        for pr_number in range(62, 137)
+        for pr_number in range(62, 138)
     ]
     return {
         "schema_version": 1,
         "generated_at": "2026-06-15T00:00:02Z",
         "read_only": True,
         "github_status_ok": ok,
-        "stack_count": 75,
-        "latest_pr": 136,
-        "latest_pr_url": "https://github.com/Kiwunaka/Pokrov-client/pull/136",
+        "stack_count": 76,
+        "latest_pr": 137,
+        "latest_pr_url": "https://github.com/Kiwunaka/Pokrov-client/pull/137",
         "expected_pr_url_prefix": "https://github.com/Kiwunaka/Pokrov-client/pull/",
-        "latest_candidate": "v0.115.0-source",
-        "clean_pr_count": 75 if ok else 62,
+        "latest_candidate": "v0.116.0-source",
+        "clean_pr_count": 76 if ok else 62,
         "draft_pr_count": 0,
         "unclean_pr_count": 0 if ok else 1,
-        "successful_check_count": 225 if ok else 194,
+        "successful_check_count": 228 if ok else 194,
         "failed_check_count": 0 if ok else 1,
         "pull_requests": pull_requests,
-        "errors": [] if ok else ["PR #136 check 'Flutter analyze and tests' is FAILURE"],
+        "errors": [] if ok else ["PR #137 check 'Flutter analyze and tests' is FAILURE"],
     }
 
 
@@ -157,7 +162,7 @@ def _tag_readiness_summary(ready: bool = False) -> dict:
         "schema_version": 1,
         "generated_at": "2026-06-15T00:00:03Z",
         "read_only": True,
-        "tag": "v0.115.0-source",
+        "tag": "v0.116.0-source",
         "ready_for_tag": ready,
         "source_only": True,
         "ships_apk": False,
@@ -165,8 +170,8 @@ def _tag_readiness_summary(ready: bool = False) -> dict:
         "store_release": False,
         "trusted_signing_claim": False,
         "tag_creation_allowed": ready,
-        "latest_candidate": "v0.115.0-source",
-        "latest_stacked_pr": 136,
+        "latest_candidate": "v0.116.0-source",
+        "latest_stacked_pr": 137,
         "input_fingerprints": {
             "blocker_inventory": {
                 "path": "config/release-blocker-inventory.seed.json",
@@ -187,7 +192,7 @@ def _publication_dry_run_summary(ok: bool = True) -> dict:
         "schema_version": 1,
         "generated_at": "2026-06-15T00:00:04Z",
         "read_only": True,
-        "tag": "v0.115.0-source",
+        "tag": "v0.116.0-source",
         "commit_sha": "a" * 40,
         "evidence_bundle_preflight_commit_sha": "a" * 40,
         "evidence_bundle_preflight_ref_commit_sha": "a" * 40,
@@ -207,24 +212,24 @@ def _publication_dry_run_summary(ok: bool = True) -> dict:
         "source_archive_sha256": "2" * 64,
         "input_fingerprints": {
             "evidence_bundle": {
-                "path": "build/release-evidence/v0.115.0-source/release-evidence.json",
+                "path": "build/release-evidence/v0.116.0-source/release-evidence.json",
                 "sha256": "c" * 64,
             },
             "release_notes": {
-                "path": "build/source-release/v0.115.0-source/release-notes.md",
+                "path": "build/source-release/v0.116.0-source/release-notes.md",
                 "sha256": "d" * 64,
             },
         },
         "evidence_bundle_input_fingerprints": {
             "preflight_summary": {
-                "path": "build/source-release-preflight/v0.115.0-source/preflight.json",
+                "path": "build/source-release-preflight/v0.116.0-source/preflight.json",
                 "sha256": "e" * 64,
             },
         },
         "evidence_bundle_preflight_artifact_fingerprints": {
             "proof_manifest": {"path": "proof.json", "sha256": "f" * 64},
             "release_notes": {
-                "path": "build/source-release/v0.115.0-source/release-notes.md",
+                "path": "build/source-release/v0.116.0-source/release-notes.md",
                 "sha256": "d" * 64,
             },
             "source_archive": {"path": "source.zip", "sha256": "2" * 64},
@@ -246,10 +251,16 @@ def _write_preflight_fixture(tmp_path: Path) -> Path:
 def _write_ruleset_report_fixture(tmp_path: Path) -> Path:
     ruleset = tmp_path / "github-ruleset-report.json"
     ruleset.write_text(
-        (
-            '{"schema_version":1,"ok":true,"read_only":true,'
-            '"repository":"Kiwunaka/Pokrov-client","branch":"main",'
-            '"checks":[{"name":"ruleset:active","status":"pass"}]}'
+        json.dumps(
+            {
+                "schema_version": 1,
+                "ok": True,
+                "read_only": True,
+                "repository": "Kiwunaka/Pokrov-client",
+                "branch": "main",
+                "required_status_checks": REQUIRED_STATUS_CHECKS,
+                "checks": [{"name": "ruleset:active", "status": "pass"}],
+            }
         ),
         encoding="utf-8",
     )
@@ -300,7 +311,7 @@ def _write_publication_input_fixtures(tmp_path: Path) -> tuple[Path, Path]:
     evidence_bundle = tmp_path / "release-evidence.json"
     evidence_bundle.write_text('{"source_only":true}', encoding="utf-8")
     release_notes = tmp_path / "release-notes.md"
-    release_notes.write_text("# v0.115.0-source\n", encoding="utf-8")
+    release_notes.write_text("# v0.116.0-source\n", encoding="utf-8")
     return evidence_bundle, release_notes
 
 
@@ -407,7 +418,7 @@ def _write_input_summaries(
             / "source-tag-readiness"
             / "test-inputs"
             / suffix
-            / "v0.115.0-source-tag-readiness.json"
+            / "v0.116.0-source-tag-readiness.json"
         )
         publication_path = (
             ROOT
@@ -415,13 +426,13 @@ def _write_input_summaries(
             / "source-release-publication"
             / "test-inputs"
             / suffix
-            / "v0.115.0-source-publication-dry-run.json"
+            / "v0.116.0-source-publication-dry-run.json"
         )
     else:
         merge_path = tmp_path / "release-merge-order.json"
         github_path = tmp_path / "release-stack-github-status.json"
-        tag_path = tmp_path / "v0.115.0-source-tag-readiness.json"
-        publication_path = tmp_path / "v0.115.0-source-publication-dry-run.json"
+        tag_path = tmp_path / "v0.116.0-source-tag-readiness.json"
+        publication_path = tmp_path / "v0.116.0-source-publication-dry-run.json"
     for path in (merge_path, github_path, tag_path, publication_path):
         path.parent.mkdir(parents=True, exist_ok=True)
     blocker_inventory, source_readiness = _write_tag_readiness_input_fixtures(tmp_path)
@@ -511,6 +522,12 @@ def test_release_merge_handoff_seed_defines_read_only_inputs() -> None:
     assert (
         seed["policy"][
             "requires_publication_dry_run_ruleset_report_check_entry_shape"
+        ]
+        is True
+    )
+    assert (
+        seed["policy"][
+            "requires_publication_dry_run_ruleset_report_required_status_checks"
         ]
         is True
     )
@@ -651,6 +668,7 @@ def test_release_merge_handoff_script_is_read_only() -> None:
         "publication dry-run ruleset report ok status without checks",
         "publication dry-run ruleset report ok status with failed checks",
         "publication dry-run ruleset report check entry shape mismatch",
+        "publication dry-run ruleset report required status checks mismatch",
         "publication_dry_run_evidence_bundle_preflight_artifact_fingerprints",
         "tag readiness summary is missing input fingerprints",
         "publication dry-run summary is missing input fingerprints",
@@ -774,17 +792,17 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
     assert summary["manual_tag_required"] is True
     assert summary["publish_performed"] is False
     assert summary["tag_push_performed"] is False
-    assert summary["latest_candidate"] == "v0.115.0-source"
-    assert summary["latest_pr"] == 136
-    assert summary["latest_pr_url"] == "https://github.com/Kiwunaka/Pokrov-client/pull/136"
+    assert summary["latest_candidate"] == "v0.116.0-source"
+    assert summary["latest_pr"] == 137
+    assert summary["latest_pr_url"] == "https://github.com/Kiwunaka/Pokrov-client/pull/137"
     assert summary["expected_pr_url_prefix"] == (
         "https://github.com/Kiwunaka/Pokrov-client/pull/"
     )
     assert summary["github_status_expected_pr_url_prefix"] == (
         "https://github.com/Kiwunaka/Pokrov-client/pull/"
     )
-    assert summary["blocker_inventory_latest_candidate"] == "v0.115.0-source"
-    assert summary["blocker_inventory_latest_pr"] == 136
+    assert summary["blocker_inventory_latest_candidate"] == "v0.116.0-source"
+    assert summary["blocker_inventory_latest_pr"] == 137
     assert summary["source_only"] is True
     assert summary["no_apk"] is True
     assert summary["no_exe"] is True
@@ -812,7 +830,7 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
         "sha256"
     ] == _sha256(publication_path)
     assert summary["input_fingerprints"]["publication_dry_run"]["path"].endswith(
-        "v0.115.0-source-publication-dry-run.json"
+        "v0.116.0-source-publication-dry-run.json"
     )
     assert summary["tag_readiness_input_fingerprints"]["blocker_inventory"][
         "sha256"
@@ -905,37 +923,37 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
         "publication_dry_run": 1,
     }
     assert summary["input_stack_counts"] == {
-        "merge_order": 75,
-        "github_status": 75,
+        "merge_order": 76,
+        "github_status": 76,
     }
     assert summary["github_status_counts"] == {
-        "stack_count": 75,
-        "clean_pr_count": 75,
+        "stack_count": 76,
+        "clean_pr_count": 76,
         "draft_pr_count": 0,
         "unclean_pr_count": 0,
-        "successful_check_count": 225,
+        "successful_check_count": 228,
         "failed_check_count": 0,
         "required_status_check_count": 3,
     }
-    assert summary["github_status_pull_request_count"] == 75
-    assert summary["github_status_pr_sequence"] == list(range(62, 137))
+    assert summary["github_status_pull_request_count"] == 76
+    assert summary["github_status_pr_sequence"] == list(range(62, 138))
     assert summary["github_status_pr_refs"][0] == {
         "pr": 62,
         "base": "codex/v0.40-source",
         "head": "codex/v0.41-source",
     }
     assert summary["github_status_pr_refs"][-1] == {
-        "pr": 136,
-        "base": "codex/v0.114-source",
-        "head": "codex/v0.115-source",
+        "pr": 137,
+        "base": "codex/v0.115-source",
+        "head": "codex/v0.116-source",
     }
     assert summary["github_status_pr_urls"][0] == {
         "pr": 62,
         "url": "https://github.com/Kiwunaka/Pokrov-client/pull/62",
     }
     assert summary["github_status_pr_urls"][-1] == {
-        "pr": 136,
-        "url": "https://github.com/Kiwunaka/Pokrov-client/pull/136",
+        "pr": 137,
+        "url": "https://github.com/Kiwunaka/Pokrov-client/pull/137",
     }
     assert summary["github_status_pr_states"][0] == {
         "pr": 62,
@@ -943,7 +961,7 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
         "isDraft": False,
     }
     assert summary["github_status_pr_states"][-1] == {
-        "pr": 136,
+        "pr": 137,
         "mergeStateStatus": "CLEAN",
         "isDraft": False,
     }
@@ -955,7 +973,7 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
         "checks": _github_status_pr_checks(),
     }
     assert summary["github_status_pr_checks"][-1] == {
-        "pr": 136,
+        "pr": 137,
         "successful_check_count": 3,
         "failed_check_count": 0,
         "required_status_check_count": 3,
@@ -981,15 +999,15 @@ def test_release_merge_handoff_uses_seed_default_input_paths(tmp_path: Path) -> 
         ROOT
         / "build"
         / "source-tag-readiness"
-        / "v0.115.0-source"
-        / "v0.115.0-source-tag-readiness.json"
+        / "v0.116.0-source"
+        / "v0.116.0-source-tag-readiness.json"
     )
     default_publication_path = (
         ROOT
         / "build"
         / "source-release-publication"
-        / "v0.115.0-source"
-        / "v0.115.0-source-publication-dry-run.json"
+        / "v0.116.0-source"
+        / "v0.116.0-source-publication-dry-run.json"
     )
     out_dir = ROOT / "build" / "release-merge-handoff"
     summary_path = out_dir / "release-merge-handoff.json"
@@ -1058,10 +1076,10 @@ def test_release_merge_handoff_uses_seed_default_input_paths(tmp_path: Path) -> 
         assert result.returncode == 0, result.stderr + result.stdout
         summary = json.loads(summary_path.read_text(encoding="utf-8-sig"))
         assert summary["handoff_ready_for_maintainer"] is True
-        assert summary["latest_candidate"] == "v0.115.0-source"
-        assert summary["latest_pr"] == 136
-        assert summary["blocker_inventory_latest_candidate"] == "v0.115.0-source"
-        assert summary["blocker_inventory_latest_pr"] == 136
+        assert summary["latest_candidate"] == "v0.116.0-source"
+        assert summary["latest_pr"] == 137
+        assert summary["blocker_inventory_latest_candidate"] == "v0.116.0-source"
+        assert summary["blocker_inventory_latest_pr"] == 137
         assert summary["publication_dry_run_ok"] is True
         assert summary["source_only"] is True
         assert summary["no_apk"] is True
@@ -1153,7 +1171,7 @@ def test_release_merge_handoff_blocks_mismatched_input_candidates(
         / "source-release-publication"
         / "test-inputs"
         / suffix
-        / "v0.115.0-source-publication-dry-run.json"
+        / "v0.116.0-source-publication-dry-run.json"
     )
     for path in (merge_path, github_path, tag_path, publication_path):
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -1266,7 +1284,7 @@ def test_release_merge_handoff_blocks_input_summary_errors(
         tmp_path
     )
     merge_summary = json.loads(merge_path.read_text(encoding="utf-8"))
-    merge_summary["errors"] = ["PR #136 base was stale when checked"]
+    merge_summary["errors"] = ["PR #137 base was stale when checked"]
     _write_json(merge_path, merge_summary)
     out_dir = ROOT / "build" / "release-merge-handoff" / "test-output"
     shutil.rmtree(out_dir, ignore_errors=True)
@@ -1305,7 +1323,7 @@ def test_release_merge_handoff_blocks_input_summary_errors(
     assert result.returncode == 2
     assert summary["handoff_ready_for_maintainer"] is False
     assert summary["input_error_count"] == 1
-    assert summary["input_errors"] == ["PR #136 base was stale when checked"]
+    assert summary["input_errors"] == ["PR #137 base was stale when checked"]
     assert "input summaries report errors" in summary["blocking_errors"]
 
 
@@ -2191,6 +2209,7 @@ def test_release_merge_handoff_blocks_wrong_publication_ruleset_report_target(
                 "read_only": True,
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
+                "required_status_checks": REQUIRED_STATUS_CHECKS,
             },
             "publication dry-run ruleset report ok status without checks",
         ),
@@ -2201,6 +2220,7 @@ def test_release_merge_handoff_blocks_wrong_publication_ruleset_report_target(
                 "read_only": True,
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
+                "required_status_checks": REQUIRED_STATUS_CHECKS,
                 "checks": [{"status": "pass"}],
             },
             "publication dry-run ruleset report check entry shape mismatch",
@@ -2212,6 +2232,7 @@ def test_release_merge_handoff_blocks_wrong_publication_ruleset_report_target(
                 "read_only": True,
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
+                "required_status_checks": REQUIRED_STATUS_CHECKS,
                 "checks": [{"name": "ruleset:active", "status": "fail"}],
             },
             "publication dry-run ruleset report ok status with failed checks",
@@ -2274,6 +2295,91 @@ def test_release_merge_handoff_blocks_inconsistent_publication_ruleset_report_ok
     assert result.returncode == 2
     assert summary["handoff_ready_for_maintainer"] is False
     assert expected_error in summary["blocking_errors"]
+
+
+@pytest.mark.parametrize(
+    "required_status_checks",
+    [
+        [],
+        ["Source import and public tree checks"],
+        [
+            "Source import and public tree checks",
+            "Android native Gradle unit tests",
+            "Flutter analyze and tests",
+        ],
+    ],
+)
+def test_release_merge_handoff_blocks_publication_ruleset_report_required_status_check_mismatch(
+    tmp_path: Path,
+    required_status_checks: list[str],
+) -> None:
+    merge_path, github_path, tag_path, publication_path = _write_input_summaries(
+        tmp_path
+    )
+    publication_summary = json.loads(publication_path.read_text(encoding="utf-8"))
+    ruleset_path = Path(
+        publication_summary["evidence_bundle_input_fingerprints"][
+            "github_ruleset_report"
+        ]["path"]
+    )
+    ruleset_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "ok": True,
+                "read_only": True,
+                "repository": "Kiwunaka/Pokrov-client",
+                "branch": "main",
+                "required_status_checks": required_status_checks,
+                "checks": [{"name": "ruleset:active", "status": "pass"}],
+            }
+        ),
+        encoding="utf-8",
+    )
+    publication_summary["evidence_bundle_input_fingerprints"]["github_ruleset_report"][
+        "sha256"
+    ] = _sha256(ruleset_path)
+    _write_json(publication_path, publication_summary)
+    out_dir = ROOT / "build" / "release-merge-handoff" / "test-output"
+    shutil.rmtree(out_dir, ignore_errors=True)
+
+    try:
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "prepare-release-merge-handoff.ps1"),
+                "-MergeOrderPath",
+                str(merge_path),
+                "-GithubStatusPath",
+                str(github_path),
+                "-TagReadinessPath",
+                str(tag_path),
+                "-PublicationDryRunPath",
+                str(publication_path),
+                "-OutDir",
+                str(out_dir),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        summary = json.loads(
+            (out_dir / "release-merge-handoff.json").read_text(encoding="utf-8-sig")
+        )
+    finally:
+        shutil.rmtree(out_dir, ignore_errors=True)
+
+    assert result.returncode == 2
+    assert summary["handoff_ready_for_maintainer"] is False
+    assert (
+        "publication dry-run ruleset report required status checks mismatch"
+        in summary["blocking_errors"]
+    )
 
 
 def test_release_merge_handoff_blocks_stale_publication_evidence_bundle_input_fingerprint(
@@ -2789,7 +2895,7 @@ def test_release_merge_handoff_blocks_latest_pr_url_wrong_repository(
         tmp_path
     )
     github_summary = json.loads(github_path.read_text(encoding="utf-8"))
-    github_summary["latest_pr_url"] = "https://github.com/example/fork/pull/136"
+    github_summary["latest_pr_url"] = "https://github.com/example/fork/pull/137"
     _write_json(github_path, github_summary)
     out_dir = ROOT / "build" / "release-merge-handoff" / "test-output"
     shutil.rmtree(out_dir, ignore_errors=True)
@@ -3301,8 +3407,8 @@ def test_release_merge_handoff_blocks_blocker_inventory_candidate_mismatch(
 
     try:
         inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
-        inventory["tracked_candidates"]["latest_candidate"] = "v0.116.0-source"
-        inventory["tracked_candidates"]["latest_stacked_pr"] = 137
+        inventory["tracked_candidates"]["latest_candidate"] = "v0.117.0-source"
+        inventory["tracked_candidates"]["latest_stacked_pr"] = 138
         _write_json(inventory_path, inventory)
 
         result = subprocess.run(

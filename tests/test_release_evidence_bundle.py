@@ -9,6 +9,11 @@ import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
+REQUIRED_STATUS_CHECKS = [
+    "Source import and public tree checks",
+    "Flutter analyze and tests",
+    "Android native Gradle unit tests",
+]
 
 
 def _read(relative_path: str) -> str:
@@ -98,6 +103,7 @@ def test_release_evidence_bundle_seed_defines_source_only_policy() -> None:
     assert seed["policy"]["requires_ruleset_report_target"] is True
     assert seed["policy"]["requires_ruleset_report_ok_consistency"] is True
     assert seed["policy"]["requires_ruleset_report_check_entry_shape"] is True
+    assert seed["policy"]["requires_ruleset_report_required_status_checks"] is True
     assert seed["policy"]["requires_preflight_artifact_fingerprints"] is True
     assert seed["policy"]["requires_preflight_artifact_fingerprint_integrity"] is True
     assert seed["policy"]["requires_preflight_commit_sha_consistency"] is True
@@ -139,6 +145,7 @@ def test_release_evidence_bundle_script_preserves_claim_boundaries() -> None:
         "ruleset report ok status without checks",
         "ruleset report ok status with failed checks",
         "ruleset report check entry shape mismatch",
+        "ruleset report required status checks mismatch",
         "preflight_artifact_fingerprints",
         "preflight_commit_sha",
         "preflight_ref_commit_sha",
@@ -217,6 +224,7 @@ def test_release_evidence_bundle_script_writes_bundle_from_fixture(tmp_path: Pat
                 "read_only": True,
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
+                "required_status_checks": REQUIRED_STATUS_CHECKS,
                 "checks": [{"name": "ruleset:active", "status": "pass"}],
             }
         ),
@@ -410,6 +418,7 @@ def test_release_evidence_bundle_rejects_wrong_ruleset_report_target(
                 "read_only": True,
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
+                "required_status_checks": REQUIRED_STATUS_CHECKS,
             },
             "ruleset report ok status without checks",
         ),
@@ -420,6 +429,7 @@ def test_release_evidence_bundle_rejects_wrong_ruleset_report_target(
                 "read_only": True,
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
+                "required_status_checks": REQUIRED_STATUS_CHECKS,
                 "checks": [{"status": "pass"}],
             },
             "ruleset report check entry shape mismatch",
@@ -431,6 +441,7 @@ def test_release_evidence_bundle_rejects_wrong_ruleset_report_target(
                 "read_only": True,
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
+                "required_status_checks": REQUIRED_STATUS_CHECKS,
                 "checks": [{"name": "ruleset:active", "status": "fail"}],
             },
             "ruleset report ok status with failed checks",
@@ -473,6 +484,70 @@ def test_release_evidence_bundle_rejects_inconsistent_ruleset_report_ok_status(
     assert result.returncode != 0
     assert not (out_dir / "v9.9.9-source-release-evidence.json").exists()
     assert expected_error in (result.stderr + result.stdout)
+
+
+@pytest.mark.parametrize(
+    "required_status_checks",
+    [
+        [],
+        ["Source import and public tree checks"],
+        [
+            "Source import and public tree checks",
+            "Android native Gradle unit tests",
+            "Flutter analyze and tests",
+        ],
+    ],
+)
+def test_release_evidence_bundle_rejects_ruleset_report_required_status_check_mismatch(
+    tmp_path: Path,
+    required_status_checks: list[str],
+) -> None:
+    preflight = _write_valid_preflight_fixture(tmp_path)
+    ruleset = tmp_path / "ruleset.json"
+    out_dir = tmp_path / "out"
+
+    ruleset.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "ok": True,
+                "read_only": True,
+                "repository": "Kiwunaka/Pokrov-client",
+                "branch": "main",
+                "required_status_checks": required_status_checks,
+                "checks": [{"name": "ruleset:active", "status": "pass"}],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [
+            "powershell",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(ROOT / "scripts" / "prepare-release-evidence-bundle.ps1"),
+            "-Tag",
+            "v9.9.9-source",
+            "-PreflightSummaryPath",
+            str(preflight),
+            "-RulesetReportPath",
+            str(ruleset),
+            "-OutDir",
+            str(out_dir),
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode != 0
+    assert not (out_dir / "v9.9.9-source-release-evidence.json").exists()
+    assert "ruleset report required status checks mismatch" in (
+        result.stderr + result.stdout
+    )
 
 
 def test_release_evidence_bundle_rejects_preflight_without_artifact_fingerprints(

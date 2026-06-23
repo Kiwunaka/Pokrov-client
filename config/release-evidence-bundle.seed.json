@@ -24,7 +24,8 @@
     "requires_ruleset_report_shape": true,
     "requires_ruleset_report_target": true,
     "requires_ruleset_report_ok_consistency": true,
-    "requires_ruleset_report_check_entry_shape": true
+    "requires_ruleset_report_check_entry_shape": true,
+    "requires_ruleset_report_required_status_checks": true
   },
   "required_summary_flags": [
     "source_only",

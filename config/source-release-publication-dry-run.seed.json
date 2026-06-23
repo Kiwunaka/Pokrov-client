@@ -28,7 +28,8 @@
     "requires_evidence_bundle_ruleset_report_shape": true,
     "requires_evidence_bundle_ruleset_report_target": true,
     "requires_evidence_bundle_ruleset_report_ok_consistency": true,
-    "requires_evidence_bundle_ruleset_report_check_entry_shape": true
+    "requires_evidence_bundle_ruleset_report_check_entry_shape": true,
+    "requires_evidence_bundle_ruleset_report_required_status_checks": true
   },
   "required_evidence_flags": [
     "source_only",

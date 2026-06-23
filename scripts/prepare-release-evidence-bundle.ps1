@@ -17,6 +17,12 @@ $defaultOutputDir = "build\release-evidence"
 $expectedRulesetRepository = "Kiwunaka/Pokrov-client"
 $expectedRulesetBranch = "main"
 
+function Get-RequiredStatusChecks {
+  $requiredChecksPath = Join-Path $root "config\required-checks.seed.json"
+  $requiredChecksSeed = Get-Content -Raw -LiteralPath $requiredChecksPath | ConvertFrom-Json
+  return @($requiredChecksSeed.required_jobs)
+}
+
 function Resolve-RepoPath {
   param([Parameter(Mandatory = $true)][string]$Path)
 
@@ -174,6 +180,21 @@ function Assert-RulesetReportShape {
 
   if ([string]$Report.branch -ne $expectedRulesetBranch) {
     throw "Release evidence refused ruleset report branch mismatch."
+  }
+
+  $expectedRequiredChecks = Get-RequiredStatusChecks
+  $requiredChecksProperty = $Report.PSObject.Properties["required_status_checks"]
+  $actualRequiredChecks = @()
+  if ($null -ne $requiredChecksProperty -and $null -ne $requiredChecksProperty.Value) {
+    $actualRequiredChecks = @($requiredChecksProperty.Value)
+  }
+  if ($actualRequiredChecks.Count -ne $expectedRequiredChecks.Count) {
+    throw "Release evidence refused ruleset report required status checks mismatch."
+  }
+  for ($index = 0; $index -lt $expectedRequiredChecks.Count; $index += 1) {
+    if ([string]$actualRequiredChecks[$index] -ne [string]$expectedRequiredChecks[$index]) {
+      throw "Release evidence refused ruleset report required status checks mismatch."
+    }
   }
 
   if ($Report.ok -eq $true) {
