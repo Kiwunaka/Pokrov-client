@@ -328,8 +328,11 @@ production readiness without matching public evidence.
 - Added source publication packet fingerprint integrity checks so
   handoff-carried publication dry-run fingerprints must match the direct
   dry-run summary before manual release review.
+- Added source publication packet artifact file fingerprint checks so stale
+  release notes, proof manifests, source archives, evidence bundles, preflight
+  proof, or Windows verifier summaries block manual release review.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.140.0-source` candidates.
+  `v0.141.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -475,6 +478,7 @@ production readiness without matching public evidence.
 | `v0.138.0-source` | Pending stacked PR, not tagged | PR #159 |
 | `v0.139.0-source` | Pending stacked PR, not tagged | PR #160 |
 | `v0.140.0-source` | Pending stacked PR, not tagged | PR #161 |
+| `v0.141.0-source` | Pending stacked PR, not tagged | PR #162 |
 
 ### Still Source-Only
 
