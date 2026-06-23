@@ -520,6 +520,12 @@
       "candidate": "v0.125.0-source",
       "base": "codex/v0.124-tag-readiness-milestone-status-consistency",
       "head": "codex/v0.125-tag-readiness-milestone-status-allowlist"
+    },
+    {
+      "pr": 147,
+      "candidate": "v0.126.0-source",
+      "base": "codex/v0.125-tag-readiness-milestone-status-allowlist",
+      "head": "codex/v0.126-tag-readiness-evidence-url-boundary"
     }
   ]
 }

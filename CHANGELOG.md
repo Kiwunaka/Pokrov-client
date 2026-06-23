@@ -294,8 +294,11 @@ production readiness without matching public evidence.
   still pending or not tagged.
 - Added a source tag-readiness milestone ready-status allowlist so tag creation
   requires an explicitly ready selected source-readiness milestone status.
+- Added a source tag-readiness milestone evidence repository-boundary check so
+  the selected milestone must point at the canonical `Kiwunaka/Pokrov-client`
+  pull request URL for the current top stacked PR.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.125.0-source` candidates.
+  `v0.126.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -426,6 +429,7 @@ production readiness without matching public evidence.
 | `v0.123.0-source` | Pending stacked PR, not tagged | PR #144 |
 | `v0.124.0-source` | Pending stacked PR, not tagged | PR #145 |
 | `v0.125.0-source` | Pending stacked PR, not tagged | PR #146 |
+| `v0.126.0-source` | Pending stacked PR, not tagged | PR #147 |
 
 ### Still Source-Only
 

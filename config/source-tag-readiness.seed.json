@@ -29,6 +29,7 @@
     "requires_source_readiness_milestone_ready_status_allowlist": true,
     "requires_tag_creation_allowed_milestone_status_consistency": true,
     "requires_source_readiness_milestone_evidence": true,
+    "requires_source_readiness_milestone_evidence_repo_boundary": true,
     "requires_source_readiness_milestone_scope": true,
     "requires_read_only_summary": true,
     "requires_input_fingerprints": true
