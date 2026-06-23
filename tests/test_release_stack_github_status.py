@@ -17,6 +17,25 @@ def _read_json(relative_path: str) -> dict:
     return json.loads(_read(relative_path))
 
 
+def _write_json(path: Path, payload: dict) -> None:
+    path.write_text(json.dumps(payload), encoding="utf-8")
+
+
+def _snapshot_files(paths: list[Path]) -> dict[Path, bytes | None]:
+    snapshots: dict[Path, bytes | None] = {}
+    for path in paths:
+        snapshots[path] = path.read_bytes() if path.exists() else None
+    return snapshots
+
+
+def _restore_files(snapshots: dict[Path, bytes | None]) -> None:
+    for path, content in snapshots.items():
+        if content is None:
+            path.unlink(missing_ok=True)
+        else:
+            path.write_bytes(content)
+
+
 def _check_run(name: str, conclusion: str = "SUCCESS") -> dict:
     slug = name.lower().replace(" ", "-")
     return {
@@ -82,6 +101,7 @@ def test_release_stack_github_status_seed_defines_read_only_policy() -> None:
     assert seed["policy"]["requires_expected_repository_pr_urls"] is True
     assert seed["policy"]["requires_per_pr_status_check_evidence"] is True
     assert seed["policy"]["requires_per_pr_status_check_trace_evidence"] is True
+    assert seed["policy"]["requires_required_checks_seed_match"] is True
     assert seed["expected_pr_url_prefix"] == "https://github.com/Kiwunaka/Pokrov-client/pull/"
     assert seed["required_status_checks"] == [
         "Source import and public tree checks",
@@ -168,8 +188,8 @@ def test_release_stack_github_status_command_accepts_clean_snapshot(
     assert summary["github_status_ok"] is True
     assert summary["read_only"] is True
     assert summary["stack_count"] >= 5
-    assert summary["latest_pr"] == 156
-    assert summary["latest_pr_url"] == "https://github.com/Kiwunaka/Pokrov-client/pull/156"
+    assert summary["latest_pr"] == 157
+    assert summary["latest_pr_url"] == "https://github.com/Kiwunaka/Pokrov-client/pull/157"
     assert summary["pull_requests"][-1]["url"] == summary["latest_pr_url"]
     assert summary["pull_requests"][-1]["successful_check_count"] == 3
     assert summary["pull_requests"][-1]["failed_check_count"] == 0
@@ -250,14 +270,14 @@ def test_release_stack_github_status_rejects_missing_pr_url(
 
     assert result.returncode == 2
     assert summary["github_status_ok"] is False
-    assert "PR #156 pull request URL is missing" in summary["errors"]
+    assert "PR #157 pull request URL is missing" in summary["errors"]
 
 
 def test_release_stack_github_status_rejects_wrong_repository_pr_url(
     tmp_path: Path,
 ) -> None:
     snapshot = _snapshot_for_stack()
-    snapshot[-1]["url"] = "https://github.com/example/fork/pull/156"
+    snapshot[-1]["url"] = "https://github.com/example/fork/pull/157"
     snapshot_path = tmp_path / "prs.wrong-repo-url.json"
     _write_snapshot(snapshot_path, snapshot)
     out_dir = ROOT / "build" / "release-stack-github-status" / "test-output"
@@ -295,7 +315,7 @@ def test_release_stack_github_status_rejects_wrong_repository_pr_url(
     assert summary["expected_pr_url_prefix"] == (
         "https://github.com/Kiwunaka/Pokrov-client/pull/"
     )
-    assert "PR #156 pull request URL does not match expected repository" in summary[
+    assert "PR #157 pull request URL does not match expected repository" in summary[
         "errors"
     ]
 
@@ -392,4 +412,37 @@ def test_release_stack_github_status_is_documented_and_validated() -> None:
     assert "release stack GitHub status" in docs
     assert "config\\\\release-stack-github-status.seed.json" in validator
     assert "scripts\\\\check-release-stack-github-status.ps1" in validator
+    assert "required_status_checks must exactly match" in validator
     assert "release stack github status verifier" in changelog.lower()
+
+
+def test_validate_seed_blocks_release_stack_required_check_mismatch() -> None:
+    seed_path = ROOT / "config" / "release-stack-github-status.seed.json"
+    snapshots = _snapshot_files([seed_path])
+
+    try:
+        seed = json.loads(seed_path.read_text(encoding="utf-8"))
+        seed["required_status_checks"].append("Unexpected extra required check")
+        _write_json(seed_path, seed)
+
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "validate-seed.ps1"),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    finally:
+        _restore_files(snapshots)
+
+    assert result.returncode != 0
+    assert (
+        "release-stack-github-status.seed.json required_status_checks must exactly match"
+        in result.stdout + result.stderr
+    )

@@ -1427,7 +1427,7 @@ if (Test-Path -LiteralPath $releaseStackGithubStatusPath -PathType Leaf) {
     $manifestErrors.Add("config\\release-stack-github-status.seed.json must read config/release-merge-order.seed.json")
   }
 
-  foreach ($field in @("read_only", "no_merge", "no_git_push", "no_github_api_mutation", "uses_pr_status_snapshot", "writes_only_ignored_build_output", "requires_clean_prs", "requires_ci_success", "requires_pull_request_urls", "requires_expected_repository_pr_urls", "requires_per_pr_status_check_evidence", "requires_per_pr_status_check_trace_evidence")) {
+  foreach ($field in @("read_only", "no_merge", "no_git_push", "no_github_api_mutation", "uses_pr_status_snapshot", "writes_only_ignored_build_output", "requires_clean_prs", "requires_ci_success", "requires_pull_request_urls", "requires_expected_repository_pr_urls", "requires_per_pr_status_check_evidence", "requires_per_pr_status_check_trace_evidence", "requires_required_checks_seed_match")) {
     if ($releaseStackGithubStatus.policy.$field -ne $true) {
       $manifestErrors.Add("config\\release-stack-github-status.seed.json policy.$field must remain true")
     }
@@ -1439,6 +1439,13 @@ if (Test-Path -LiteralPath $releaseStackGithubStatusPath -PathType Leaf) {
   foreach ($requiredCheck in @("Source import and public tree checks", "Flutter analyze and tests", "Android native Gradle unit tests")) {
     if (@($releaseStackGithubStatus.required_status_checks) -notcontains $requiredCheck) {
       $manifestErrors.Add("config\\release-stack-github-status.seed.json must require '$requiredCheck'")
+    }
+  }
+  $requiredChecksSeedPath = Join-Path $root "config\\required-checks.seed.json"
+  if (Test-Path -LiteralPath $requiredChecksSeedPath -PathType Leaf) {
+    $requiredChecksSeed = Get-Content -Raw -LiteralPath $requiredChecksSeedPath | ConvertFrom-Json
+    if ((@($releaseStackGithubStatus.required_status_checks) -join "|") -ne (@($requiredChecksSeed.required_jobs) -join "|")) {
+      $manifestErrors.Add("config\\release-stack-github-status.seed.json required_status_checks must exactly match config\\required-checks.seed.json required_jobs")
     }
   }
 

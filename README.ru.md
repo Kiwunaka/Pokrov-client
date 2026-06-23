@@ -217,6 +217,11 @@ Source readiness note: `v0.135.0-source` is a pending stacked PR for verifying
 that seed validation requires source-readiness stacked PR evidence to match the
 release merge-order stack; it is not tagged and does not ship APK/EXE binaries.
 
+Source readiness note: `v0.136.0-source` is a pending stacked PR for verifying
+that seed validation requires release stack GitHub status required checks to
+match the canonical required-checks seed exactly; it is not tagged and does not
+ship APK/EXE binaries.
+
 Source readiness note: `v0.53.0-source` is a pending stacked PR for Windows
 verifier CI/preflight enforcement; it is not tagged and does not ship APK/EXE
 binaries.
