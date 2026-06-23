@@ -51,7 +51,10 @@ function Assert-InputFingerprintIntegrity {
   param(
     [Parameter(Mandatory = $true)][object]$Fingerprint,
     [Parameter(Mandatory = $true)][string]$ErrorMessage,
-    [Parameter(Mandatory = $true)][object]$BlockingErrors
+    [Parameter(Mandatory = $true)][object]$BlockingErrors,
+    [string]$RulesetReportSchemaVersionErrorMessage = "",
+    [string]$RulesetReportReadOnlyErrorMessage = "",
+    [string]$RulesetReportOkStatusErrorMessage = ""
   )
 
   $resolvedFingerprintPath = [System.IO.Path]::GetFullPath((Resolve-RepoPath -Path ([string]$Fingerprint.path)))
@@ -63,6 +66,24 @@ function Assert-InputFingerprintIntegrity {
   $actualFingerprint = Get-InputFingerprint -Path $resolvedFingerprintPath
   if ([string]$Fingerprint.sha256 -ne [string]$actualFingerprint.sha256) {
     $BlockingErrors.Add($ErrorMessage)
+    return
+  }
+
+  if (
+    -not [string]::IsNullOrWhiteSpace($RulesetReportSchemaVersionErrorMessage) -or
+    -not [string]::IsNullOrWhiteSpace($RulesetReportReadOnlyErrorMessage) -or
+    -not [string]::IsNullOrWhiteSpace($RulesetReportOkStatusErrorMessage)
+  ) {
+    $rulesetReport = Get-Content -Raw -LiteralPath $resolvedFingerprintPath | ConvertFrom-Json
+    if ([int]$rulesetReport.schema_version -ne 1) {
+      $BlockingErrors.Add($RulesetReportSchemaVersionErrorMessage)
+    }
+    if ($rulesetReport.read_only -ne $true) {
+      $BlockingErrors.Add($RulesetReportReadOnlyErrorMessage)
+    }
+    if ($null -eq $rulesetReport.PSObject.Properties["ok"]) {
+      $BlockingErrors.Add($RulesetReportOkStatusErrorMessage)
+    }
   }
 }
 
@@ -359,6 +380,9 @@ try {
     Assert-InputFingerprintIntegrity `
       -Fingerprint $publicationDryRunRulesetReportFingerprint `
       -ErrorMessage "publication dry-run ruleset report input fingerprint mismatch" `
+      -RulesetReportSchemaVersionErrorMessage "publication dry-run ruleset report without schema_version 1" `
+      -RulesetReportReadOnlyErrorMessage "publication dry-run ruleset report that is not read-only" `
+      -RulesetReportOkStatusErrorMessage "publication dry-run ruleset report without ok status" `
       -BlockingErrors $blockingErrors
   } elseif (
     $publicationDryRun.github_enforcement_claim_allowed -eq $true -or
