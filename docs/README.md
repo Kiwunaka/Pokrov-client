@@ -65,7 +65,7 @@ anything.
   readiness, release merge order, release stack GitHub status, and release
   merge handoff helpers, plus `scripts/prepare-source-publication-packet.ps1`
   for the source publication packet final manual GitHub Release review and
-  handoff-carried publication dry-run fingerprint integrity check.
+  handoff-carried plus artifact-file fingerprint integrity checks.
 - [Required checks](REQUIRED_CHECKS.md): CI job names, branch-protection
   guidance, and source-release gates.
 - [GitHub ruleset setup](GITHUB_RULESET_SETUP.md): repository ruleset or

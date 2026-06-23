@@ -610,6 +610,12 @@
       "candidate": "v0.140.0-source",
       "base": "codex/v0.139-source-publication-packet-input-freshness",
       "head": "codex/v0.140-source-publication-packet-fingerprint-integrity"
+    },
+    {
+      "pr": 162,
+      "candidate": "v0.141.0-source",
+      "base": "codex/v0.140-source-publication-packet-fingerprint-integrity",
+      "head": "codex/v0.141-source-publication-packet-artifact-integrity"
     }
   ]
 }

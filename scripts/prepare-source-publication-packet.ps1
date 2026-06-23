@@ -174,6 +174,49 @@ function Add-FingerprintIntegrityErrors {
   }
 }
 
+function Get-ArtifactFileFingerprint {
+  param([object]$Fingerprint)
+
+  $resolvedPath = Get-NormalizedFingerprintPath -Path ([string]$Fingerprint.path)
+  if (
+    [string]::IsNullOrWhiteSpace($resolvedPath) -or
+    -not (Test-Path -LiteralPath $resolvedPath -PathType Leaf)
+  ) {
+    return [ordered]@{
+      path = $resolvedPath
+      sha256 = ""
+    }
+  }
+  return Get-InputFingerprint -Path $resolvedPath
+}
+
+function Add-ArtifactFileFingerprintErrors {
+  param(
+    [System.Collections.Generic.List[string]]$Errors,
+    [object]$Fingerprint,
+    [string]$Name
+  )
+
+  $expectedPath = Get-NormalizedFingerprintPath -Path ([string]$Fingerprint.path)
+  $expectedSha = [string]$Fingerprint.sha256
+  if (
+    [string]::IsNullOrWhiteSpace($expectedPath) -or
+    [string]::IsNullOrWhiteSpace($expectedSha)
+  ) {
+    Add-BlockingError -Errors $Errors -Message "source publication packet artifact fingerprint is missing path or sha256 for $Name"
+    return
+  }
+  if (-not (Test-Path -LiteralPath $expectedPath -PathType Leaf)) {
+    Add-BlockingError -Errors $Errors -Message "source publication packet artifact fingerprint mismatch for $Name"
+    return
+  }
+
+  $actualFingerprint = Get-InputFingerprint -Path $expectedPath
+  if (-not $expectedSha.Equals([string]$actualFingerprint.sha256, [System.StringComparison]::OrdinalIgnoreCase)) {
+    Add-BlockingError -Errors $Errors -Message "source publication packet artifact fingerprint mismatch for $Name"
+  }
+}
+
 function Add-InputGeneratedAtErrors {
   param(
     [System.Collections.Generic.List[string]]$Errors,
@@ -356,6 +399,34 @@ try {
     Add-BlockingError -Errors $blockingErrors -Message "release handoff latest candidate must match publication dry-run tag"
   }
 
+  foreach ($artifactFileSpec in @(
+    [ordered]@{ name = "release_notes"; value = $releaseNotes },
+    [ordered]@{ name = "release_evidence_bundle"; value = $releaseEvidenceBundle },
+    [ordered]@{ name = "proof_manifest"; value = $proofManifest },
+    [ordered]@{ name = "source_archive"; value = $sourceArchive },
+    [ordered]@{ name = "clean_clone_or_import_proof"; value = $cleanCloneOrImportProof },
+    [ordered]@{ name = "windows_bundle_verifier_summary"; value = Get-FingerprintObject -Container $publicationArtifactFingerprints -FieldName "windows_bundle_verifier_summary" }
+  )) {
+    Add-ArtifactFileFingerprintErrors -Errors $blockingErrors -Fingerprint $artifactFileSpec.value -Name $artifactFileSpec.name
+  }
+
+  $publicationRulesetReport = Get-FingerprintObject -Container $publicationEvidenceBundleFingerprints -FieldName "github_ruleset_report"
+  if (Test-FingerprintField -Container $publicationEvidenceBundleFingerprints -FieldName "github_ruleset_report") {
+    Add-ArtifactFileFingerprintErrors -Errors $blockingErrors -Fingerprint $publicationRulesetReport -Name "github_ruleset_report"
+  }
+
+  $artifactFileFingerprints = [ordered]@{
+    release_notes = Get-ArtifactFileFingerprint -Fingerprint $releaseNotes
+    release_evidence_bundle = Get-ArtifactFileFingerprint -Fingerprint $releaseEvidenceBundle
+    proof_manifest = Get-ArtifactFileFingerprint -Fingerprint $proofManifest
+    source_archive = Get-ArtifactFileFingerprint -Fingerprint $sourceArchive
+    clean_clone_or_import_proof = Get-ArtifactFileFingerprint -Fingerprint $cleanCloneOrImportProof
+    windows_bundle_verifier_summary = Get-ArtifactFileFingerprint -Fingerprint (Get-FingerprintObject -Container $publicationArtifactFingerprints -FieldName "windows_bundle_verifier_summary")
+  }
+  if (Test-FingerprintField -Container $publicationEvidenceBundleFingerprints -FieldName "github_ruleset_report") {
+    $artifactFileFingerprints.github_ruleset_report = Get-ArtifactFileFingerprint -Fingerprint $publicationRulesetReport
+  }
+
   if ([string]::IsNullOrWhiteSpace($OutDir)) {
     $OutDir = Join-Path $root $defaultOutputDir
   } else {
@@ -417,6 +488,7 @@ try {
     release_handoff_publication_dry_run_input_fingerprints = $releaseHandoffPublicationInputFingerprints
     release_handoff_publication_dry_run_evidence_bundle_input_fingerprints = $releaseHandoffPublicationEvidenceBundleFingerprints
     release_handoff_publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $releaseHandoffPublicationArtifactFingerprints
+    artifact_file_fingerprints = $artifactFileFingerprints
     blocking_error_count = [int]$blockingErrors.Count
     blocking_errors = @($blockingErrors)
     next_manual_steps = @(
