@@ -96,6 +96,19 @@ function Assert-RulesetReportInputFingerprintIntegrity {
   if ([string]$Fingerprint.sha256 -ne [string]$actualFingerprint.sha256) {
     throw "Publication dry-run refused evidence bundle github ruleset report fingerprint mismatch."
   }
+
+  $rulesetReport = Get-Content -Raw -LiteralPath $resolvedFingerprintPath | ConvertFrom-Json
+  if ([int]$rulesetReport.schema_version -ne 1) {
+    throw "Publication dry-run refused ruleset report without schema_version 1."
+  }
+
+  if ($rulesetReport.read_only -ne $true) {
+    throw "Publication dry-run refused ruleset report that is not read-only."
+  }
+
+  if ($null -eq $rulesetReport.PSObject.Properties["ok"]) {
+    throw "Publication dry-run refused ruleset report without ok status."
+  }
 }
 
 function Assert-ArtifactFingerprintIntegrity {
