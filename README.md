@@ -196,6 +196,7 @@ Source release status:
 | `v0.134.0-source` | Pending stacked PR, not tagged | Seed validation requires stacked PR milestone evidence PR numbers to increase with the candidate sequence. |
 | `v0.135.0-source` | Pending stacked PR, not tagged | Seed validation requires source-readiness stacked PR evidence to match the release merge-order stack. |
 | `v0.136.0-source` | Pending stacked PR, not tagged | Seed validation requires release stack GitHub status required checks to match the canonical required-checks seed exactly. |
+| `v0.137.0-source` | Pending stacked PR, not tagged | Seed validation requires active-range source-readiness stacked PR milestones to be covered by the release merge-order stack. |
 
 ## Which App Should I Use?
 

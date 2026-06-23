@@ -9,7 +9,8 @@
     "stacked_pr_milestone_evidence_must_be_canonical_pr_url": true,
     "stacked_pr_milestone_evidence_urls_must_be_unique": true,
     "stacked_pr_milestone_evidence_pr_numbers_must_increase": true,
-    "stacked_pr_milestones_must_match_merge_order_stack": true
+    "stacked_pr_milestones_must_match_merge_order_stack": true,
+    "stacked_pr_milestones_must_be_covered_by_merge_order_stack": true
   },
   "milestones": [
     {
@@ -1502,6 +1503,17 @@
       "status": "stacked_pr_pending_not_tagged",
       "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/157",
       "scope": "Seed validation requires release stack GitHub status required checks to exactly match the canonical required-checks seed.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.137.0-source",
+      "status": "stacked_pr_pending_not_tagged",
+      "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/158",
+      "scope": "Seed validation requires active-range source-readiness stacked PR milestones to be covered by the release merge-order stack.",
       "source_only": true,
       "ships_apk": false,
       "ships_exe": false,

@@ -222,6 +222,11 @@ that seed validation requires release stack GitHub status required checks to
 match the canonical required-checks seed exactly; it is not tagged and does not
 ship APK/EXE binaries.
 
+Source readiness note: `v0.137.0-source` is a pending stacked PR for verifying
+that seed validation requires active-range source-readiness stacked PR
+milestones to be covered by the release merge-order stack; it is not tagged and
+does not ship APK/EXE binaries.
+
 Source readiness note: `v0.53.0-source` is a pending stacked PR for Windows
 verifier CI/preflight enforcement; it is not tagged and does not ship APK/EXE
 binaries.

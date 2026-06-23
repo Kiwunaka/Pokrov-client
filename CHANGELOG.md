@@ -317,8 +317,10 @@ production readiness without matching public evidence.
   match the release merge-order stack for every tracked candidate.
 - Added seed validation coverage so release stack GitHub status required checks
   must exactly match the canonical required-checks seed.
+- Added seed validation coverage so active-range source-readiness stacked PR
+  milestones must be covered by the release merge-order stack.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.136.0-source` candidates.
+  `v0.137.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -460,6 +462,7 @@ production readiness without matching public evidence.
 | `v0.134.0-source` | Pending stacked PR, not tagged | PR #155 |
 | `v0.135.0-source` | Pending stacked PR, not tagged | PR #156 |
 | `v0.136.0-source` | Pending stacked PR, not tagged | PR #157 |
+| `v0.137.0-source` | Pending stacked PR, not tagged | PR #158 |
 
 ### Still Source-Only
 
