@@ -1729,6 +1729,9 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
   if ($sourceReadiness.policy.stacked_pr_milestone_evidence_must_be_canonical_pr_url -ne $true) {
     $manifestErrors.Add("config\\source-release-readiness.seed.json must require stacked PR milestone evidence to use canonical PR URLs")
   }
+  if ($sourceReadiness.policy.stacked_pr_milestone_evidence_urls_must_be_unique -ne $true) {
+    $manifestErrors.Add("config\\source-release-readiness.seed.json must require unique stacked PR milestone evidence URLs")
+  }
 
   $releaseBlockerInventoryPath = Join-Path $root "config\\release-blocker-inventory.seed.json"
   if (Test-Path -LiteralPath $releaseBlockerInventoryPath -PathType Leaf) {
@@ -1752,6 +1755,7 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
 
   $sourceReadinessCanonicalPrPrefix = "https://github.com/Kiwunaka/Pokrov-client/pull/"
   $sourceReadinessTags = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+  $sourceReadinessStackedEvidenceUrls = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
   foreach ($milestone in @($sourceReadiness.milestones)) {
     $milestoneTag = [string]$milestone.tag
     $milestoneStatus = [string]$milestone.status
@@ -1773,6 +1777,9 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
       ) {
         $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$milestoneTag' stacked PR evidence must use canonical repository PR URL")
       }
+    }
+    if ($milestoneStatus.StartsWith("stacked_pr_", [System.StringComparison]::Ordinal) -and -not $sourceReadinessStackedEvidenceUrls.Add($milestoneEvidence)) {
+      $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$milestoneTag' stacked PR evidence URL must be unique")
     }
     if ($milestone.source_only -ne $true) {
       $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$milestoneTag' must be source_only")
