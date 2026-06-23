@@ -67,7 +67,7 @@ function Assert-InputFingerprintIntegrity {
     [string]$RulesetReportOkFailedChecksErrorMessage = "",
     [string]$RulesetReportCheckEntryShapeErrorMessage = "",
     [string]$RulesetReportRequiredStatusChecksErrorMessage = "",
-    [string]$RulesetReportRequiredStatusCheckCoverageErrorMessage = ""
+    [string]$RulesetReportCoveredRequiredStatusChecksErrorMessage = ""
   )
 
   $resolvedFingerprintPath = [System.IO.Path]::GetFullPath((Resolve-RepoPath -Path ([string]$Fingerprint.path)))
@@ -92,7 +92,7 @@ function Assert-InputFingerprintIntegrity {
     -not [string]::IsNullOrWhiteSpace($RulesetReportOkFailedChecksErrorMessage) -or
     -not [string]::IsNullOrWhiteSpace($RulesetReportCheckEntryShapeErrorMessage) -or
     -not [string]::IsNullOrWhiteSpace($RulesetReportRequiredStatusChecksErrorMessage) -or
-    -not [string]::IsNullOrWhiteSpace($RulesetReportRequiredStatusCheckCoverageErrorMessage)
+    -not [string]::IsNullOrWhiteSpace($RulesetReportCoveredRequiredStatusChecksErrorMessage)
   ) {
     $rulesetReport = Get-Content -Raw -LiteralPath $resolvedFingerprintPath | ConvertFrom-Json
     if ([int]$rulesetReport.schema_version -ne 1) {
@@ -127,6 +127,22 @@ function Assert-InputFingerprintIntegrity {
       }
     }
     if ($rulesetReport.ok -eq $true) {
+      $coveredRequiredChecksProperty = $rulesetReport.PSObject.Properties["covered_required_status_checks"]
+      $actualCoveredRequiredChecks = @()
+      if ($null -ne $coveredRequiredChecksProperty -and $null -ne $coveredRequiredChecksProperty.Value) {
+        $actualCoveredRequiredChecks = @($coveredRequiredChecksProperty.Value)
+      }
+      if ($actualCoveredRequiredChecks.Count -ne $expectedRequiredChecks.Count) {
+        $BlockingErrors.Add($RulesetReportCoveredRequiredStatusChecksErrorMessage)
+      } else {
+        for ($index = 0; $index -lt $expectedRequiredChecks.Count; $index += 1) {
+          if ([string]$actualCoveredRequiredChecks[$index] -ne [string]$expectedRequiredChecks[$index]) {
+            $BlockingErrors.Add($RulesetReportCoveredRequiredStatusChecksErrorMessage)
+            break
+          }
+        }
+      }
+
       $rulesetChecksProperty = $rulesetReport.PSObject.Properties["checks"]
       $rulesetChecks = @()
       if ($null -ne $rulesetChecksProperty -and $null -ne $rulesetChecksProperty.Value) {
@@ -145,13 +161,6 @@ function Assert-InputFingerprintIntegrity {
           }
           if ([string]$check.status -ne "pass") {
             $BlockingErrors.Add($RulesetReportOkFailedChecksErrorMessage)
-            break
-          }
-        }
-        $passedCheckNames = @($rulesetChecks | ForEach-Object { [string]$_.name })
-        foreach ($expectedCheck in $expectedRequiredChecks) {
-          if (@($passedCheckNames | Where-Object { $_ -eq [string]$expectedCheck }).Count -eq 0) {
-            $BlockingErrors.Add($RulesetReportRequiredStatusCheckCoverageErrorMessage)
             break
           }
         }
@@ -462,7 +471,7 @@ try {
       -RulesetReportOkFailedChecksErrorMessage "publication dry-run ruleset report ok status with failed checks" `
       -RulesetReportCheckEntryShapeErrorMessage "publication dry-run ruleset report check entry shape mismatch" `
       -RulesetReportRequiredStatusChecksErrorMessage "publication dry-run ruleset report required status checks mismatch" `
-      -RulesetReportRequiredStatusCheckCoverageErrorMessage "publication dry-run ruleset report required status check coverage mismatch" `
+      -RulesetReportCoveredRequiredStatusChecksErrorMessage "publication dry-run ruleset report covered required status checks mismatch" `
       -BlockingErrors $blockingErrors
   } elseif (
     $publicationDryRun.github_enforcement_claim_allowed -eq $true -or

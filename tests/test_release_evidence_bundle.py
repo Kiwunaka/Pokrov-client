@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import hashlib
 import json
@@ -15,7 +15,8 @@ REQUIRED_STATUS_CHECKS = [
     "Android native Gradle unit tests",
 ]
 REQUIRED_RULESET_CHECKS = [
-    {"name": name, "status": "pass"} for name in REQUIRED_STATUS_CHECKS
+    {"name": "ruleset:required_status_checks", "status": "pass"},
+    {"name": "branch_protection:required_status_checks", "status": "pass"},
 ]
 
 
@@ -108,7 +109,7 @@ def test_release_evidence_bundle_seed_defines_source_only_policy() -> None:
     assert seed["policy"]["requires_ruleset_report_check_entry_shape"] is True
     assert seed["policy"]["requires_ruleset_report_required_status_checks"] is True
     assert (
-        seed["policy"]["requires_ruleset_report_required_status_check_coverage"]
+        seed["policy"]["requires_ruleset_report_covered_required_status_checks"]
         is True
     )
     assert seed["policy"]["requires_preflight_artifact_fingerprints"] is True
@@ -153,7 +154,7 @@ def test_release_evidence_bundle_script_preserves_claim_boundaries() -> None:
         "ruleset report ok status with failed checks",
         "ruleset report check entry shape mismatch",
         "ruleset report required status checks mismatch",
-        "ruleset report required status check coverage mismatch",
+        "ruleset report covered required status checks mismatch",
         "preflight_artifact_fingerprints",
         "preflight_commit_sha",
         "preflight_ref_commit_sha",
@@ -233,6 +234,7 @@ def test_release_evidence_bundle_script_writes_bundle_from_fixture(tmp_path: Pat
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,
+                "covered_required_status_checks": REQUIRED_STATUS_CHECKS,
                 "checks": REQUIRED_RULESET_CHECKS,
             }
         ),
@@ -427,6 +429,7 @@ def test_release_evidence_bundle_rejects_wrong_ruleset_report_target(
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,
+                "covered_required_status_checks": REQUIRED_STATUS_CHECKS,
             },
             "ruleset report ok status without checks",
         ),
@@ -438,6 +441,7 @@ def test_release_evidence_bundle_rejects_wrong_ruleset_report_target(
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,
+                "covered_required_status_checks": REQUIRED_STATUS_CHECKS,
                 "checks": [{"status": "pass"}],
             },
             "ruleset report check entry shape mismatch",
@@ -450,6 +454,7 @@ def test_release_evidence_bundle_rejects_wrong_ruleset_report_target(
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,
+                "covered_required_status_checks": REQUIRED_STATUS_CHECKS,
                 "checks": [{"name": "ruleset:active", "status": "fail"}],
             },
             "ruleset report ok status with failed checks",
@@ -523,6 +528,7 @@ def test_release_evidence_bundle_rejects_ruleset_report_required_status_check_mi
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": required_status_checks,
+                "covered_required_status_checks": REQUIRED_STATUS_CHECKS,
                 "checks": REQUIRED_RULESET_CHECKS,
             }
         ),
@@ -558,7 +564,7 @@ def test_release_evidence_bundle_rejects_ruleset_report_required_status_check_mi
     )
 
 
-def test_release_evidence_bundle_rejects_ruleset_report_required_status_check_coverage_mismatch(
+def test_release_evidence_bundle_rejects_ruleset_report_covered_required_status_check_mismatch(
     tmp_path: Path,
 ) -> None:
     preflight = _write_valid_preflight_fixture(tmp_path)
@@ -574,7 +580,8 @@ def test_release_evidence_bundle_rejects_ruleset_report_required_status_check_co
                 "repository": "Kiwunaka/Pokrov-client",
                 "branch": "main",
                 "required_status_checks": REQUIRED_STATUS_CHECKS,
-                "checks": REQUIRED_RULESET_CHECKS[:-1],
+                "covered_required_status_checks": REQUIRED_STATUS_CHECKS[:-1],
+                "checks": REQUIRED_RULESET_CHECKS,
             }
         ),
         encoding="utf-8",
@@ -604,7 +611,7 @@ def test_release_evidence_bundle_rejects_ruleset_report_required_status_check_co
 
     assert result.returncode != 0
     assert not (out_dir / "v9.9.9-source-release-evidence.json").exists()
-    assert "ruleset report required status check coverage mismatch" in (
+    assert "ruleset report covered required status checks mismatch" in (
         result.stderr + result.stdout
     )
 

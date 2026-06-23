@@ -1293,6 +1293,17 @@
       "ships_exe": false,
       "store_release": false,
       "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.118.0-source",
+      "status": "stacked_pr_green_not_tagged",
+      "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/139",
+      "scope": "GitHub ruleset verifier reports covered required status checks explicitly, and release evidence, publication dry-run, and release merge handoff reject ok reports whose covered required checks do not match the canonical CI job list.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
     }
   ]
 }

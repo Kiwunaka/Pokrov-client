@@ -472,6 +472,12 @@
       "candidate": "v0.117.0-source",
       "base": "codex/v0.116-ruleset-report-required-checks",
       "head": "codex/v0.117-ruleset-report-required-check-coverage"
+    },
+    {
+      "pr": 139,
+      "candidate": "v0.118.0-source",
+      "base": "codex/v0.117-ruleset-report-required-check-coverage",
+      "head": "codex/v0.118-ruleset-report-covered-required-checks"
     }
   ]
 }

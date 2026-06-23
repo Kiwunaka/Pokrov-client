@@ -218,6 +218,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.115.0-source` | Pending stacked PR, not tagged | Release evidence, publication dry-run, and handoff reject ruleset report checks without traceable name or status fields. |
 | `v0.116.0-source` | Pending stacked PR, not tagged | Release evidence, publication dry-run, and handoff reject ruleset reports whose required status checks do not match the canonical CI list. |
 | `v0.117.0-source` | Pending stacked PR, not tagged | Release evidence, publication dry-run, and handoff reject ruleset reports whose passing checks do not cover every canonical required CI job. |
+| `v0.118.0-source` | Pending stacked PR, not tagged | GitHub ruleset verifier reports covered required status checks explicitly, and release gates reject `ok` reports whose covered checks do not match the canonical CI list. |
 
 ## Architecture Boundary
 
