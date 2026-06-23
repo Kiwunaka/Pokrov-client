@@ -251,8 +251,10 @@ production readiness without matching public evidence.
   verifier JSON cannot enable enforcement claims in release evidence.
 - Added publication dry-run GitHub ruleset report shape validation so malformed
   verifier JSON from release evidence cannot reach manual release review.
+- Added release merge handoff GitHub ruleset report shape validation so
+  malformed verifier JSON from publication dry-run cannot mark handoff ready.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.111.0-source` candidates.
+  `v0.112.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -369,6 +371,7 @@ production readiness without matching public evidence.
 | `v0.109.0-source` | Pending stacked PR, not tagged | PR #130 |
 | `v0.110.0-source` | Pending stacked PR, not tagged | PR #131 |
 | `v0.111.0-source` | Pending stacked PR, not tagged | PR #132 |
+| `v0.112.0-source` | Pending stacked PR, not tagged | PR #133 |
 
 ### Still Source-Only
 
