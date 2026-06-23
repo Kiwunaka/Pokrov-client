@@ -60,7 +60,9 @@ handoff and publication dry-run exist. The source publication packet
 consolidates release notes, proof manifest, source archive, release evidence
 bundle, clean-clone/import proof, input fingerprints, and source-only
 no-binary flags for final manual review. It rejects missing, malformed, stale,
-or too-far-future generated-at timestamps on its direct input summaries. It is
+or too-far-future generated-at timestamps on its direct input summaries, and
+handoff-carried publication dry-run fingerprints that do not match the direct
+publication dry-run summary. It is
 not a publisher and does not merge, tag, push, publish, or upload assets.
 
 Required checks and release gates are summarized in

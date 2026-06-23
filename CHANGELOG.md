@@ -325,8 +325,11 @@ production readiness without matching public evidence.
 - Added source publication packet generated-at freshness checks for release
   handoff and publication dry-run summaries before manual GitHub Release
   review.
+- Added source publication packet fingerprint integrity checks so
+  handoff-carried publication dry-run fingerprints must match the direct
+  dry-run summary before manual release review.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.139.0-source` candidates.
+  `v0.140.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -471,6 +474,7 @@ production readiness without matching public evidence.
 | `v0.137.0-source` | Pending stacked PR, not tagged | PR #158 |
 | `v0.138.0-source` | Pending stacked PR, not tagged | PR #159 |
 | `v0.139.0-source` | Pending stacked PR, not tagged | PR #160 |
+| `v0.140.0-source` | Pending stacked PR, not tagged | PR #161 |
 
 ### Still Source-Only
 

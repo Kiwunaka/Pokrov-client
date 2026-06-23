@@ -74,7 +74,9 @@ after the release handoff and publication dry-run summaries exist. The command i
 and consolidates release notes, proof manifest, source archive, release
 evidence bundle, clean-clone/import proof, source-only no-binary flags, and the
 next manual maintainer steps. It also rejects missing, malformed, stale, or
-too-far-future generated-at timestamps on its direct input summaries. The packet
+too-far-future generated-at timestamps on its direct input summaries, plus
+handoff-carried publication dry-run fingerprints that do not match the direct
+publication dry-run summary. The packet
 is only a manual review aid; it does not merge, tag, push, publish, or upload
 anything.
 
