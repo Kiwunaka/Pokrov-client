@@ -94,7 +94,8 @@ Current helpers:
   artifact paths outside their expected ignored `build/` output roots, rejects
   release asset fingerprints outside the source-only allowlist, rejects release
   artifact file extensions outside the source-only artifact contract, rejects
-  unreadable release artifact contents, and it does not
+  unreadable release artifact contents, rejects JSON proof artifacts outside
+  their expected source-only schema contracts, and it does not
   merge, tag, push, publish, or upload anything
 - `verify-windows-bundle.ps1`: Windows bundle verifier for source-only Windows
   bundle proof; checks required Windows shell source paths and rejects

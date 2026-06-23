@@ -640,6 +640,12 @@
       "candidate": "v0.145.0-source",
       "base": "codex/v0.144-source-publication-packet-artifact-filenames",
       "head": "codex/v0.145-source-publication-packet-artifact-content"
+    },
+    {
+      "pr": 167,
+      "candidate": "v0.146.0-source",
+      "base": "codex/v0.145-source-publication-packet-artifact-content",
+      "head": "codex/v0.146-source-publication-packet-artifact-schema"
     }
   ]
 }

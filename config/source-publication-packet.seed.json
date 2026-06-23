@@ -37,12 +37,13 @@
     "requires_source_only_release_asset_allowlist": true,
     "requires_publication_artifact_file_extensions": true,
     "requires_publication_artifact_content_validation": true,
+    "requires_publication_artifact_schema_validation": true,
     "requires_source_only_flags": true,
     "writes_only_ignored_build_output": true
   },
   "inputs": {
     "release_handoff": "build/release-merge-handoff/release-merge-handoff.json",
-    "publication_dry_run": "build/source-release-publication/v0.145.0-source/v0.145.0-source-publication-dry-run.json"
+    "publication_dry_run": "build/source-release-publication/v0.146.0-source/v0.146.0-source-publication-dry-run.json"
   },
   "input_roots": {
     "release_handoff": "build/release-merge-handoff",
@@ -84,8 +85,15 @@
     "windows_bundle_verifier_summary": "json",
     "github_ruleset_report": "json"
   },
+  "artifact_schema_contracts": {
+    "release_evidence_bundle": "source_evidence",
+    "proof_manifest": "source_proof",
+    "clean_clone_or_import_proof": "source_preflight",
+    "windows_bundle_verifier_summary": "windows_bundle_verifier",
+    "github_ruleset_report": "github_ruleset_report"
+  },
   "output": {
-    "packet": "build/source-publication-packet/v0.145.0-source/source-publication-packet.json"
+    "packet": "build/source-publication-packet/v0.146.0-source/source-publication-packet.json"
   },
   "required_source_only_flags": [
     "source_only",
