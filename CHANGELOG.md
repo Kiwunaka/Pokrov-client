@@ -396,8 +396,11 @@ production readiness without matching public evidence.
 - Added release merge handoff validation and output for the publication dry-run
   source archive SHA-256 so maintainer handoff keeps explicit archive hash
   proof.
+- Added source publication packet validation and output for the release handoff
+  publication dry-run source archive SHA-256 so manual review keeps explicit
+  archive hash proof in the final packet.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.163.0-source` candidates.
+  `v0.164.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -566,6 +569,7 @@ production readiness without matching public evidence.
 | `v0.161.0-source` | Pending stacked PR, not tagged | PR #182 |
 | `v0.162.0-source` | Pending stacked PR, not tagged | PR #183 |
 | `v0.163.0-source` | Pending stacked PR, not tagged | PR #184 |
+| `v0.164.0-source` | Pending stacked PR, not tagged | PR #185 |
 
 ### Still Source-Only
 

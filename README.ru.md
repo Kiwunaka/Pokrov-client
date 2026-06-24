@@ -357,6 +357,11 @@ that the release merge handoff carries and requires the publication dry-run
 source archive SHA-256 as explicit maintainer proof; it is not tagged and does
 not ship APK/EXE binaries.
 
+Source readiness note: `v0.164.0-source` is a pending stacked PR for verifying
+that the source publication packet carries and validates the release handoff
+publication dry-run source archive SHA-256 as explicit review proof; it is not
+tagged and does not ship APK/EXE binaries.
+
 Source readiness note: `v0.53.0-source` is a pending stacked PR for Windows
 verifier CI/preflight enforcement; it is not tagged and does not ship APK/EXE
 binaries.
