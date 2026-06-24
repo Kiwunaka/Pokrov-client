@@ -718,6 +718,12 @@
       "candidate": "v0.158.0-source",
       "base": "codex/v0.157-source-publication-evidence-archive-name",
       "head": "codex/v0.158-source-publication-dry-run-archive-name-proof"
+    },
+    {
+      "pr": 180,
+      "candidate": "v0.159.0-source",
+      "base": "codex/v0.158-source-publication-dry-run-archive-name-proof",
+      "head": "codex/v0.159-release-handoff-carries-dry-run-archive-name"
     }
   ]
 }

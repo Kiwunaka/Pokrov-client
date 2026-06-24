@@ -968,6 +968,7 @@ try {
     publication_dry_run_evidence_bundle_input_fingerprints = $publicationDryRunEvidenceBundleInputFingerprints
     publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $publicationDryRunEvidenceBundlePreflightArtifactFingerprints
     publication_dry_run_commit_sha = $publicationDryRunCommitSha
+    publication_dry_run_source_archive = [string]$publicationDryRun.source_archive
     publication_dry_run_evidence_bundle_preflight_commit_sha = $publicationDryRunEvidenceBundlePreflightCommitSha
     publication_dry_run_evidence_bundle_preflight_ref_commit_sha = $publicationDryRunEvidenceBundlePreflightRefCommitSha
     input_generated_at = [ordered]@{
