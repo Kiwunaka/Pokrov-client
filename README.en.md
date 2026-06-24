@@ -272,6 +272,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.169.0-source` | Pending stacked PR, not tagged | Source publication gate makes the source publication packet an explicit final manual publish review proof before source-only GitHub Release publication. |
 | `v0.170.0-source` | Pending stacked PR, not tagged | Source publication gate recalculates source publication packet artifact fingerprints before manual source-only GitHub Release publication. |
 | `v0.171.0-source` | Pending stacked PR, not tagged | Source publication gate recalculates source publication packet input fingerprints before manual source-only GitHub Release publication. |
+| `v0.172.0-source` | Ready for source tag | Source readiness stack is merged to `main`, superseded stacked PRs are closed, dependency hygiene PRs are merged, and the final tag commit is recorded by source preflight at tag time. |
 
 ## Architecture Boundary
 

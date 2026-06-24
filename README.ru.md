@@ -397,6 +397,12 @@ that the source publication gate recalculates source publication packet input
 fingerprints before manual source-only GitHub Release publication; it is not
 tagged and does not ship APK/EXE binaries.
 
+Source readiness note: `v0.172.0-source` is ready for a source-only tag after
+the source-readiness stack was merged to `main`, superseded stacked PRs were
+closed, and dependency hygiene PRs were merged. The final tag commit is recorded
+by source preflight at tag time; it is not tagged yet and does not ship APK/EXE
+binaries.
+
 Source readiness note: `v0.53.0-source` is a pending stacked PR for Windows
 verifier CI/preflight enforcement; it is not tagged and does not ship APK/EXE
 binaries.

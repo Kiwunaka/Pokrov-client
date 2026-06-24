@@ -82,6 +82,7 @@ def test_source_release_readiness_milestones_are_source_only() -> None:
         assert milestone["status"] in {
             "tagged",
             "not_tagged",
+            "ready_for_tag",
             "stacked_pr_green_not_tagged",
             "stacked_pr_pending_not_tagged",
         }
@@ -224,6 +225,10 @@ def test_tagged_milestones_have_release_notes_and_pending_milestones_are_clear()
             evidence = ROOT / milestone["evidence"]
             assert evidence.is_file()
             assert "No APK or EXE binaries" in evidence.read_text(encoding="utf-8")
+        elif milestone["status"] == "ready_for_tag":
+            assert milestone["evidence"].startswith(
+                "https://github.com/Kiwunaka/Pokrov-client/pull/"
+            )
         else:
             assert "not_tagged" in milestone["status"]
 

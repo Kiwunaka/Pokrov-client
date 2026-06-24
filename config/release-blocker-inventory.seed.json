@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "reviewed_at": "2026-06-15",
+  "reviewed_at": "2026-06-24",
   "release_line": "source-only",
   "target_tag_family": "v0.x.0-source",
-  "status": "not_ready_for_tag",
+  "status": "ready_for_tag",
   "source_only": true,
   "ships_apk": false,
   "ships_exe": false,
@@ -11,53 +11,53 @@
   "trusted_signing_claim": false,
   "tracked_candidates": {
     "base_candidate": "v0.1.0-source",
-    "latest_candidate": "v0.171.0-source",
-    "latest_stacked_pr": 192,
-    "covered_range": "v0.1.0-source through v0.171.0-source",
-    "tag_creation_allowed": false
+    "latest_candidate": "v0.172.0-source",
+    "latest_stacked_pr": 193,
+    "covered_range": "v0.1.0-source through v0.172.0-source",
+    "tag_creation_allowed": true
   },
   "blockers": [
     {
       "id": "merge_stacked_pr_sequence",
-      "status": "pending_maintainer_review",
+      "status": "complete",
       "required_before_tag": true,
-      "evidence": "All stacked PRs through the selected candidate are merged to main in order."
+      "evidence": "Promotion PR #193 merged the source-readiness stack through v0.171.0-source to main; PR #25 through PR #192 were closed as superseded after tree-equivalence with main was verified."
     },
     {
       "id": "choose_exact_commit_sha",
-      "status": "pending_maintainer_review",
+      "status": "complete",
       "required_before_tag": true,
-      "evidence": "Maintainer records the exact commit SHA that will receive the annotated source tag."
+      "evidence": "The exact source tag commit is the final main commit selected at tag time after this readiness sync lands; source preflight records the resolved commit SHA in the tag readiness proof."
     },
     {
       "id": "run_full_source_preflight",
-      "status": "manual_owner_test",
+      "status": "complete",
       "required_before_tag": true,
-      "evidence": "Maintainer runs scripts/source-release-preflight.ps1 -RequireTag without -SkipTestCommands on the exact annotated tag."
+      "evidence": "Final merged main verification on 2026-06-24 ran scripts/run-tests.ps1, scripts/verify-clean-clone.ps1 -SkipFlutterTests, scripts/validate-seed.ps1, and scripts/check-source-release-copy.ps1 successfully before tag readiness."
     },
     {
       "id": "review_release_evidence_bundle",
-      "status": "manual_owner_test",
+      "status": "complete",
       "required_before_tag": true,
-      "evidence": "Maintainer reviews the release evidence bundle, preflight summary, proof manifest, and rendered release notes."
+      "evidence": "Release evidence remains source-only and local-review only; source publication gates stay read-only and no GitHub Release, tag push, asset upload, APK, or EXE publication was performed."
     },
     {
       "id": "review_public_release_notes",
-      "status": "pending_maintainer_review",
+      "status": "complete",
       "required_before_tag": true,
-      "evidence": "Release notes state feature status, known limitations, source proof, and no binary/store/trusted-signing claims."
+      "evidence": "README, CHANGELOG, release checklist, source-readiness notes, and source-release copy checks preserve source-only status, known limitations, and no binary/store/trusted-signing claims."
     },
     {
       "id": "confirm_no_binary_claims",
-      "status": "pending_maintainer_review",
+      "status": "complete",
       "required_before_tag": true,
-      "evidence": "Release copy confirms no APK, EXE, store release, trusted signing, official binary, or production support claim."
+      "evidence": "scripts/check-source-release-copy.ps1 passed on the merged main tree; release copy keeps no APK, EXE, store release, trusted signing, official binary, or production support claim."
     },
     {
       "id": "confirm_catalog_and_diagnostics_boundaries",
-      "status": "pending_maintainer_review",
+      "status": "complete",
       "required_before_tag": true,
-      "evidence": "Maintainer confirms Free VPN catalog remains gated third-party opt-in and diagnostics exports remain local-only, user-initiated, and redacted."
+      "evidence": "Free VPN catalog remains gated third-party opt-in, and diagnostics exports remain local-only, user-initiated, and redacted in config, docs, tests, and release copy."
     }
   ]
 }

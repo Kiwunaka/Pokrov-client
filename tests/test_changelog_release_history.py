@@ -39,6 +39,8 @@ def test_changelog_tracks_every_source_readiness_milestone() -> None:
         assert milestone["tag"] in changelog
         if milestone["status"] == "stacked_pr_green_not_tagged":
             assert f"`{milestone['tag']}` | Pending stacked PR, not tagged" in changelog
+        elif milestone["status"] == "ready_for_tag":
+            assert f"`{milestone['tag']}` | Ready for source tag" in changelog
         elif milestone["status"] == "not_tagged":
             assert f"`{milestone['tag']}` | Not tagged" in changelog
 

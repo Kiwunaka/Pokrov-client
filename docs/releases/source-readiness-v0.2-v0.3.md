@@ -1,10 +1,30 @@
-# Source Readiness: v0.2-v0.171
+# Source Readiness: v0.2-v0.172
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
 checklist is run on the exact commit. The machine-readable readiness inventory
 lives in
 [`config/source-release-readiness.seed.json`](../../config/source-release-readiness.seed.json).
+
+## v0.172.0-source Candidate
+
+Status: ready for source tag, not tagged yet.
+
+Current evidence:
+
+- PR #193: promoted the source-readiness stack through `v0.171.0-source` to
+  `main`
+- PR #194 through PR #197: dependency hygiene PRs merged after the stack
+  promotion
+- final source-only tag commit is recorded by source preflight at tag time
+
+Required before publishing a GitHub Release:
+
+- create the annotated source tag on the final selected `main` commit
+- run the source preflight, release evidence bundle, publication dry-run, source
+  publication packet, and source publication gate commands from that exact tag
+- keep the source-only boundary: no APK, EXE, store release, trusted signing, or
+  official binary claim
 
 ## v0.171.0-source Candidate
 

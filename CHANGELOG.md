@@ -420,8 +420,12 @@ production readiness without matching public evidence.
 - Added source publication gate input fingerprint integrity checks so manual
   source-only publication is blocked if release handoff or publication dry-run
   summaries drift after the source publication packet is generated.
+- Added source tag readiness sync for `v0.172.0-source` after the
+  source-readiness stack was promoted to `main`, superseded stacked PRs were
+  closed, and dependency hygiene PRs were merged. The final source-only tag
+  commit is recorded by source preflight at tag time.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.171.0-source` candidates.
+  `v0.172.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -598,6 +602,7 @@ production readiness without matching public evidence.
 | `v0.169.0-source` | Pending stacked PR, not tagged | PR #190 |
 | `v0.170.0-source` | Pending stacked PR, not tagged | PR #191 |
 | `v0.171.0-source` | Pending stacked PR, not tagged | PR #192 |
+| `v0.172.0-source` | Ready for source tag | PR #193 |
 
 ### Still Source-Only
 
