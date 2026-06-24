@@ -16,9 +16,28 @@ public source.
 POKROV does not provide your backend, billing, support, signing, or release
 claims.
 
+Read [Enterprise boundary](ENTERPRISE.md) (`docs/ENTERPRISE.md`) before
+distributing operator builds. It covers GPLv3, commercial license boundaries,
+paid services, and the fact that operator builds remain operator-owned
+distributions.
+
 Operator builds are not POKROV builds. Do not use POKROV names, logos,
 endpoints, support bots, signing identities, release channels, or official
 service claims for your users.
+
+## First-Run Path For Operators
+
+1. choose the `operator` variant
+2. run the local fixture backend with
+   `powershell -ExecutionPolicy Bypass -File .\scripts\run-operator-fixture-smoke.ps1`
+3. export white-label color tokens with
+   `powershell -ExecutionPolicy Bypass -File .\scripts\export-white-label-color-tokens.ps1`
+4. implement the minimal managed-profile contract from
+   [`docs/operator/openapi.yaml`](operator/openapi.yaml)
+5. replace placeholder API, cabinet, checkout, support, privacy, signing, and
+   release channels with operator-owned surfaces
+6. publish your own support policy, privacy policy, checksums, signing notes,
+   and release notes
 
 ## Minimal API Contract
 
@@ -50,9 +69,71 @@ The fixture supports error modes for client testing:
 
 ```powershell
 Invoke-RestMethod http://127.0.0.1:8765/api/client/profile/managed?mode=401
+Invoke-RestMethod http://127.0.0.1:8765/api/client/profile/managed?mode=429
 Invoke-RestMethod http://127.0.0.1:8765/api/client/profile/managed?mode=500
 Invoke-RestMethod http://127.0.0.1:8765/api/client/profile/managed?mode=malformed-profile
 ```
+
+## Contract Conventions
+
+The current public operator contract is `2026-06-operator-v1`. It is intentionally
+small, but operators should keep these conventions stable before shipping a
+branded client:
+
+- accept `X-Request-ID` on every client request and echo it on every response
+- accept `X-Client-Version` so the backend can make compatibility decisions
+- return `X-API-Version` on every response
+- return `Retry-After` with HTTP `429` rate limits
+- use `Deprecation` and `Sunset` headers before removing or changing a route,
+  field, enum value, or error code
+- keep `error.code` stable for client behavior and support triage
+- keep `error.message` safe for logs and support, without secrets or profile
+  URLs
+
+The public client sends a fresh `X-Request-ID` per operator API request and the
+runtime app version in `X-Client-Version`. Treat the request ID as a short-lived
+support trace only; do not use it as a stable user identifier.
+
+Standard error response:
+
+```json
+{
+  "ok": false,
+  "error": {
+    "code": "rate_limited",
+    "message": "Too many requests. Retry after the advertised delay.",
+    "request_id": "client-or-server-trace-id",
+    "retryable": true,
+    "retry_after_seconds": 60
+  }
+}
+```
+
+Stable error codes for this source milestone:
+
+| Code | Meaning | Retry |
+| --- | --- | --- |
+| `bad_request` | Request shape or field value is invalid. | No, unless the user changes input. |
+| `unauthorized` | Session token is missing, expired, or rejected. | After session refresh or sign-in. |
+| `forbidden` | Account or policy does not allow the action. | No. |
+| `not_found` | Route or resource does not exist. | No. |
+| `rate_limited` | The operator service is throttling requests. | Yes, after `Retry-After`. |
+| `server_error` | Operator backend failed unexpectedly. | Yes, with backoff. |
+
+## Session Lifecycle
+
+`POST /api/client/session/start-trial` creates or resumes a client session. The
+response must include:
+
+- `session.session_token`: short-lived bearer token for managed endpoints
+- `session.token_type`: `Bearer`
+- `session.expires_in`: token lifetime in seconds
+- `session.refresh_after`: suggested refresh point before expiry
+- `provisioning.managed_manifest.version`: profile contract version, currently
+  `operator-v1`
+
+Clients should refresh or restart the session before `expires_in` elapses. Do
+not ask users to paste tokens into GitHub issues or support chats.
 
 ### `POST /api/client/session/start-trial`
 
@@ -64,13 +145,17 @@ Expected response shape:
 {
   "session": {
     "session_token": "short-lived-or-refreshable-client-token",
-    "account_id": "operator-account-id"
+    "account_id": "operator-account-id",
+    "token_type": "Bearer",
+    "expires_in": 3600,
+    "refresh_after": 3000
   },
   "provisioning": {
     "status": "ready",
     "sync_ok": true,
     "managed_manifest": {
-      "url": "/api/client/profile/managed"
+      "url": "/api/client/profile/managed",
+      "version": "operator-v1"
     }
   }
 }
@@ -132,10 +217,14 @@ separate evidence for those claims.
 
 Optional if you want in-app support:
 
-- `GET /api/client/support/tickets`
-- `POST /api/client/support/tickets`
-- `GET /api/client/support/tickets/{ticket_id}`
-- `POST /api/client/support/tickets/{ticket_id}/messages`
+- `GET /api/tickets`
+- `POST /api/tickets`
+- `GET /api/tickets/{ticket_id}`
+- `POST /api/tickets/{ticket_id}/messages`
+
+These paths match the current app support adapter. If an operator already uses
+different public support paths, keep that translation behind the operator API
+gateway rather than changing the client contract ad hoc.
 
 ### Optional App-First Endpoints
 
@@ -151,7 +240,18 @@ first operator smoke:
 
 ## Build Defines
 
+Preview the current operator command from
+[`config/variants/operator-client.seed.json`](../config/variants/operator-client.seed.json):
+
 ```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\print-build-variant-command.ps1 -Variant operator -Platform windows -Action build -Release
+```
+
+The helper prints a command only. It does not sign, package, upload, publish, or
+claim a release artifact.
+
+```powershell
+Push-Location apps/windows_shell
 flutter build windows --release `
   --dart-define=OPEN_CLIENT_VARIANT=operator `
   --dart-define=OPEN_CLIENT_BRAND_NAME="Acme VPN" `
@@ -161,6 +261,7 @@ flutter build windows --release `
   --dart-define=OPEN_CLIENT_CHECKOUT_URL="https://pay.acme.example/checkout" `
   --dart-define=OPEN_CLIENT_SUPPORT_URL="https://support.acme.example/" `
   --dart-define=OPEN_CLIENT_PRIVACY_URL="https://acme.example/privacy/"
+Pop-Location
 ```
 
 For Android, pass the same defines to `flutter build apk` or your Gradle-backed

@@ -1,0 +1,801 @@
+{
+  "schema_version": 1,
+  "script": "scripts/check-release-merge-order.ps1",
+  "default_output_dir": "build/release-merge-order",
+  "policy": {
+    "read_only": true,
+    "no_merge": true,
+    "no_git_push": true,
+    "no_github_api_mutation": true,
+    "requires_linear_base_to_head_chain": true,
+    "writes_only_ignored_build_output": true
+  },
+  "stack": [
+    {
+      "pr": 61,
+      "candidate": "v0.41.0-source",
+      "base": "codex/v0.40-enterprise-boundary",
+      "head": "codex/v0.41-safe-diagnostics-export"
+    },
+    {
+      "pr": 62,
+      "candidate": "v0.42.0-source",
+      "base": "codex/v0.41-safe-diagnostics-export",
+      "head": "codex/v0.42-diagnostics-export-policy"
+    },
+    {
+      "pr": 63,
+      "candidate": "v0.43.0-source",
+      "base": "codex/v0.42-diagnostics-export-policy",
+      "head": "codex/v0.43-release-blocker-inventory"
+    },
+    {
+      "pr": 64,
+      "candidate": "v0.44.0-source",
+      "base": "codex/v0.43-release-blocker-inventory",
+      "head": "codex/v0.44-tag-readiness-command"
+    },
+    {
+      "pr": 65,
+      "candidate": "v0.45.0-source",
+      "base": "codex/v0.44-tag-readiness-command",
+      "head": "codex/v0.45-release-merge-order"
+    },
+    {
+      "pr": 66,
+      "candidate": "v0.46.0-source",
+      "base": "codex/v0.45-release-merge-order",
+      "head": "codex/v0.46-release-stack-github-status"
+    },
+    {
+      "pr": 67,
+      "candidate": "v0.47.0-source",
+      "base": "codex/v0.46-release-stack-github-status",
+      "head": "codex/v0.47-release-merge-handoff"
+    },
+    {
+      "pr": 68,
+      "candidate": "v0.48.0-source",
+      "base": "codex/v0.47-release-merge-handoff",
+      "head": "codex/v0.48-android-device-validation"
+    },
+    {
+      "pr": 69,
+      "candidate": "v0.49.0-source",
+      "base": "codex/v0.48-android-device-validation",
+      "head": "codex/v0.49-operator-request-headers"
+    },
+    {
+      "pr": 70,
+      "candidate": "v0.50.0-source",
+      "base": "codex/v0.49-operator-request-headers",
+      "head": "codex/v0.50-android-native-ci"
+    },
+    {
+      "pr": 71,
+      "candidate": "v0.51.0-source",
+      "base": "codex/v0.50-android-native-ci",
+      "head": "codex/v0.51-windows-bundle-verifier"
+    },
+    {
+      "pr": 72,
+      "candidate": "v0.52.0-source",
+      "base": "codex/v0.51-windows-bundle-verifier",
+      "head": "codex/v0.52-runtime-archive-hardening"
+    },
+    {
+      "pr": 73,
+      "candidate": "v0.53.0-source",
+      "base": "codex/v0.52-runtime-archive-hardening",
+      "head": "codex/v0.53-windows-verifier-preflight"
+    },
+    {
+      "pr": 74,
+      "candidate": "v0.54.0-source",
+      "base": "codex/v0.53-windows-verifier-preflight",
+      "head": "codex/v0.54-release-evidence-windows-proof"
+    },
+    {
+      "pr": 75,
+      "candidate": "v0.55.0-source",
+      "base": "codex/v0.54-release-evidence-windows-proof",
+      "head": "codex/v0.55-publication-windows-proof"
+    },
+    {
+      "pr": 76,
+      "candidate": "v0.56.0-source",
+      "base": "codex/v0.55-publication-windows-proof",
+      "head": "codex/v0.56-merge-handoff-publication-proof"
+    },
+    {
+      "pr": 77,
+      "candidate": "v0.57.0-source",
+      "base": "codex/v0.56-merge-handoff-publication-proof",
+      "head": "codex/v0.57-merge-handoff-input-fingerprints"
+    },
+    {
+      "pr": 78,
+      "candidate": "v0.58.0-source",
+      "base": "codex/v0.57-merge-handoff-input-fingerprints",
+      "head": "codex/v0.58-merge-handoff-source-flags"
+    },
+    {
+      "pr": 79,
+      "candidate": "v0.59.0-source",
+      "base": "codex/v0.58-merge-handoff-source-flags",
+      "head": "codex/v0.59-merge-handoff-input-roots"
+    },
+    {
+      "pr": 80,
+      "candidate": "v0.60.0-source",
+      "base": "codex/v0.59-merge-handoff-input-roots",
+      "head": "codex/v0.60-merge-handoff-input-timestamps"
+    },
+    {
+      "pr": 81,
+      "candidate": "v0.61.0-source",
+      "base": "codex/v0.60-merge-handoff-input-timestamps",
+      "head": "codex/v0.61-merge-handoff-input-schema"
+    },
+    {
+      "pr": 82,
+      "candidate": "v0.62.0-source",
+      "base": "codex/v0.61-merge-handoff-input-schema",
+      "head": "codex/v0.62-merge-handoff-stack-counts"
+    },
+    {
+      "pr": 83,
+      "candidate": "v0.63.0-source",
+      "base": "codex/v0.62-merge-handoff-stack-counts",
+      "head": "codex/v0.63-merge-handoff-input-errors"
+    },
+    {
+      "pr": 84,
+      "candidate": "v0.64.0-source",
+      "base": "codex/v0.63-merge-handoff-input-errors",
+      "head": "codex/v0.64-merge-handoff-tag-errors"
+    },
+    {
+      "pr": 85,
+      "candidate": "v0.65.0-source",
+      "base": "codex/v0.64-merge-handoff-tag-errors",
+      "head": "codex/v0.65-merge-handoff-blocker-count"
+    },
+    {
+      "pr": 86,
+      "candidate": "v0.66.0-source",
+      "base": "codex/v0.65-merge-handoff-blocker-count",
+      "head": "codex/v0.66-merge-handoff-blocker-shape"
+    },
+    {
+      "pr": 87,
+      "candidate": "v0.67.0-source",
+      "base": "codex/v0.66-merge-handoff-blocker-shape",
+      "head": "codex/v0.67-merge-handoff-readiness-flags"
+    },
+    {
+      "pr": 88,
+      "candidate": "v0.68.0-source",
+      "base": "codex/v0.67-merge-handoff-readiness-flags",
+      "head": "codex/v0.68-merge-handoff-tag-denial"
+    },
+    {
+      "pr": 89,
+      "candidate": "v0.69.0-source",
+      "base": "codex/v0.68-merge-handoff-tag-denial",
+      "head": "codex/v0.69-tag-readiness-blocker-evidence"
+    },
+    {
+      "pr": 90,
+      "candidate": "v0.70.0-source",
+      "base": "codex/v0.69-tag-readiness-blocker-evidence",
+      "head": "codex/v0.70-tag-readiness-pr-consistency"
+    },
+    {
+      "pr": 91,
+      "candidate": "v0.71.0-source",
+      "base": "codex/v0.70-tag-readiness-pr-consistency",
+      "head": "codex/v0.71-handoff-seed-candidate-paths"
+    },
+    {
+      "pr": 92,
+      "candidate": "v0.72.0-source",
+      "base": "codex/v0.71-handoff-seed-candidate-paths",
+      "head": "codex/v0.72-handoff-blocker-inventory-match"
+    },
+    {
+      "pr": 93,
+      "candidate": "v0.73.0-source",
+      "base": "codex/v0.72-handoff-blocker-inventory-match",
+      "head": "codex/v0.73-tag-readiness-latest-candidate"
+    },
+    {
+      "pr": 94,
+      "candidate": "v0.74.0-source",
+      "base": "codex/v0.73-tag-readiness-latest-candidate",
+      "head": "codex/v0.74-tag-readiness-evidence-pr"
+    },
+    {
+      "pr": 95,
+      "candidate": "v0.75.0-source",
+      "base": "codex/v0.74-tag-readiness-evidence-pr",
+      "head": "codex/v0.75-tag-readiness-milestone-flags"
+    },
+    {
+      "pr": 96,
+      "candidate": "v0.76.0-source",
+      "base": "codex/v0.75-tag-readiness-milestone-flags",
+      "head": "codex/v0.76-tag-readiness-inventory-flags"
+    },
+    {
+      "pr": 97,
+      "candidate": "v0.77.0-source",
+      "base": "codex/v0.76-tag-readiness-inventory-flags",
+      "head": "codex/v0.77-tag-readiness-blocker-evidence"
+    },
+    {
+      "pr": 98,
+      "candidate": "v0.78.0-source",
+      "base": "codex/v0.77-tag-readiness-blocker-evidence",
+      "head": "codex/v0.78-tag-readiness-blocker-id"
+    },
+    {
+      "pr": 99,
+      "candidate": "v0.79.0-source",
+      "base": "codex/v0.78-tag-readiness-blocker-id",
+      "head": "codex/v0.79-tag-readiness-blocker-status"
+    },
+    {
+      "pr": 100,
+      "candidate": "v0.80.0-source",
+      "base": "codex/v0.79-tag-readiness-blocker-status",
+      "head": "codex/v0.80-tag-readiness-blocker-required-flag"
+    },
+    {
+      "pr": 101,
+      "candidate": "v0.81.0-source",
+      "base": "codex/v0.80-tag-readiness-blocker-required-flag",
+      "head": "codex/v0.81-tag-readiness-milestone-status"
+    },
+    {
+      "pr": 102,
+      "candidate": "v0.82.0-source",
+      "base": "codex/v0.81-tag-readiness-milestone-status",
+      "head": "codex/v0.82-tag-readiness-milestone-evidence"
+    },
+    {
+      "pr": 103,
+      "candidate": "v0.83.0-source",
+      "base": "codex/v0.82-tag-readiness-milestone-evidence",
+      "head": "codex/v0.83-tag-readiness-milestone-scope"
+    },
+    {
+      "pr": 104,
+      "candidate": "v0.84.0-source",
+      "base": "codex/v0.83-tag-readiness-milestone-scope",
+      "head": "codex/v0.84-tag-readiness-read-only-summary"
+    },
+    {
+      "pr": 105,
+      "candidate": "v0.85.0-source",
+      "base": "codex/v0.84-tag-readiness-read-only-summary",
+      "head": "codex/v0.85-tag-readiness-input-fingerprints"
+    },
+    {
+      "pr": 107,
+      "candidate": "v0.86.0-source",
+      "base": "codex/v0.85-tag-readiness-input-fingerprints",
+      "head": "codex/v0.86-handoff-tag-readiness-fingerprints"
+    },
+    {
+      "pr": 108,
+      "candidate": "v0.87.0-source",
+      "base": "codex/v0.86-handoff-tag-readiness-fingerprints",
+      "head": "codex/v0.87-publication-dry-run-fingerprints"
+    },
+    {
+      "pr": 109,
+      "candidate": "v0.88.0-source",
+      "base": "codex/v0.87-publication-dry-run-fingerprints",
+      "head": "codex/v0.88-evidence-bundle-input-fingerprints"
+    },
+    {
+      "pr": 110,
+      "candidate": "v0.89.0-source",
+      "base": "codex/v0.88-evidence-bundle-input-fingerprints",
+      "head": "codex/v0.89-preflight-artifact-fingerprints"
+    },
+    {
+      "pr": 111,
+      "candidate": "v0.90.0-source",
+      "base": "codex/v0.89-preflight-artifact-fingerprints",
+      "head": "codex/v0.90-artifact-fingerprint-integrity"
+    },
+    {
+      "pr": 112,
+      "candidate": "v0.91.0-source",
+      "base": "codex/v0.90-artifact-fingerprint-integrity",
+      "head": "codex/v0.91-release-commit-sha-consistency"
+    },
+    {
+      "pr": 113,
+      "candidate": "v0.92.0-source",
+      "base": "codex/v0.91-release-commit-sha-consistency",
+      "head": "codex/v0.92-preflight-ref-commit-consistency"
+    },
+    {
+      "pr": 114,
+      "candidate": "v0.93.0-source",
+      "base": "codex/v0.92-preflight-ref-commit-consistency",
+      "head": "codex/v0.93-handoff-latest-pr-url"
+    },
+    {
+      "pr": 115,
+      "candidate": "v0.94.0-source",
+      "base": "codex/v0.93-handoff-latest-pr-url",
+      "head": "codex/v0.94-release-pr-url-repo-boundary"
+    },
+    {
+      "pr": 116,
+      "candidate": "v0.95.0-source",
+      "base": "codex/v0.94-release-pr-url-repo-boundary",
+      "head": "codex/v0.95-handoff-pr-url-prefix-consistency"
+    },
+    {
+      "pr": 117,
+      "candidate": "v0.96.0-source",
+      "base": "codex/v0.95-handoff-pr-url-prefix-consistency",
+      "head": "codex/v0.96-handoff-github-status-counts"
+    },
+    {
+      "pr": 118,
+      "candidate": "v0.97.0-source",
+      "base": "codex/v0.96-handoff-github-status-counts",
+      "head": "codex/v0.97-handoff-github-pr-entries"
+    },
+    {
+      "pr": 119,
+      "candidate": "v0.98.0-source",
+      "base": "codex/v0.97-handoff-github-pr-entries",
+      "head": "codex/v0.98-handoff-github-pr-sequence"
+    },
+    {
+      "pr": 120,
+      "candidate": "v0.99.0-source",
+      "base": "codex/v0.98-handoff-github-pr-sequence",
+      "head": "codex/v0.99-handoff-github-pr-refs"
+    },
+    {
+      "pr": 121,
+      "candidate": "v0.100.0-source",
+      "base": "codex/v0.99-handoff-github-pr-refs",
+      "head": "codex/v0.100-handoff-github-pr-urls"
+    },
+    {
+      "pr": 122,
+      "candidate": "v0.101.0-source",
+      "base": "codex/v0.100-handoff-github-pr-urls",
+      "head": "codex/v0.101-handoff-github-pr-states"
+    },
+    {
+      "pr": 123,
+      "candidate": "v0.102.0-source",
+      "base": "codex/v0.101-handoff-github-pr-states",
+      "head": "codex/v0.102-handoff-github-pr-checks"
+    },
+    {
+      "pr": 124,
+      "candidate": "v0.103.0-source",
+      "base": "codex/v0.102-handoff-github-pr-checks",
+      "head": "codex/v0.103-handoff-github-pr-check-trace"
+    },
+    {
+      "pr": 125,
+      "candidate": "v0.104.0-source",
+      "base": "codex/v0.103-handoff-github-pr-check-trace",
+      "head": "codex/v0.104-publication-preflight-fingerprint"
+    },
+    {
+      "pr": 126,
+      "candidate": "v0.105.0-source",
+      "base": "codex/v0.104-publication-preflight-fingerprint",
+      "head": "codex/v0.105-handoff-preflight-fingerprint"
+    },
+    {
+      "pr": 127,
+      "candidate": "v0.106.0-source",
+      "base": "codex/v0.105-handoff-preflight-fingerprint",
+      "head": "codex/v0.106-handoff-publication-input-fingerprints"
+    },
+    {
+      "pr": 128,
+      "candidate": "v0.107.0-source",
+      "base": "codex/v0.106-handoff-publication-input-fingerprints",
+      "head": "codex/v0.107-handoff-tag-readiness-input-fingerprints"
+    },
+    {
+      "pr": 129,
+      "candidate": "v0.108.0-source",
+      "base": "codex/v0.107-handoff-tag-readiness-input-fingerprints",
+      "head": "codex/v0.108-handoff-publication-artifact-fingerprints"
+    },
+    {
+      "pr": 130,
+      "candidate": "v0.109.0-source",
+      "base": "codex/v0.108-handoff-publication-artifact-fingerprints",
+      "head": "codex/v0.109-ruleset-report-input-fingerprints"
+    },
+    {
+      "pr": 131,
+      "candidate": "v0.110.0-source",
+      "base": "codex/v0.109-ruleset-report-input-fingerprints",
+      "head": "codex/v0.110-ruleset-report-shape-guard"
+    },
+    {
+      "pr": 132,
+      "candidate": "v0.111.0-source",
+      "base": "codex/v0.110-ruleset-report-shape-guard",
+      "head": "codex/v0.111-publication-ruleset-report-shape"
+    },
+    {
+      "pr": 133,
+      "candidate": "v0.112.0-source",
+      "base": "codex/v0.111-publication-ruleset-report-shape",
+      "head": "codex/v0.112-handoff-ruleset-report-shape"
+    },
+    {
+      "pr": 134,
+      "candidate": "v0.113.0-source",
+      "base": "codex/v0.112-handoff-ruleset-report-shape",
+      "head": "codex/v0.113-ruleset-report-target-guard"
+    },
+    {
+      "pr": 135,
+      "candidate": "v0.114.0-source",
+      "base": "codex/v0.113-ruleset-report-target-guard",
+      "head": "codex/v0.114-ruleset-report-ok-consistency"
+    },
+    {
+      "pr": 136,
+      "candidate": "v0.115.0-source",
+      "base": "codex/v0.114-ruleset-report-ok-consistency",
+      "head": "codex/v0.115-ruleset-report-check-shape"
+    },
+    {
+      "pr": 137,
+      "candidate": "v0.116.0-source",
+      "base": "codex/v0.115-ruleset-report-check-shape",
+      "head": "codex/v0.116-ruleset-report-required-checks"
+    },
+    {
+      "pr": 138,
+      "candidate": "v0.117.0-source",
+      "base": "codex/v0.116-ruleset-report-required-checks",
+      "head": "codex/v0.117-ruleset-report-required-check-coverage"
+    },
+    {
+      "pr": 139,
+      "candidate": "v0.118.0-source",
+      "base": "codex/v0.117-ruleset-report-required-check-coverage",
+      "head": "codex/v0.118-ruleset-report-covered-required-checks"
+    },
+    {
+      "pr": 140,
+      "candidate": "v0.119.0-source",
+      "base": "codex/v0.118-ruleset-report-covered-required-checks",
+      "head": "codex/v0.119-ruleset-report-freshness"
+    },
+    {
+      "pr": 141,
+      "candidate": "v0.120.0-source",
+      "base": "codex/v0.119-ruleset-report-freshness",
+      "head": "codex/v0.120-handoff-input-freshness"
+    },
+    {
+      "pr": 142,
+      "candidate": "v0.121.0-source",
+      "base": "codex/v0.120-handoff-input-freshness",
+      "head": "codex/v0.121-evidence-publication-input-freshness"
+    },
+    {
+      "pr": 143,
+      "candidate": "v0.122.0-source",
+      "base": "codex/v0.121-evidence-publication-input-freshness",
+      "head": "codex/v0.122-tag-readiness-inventory-consistency"
+    },
+    {
+      "pr": 144,
+      "candidate": "v0.123.0-source",
+      "base": "codex/v0.122-tag-readiness-inventory-consistency",
+      "head": "codex/v0.123-tag-readiness-ready-status-consistency"
+    },
+    {
+      "pr": 145,
+      "candidate": "v0.124.0-source",
+      "base": "codex/v0.123-tag-readiness-ready-status-consistency",
+      "head": "codex/v0.124-tag-readiness-milestone-status-consistency"
+    },
+    {
+      "pr": 146,
+      "candidate": "v0.125.0-source",
+      "base": "codex/v0.124-tag-readiness-milestone-status-consistency",
+      "head": "codex/v0.125-tag-readiness-milestone-status-allowlist"
+    },
+    {
+      "pr": 147,
+      "candidate": "v0.126.0-source",
+      "base": "codex/v0.125-tag-readiness-milestone-status-allowlist",
+      "head": "codex/v0.126-tag-readiness-evidence-url-boundary"
+    },
+    {
+      "pr": 148,
+      "candidate": "v0.127.0-source",
+      "base": "codex/v0.126-tag-readiness-evidence-url-boundary",
+      "head": "codex/v0.127-validate-tag-readiness-evidence-url-boundary"
+    },
+    {
+      "pr": 149,
+      "candidate": "v0.128.0-source",
+      "base": "codex/v0.127-validate-tag-readiness-evidence-url-boundary",
+      "head": "codex/v0.128-validate-source-readiness-latest-evidence"
+    },
+    {
+      "pr": 150,
+      "candidate": "v0.129.0-source",
+      "base": "codex/v0.128-validate-source-readiness-latest-evidence",
+      "head": "codex/v0.129-validate-merge-order-latest-candidate"
+    },
+    {
+      "pr": 151,
+      "candidate": "v0.130.0-source",
+      "base": "codex/v0.129-validate-merge-order-latest-candidate",
+      "head": "codex/v0.130-validate-blocker-covered-range"
+    },
+    {
+      "pr": 152,
+      "candidate": "v0.131.0-source",
+      "base": "codex/v0.130-validate-blocker-covered-range",
+      "head": "codex/v0.131-validate-source-readiness-unique-tags"
+    },
+    {
+      "pr": 153,
+      "candidate": "v0.132.0-source",
+      "base": "codex/v0.131-validate-source-readiness-unique-tags",
+      "head": "codex/v0.132-validate-source-readiness-evidence-boundary"
+    },
+    {
+      "pr": 154,
+      "candidate": "v0.133.0-source",
+      "base": "codex/v0.132-validate-source-readiness-evidence-boundary",
+      "head": "codex/v0.133-validate-source-readiness-unique-evidence"
+    },
+    {
+      "pr": 155,
+      "candidate": "v0.134.0-source",
+      "base": "codex/v0.133-validate-source-readiness-unique-evidence",
+      "head": "codex/v0.134-validate-source-readiness-pr-sequence"
+    },
+    {
+      "pr": 156,
+      "candidate": "v0.135.0-source",
+      "base": "codex/v0.134-validate-source-readiness-pr-sequence",
+      "head": "codex/v0.135-validate-source-readiness-merge-order"
+    },
+    {
+      "pr": 157,
+      "candidate": "v0.136.0-source",
+      "base": "codex/v0.135-validate-source-readiness-merge-order",
+      "head": "codex/v0.136-validate-stack-status-required-checks"
+    },
+    {
+      "pr": 158,
+      "candidate": "v0.137.0-source",
+      "base": "codex/v0.136-validate-stack-status-required-checks",
+      "head": "codex/v0.137-validate-source-readiness-merge-coverage"
+    },
+    {
+      "pr": 159,
+      "candidate": "v0.138.0-source",
+      "base": "codex/v0.137-validate-source-readiness-merge-coverage",
+      "head": "codex/v0.138-source-publication-packet"
+    },
+    {
+      "pr": 160,
+      "candidate": "v0.139.0-source",
+      "base": "codex/v0.138-source-publication-packet",
+      "head": "codex/v0.139-source-publication-packet-input-freshness"
+    },
+    {
+      "pr": 161,
+      "candidate": "v0.140.0-source",
+      "base": "codex/v0.139-source-publication-packet-input-freshness",
+      "head": "codex/v0.140-source-publication-packet-fingerprint-integrity"
+    },
+    {
+      "pr": 162,
+      "candidate": "v0.141.0-source",
+      "base": "codex/v0.140-source-publication-packet-fingerprint-integrity",
+      "head": "codex/v0.141-source-publication-packet-artifact-integrity"
+    },
+    {
+      "pr": 163,
+      "candidate": "v0.142.0-source",
+      "base": "codex/v0.141-source-publication-packet-artifact-integrity",
+      "head": "codex/v0.142-source-publication-packet-artifact-roots"
+    },
+    {
+      "pr": 164,
+      "candidate": "v0.143.0-source",
+      "base": "codex/v0.142-source-publication-packet-artifact-roots",
+      "head": "codex/v0.143-source-publication-packet-asset-allowlist"
+    },
+    {
+      "pr": 165,
+      "candidate": "v0.144.0-source",
+      "base": "codex/v0.143-source-publication-packet-asset-allowlist",
+      "head": "codex/v0.144-source-publication-packet-artifact-filenames"
+    },
+    {
+      "pr": 166,
+      "candidate": "v0.145.0-source",
+      "base": "codex/v0.144-source-publication-packet-artifact-filenames",
+      "head": "codex/v0.145-source-publication-packet-artifact-content"
+    },
+    {
+      "pr": 167,
+      "candidate": "v0.146.0-source",
+      "base": "codex/v0.145-source-publication-packet-artifact-content",
+      "head": "codex/v0.146-source-publication-packet-artifact-schema"
+    },
+    {
+      "pr": 168,
+      "candidate": "v0.147.0-source",
+      "base": "codex/v0.146-source-publication-packet-artifact-schema",
+      "head": "codex/v0.147-source-publication-packet-release-notes-claims"
+    },
+    {
+      "pr": 169,
+      "candidate": "v0.148.0-source",
+      "base": "codex/v0.147-source-publication-packet-release-notes-claims",
+      "head": "codex/v0.148-source-publication-packet-release-notes-proof"
+    },
+    {
+      "pr": 170,
+      "candidate": "v0.149.0-source",
+      "base": "codex/v0.148-source-publication-packet-release-notes-proof",
+      "head": "codex/v0.149-source-publication-packet-proof-manifest-sha"
+    },
+    {
+      "pr": 171,
+      "candidate": "v0.150.0-source",
+      "base": "codex/v0.149-source-publication-packet-proof-manifest-sha",
+      "head": "codex/v0.150-source-publication-packet-proof-archive-name"
+    },
+    {
+      "pr": 172,
+      "candidate": "v0.151.0-source",
+      "base": "codex/v0.150-source-publication-packet-proof-archive-name",
+      "head": "codex/v0.151-source-publication-packet-proof-commit-sha"
+    },
+    {
+      "pr": 173,
+      "candidate": "v0.152.0-source",
+      "base": "codex/v0.151-source-publication-packet-proof-commit-sha",
+      "head": "codex/v0.152-source-publication-packet-proof-tag"
+    },
+    {
+      "pr": 174,
+      "candidate": "v0.153.0-source",
+      "base": "codex/v0.152-source-publication-packet-proof-tag",
+      "head": "codex/v0.153-source-publication-packet-evidence-tag"
+    },
+    {
+      "pr": 175,
+      "candidate": "v0.154.0-source",
+      "base": "codex/v0.153-source-publication-packet-evidence-tag",
+      "head": "codex/v0.154-source-publication-packet-evidence-commit"
+    },
+    {
+      "pr": 176,
+      "candidate": "v0.155.0-source",
+      "base": "codex/v0.154-source-publication-packet-evidence-commit",
+      "head": "codex/v0.155-source-publication-packet-evidence-archive-sha"
+    },
+    {
+      "pr": 177,
+      "candidate": "v0.156.0-source",
+      "base": "codex/v0.155-source-publication-packet-evidence-archive-sha",
+      "head": "codex/v0.156-source-publication-packet-evidence-archive-name"
+    },
+    {
+      "pr": 178,
+      "candidate": "v0.157.0-source",
+      "base": "codex/v0.156-source-publication-packet-evidence-archive-name",
+      "head": "codex/v0.157-source-publication-evidence-archive-name"
+    },
+    {
+      "pr": 179,
+      "candidate": "v0.158.0-source",
+      "base": "codex/v0.157-source-publication-evidence-archive-name",
+      "head": "codex/v0.158-source-publication-dry-run-archive-name-proof"
+    },
+    {
+      "pr": 180,
+      "candidate": "v0.159.0-source",
+      "base": "codex/v0.158-source-publication-dry-run-archive-name-proof",
+      "head": "codex/v0.159-release-handoff-carries-dry-run-archive-name"
+    },
+    {
+      "pr": 181,
+      "candidate": "v0.160.0-source",
+      "base": "codex/v0.159-release-handoff-carries-dry-run-archive-name",
+      "head": "codex/v0.160-publication-packet-handoff-archive-name-binding"
+    },
+    {
+      "pr": 182,
+      "candidate": "v0.161.0-source",
+      "base": "codex/v0.160-publication-packet-handoff-archive-name-binding",
+      "head": "codex/v0.161-publication-packet-carries-handoff-archive-name"
+    },
+    {
+      "pr": 183,
+      "candidate": "v0.162.0-source",
+      "base": "codex/v0.161-publication-packet-carries-handoff-archive-name",
+      "head": "codex/v0.162-publication-packet-carries-handoff-commit-sha"
+    },
+    {
+      "pr": 184,
+      "candidate": "v0.163.0-source",
+      "base": "codex/v0.162-publication-packet-carries-handoff-commit-sha",
+      "head": "codex/v0.163-release-handoff-carries-dry-run-archive-sha"
+    },
+    {
+      "pr": 185,
+      "candidate": "v0.164.0-source",
+      "base": "codex/v0.163-release-handoff-carries-dry-run-archive-sha",
+      "head": "codex/v0.164-publication-packet-carries-handoff-archive-sha"
+    },
+    {
+      "pr": 186,
+      "candidate": "v0.165.0-source",
+      "base": "codex/v0.164-publication-packet-carries-handoff-archive-sha",
+      "head": "codex/v0.165-publication-packet-carries-handoff-preflight-commit"
+    },
+    {
+      "pr": 187,
+      "candidate": "v0.166.0-source",
+      "base": "codex/v0.165-publication-packet-carries-handoff-preflight-commit",
+      "head": "codex/v0.166-publication-packet-carries-handoff-preflight-ref"
+    },
+    {
+      "pr": 188,
+      "candidate": "v0.167.0-source",
+      "base": "codex/v0.166-publication-packet-carries-handoff-preflight-ref",
+      "head": "codex/v0.167-publication-packet-carries-handoff-windows-proof"
+    },
+    {
+      "pr": 189,
+      "candidate": "v0.168.0-source",
+      "base": "codex/v0.167-publication-packet-carries-handoff-windows-proof",
+      "head": "codex/v0.168-publication-packet-carries-handoff-ruleset-proof"
+    },
+    {
+      "pr": 190,
+      "candidate": "v0.169.0-source",
+      "base": "codex/v0.168-publication-packet-carries-handoff-ruleset-proof",
+      "head": "codex/v0.169-source-publication-final-gate"
+    },
+    {
+      "pr": 191,
+      "candidate": "v0.170.0-source",
+      "base": "codex/v0.169-source-publication-final-gate",
+      "head": "codex/v0.170-source-publication-gate-artifact-integrity"
+    },
+    {
+      "pr": 192,
+      "candidate": "v0.171.0-source",
+      "base": "codex/v0.170-source-publication-gate-artifact-integrity",
+      "head": "codex/v0.171-source-publication-gate-input-integrity"
+    }
+  ]
+}

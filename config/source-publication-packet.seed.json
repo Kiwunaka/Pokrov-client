@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "script": "scripts/prepare-source-publication-packet.ps1",
+  "default_output_dir": "build/source-publication-packet",
+  "policy": {
+    "read_only": true,
+    "source_only": true,
+    "manual_publish_only": true,
+    "no_merge": true,
+    "no_tag_creation": true,
+    "no_tag_push": true,
+    "no_github_release_publish": true,
+    "no_asset_upload": true,
+    "no_apk": true,
+    "no_exe": true,
+    "no_store_release": true,
+    "no_trusted_signing_claim": true,
+    "requires_release_handoff_summary": true,
+    "requires_publication_dry_run_summary": true,
+    "requires_release_handoff_ready": true,
+    "requires_publication_dry_run_ready": true,
+    "requires_rendered_release_notes": true,
+    "requires_proof_manifest": true,
+    "requires_source_archive": true,
+    "requires_release_evidence_bundle": true,
+    "requires_clean_clone_or_import_proof": true,
+    "requires_artifact_fingerprints": true,
+    "requires_input_fingerprints": true,
+    "requires_input_generated_at": true,
+    "requires_input_generated_at_parseable": true,
+    "requires_input_generated_at_freshness": true,
+    "requires_release_handoff_publication_dry_run_input_fingerprint_integrity": true,
+    "requires_release_handoff_publication_dry_run_source_archive_name_binding": true,
+    "carries_release_handoff_publication_dry_run_source_archive_name": true,
+    "requires_release_handoff_publication_dry_run_source_archive_sha_binding": true,
+    "carries_release_handoff_publication_dry_run_source_archive_sha": true,
+    "requires_release_handoff_publication_dry_run_commit_sha_binding": true,
+    "carries_release_handoff_publication_dry_run_commit_sha": true,
+    "requires_release_handoff_publication_dry_run_evidence_bundle_preflight_commit_sha_binding": true,
+    "carries_release_handoff_publication_dry_run_evidence_bundle_preflight_commit_sha": true,
+    "requires_release_handoff_publication_dry_run_evidence_bundle_preflight_ref_commit_sha_binding": true,
+    "carries_release_handoff_publication_dry_run_evidence_bundle_preflight_ref_commit_sha": true,
+    "requires_release_handoff_windows_bundle_verifier_binding": true,
+    "carries_release_handoff_windows_bundle_verifier_proof": true,
+    "requires_release_handoff_github_ruleset_report_binding": true,
+    "carries_release_handoff_github_ruleset_report_proof": true,
+    "requires_publication_dry_run_carried_input_fingerprint_integrity": true,
+    "requires_publication_dry_run_carried_artifact_fingerprint_integrity": true,
+    "requires_publication_artifact_file_fingerprint_integrity": true,
+    "requires_publication_artifact_root_boundaries": true,
+    "requires_source_only_release_asset_allowlist": true,
+    "requires_publication_artifact_file_extensions": true,
+    "requires_publication_artifact_content_validation": true,
+    "requires_publication_artifact_schema_validation": true,
+    "requires_release_notes_claim_guard": true,
+    "forbids_release_notes_tbd_placeholders": true,
+    "requires_release_notes_proof_values": true,
+    "requires_release_evidence_bundle_tag_binding": true,
+    "requires_release_evidence_bundle_commit_sha_binding": true,
+    "requires_release_evidence_bundle_source_archive_sha_binding": true,
+    "requires_release_evidence_bundle_source_archive_name_binding": true,
+    "requires_proof_manifest_tag_binding": true,
+    "requires_proof_manifest_commit_sha_binding": true,
+    "requires_proof_manifest_source_archive_sha_binding": true,
+    "requires_proof_manifest_source_archive_name_binding": true,
+    "requires_source_only_flags": true,
+    "writes_only_ignored_build_output": true
+  },
+  "inputs": {
+    "release_handoff": "build/release-merge-handoff/release-merge-handoff.json",
+    "publication_dry_run": "build/source-release-publication/v0.171.0-source/v0.171.0-source-publication-dry-run.json"
+  },
+  "input_roots": {
+    "release_handoff": "build/release-merge-handoff",
+    "publication_dry_run": "build/source-release-publication"
+  },
+  "artifact_roots": {
+    "release_notes": "build/source-release-preflight",
+    "release_evidence_bundle": "build/release-evidence",
+    "proof_manifest": "build/source-release-preflight",
+    "source_archive": "build/source-release-preflight",
+    "clean_clone_or_import_proof": "build/source-release-preflight",
+    "windows_bundle_verifier_summary": "build/windows-bundle-verifier",
+    "github_ruleset_report": "build/release-evidence"
+  },
+  "allowed_release_assets": [
+    "release_notes",
+    "proof_manifest",
+    "source_archive",
+    "release_evidence_bundle",
+    "clean_clone_or_import_proof",
+    "windows_bundle_verifier_summary",
+    "github_ruleset_report"
+  ],
+  "artifact_file_extensions": {
+    "release_notes": ".md",
+    "release_evidence_bundle": ".json",
+    "proof_manifest": ".json",
+    "source_archive": ".zip",
+    "clean_clone_or_import_proof": ".json",
+    "windows_bundle_verifier_summary": ".json",
+    "github_ruleset_report": ".json"
+  },
+  "artifact_content_types": {
+    "release_notes": "markdown",
+    "release_evidence_bundle": "json",
+    "proof_manifest": "json",
+    "source_archive": "zip",
+    "clean_clone_or_import_proof": "json",
+    "windows_bundle_verifier_summary": "json",
+    "github_ruleset_report": "json"
+  },
+  "artifact_schema_contracts": {
+    "release_evidence_bundle": "source_evidence",
+    "proof_manifest": "source_proof",
+    "clean_clone_or_import_proof": "source_preflight",
+    "windows_bundle_verifier_summary": "windows_bundle_verifier",
+    "github_ruleset_report": "github_ruleset_report"
+  },
+  "release_notes_required_markers": [
+    "source-only release",
+    "## Included",
+    "## Not Included",
+    "## Known Limitations",
+    "No APK",
+    "No EXE",
+    "No store release",
+    "No trusted Windows signing claim",
+    "official binary"
+  ],
+  "release_notes_proof_requirements": [
+    "publication_dry_run.tag",
+    "publication_dry_run.source_archive_sha256"
+  ],
+  "proof_manifest_proof_requirements": [
+    "proof_manifest.tag",
+    "proof_manifest.commit_sha",
+    "proof_manifest.source_archive",
+    "proof_manifest.source_archive_sha256",
+    "publication_dry_run.tag",
+    "publication_dry_run.commit_sha",
+    "publication_dry_run.source_archive_sha256"
+  ],
+  "release_evidence_bundle_proof_requirements": [
+    "release_evidence_bundle.tag",
+    "release_evidence_bundle.commit_sha",
+    "release_evidence_bundle.source_archive",
+    "release_evidence_bundle.source_archive_sha256",
+    "publication_dry_run.tag",
+    "publication_dry_run.commit_sha",
+    "publication_dry_run.source_archive_sha256"
+  ],
+  "output": {
+    "packet": "build/source-publication-packet/v0.171.0-source/source-publication-packet.json"
+  },
+  "required_source_only_flags": [
+    "source_only",
+    "no_apk",
+    "no_exe",
+    "no_store_release",
+    "no_trusted_signing_claim"
+  ],
+  "required_artifacts": [
+    "release_notes",
+    "proof_manifest",
+    "source_archive",
+    "release_evidence_bundle",
+    "clean_clone_or_import_proof"
+  ]
+}

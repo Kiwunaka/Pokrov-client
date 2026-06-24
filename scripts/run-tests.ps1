@@ -33,29 +33,9 @@ function Invoke-WorkspaceFlutterTests {
 }
 
 function Invoke-AndroidGradleUnitTests {
-  $androidProjectPath = Join-Path $root "apps\android_shell\android"
-  $gradleWrapper = Join-Path $androidProjectPath "gradlew.bat"
-  $libcoreAar = Join-Path $androidProjectPath "app\libs\libcore.aar"
-
-  if (-not (Test-Path $gradleWrapper)) {
-    Write-Error "Android Gradle wrapper not found at $gradleWrapper"
-    exit 1
-  }
-
-  if (-not (Test-Path -LiteralPath $libcoreAar)) {
-    Write-Error "Android runtime artifact not found at $libcoreAar. Run scripts\fetch-libcore-assets.ps1 -Platforms @('android') -SyncToHosts before -RunAndroidGradle."
-    exit 1
-  }
-
-  Write-Host "Running Android Gradle unit tests in apps\android_shell" -ForegroundColor Cyan
-  Push-Location $androidProjectPath
-  try {
-    & $gradleWrapper testDebugUnitTest
-    if ($LASTEXITCODE -ne 0) {
-      exit $LASTEXITCODE
-    }
-  } finally {
-    Pop-Location
+  & (Join-Path $PSScriptRoot "run-android-native-tests.ps1")
+  if ($LASTEXITCODE -ne 0) {
+    exit $LASTEXITCODE
   }
 }
 

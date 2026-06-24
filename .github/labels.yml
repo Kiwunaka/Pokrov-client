@@ -1,0 +1,67 @@
+- name: bug
+  color: d73a4a
+  description: Something is not working in the public client or repository process.
+
+- name: build
+  color: fbca04
+  description: Build, bootstrap, clean-clone, or local toolchain problem.
+
+- name: docs
+  color: 0075ca
+  description: Documentation, README, release notes, or public copy update.
+
+- name: enhancement
+  color: a2eeef
+  description: Public client or repository improvement request.
+
+- name: import
+  color: 0e8a16
+  description: Local key, QR, subscription, file, or third-party catalog import flow.
+
+- name: operator
+  color: 5319e7
+  description: Operator or company client integration, fixture, OpenAPI, or white-label flow.
+
+- name: community
+  color: 1d76db
+  description: Personal Key / Community Client behavior for user-owned local profiles.
+
+- name: android
+  color: 3ddc84
+  description: Android shell, manifest, permission, runtime, QR camera, or packaging path.
+
+- name: windows
+  color: 00a4ef
+  description: Windows shell, runner metadata, runtime, QR camera, or packaging path.
+
+- name: parser
+  color: c5def5
+  description: Key, subscription, catalog, QR payload, or config parser behavior.
+
+- name: runtime
+  color: fef2c0
+  description: Runtime artifact, staging, connect/disconnect, routing, DNS, or diagnostics path.
+
+- name: release
+  color: bfdadc
+  description: Source-only release proof, preflight, readiness, tags, checksums, or release copy.
+
+- name: source-boundary
+  color: 5319e7
+  description: Public/private boundary, source import, secret avoidance, or clean-room guard.
+
+- name: dependencies
+  color: 0366d6
+  description: Dependency update, Dependabot PR, lockfile, or dependency review work.
+
+- name: security-private
+  color: b60205
+  description: Redirect to private security reporting; do not discuss vulnerability details publicly.
+
+- name: help wanted
+  color: 008672
+  description: Maintainers welcome public help after scope and safety boundaries are clear.
+
+- name: good first issue
+  color: 7057ff
+  description: Reserved for small, self-contained public tasks after maintainer review.

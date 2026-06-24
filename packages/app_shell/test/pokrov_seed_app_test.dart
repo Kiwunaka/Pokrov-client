@@ -2611,6 +2611,91 @@ void main() {
     expect(find.text('Still broken'), findsOneWidget);
   });
 
+  testWidgets('support diagnostics can be copied as redacted JSON',
+      (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1280, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final copied = <String>[];
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, (call) async {
+      if (call.method == 'Clipboard.setData') {
+        final arguments = call.arguments as Map<Object?, Object?>;
+        copied.add(arguments['text'] as String);
+      }
+      return null;
+    });
+    addTearDown(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, null);
+    });
+
+    final variant = const ClientVariantProfile(
+      variant: ProductVariant.operator,
+      id: 'operator',
+      displayName: 'Acme vless://secret@example.com',
+      brandMarkAssetName: '',
+      apiBaseUrl: 'https://api.operator.example/',
+      checkoutUrl: 'https://pay.operator.example/checkout',
+      cabinetUrl: 'https://app.operator.example/',
+      supportBot: '@operator_support',
+      feedbackBot: '@operator_feedback',
+      publicChannel: '@operator_channel',
+      supportEmail: 'support@operator.example',
+      supportUrl: 'https://support.operator.example/',
+      privacyPolicyUrl: 'https://operator.example/privacy/',
+      usesApiServices: true,
+      description: 'Operator test client mode.',
+    );
+    final supportTicketService = _FakeSupportTicketService(
+      const SupportTicketReceipt(
+        ticketId: 911,
+        statusTitle: 'Open',
+        messageCount: 1,
+      ),
+    );
+
+    await tester.pumpWidget(
+      PokrovSeedApp(
+        appContext: buildSeedAppContext(
+          hostPlatform: HostPlatform.windows,
+          variantProfile: variant,
+        ),
+        supportTicketService: supportTicketService,
+      ),
+    );
+    await tester.pumpAndSettle();
+    await _completeFirstLaunchIfPresent(tester);
+
+    await _tapNav(tester, 'nav-profile');
+    final support = find.byKey(const ValueKey('profile-section-support'));
+    await tester.dragUntilVisible(
+      support,
+      find.byType(Scrollable).first,
+      const Offset(0, -260),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(support);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('support-attach-diagnostics')));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('support-diagnostics-copy-json')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(copied, hasLength(1));
+    final payload = jsonDecode(copied.single) as Map<String, Object?>;
+    expect(payload['platform'], 'windows');
+    expect(payload['route_mode'], isNotEmpty);
+    expect(payload['connection_status'], isNotEmpty);
+    expect(copied.single, contains('[redacted]'));
+    expect(copied.single, isNot(contains('vless://')));
+    expect(copied.single, isNot(contains('secret@example.com')));
+    expect(copied.single, isNot(contains('raw_config')));
+    expect(copied.single, isNot(contains('subscription_url')));
+  });
+
   testWidgets('support chat keeps AI helper scoped to support suggestions',
       (tester) async {
     await tester.binding.setSurfaceSize(const Size(760, 800));
@@ -3480,6 +3565,92 @@ void main() {
       find.textContaining('does not promise speed, privacy, uptime'),
       findsOneWidget,
     );
+    expect(
+      find.text('Manual import requires OPEN_CLIENT_ENABLE_FREE_CATALOG=true.'),
+      findsOneWidget,
+    );
+    final importCatalog =
+        find.byKey(const ValueKey('free-vpn-catalog-import-action'));
+    await tester.dragUntilVisible(
+      importCatalog,
+      find.byKey(const ValueKey('free-vpn-catalog-sheet')),
+      const Offset(0, -120),
+      maxIteration: 6,
+    );
+    await tester.pumpAndSettle();
+    expect(tester.widget<FilledButton>(importCatalog).onPressed, isNull);
+  });
+
+  testWidgets('community access copy stays local and does not imply free nodes',
+      (tester) async {
+    await tester.pumpWidget(
+      PokrovSeedApp(
+        appContext: buildSeedAppContext(hostPlatform: HostPlatform.android),
+        communityQrScanner: (context) async => null,
+      ),
+    );
+    await tester.pumpAndSettle();
+    await _completeFirstLaunchIfPresent(tester);
+
+    expect(find.text('Локальные профили'), findsOneWidget);
+    expect(find.text('Свои ключи'), findsOneWidget);
+    expect(find.text('Без аккаунта'), findsOneWidget);
+    expect(find.text('Локально'), findsOneWidget);
+    expect(find.text('Бесплатный узел'), findsNothing);
+    expect(find.text('Базовый режим'), findsNothing);
+    expect(find.textContaining('+0 дней за Telegram'), findsNothing);
+
+    await _tapNav(tester, 'nav-profile');
+    expect(find.text('Локальные профили · Свои ключи'), findsOneWidget);
+    expect(find.text('Бесплатный узел'), findsNothing);
+    expect(find.text('Базовый режим'), findsNothing);
+    expect(find.textContaining('Telegram +0'), findsNothing);
+  });
+
+  testWidgets('free VPN catalog default flag blocks import fetch',
+      (tester) async {
+    var fetchCount = 0;
+    await tester.pumpWidget(
+      PokrovSeedApp(
+        appContext: buildSeedAppContext(hostPlatform: HostPlatform.android),
+        communitySubscriptionFetcher: (uri) async {
+          fetchCount += 1;
+          return '';
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+    await _completeFirstLaunchIfPresent(tester);
+
+    await _tapNav(tester, 'nav-profile');
+    final catalogAction =
+        find.byKey(const ValueKey('profile-free-vpn-catalog-action'));
+    await tester.dragUntilVisible(
+      catalogAction,
+      find.byType(Scrollable).first,
+      const Offset(0, -220),
+      maxIteration: 12,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(catalogAction);
+    await tester.pumpAndSettle();
+
+    final importCatalog =
+        find.byKey(const ValueKey('free-vpn-catalog-import-action'));
+    await tester.dragUntilVisible(
+      importCatalog,
+      find.byKey(const ValueKey('free-vpn-catalog-sheet')),
+      const Offset(0, -120),
+      maxIteration: 6,
+    );
+    await tester.pumpAndSettle();
+    expect(tester.widget<FilledButton>(importCatalog).onPressed, isNull);
+    await tester.tap(importCatalog);
+    await tester.pumpAndSettle();
+
+    expect(fetchCount, 0);
+    expect(
+        find.byKey(const ValueKey('free-vpn-catalog-sheet')), findsOneWidget);
   });
 
   testWidgets('community import hub routes key and QR actions', (tester) async {
@@ -3771,6 +3942,113 @@ void main() {
       ),
       findsNothing,
     );
+  });
+
+  testWidgets('free VPN catalog opt-in imports and clears cached entries',
+      (tester) async {
+    final fixture = File(
+      '../../tests/fixtures/free_vpn_catalog/avencores_subscription_text.txt',
+    ).readAsStringSync();
+    var fetchCount = 0;
+
+    await tester.pumpWidget(
+      PokrovSeedApp(
+        appContext: buildSeedAppContext(hostPlatform: HostPlatform.android),
+        communityFreeCatalogEnabled: true,
+        communitySubscriptionFetcher: (uri) async {
+          fetchCount += 1;
+          expect(
+            uri.toString(),
+            'https://github.com/AvenCores/goida-vpn-configs/raw/refs/heads/main/githubmirror/1.txt',
+          );
+          return fixture;
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+    await _completeFirstLaunchIfPresent(tester);
+
+    await _tapNav(tester, 'nav-profile');
+    final catalogAction =
+        find.byKey(const ValueKey('profile-free-vpn-catalog-action'));
+    await tester.dragUntilVisible(
+      catalogAction,
+      find.byType(Scrollable).first,
+      const Offset(0, -220),
+      maxIteration: 12,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(catalogAction);
+    await tester.pumpAndSettle();
+
+    expect(
+        find.byKey(const ValueKey('free-vpn-catalog-sheet')), findsOneWidget);
+    expect(
+      find.text('No cached third-party catalog profiles.'),
+      findsOneWidget,
+    );
+    expect(find.text('This section is opt-in and disabled by default.'),
+        findsOneWidget);
+
+    final importCatalog =
+        find.byKey(const ValueKey('free-vpn-catalog-import-action'));
+    await tester.dragUntilVisible(
+      importCatalog,
+      find.byKey(const ValueKey('free-vpn-catalog-sheet')),
+      const Offset(0, -120),
+      maxIteration: 6,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(importCatalog);
+    await tester.pumpAndSettle();
+
+    expect(fetchCount, 1);
+    final catalogProfile = find
+        .byKey(const ValueKey('profile-local-profile-open-client-aven-vless'));
+    await tester.dragUntilVisible(
+      catalogProfile,
+      find.byType(Scrollable).first,
+      const Offset(0, -160),
+      maxIteration: 12,
+    );
+    await tester.pumpAndSettle();
+    expect(catalogProfile, findsOneWidget);
+    expect(find.text('Free VPN catalog'), findsWidgets);
+    expect(find.text('4 cached'), findsOneWidget);
+
+    await tester.dragUntilVisible(
+      catalogAction,
+      find.byType(Scrollable).first,
+      const Offset(0, 160),
+      maxIteration: 12,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(catalogAction);
+    await tester.pumpAndSettle();
+    expect(
+      find.text('4 cached profile(s) from 1 source(s).'),
+      findsOneWidget,
+    );
+
+    final clearCatalog =
+        find.byKey(const ValueKey('free-vpn-catalog-clear-action'));
+    await tester.dragUntilVisible(
+      clearCatalog,
+      find.byKey(const ValueKey('free-vpn-catalog-sheet')),
+      const Offset(0, -120),
+      maxIteration: 6,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(clearCatalog);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(
+          const ValueKey('profile-local-profile-open-client-aven-vless')),
+      findsNothing,
+    );
+    expect(find.text('No cached third-party catalog profiles.'), findsNothing);
+    expect(find.text('None'), findsWidgets);
   });
 
   testWidgets('community subscription refresh updates existing local profiles',
@@ -5109,6 +5387,7 @@ void main() {
       expect(appContext.variantProfile.displayName, 'Open Client');
       expect(appContext.variantProfile.usesApiServices, isFalse);
       expect(appContext.apiBaseUrl, isEmpty);
+      expect(appContext.accessLane, AccessLane.localProfiles);
       expect(appContext.bootstrapContract.hostPlatform, platform);
       expect(
         appContext.scope.publicReleaseTargets,
@@ -5124,7 +5403,12 @@ void main() {
           ClientPlatform.macos,
         ]),
       );
-      expect(appContext.runtimeProfile.freeTier.speedMbps, 50);
+      expect(appContext.runtimeProfile.freeTier.speedMbps, 0);
+      expect(
+          appContext.runtimeProfile.freeTier.nodePool, 'local-user-profiles');
+      expect(appContext.runtimeProfile.freeTier.nodePoolLabel, 'Свои ключи');
+      expect(appContext.runtimeProfile.trialDays, 0);
+      expect(appContext.runtimeProfile.telegramBonusDays, 0);
       expect(appContext.redeemHint, isEmpty);
       expect(appContext.locations, hasLength(1));
     }

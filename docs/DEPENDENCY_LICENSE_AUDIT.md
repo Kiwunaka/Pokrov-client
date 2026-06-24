@@ -5,12 +5,21 @@ releases.
 
 ## Status
 
-Current status: first source snapshot imported. Direct dependency review is
-recorded for `v0.1.0-source`; exact transitive dependency inventory remains a
-release follow-up before binary artifacts.
+Current status: first source snapshot imported and the public source-tree
+dependency inventory is recorded for source release review. The machine-readable
+source inventory lives in
+[`config/dependency-license-inventory.seed.json`](../config/dependency-license-inventory.seed.json)
+and is verified against locally generated `pubspec.lock` files when present by
+[`tests/test_release_provenance.py`](../tests/test_release_provenance.py).
 
-The table below records the first direct dependency pass. Exact transitive
-dependency output should be added after a clean public bootstrap.
+The table below records the first direct dependency pass. The inventory file is
+the source-release gate for exact transitive Dart/Flutter package names and
+versions.
+
+Dependency update routing is documented in
+[Dependency update policy](DEPENDENCY_UPDATE_POLICY.md). Dependabot updates do
+not bypass this inventory: when `pubspec.lock` files change, the reviewed
+package list must be updated before a source release claim.
 
 | Package or asset | Version | Use | License | Bundled | GPL compatible | Action |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -32,14 +41,51 @@ dependency output should be added after a clean public bootstrap.
 | `AvenCores/goida-vpn-configs` | catalog candidate | optional third-party public config feeds | GPL-3.0 | no | yes | disabled by default; attribution required |
 | Gradle wrapper | wrapper from source snapshot | Android build bootstrap | Apache-2.0 | wrapper jar committed | yes | verify checksum during CI setup |
 | POKROV client brand PNGs | source snapshot | app shell identity | governed by `BRAND.md` | yes | restricted trademark use | keep official-build boundary |
-| `hiddify/hiddify-core` runtime artifacts | `v3.1.8` seed | runtime bridge testing | see upstream project | downloaded, not committed | pending | verify before public binary release |
+| `hiddify/hiddify-core` runtime artifacts | `v3.1.8` seed | runtime bridge testing | see upstream project | downloaded, not committed | pending | manifest records pending license/binary review and `PENDING_PUBLIC_BINARY_REVIEW`; replace with exact SHA-256 values only after public binary review |
+
+## Current Transitive Inventory Evidence
+
+- Inventory date: `2026-06-13`.
+- Source: seven local `pubspec.lock` files across Android, Windows, and
+  shared packages.
+- Current inventory size: 93 unique Dart/Flutter packages.
+- Allowed source-release license families: `MIT`, `BSD-3-Clause`,
+  `Apache-2.0`, repository `GPL-3.0`, and Flutter SDK BSD-style licensing.
+- Required verification:
+  `python -m pytest tests/test_release_provenance.py`.
+
+This is source-release evidence only. Public binary releases still require a
+fresh native/runtime review for bundled runtime artifacts, platform build
+outputs, signing material, store metadata, and installer contents.
+
+Runtime artifact metadata lives in
+[`config/runtime-artifacts.seed.json`](../config/runtime-artifacts.seed.json).
+The source-only release lane may document local fetch instructions, but it must
+not claim archive hashes, redistribution clearance, APK/EXE delivery, or bundled
+runtime safety until that manifest is updated from pending review to recorded
+binary evidence. The local fetch helper performs archive entry traversal checks
+before extraction or host sync, but that safety guard is not a binary license
+review, redistribution approval, or public runtime-safety claim.
+
+## Generated Asset Provenance
+
+Generated and brand PNG provenance is tracked in
+[`config/generated-assets.seed.json`](../config/generated-assets.seed.json).
+
+- README and diagram raster artwork is generated artwork with prompts and
+  release-scope notes in [`assets/IMAGEGEN_PROMPTS.md`](../assets/IMAGEGEN_PROMPTS.md).
+- `assets/branding/pokrov-mark.png` is an official brand mark governed by
+  [`BRAND.md`](../BRAND.md); forks may use the code license but must not reuse
+  the official mark to imply an official POKROV build.
+- Every `assets/**/*.png` file must be listed in the generated asset inventory
+  before a source release tag.
 
 ## Review Checklist
 
 - Flutter and Dart packages.
-- Android native dependencies.
-- Windows native dependencies.
-- Runtime binaries.
+- Android native dependencies for binary releases.
+- Windows native dependencies for binary releases.
+- Runtime binaries for binary releases.
 - Icons and logos.
 - Fonts.
 - Generated images and other generated assets.

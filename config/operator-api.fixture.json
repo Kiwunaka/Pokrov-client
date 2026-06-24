@@ -2,6 +2,33 @@
   "name": "Operator API fixture",
   "variant": "operator",
   "base_url": "http://127.0.0.1:8765",
+  "contract": {
+    "version": "2026-06-operator-v1",
+    "request_id_header": "X-Request-ID",
+    "client_version_header": "X-Client-Version",
+    "response_version_header": "X-API-Version",
+    "rate_limit_header": "Retry-After",
+    "deprecation_headers": [
+      "Deprecation",
+      "Sunset"
+    ],
+    "session": {
+      "token_type": "Bearer",
+      "expires_in_seconds": 3600,
+      "refresh_after_seconds": 3000
+    },
+    "errors": {
+      "shape": "ok_false_error_object_v1",
+      "codes": [
+        "bad_request",
+        "unauthorized",
+        "forbidden",
+        "not_found",
+        "rate_limited",
+        "server_error"
+      ]
+    }
+  },
   "endpoints": {
     "start_trial": {
       "method": "POST",
@@ -9,13 +36,17 @@
       "response": {
         "session": {
           "session_token": "operator-session-token-placeholder",
-          "account_id": "operator-demo-account"
+          "account_id": "operator-demo-account",
+          "token_type": "Bearer",
+          "expires_in": 3600,
+          "refresh_after": 3000
         },
         "provisioning": {
           "status": "ready",
           "sync_ok": true,
           "managed_manifest": {
-            "url": "/api/client/profile/managed"
+            "url": "/api/client/profile/managed",
+            "version": "operator-v1"
           }
         }
       }
@@ -115,7 +146,7 @@
     },
     "support_tickets": {
       "method": "GET",
-      "path": "/api/client/support/tickets",
+      "path": "/api/tickets",
       "optional": true,
       "response": {
         "tickets": [
@@ -131,6 +162,9 @@
   },
   "notes": [
     "This local fixture is for contract development only.",
+    "Every response carries X-Request-ID and X-API-Version so operators can trace client reports without logging private keys or profile URLs.",
+    "Use the standard ok=false error object for 4xx/5xx responses and Retry-After for 429 rate limits.",
+    "Version and deprecation changes should be announced with X-API-Version, Deprecation, and Sunset before breaking older clients.",
     "Replace all placeholder URLs, tokens, branding, signing, support, and privacy policy values before shipping.",
     "Fork releases must not imply official POKROV operation or use official POKROV infrastructure."
   ]

@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-06-14",
+  "script": "scripts/prepare-release-evidence-bundle.ps1",
+  "default_output_dir": "build/release-evidence",
+  "inputs": [
+    "source-release-preflight summary JSON",
+    "optional GitHub ruleset verifier JSON"
+  ],
+  "policy": {
+    "source_only_boundary_required": true,
+    "no_publish_side_effects": true,
+    "writes_only_ignored_build_output": true,
+    "ruleset_report_may_be_failing": true,
+    "failing_ruleset_report_blocks_enforcement_claims": true,
+    "does_not_replace_full_preflight": true,
+    "windows_bundle_verifier_required": true,
+    "requires_input_fingerprints": true,
+    "requires_preflight_generated_at": true,
+    "requires_preflight_generated_at_freshness": true,
+    "requires_ruleset_report_input_fingerprint_when_present": true,
+    "requires_preflight_artifact_fingerprints": true,
+    "requires_preflight_artifact_fingerprint_integrity": true,
+    "requires_preflight_commit_sha_consistency": true,
+    "requires_preflight_ref_commit_sha_consistency": true,
+    "requires_ruleset_report_shape": true,
+    "requires_ruleset_report_target": true,
+    "requires_ruleset_report_ok_consistency": true,
+    "requires_ruleset_report_checked_at": true,
+    "requires_ruleset_report_freshness": true,
+    "requires_ruleset_report_check_entry_shape": true,
+    "requires_ruleset_report_required_status_checks": true,
+    "requires_ruleset_report_covered_required_status_checks": true
+  },
+  "required_summary_flags": [
+    "source_only",
+    "no_apk",
+    "no_exe",
+    "no_store_release",
+    "no_trusted_signing_claim",
+    "windows_bundle_verifier_ok"
+  ],
+  "forbidden_claims": [
+    "APK shipped",
+    "EXE shipped",
+    "store release ready",
+    "trusted signing ready",
+    "remote GitHub enforcement active without verifier pass"
+  ]
+}

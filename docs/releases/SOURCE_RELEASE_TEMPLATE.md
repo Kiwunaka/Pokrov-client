@@ -2,12 +2,19 @@
 
 Use this body for GitHub source-only releases.
 
+`scripts/source-release-preflight.ps1` can run the local release gate, prepare
+the source proof manifest, render the first GitHub Release draft, and write a
+local preflight summary. Review the draft, then fill the exact feature status
+and known limitations before publishing.
+
 ## Source Reference
 
 - Tag:
+- Tag object SHA:
 - Commit SHA:
 - Commit date:
 - Source archive SHA-256:
+- Source proof manifest:
 - Verification date:
 
 ## Included
@@ -29,10 +36,13 @@ Use this body for GitHub source-only releases.
 ## Verification
 
 ```powershell
-python -m pytest tests
-powershell -ExecutionPolicy Bypass -File .\scripts\validate-seed.ps1
-powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1 -Source .
-powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1
+$tag = "v0.3.0-source"
+$preflight = Join-Path $env:TEMP "$tag-preflight"
+powershell -ExecutionPolicy Bypass -File .\scripts\source-release-preflight.ps1 `
+  -Tag $tag `
+  -Ref "refs/tags/$tag" `
+  -OutDir $preflight `
+  -RequireTag
 ```
 
 ## Release Honesty

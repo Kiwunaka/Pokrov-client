@@ -95,6 +95,150 @@ void main() {
     );
   });
 
+  test('operator API requests carry trace and client version headers',
+      () async {
+    final tempDirectory = await Directory.systemTemp.createTemp(
+      'pokrov-operator-headers-test-',
+    );
+    addTearDown(() async {
+      if (await tempDirectory.exists()) {
+        await tempDirectory.delete(recursive: true);
+      }
+    });
+
+    final observedHeaders = <String, Map<String, String>>{};
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    addTearDown(server.close);
+
+    void captureHeaders(HttpRequest request) {
+      observedHeaders[request.uri.path] = <String, String>{
+        'authorization':
+            request.headers.value(HttpHeaders.authorizationHeader) ?? '',
+        'requestId': request.headers.value('X-Request-ID') ?? '',
+        'clientVersion': request.headers.value('X-Client-Version') ?? '',
+      };
+    }
+
+    unawaited(() async {
+      await for (final request in server) {
+        captureHeaders(request);
+        final body = await utf8.decoder.bind(request).join();
+        if (request.uri.path == '/api/client/session/start-trial') {
+          final decoded = jsonDecode(body) as Map<String, dynamic>;
+          expect(decoded['install_id'], isNotEmpty);
+          request.response
+            ..headers.contentType = ContentType.json
+            ..write(
+              jsonEncode(
+                <String, Object?>{
+                  'session': <String, Object?>{
+                    'session_token': 'session-token-headers',
+                    'account_id': 'headers-account',
+                  },
+                  'provisioning': <String, Object?>{
+                    'status': 'ready',
+                    'sync_ok': true,
+                    'managed_manifest': <String, Object?>{
+                      'url': '/api/client/profile/managed',
+                    },
+                  },
+                },
+              ),
+            );
+          await request.response.close();
+          continue;
+        }
+
+        if (request.uri.path == '/api/client/route-policy') {
+          request.response
+            ..headers.contentType = ContentType.json
+            ..write(jsonEncode(<String, Object?>{'ok': true}));
+          await request.response.close();
+          continue;
+        }
+
+        if (request.uri.path == '/api/client/profile/managed') {
+          request.response
+            ..headers.contentType = ContentType.json
+            ..write(
+              jsonEncode(
+                <String, Object?>{
+                  'provisioning': <String, Object?>{
+                    'status': 'ready',
+                    'sync_ok': true,
+                  },
+                  'profile_revision': 'rev-headers',
+                  'config_format': 'singbox-json',
+                  'config_payload': <String, Object?>{
+                    'outbounds': <Object?>[
+                      <String, Object?>{
+                        'type': 'selector',
+                        'tag': 'proxy',
+                      },
+                    ],
+                    'route': <String, Object?>{
+                      'final': 'proxy',
+                    },
+                  },
+                },
+              ),
+            );
+          await request.response.close();
+          continue;
+        }
+
+        request.response.statusCode = HttpStatus.notFound;
+        await request.response.close();
+      }
+    }());
+
+    final bootstrapper = AppFirstRuntimeBootstrapper(
+      apiBaseUrl: 'http://127.0.0.1:${server.port}/',
+      supportDirectoryResolver: () async => tempDirectory,
+    );
+
+    final payload = await bootstrapper.resolveManagedProfile(
+      hostPlatform: HostPlatform.windows,
+      routeMode: RouteMode.fullTunnel,
+    );
+
+    expect(payload.profileName, 'pokrov-windows-rev-headers');
+    expect(
+      observedHeaders.keys,
+      containsAll(const <String>[
+        '/api/client/session/start-trial',
+        '/api/client/route-policy',
+        '/api/client/profile/managed',
+      ]),
+    );
+    expect(
+      observedHeaders['/api/client/session/start-trial']?['authorization'],
+      isEmpty,
+    );
+    expect(
+      observedHeaders['/api/client/route-policy']?['authorization'],
+      'Bearer session-token-headers',
+    );
+    expect(
+      observedHeaders['/api/client/profile/managed']?['authorization'],
+      'Bearer session-token-headers',
+    );
+
+    final requestIds = observedHeaders.values
+        .map((headers) => headers['requestId'] ?? '')
+        .toList();
+    for (final requestId in requestIds) {
+      expect(requestId, startsWith('pokrov-client-'));
+      expect(requestId.length, lessThanOrEqualTo(96));
+      expect(requestId, isNot(contains('session-token-headers')));
+      expect(requestId, isNot(contains('/api/client/')));
+    }
+    expect(requestIds.toSet(), hasLength(requestIds.length));
+    for (final headers in observedHeaders.values) {
+      expect(headers['clientVersion'], '1.0.0-beta.2');
+    }
+  });
+
   test('bootstraps and persists a managed profile from the app-first API',
       () async {
     final tempDirectory = await Directory.systemTemp.createTemp(

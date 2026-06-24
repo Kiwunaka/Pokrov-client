@@ -141,6 +141,10 @@ const _openClientOfficialBuild = bool.fromEnvironment(
   'OPEN_CLIENT_OFFICIAL_BUILD',
   defaultValue: false,
 );
+const _openClientEnableFreeCatalog = bool.fromEnvironment(
+  'OPEN_CLIENT_ENABLE_FREE_CATALOG',
+  defaultValue: false,
+);
 const _selectedAppsEnforcementReady = true;
 const _pokrovAppVersion = '1.0.0-beta.2';
 const _seedRulesetVersion = '2026-04-13';
@@ -766,8 +770,9 @@ SeedAppContext buildSeedAppContext({
   return SeedAppContext(
     hostPlatform: hostPlatform,
     variantProfile: profile,
-    accessLane:
-        profile.isCommunity ? AccessLane.freeMonthly : AccessLane.trialPremium,
+    accessLane: profile.isCommunity
+        ? AccessLane.localProfiles
+        : AccessLane.trialPremium,
     scope: const ProgramScope(
       publicReleaseTargets: [
         ClientPlatform.android,
@@ -791,13 +796,21 @@ SeedAppContext buildSeedAppContext({
       ],
       trialDays: profile.isCommunity ? 0 : 5,
       telegramBonusDays: profile.isCommunity ? 0 : 10,
-      freeTier: const FreeTierPolicy(
-        trafficGb: 5,
-        periodDays: 30,
-        speedMbps: 50,
-        deviceLimit: 1,
-        nodePool: 'NL-free',
-      ),
+      freeTier: profile.isCommunity
+          ? const FreeTierPolicy(
+              trafficGb: 0,
+              periodDays: 0,
+              speedMbps: 0,
+              deviceLimit: 0,
+              nodePool: 'local-user-profiles',
+            )
+          : const FreeTierPolicy(
+              trafficGb: 5,
+              periodDays: 30,
+              speedMbps: 50,
+              deviceLimit: 1,
+              nodePool: 'NL-free',
+            ),
       allowsExternalCheckoutOnly: true,
       firstPartyPromosOnly: true,
     ),
@@ -853,6 +866,7 @@ class PokrovSeedApp extends StatelessWidget {
     this.runtimeActionTimeout = const Duration(seconds: 18),
     this.communitySubscriptionAutoRefreshInterval = const Duration(minutes: 30),
     this.communitySubscriptionStaleAfter = const Duration(minutes: 30),
+    this.communityFreeCatalogEnabled = _openClientEnableFreeCatalog,
   });
 
   final SeedAppContext appContext;
@@ -865,6 +879,7 @@ class PokrovSeedApp extends StatelessWidget {
   final Duration runtimeActionTimeout;
   final Duration communitySubscriptionAutoRefreshInterval;
   final Duration communitySubscriptionStaleAfter;
+  final bool communityFreeCatalogEnabled;
 
   @override
   Widget build(BuildContext context) {
@@ -956,6 +971,7 @@ class PokrovSeedApp extends StatelessWidget {
         communitySubscriptionAutoRefreshInterval:
             communitySubscriptionAutoRefreshInterval,
         communitySubscriptionStaleAfter: communitySubscriptionStaleAfter,
+        communityFreeCatalogEnabled: communityFreeCatalogEnabled,
       ),
     );
   }
@@ -974,6 +990,7 @@ class PokrovSeedShell extends StatefulWidget {
     this.runtimeActionTimeout = const Duration(seconds: 18),
     this.communitySubscriptionAutoRefreshInterval = const Duration(minutes: 30),
     this.communitySubscriptionStaleAfter = const Duration(minutes: 30),
+    this.communityFreeCatalogEnabled = _openClientEnableFreeCatalog,
   });
 
   final SeedAppContext appContext;
@@ -986,6 +1003,7 @@ class PokrovSeedShell extends StatefulWidget {
   final Duration runtimeActionTimeout;
   final Duration communitySubscriptionAutoRefreshInterval;
   final Duration communitySubscriptionStaleAfter;
+  final bool communityFreeCatalogEnabled;
 
   @override
   State<PokrovSeedShell> createState() => _PokrovSeedShellState();
@@ -1251,6 +1269,26 @@ class _CommunityProfileState {
     return urls.toList(growable: false)..sort();
   }
 
+  List<String> get catalogSourceUrls {
+    final urls = <String>{};
+    for (final profile in profiles) {
+      if (profile.sourceKind != _communityCatalogSourceKind) {
+        continue;
+      }
+      final sourceUrl = profile.sourceUrl.trim();
+      if (sourceUrl.isNotEmpty) {
+        urls.add(sourceUrl);
+      }
+    }
+    return urls.toList(growable: false)..sort();
+  }
+
+  int get catalogProfileCount {
+    return profiles
+        .where((profile) => profile.sourceKind == _communityCatalogSourceKind)
+        .length;
+  }
+
   _CommunityProfileState upsertAll(
     List<_CommunityProfileRecord> incoming, {
     String? activeProfileName,
@@ -1296,6 +1334,20 @@ class _CommunityProfileState {
       activeProfileName: activeProfileName == profileName
           ? (values.isEmpty ? '' : values.first.payload.profileName)
           : activeProfileName,
+    );
+  }
+
+  _CommunityProfileState removeSourceKind(String sourceKind) {
+    final values = profiles
+        .where((profile) => profile.sourceKind != sourceKind)
+        .toList(growable: false);
+    return _CommunityProfileState(
+      profiles: values,
+      activeProfileName: values.any(
+        (profile) => profile.payload.profileName == activeProfileName,
+      )
+          ? activeProfileName
+          : (values.isEmpty ? '' : values.first.payload.profileName),
     );
   }
 
@@ -2506,6 +2558,111 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
     }
   }
 
+  Future<void> _importCommunityFreeCatalog() async {
+    final importer = _localProfileBootstrapper;
+    if (importer == null || _communitySubscriptionRefreshInFlight) {
+      return;
+    }
+    final uri = Uri.parse(_communityCatalogCandidateFeedUrl);
+    _communitySubscriptionRefreshInFlight = true;
+    final fetcher =
+        widget.communitySubscriptionFetcher ?? _fetchCommunitySubscription;
+    try {
+      final body = await fetcher(uri);
+      final imported = _CommunityProfileImporter.parseMany(
+        body,
+        routeMode: _selectedRouteMode,
+        sourceKind: _communityCatalogSourceKind,
+      );
+      final fetchedAt = DateTime.now().toUtc().toIso8601String();
+      final records = imported
+          .map(
+            (result) => result.record.copyWith(
+              sourceUrl: uri.toString(),
+              lastFetchedAt: fetchedAt,
+              lastRefreshStatus: 'ok',
+              refreshError: '',
+              entryCount: imported.length,
+            ),
+          )
+          .toList();
+      final nextState = _communityProfileState.upsertAll(records);
+      if (!mounted) {
+        return;
+      }
+      HapticFeedback.selectionClick();
+      setState(() {
+        _communityProfileRevision += 1;
+        _communityProfileState = nextState;
+        _managedProfileDirty = true;
+        _runtimeHeadline =
+            'Third-party catalog imported ${records.length} local profile${records.length == 1 ? '' : 's'}.';
+      });
+      final savedState = await importer.saveState(nextState);
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _communityProfileState = savedState;
+      });
+      _ensureCommunitySubscriptionRefreshTimer();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Imported ${records.length} third-party catalog profile(s).',
+          ),
+        ),
+      );
+    } on _CommunityProfileImportFailure catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.message)),
+      );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not import this third-party catalog.'),
+        ),
+      );
+    } finally {
+      _communitySubscriptionRefreshInFlight = false;
+    }
+  }
+
+  Future<void> _clearCommunityFreeCatalog() async {
+    final importer = _localProfileBootstrapper;
+    if (importer == null) {
+      return;
+    }
+    final nextState =
+        _communityProfileState.removeSourceKind(_communityCatalogSourceKind);
+    HapticFeedback.selectionClick();
+    setState(() {
+      _communityProfileRevision += 1;
+      _communityProfileState = nextState;
+      _managedProfileDirty = true;
+      _runtimeHeadline =
+          'Third-party catalog profiles were cleared. Local keys and subscriptions were kept.';
+    });
+    final savedState = await importer.saveState(nextState);
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _communityProfileState = savedState;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Cleared third-party catalog profiles.'),
+      ),
+    );
+  }
+
   Future<void> _refreshCommunitySubscriptionsIfDue({
     bool quiet = false,
   }) async {
@@ -2569,12 +2726,20 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
       var failed = 0;
       for (final sourceUrl in sourceUrls) {
         try {
+          final existingProfiles = nextState.profiles
+              .where((profile) => profile.sourceUrl == sourceUrl)
+              .toList(growable: false);
+          final sourceKind = existingProfiles.any(
+            (profile) => profile.sourceKind == _communityCatalogSourceKind,
+          )
+              ? _communityCatalogSourceKind
+              : 'subscription_url';
           final uri = Uri.parse(sourceUrl);
           final body = await fetcher(uri);
           final imported = _CommunityProfileImporter.parseMany(
             body,
             routeMode: _selectedRouteMode,
-            sourceKind: 'subscription_url',
+            sourceKind: sourceKind,
           );
           final fetchedAt = DateTime.now().toUtc().toIso8601String();
           final records = imported
@@ -3835,7 +4000,8 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
         warpRuntimeConsent: _warpRuntimeConsent,
         warpBusy: _warpPolicyBusy,
         onToggleRuntime: _toggleRuntimeFromHome,
-        onTelegramBonus: _telegramBonusBusy
+        onTelegramBonus: _telegramBonusBusy ||
+                !widget.appContext.variantProfile.usesApiServices
             ? null
             : () {
                 if (_telegramBonusCanClaim) {
@@ -3897,6 +4063,9 @@ class _PokrovSeedShellState extends State<PokrovSeedShell>
             ? null
             : () => _scanCommunityQr(context),
         onRefreshCommunitySubscriptions: _refreshCommunitySubscriptions,
+        communityFreeCatalogEnabled: widget.communityFreeCatalogEnabled,
+        onImportCommunityFreeCatalog: _importCommunityFreeCatalog,
+        onClearCommunityFreeCatalog: _clearCommunityFreeCatalog,
       ),
     ];
 
@@ -5184,13 +5353,21 @@ class _HomeAccessStrip extends StatelessWidget {
         ),
         _HomeAccessPill(
           key: const ValueKey('home-telegram-bonus-pill'),
-          icon: telegramBonusClaimed
-              ? Icons.check_circle_outline_rounded
-              : Icons.send_outlined,
+          icon: telegramBonusLabel == 'Без аккаунта'
+              ? Icons.key_outlined
+              : telegramBonusClaimed
+                  ? Icons.check_circle_outline_rounded
+                  : Icons.send_outlined,
           label: telegramBonusLabel,
-          sublabel: telegramBonusClaimed ? 'Готово' : 'Бонус',
+          sublabel: telegramBonusLabel == 'Без аккаунта'
+              ? 'Локально'
+              : telegramBonusClaimed
+                  ? 'Готово'
+                  : 'Бонус',
           tone: _SectionTone.reward,
-          onTap: telegramBonusClaimed ? null : onTelegramBonus,
+          onTap: telegramBonusClaimed || telegramBonusLabel == 'Без аккаунта'
+              ? null
+              : onTelegramBonus,
         ),
       ],
     );
@@ -5769,6 +5946,9 @@ class _ProfileSection extends StatelessWidget {
     required this.onRemoveCommunityProfile,
     required this.onScanCommunityQr,
     required this.onRefreshCommunitySubscriptions,
+    required this.communityFreeCatalogEnabled,
+    required this.onImportCommunityFreeCatalog,
+    required this.onClearCommunityFreeCatalog,
   });
 
   final SeedAppContext appContext;
@@ -5798,6 +5978,9 @@ class _ProfileSection extends StatelessWidget {
   final ValueChanged<String> onRemoveCommunityProfile;
   final Future<void> Function()? onScanCommunityQr;
   final Future<void> Function() onRefreshCommunitySubscriptions;
+  final bool communityFreeCatalogEnabled;
+  final Future<void> Function() onImportCommunityFreeCatalog;
+  final Future<void> Function() onClearCommunityFreeCatalog;
 
   List<String> _bonusSummaryLines() {
     final summary = bonusSummary;
@@ -5851,6 +6034,10 @@ class _ProfileSection extends StatelessWidget {
     );
     final subscriptionSourceCount =
         communityProfileState.subscriptionSourceUrls.length;
+    final catalogProfileCount = communityProfileState.catalogProfileCount;
+    final catalogSourceCount = communityProfileState.catalogSourceUrls.length;
+    final catalogStatusValue =
+        catalogProfileCount == 0 ? 'Off' : '$catalogProfileCount cached';
     final communityProfileSummary = activeCommunityProfile == null
         ? 'Add a key, scan QR, or import an HTTPS subscription. Everything stays local.'
         : subscriptionSourceCount == 0
@@ -5893,10 +6080,13 @@ class _ProfileSection extends StatelessWidget {
       );
     }
 
-    void openCommunityFreeCatalog() => _showInfoSheet(
+    void openCommunityFreeCatalog() => _showCommunityFreeCatalogSheet(
           context,
-          title: 'Free VPN catalog',
-          lines: _communityFreeCatalogLines,
+          enabled: communityFreeCatalogEnabled,
+          cachedProfileCount: catalogProfileCount,
+          cachedSourceCount: catalogSourceCount,
+          onImport: onImportCommunityFreeCatalog,
+          onClear: onClearCommunityFreeCatalog,
         );
 
     return _SeedContentList(
@@ -6016,6 +6206,7 @@ class _ProfileSection extends StatelessWidget {
                           context,
                           profileCount: communityProfileState.profiles.length,
                           subscriptionSourceCount: subscriptionSourceCount,
+                          catalogProfileCount: catalogProfileCount,
                           hasCameraQr: onScanCommunityQr != null,
                           onAddKey: openCommunityKeyImport,
                           onAddSubscription: openCommunitySubscriptionImport,
@@ -6074,7 +6265,7 @@ class _ProfileSection extends StatelessWidget {
                         key: const ValueKey('profile-free-vpn-catalog-action'),
                         icon: Icons.public_rounded,
                         title: 'Free VPN catalog',
-                        value: 'Off',
+                        value: catalogStatusValue,
                         onTap: openCommunityFreeCatalog,
                       ),
                       for (final profile in communityProfileState.profiles)
@@ -8425,6 +8616,7 @@ String _accessPoolLabel(AccessLane lane) {
     AccessLane.bonusPremium ||
     AccessLane.paidUnlimited =>
       'Премиум-пул',
+    AccessLane.localProfiles => 'Свои ключи',
     AccessLane.freeMonthly || AccessLane.freeSoftMode => 'Бесплатный узел',
   };
 }
@@ -8440,6 +8632,7 @@ String _accessMainLabel(
       claimed ? '$totalDays дней доступа' : '$baseDays дней пробного доступа',
     AccessLane.bonusPremium => '$totalDays дней доступа',
     AccessLane.paidUnlimited => 'Премиум активен',
+    AccessLane.localProfiles => 'Локальные профили',
     AccessLane.freeMonthly => 'Базовый режим',
     AccessLane.freeSoftMode => 'Лимит закончился',
   };
@@ -8457,6 +8650,7 @@ String _accessShortValue(
     AccessLane.trialPremium => claimed ? '$totalDays дней' : '$baseDays дней',
     AccessLane.bonusPremium => '$totalDays дней',
     AccessLane.paidUnlimited => 'Премиум',
+    AccessLane.localProfiles => 'Локально',
     AccessLane.freeMonthly => 'Базовый',
     AccessLane.freeSoftMode => 'Лимит',
   };
@@ -8466,6 +8660,9 @@ String _telegramBonusHomeLabel(
   SeedAppContext appContext,
   AppFirstBonusSummary? bonus,
 ) {
+  if (appContext.accessLane == AccessLane.localProfiles) {
+    return 'Без аккаунта';
+  }
   final claimed = (bonus?.channelBonusClaimedAt ?? '').trim().isNotEmpty;
   if (claimed) {
     return 'Telegram-бонус активен';
@@ -8529,10 +8726,14 @@ const _communitySubscriptionImportBody =
     'The client fetches the URL, parses supported keys, and stores profiles locally. Refresh runs only when you tap it or when the app returns to foreground.';
 const _communityQrImportBody =
     'Paste the decoded QR payload. Camera scanning and pasted QR text stay local and use the same profile parser.';
+const _communityCatalogSourceKind = 'third_party_catalog';
+const _communityCatalogCandidateFeedUrl =
+    'https://github.com/AvenCores/goida-vpn-configs/raw/refs/heads/main/githubmirror/1.txt';
 const _communityFreeCatalogLines = <String>[
   'This section is opt-in and disabled by default.',
   'Candidate feed: AvenCores/goida-vpn-configs.',
   'Third-party public configs are not official POKROV nodes.',
+  'Imported catalog entries are cached as local profiles and can be cleared separately.',
   'The client does not promise speed, privacy, uptime, safety, legality, or availability for third-party public configs.',
 ];
 
@@ -8549,6 +8750,136 @@ void _showInfoSheet(
   );
 }
 
+void _showCommunityFreeCatalogSheet(
+  BuildContext context, {
+  required bool enabled,
+  required int cachedProfileCount,
+  required int cachedSourceCount,
+  required Future<void> Function() onImport,
+  required Future<void> Function() onClear,
+}) {
+  showModalBottomSheet<void>(
+    context: context,
+    showDragHandle: true,
+    backgroundColor: _SeedPalette.surface,
+    builder: (sheetContext) => _CommunityFreeCatalogSheet(
+      enabled: enabled,
+      cachedProfileCount: cachedProfileCount,
+      cachedSourceCount: cachedSourceCount,
+      onImport: enabled
+          ? () {
+              Navigator.of(sheetContext).pop();
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                unawaited(onImport());
+              });
+            }
+          : null,
+      onClear: cachedProfileCount == 0
+          ? null
+          : () {
+              Navigator.of(sheetContext).pop();
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                unawaited(onClear());
+              });
+            },
+    ),
+  );
+}
+
+class _CommunityFreeCatalogSheet extends StatelessWidget {
+  const _CommunityFreeCatalogSheet({
+    required this.enabled,
+    required this.cachedProfileCount,
+    required this.cachedSourceCount,
+    required this.onImport,
+    required this.onClear,
+  });
+
+  final bool enabled;
+  final int cachedProfileCount;
+  final int cachedSourceCount;
+  final VoidCallback? onImport;
+  final VoidCallback? onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    final status = cachedProfileCount == 0
+        ? 'No cached third-party catalog profiles.'
+        : '$cachedProfileCount cached profile(s) from $cachedSourceCount source(s).';
+    return SafeArea(
+      top: false,
+      child: SingleChildScrollView(
+        key: const ValueKey('free-vpn-catalog-sheet'),
+        padding: const EdgeInsets.fromLTRB(22, 4, 22, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Free VPN catalog',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: _SeedPalette.ink,
+                    fontWeight: FontWeight.w800,
+                  ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              status,
+              key: const ValueKey('free-vpn-catalog-cache-status'),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: _SeedPalette.ink.withValues(alpha: 0.72),
+                    height: 1.35,
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              enabled
+                  ? 'Manual import is enabled for this build.'
+                  : 'Manual import requires OPEN_CLIENT_ENABLE_FREE_CATALOG=true.',
+              key: const ValueKey('free-vpn-catalog-flag-status'),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: enabled
+                        ? _SeedPalette.ink.withValues(alpha: 0.72)
+                        : _SeedPalette.warning,
+                    height: 1.35,
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            ..._communityFreeCatalogLines.map(
+              (line) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(
+                  line,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: _SeedPalette.ink.withValues(alpha: 0.72),
+                        height: 1.35,
+                      ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            FilledButton.icon(
+              key: const ValueKey('free-vpn-catalog-import-action'),
+              onPressed: onImport,
+              icon: const Icon(Icons.download_rounded),
+              label: Text(enabled ? 'Import reviewed feed' : 'Import disabled'),
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              key: const ValueKey('free-vpn-catalog-clear-action'),
+              onPressed: onClear,
+              icon: const Icon(Icons.delete_outline_rounded),
+              label: const Text('Clear cached catalog'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 void _showCommunityImportHubSheet(
   BuildContext context, {
   required VoidCallback onAddKey,
@@ -8558,6 +8889,7 @@ void _showCommunityImportHubSheet(
   required bool hasCameraQr,
   required int profileCount,
   required int subscriptionSourceCount,
+  required int catalogProfileCount,
 }) {
   showModalBottomSheet<void>(
     context: context,
@@ -8567,6 +8899,7 @@ void _showCommunityImportHubSheet(
       hasCameraQr: hasCameraQr,
       profileCount: profileCount,
       subscriptionSourceCount: subscriptionSourceCount,
+      catalogProfileCount: catalogProfileCount,
       onAddKey: () {
         Navigator.of(sheetContext).pop();
         WidgetsBinding.instance.addPostFrameCallback((_) => onAddKey());
@@ -8598,6 +8931,7 @@ class _CommunityImportHubSheet extends StatelessWidget {
     required this.hasCameraQr,
     required this.profileCount,
     required this.subscriptionSourceCount,
+    required this.catalogProfileCount,
   });
 
   final VoidCallback onAddKey;
@@ -8607,6 +8941,7 @@ class _CommunityImportHubSheet extends StatelessWidget {
   final bool hasCameraQr;
   final int profileCount;
   final int subscriptionSourceCount;
+  final int catalogProfileCount;
 
   @override
   Widget build(BuildContext context) {
@@ -8670,7 +9005,9 @@ class _CommunityImportHubSheet extends StatelessWidget {
               key: const ValueKey('import-hub-free-catalog-action'),
               icon: Icons.public_rounded,
               title: 'Free VPN catalog',
-              value: 'Off',
+              value: catalogProfileCount == 0
+                  ? 'Off'
+                  : '$catalogProfileCount cached',
               onTap: onOpenFreeCatalog,
             ),
           ],
@@ -9199,6 +9536,37 @@ class _SupportChatScreenState extends State<_SupportChatScreen> {
     };
   }
 
+  Map<String, Object?> _exportableSupportDiagnostics() {
+    final safe = <String, Object?>{};
+    for (final entry in _supportDiagnostics().entries) {
+      final key = entry.key.trim();
+      if (!PokrovAssistantRedactor.allowedDiagnosticKeys.contains(key) ||
+          PokrovAssistantRedactor.isSensitiveKey(key)) {
+        continue;
+      }
+      final value =
+          PokrovAssistantRedactor.safeRedactedDiagnosticValue(entry.value);
+      if (value != null) {
+        safe[key] = value;
+      }
+    }
+    return safe;
+  }
+
+  Future<void> _copySupportDiagnosticsJson() async {
+    final payload = const JsonEncoder.withIndent('  ')
+        .convert(_exportableSupportDiagnostics());
+    await Clipboard.setData(ClipboardData(text: payload));
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Diagnostics copied without keys or subscription links.'),
+      ),
+    );
+  }
+
   List<_SupportChatMessage> _messagesFromThread(SupportTicketThread thread) {
     final messages = <_SupportChatMessage>[];
     for (final message in thread.messages) {
@@ -9292,6 +9660,13 @@ class _SupportChatScreenState extends State<_SupportChatScreen> {
                       key: const ValueKey('support-diagnostics-close'),
                       onPressed: () => Navigator.of(context).maybePop(),
                       child: const Text('Готово'),
+                    ),
+                    const SizedBox(width: 8),
+                    OutlinedButton.icon(
+                      key: const ValueKey('support-diagnostics-copy-json'),
+                      onPressed: () => unawaited(_copySupportDiagnosticsJson()),
+                      icon: const Icon(Icons.copy_rounded, size: 18),
+                      label: const Text('Copy'),
                     ),
                     const SizedBox(width: 8),
                     FilledButton.icon(

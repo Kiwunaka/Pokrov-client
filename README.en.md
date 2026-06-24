@@ -25,6 +25,8 @@
   &middot;
   <a href="docs/OPEN_SOURCE_SCOPE.md">Scope</a>
   &middot;
+  <a href="docs/ENTERPRISE.md">Enterprise</a>
+  &middot;
   <a href="SECURITY.md">Security</a>
   &middot;
   <a href="BRAND.md">Brand</a>
@@ -43,13 +45,13 @@ the first sanitized Android + Windows client source snapshot.
 
 ## Product Modes
 
-- Community client: neutral, no POKROV branding, no POKROV API calls by
+- Personal Key Client / Community client: neutral, no POKROV branding, no POKROV API calls by
   default, local import for single `vless://`, `trojan://`, `ss://`, and
   `vmess://` keys, local multi-profile selection, subscription URL import and
   refresh, Android/Windows QR import, and gated third-party catalog metadata.
-- Operator client: a white-label path for companies that want to connect the
+- Operator / Company Client: a white-label path for companies that want to connect the
   app to their own backend, billing, support, and brand.
-- POKROV service mode: documented for official POKROV builds only. Forks and
+- POKROV Service Mode: documented for official POKROV builds only. Forks and
   operators must not distribute builds using POKROV names, logos, endpoints,
   support, or release claims.
 
@@ -57,6 +59,17 @@ The optional third-party public config catalog remains disabled by default and
 must stay clearly labeled as not official POKROV nodes. It is not a default free
 POKROV service and does not promise availability, safety, privacy, speed, or
 uptime.
+
+The Personal Key Client makes no POKROV API calls by default. This repository
+does not provide POKROV nodes or a default free service.
+
+## First-Run Paths
+
+| Track | Use it when | Start here |
+| --- | --- | --- |
+| Personal Key Client | You already have a key, QR code, or subscription URL and want a local-only client. | Build the `community` variant, paste a `vless://`, `trojan://`, `ss://`, or `vmess://` key, scan a QR code, or add a subscription URL. |
+| Operator / Company Client | You run a service and want your own branded client. | Run the local fixture backend, export white-label color tokens, implement the minimal managed-profile contract, then wire your own API, support, billing, signing, and release channels. |
+| POKROV Service Mode | You are producing an official POKROV build. | Use official POKROV release channels and private release gates. Forks and operator builds are not official POKROV builds. |
 
 ## Which App Should I Use?
 
@@ -91,6 +104,174 @@ uptime.
 | `v0.1.0-source` | Tagged | First source-only Android/Windows snapshot with local community import. No APK/EXE. |
 | `v0.2.0-source` | Not tagged | Community import hub polish, variant-boundary enforcement, and source-import hardening are on `main`; release tag pending. |
 | `v0.3.0-source` | Not tagged | Operator fixture, Free VPN catalog gate, white-label token export, and foreground subscription scheduler are on `main`; release tag pending. |
+| `v0.4.0-source` | Pending stacked PR, not tagged | Native Android/Windows host brand-boundary hardening is in the stacked PR queue. |
+| `v0.5.0-source` | Pending stacked PR, not tagged | Community routing and WARP copy honesty hardening is in the stacked PR queue. |
+| `v0.6.0-source` | Pending stacked PR, not tagged | Dependency/license and generated-asset provenance gates are in the stacked PR queue. |
+| `v0.7.0-source` | Pending stacked PR, not tagged | Source-release proof helper for archive SHA-256 and proof manifests is in the stacked PR queue. |
+| `v0.8.0-source` | Pending stacked PR, not tagged | Source readiness matrix for tracked source-only milestones is in the stacked PR queue. |
+| `v0.9.0-source` | Pending stacked PR, not tagged | Public onboarding and triage hardening is in the stacked PR queue. |
+| `v0.10.0-source` | Pending stacked PR, not tagged | Operator API contract hardening is in the stacked PR queue. |
+| `v0.11.0-source` | Pending stacked PR, not tagged | Gated Free VPN catalog cache actions are in the stacked PR queue. |
+| `v0.12.0-source` | Pending stacked PR, not tagged | Source-readiness synchronization through the catalog cache slice is in the stacked PR queue. |
+| `v0.13.0-source` | Pending stacked PR, not tagged | Default-disabled `OPEN_CLIENT_ENABLE_FREE_CATALOG` import gate is in the stacked PR queue. |
+| `v0.14.0-source` | Pending stacked PR, not tagged | Source-readiness synchronization through the feature-flag slice is in the stacked PR queue. |
+| `v0.15.0-source` | Pending stacked PR, not tagged | Operator support ticket path canonicalization is in the stacked PR queue. |
+| `v0.16.0-source` | Pending stacked PR, not tagged | Community local-access wording and model guards are in the stacked PR queue. |
+| `v0.17.0-source` | Pending stacked PR, not tagged | Seed-backed variant command preview tooling is in the stacked PR queue. |
+| `v0.18.0-source` | Pending stacked PR, not tagged | Proof-backed source release notes rendering is in the stacked PR queue. |
+| `v0.19.0-source` | Pending stacked PR, not tagged | Annotated source tag enforcement is in the stacked PR queue. |
+| `v0.20.0-source` | Pending stacked PR, not tagged | End-to-end proof-to-release-notes smoke is in the stacked PR queue. |
+| `v0.21.0-source` | Pending stacked PR, not tagged | Self-documenting release-note verification is in the stacked PR queue. |
+| `v0.22.0-source` | Pending stacked PR, not tagged | One-command source-release preflight is in the stacked PR queue. |
+| `v0.23.0-source` | Pending stacked PR, not tagged | CI source-release preflight smoke is in the stacked PR queue. |
+| `v0.24.0-source` | Pending stacked PR, not tagged | Specialized GitHub triage templates are in the stacked PR queue. |
+| `v0.25.0-source` | Pending stacked PR, not tagged | GitHub label catalog and triage policy are in the stacked PR queue. |
+| `v0.26.0-source` | Pending stacked PR, not tagged | Runtime artifact manifest gate and local-only libcore review metadata are in the stacked PR queue. |
+| `v0.27.0-source` | Pending stacked PR, not tagged | Source release copy-claims gate is in the stacked PR queue. |
+| `v0.28.0-source` | Pending stacked PR, not tagged | Free VPN catalog provenance gate is in the stacked PR queue. |
+| `v0.29.0-source` | Pending stacked PR, not tagged | Private security intake gate is in the stacked PR queue. |
+| `v0.30.0-source` | Pending stacked PR, not tagged | Changelog and release-history gate is in the stacked PR queue. |
+| `v0.31.0-source` | Pending stacked PR, not tagged | Contributor doctor and docs index gate is in the stacked PR queue. |
+| `v0.32.0-source` | Pending stacked PR, not tagged | Build troubleshooting router is in the stacked PR queue. |
+| `v0.33.0-source` | Pending stacked PR, not tagged | CODEOWNERS review-routing gate is in the stacked PR queue. |
+| `v0.34.0-source` | Pending stacked PR, not tagged | Dependabot dependency update policy gate is in the stacked PR queue. |
+| `v0.35.0-source` | Pending stacked PR, not tagged | Required checks policy gate is in the stacked PR queue. |
+| `v0.36.0-source` | Pending stacked PR, not tagged | GitHub ruleset setup gate is in the stacked PR queue. |
+| `v0.37.0-source` | Pending stacked PR, not tagged | GitHub ruleset verifier is in the stacked PR queue. |
+| `v0.38.0-source` | Pending stacked PR, not tagged | Release evidence bundle helper is in the stacked PR queue. |
+| `v0.39.0-source` | Pending stacked PR, not tagged | Source release publication dry-run validator is in the stacked PR queue. |
+| `v0.40.0-source` | Pending stacked PR, not tagged | Enterprise boundary and operator commercial-license guard is in the stacked PR queue. |
+| `v0.41.0-source` | Pending stacked PR, not tagged | Safe diagnostics copy/export for support without keys or subscription links is in the stacked PR queue. |
+| `v0.42.0-source` | Pending stacked PR, not tagged | Privacy-first diagnostics export policy gate is in the stacked PR queue. |
+| `v0.43.0-source` | Pending stacked PR, not tagged | Release blocker inventory for source tag readiness is in the stacked PR queue. |
+| `v0.44.0-source` | Pending stacked PR, not tagged | Source tag readiness command is in the stacked PR queue. |
+| `v0.45.0-source` | Pending stacked PR, not tagged | Release merge-order verifier is in the stacked PR queue. |
+| `v0.46.0-source` | Pending stacked PR, not tagged | Release stack GitHub status verifier is in the stacked PR queue. |
+| `v0.47.0-source` | Pending stacked PR, not tagged | Release merge handoff helper is in the stacked PR queue. |
+| `v0.48.0-source` | Pending stacked PR, not tagged | Android device validation and release merge handoff default-path fix are in the stacked PR queue. |
+| `v0.49.0-source` | Pending stacked PR, not tagged | Operator request trace and client-version headers are in the stacked PR queue. |
+| `v0.50.0-source` | Pending stacked PR, not tagged | Android native Gradle CI through source-only stubs is in the stacked PR queue. |
+| `v0.51.0-source` | Pending stacked PR, not tagged | Windows bundle verifier source-only proof is in the stacked PR queue. |
+| `v0.52.0-source` | Pending stacked PR, not tagged | Runtime archive extraction hardening is in the stacked PR queue. |
+| `v0.53.0-source` | Pending stacked PR, not tagged | Windows verifier CI/preflight enforcement is in the stacked PR queue. |
+| `v0.54.0-source` | Pending stacked PR, not tagged | Release evidence bundle Windows proof gate is in the stacked PR queue. |
+| `v0.55.0-source` | Pending stacked PR, not tagged | Publication dry-run Windows proof gate is in the stacked PR queue. |
+| `v0.56.0-source` | Pending stacked PR, not tagged | Release merge handoff publication proof gate is in the stacked PR queue. |
+| `v0.57.0-source` | Pending stacked PR, not tagged | Release merge handoff input fingerprints are in the stacked PR queue. |
+| `v0.58.0-source` | Pending stacked PR, not tagged | Release merge handoff source-only flags are in the stacked PR queue. |
+| `v0.59.0-source` | Pending stacked PR, not tagged | Release merge handoff canonical input roots are in the stacked PR queue. |
+| `v0.60.0-source` | Pending stacked PR, not tagged | Release merge handoff input timestamps are in the stacked PR queue. |
+| `v0.61.0-source` | Pending stacked PR, not tagged | Release merge handoff input schema/read-only checks are in the stacked PR queue. |
+| `v0.62.0-source` | Pending stacked PR, not tagged | Release merge handoff stack-count consistency checks are in the stacked PR queue. |
+| `v0.63.0-source` | Pending stacked PR, not tagged | Release merge handoff input-error checks are in the stacked PR queue. |
+| `v0.64.0-source` | Pending stacked PR, not tagged | Release merge handoff tag-readiness input-error coverage is in the stacked PR queue. |
+| `v0.65.0-source` | Pending stacked PR, not tagged | Release merge handoff tag-readiness blocker-count consistency is in the stacked PR queue. |
+| `v0.66.0-source` | Pending stacked PR, not tagged | Release merge handoff tag-readiness blocker entry-shape checks are in the stacked PR queue. |
+| `v0.67.0-source` | Pending stacked PR, not tagged | Release merge handoff tag-readiness ready-flag consistency is in the stacked PR queue. |
+| `v0.68.0-source` | Pending stacked PR, not tagged | Release merge handoff tag-readiness blocker-absence consistency is in the stacked PR queue. |
+| `v0.69.0-source` | Pending stacked PR, not tagged | Source tag-readiness open-blocker evidence fields are in the stacked PR queue. |
+| `v0.70.0-source` | Pending stacked PR, not tagged | Release merge handoff tag-readiness latest stacked PR consistency is in the stacked PR queue. |
+| `v0.71.0-source` | Pending stacked PR, not tagged | Release merge handoff default candidate paths are kept in sync with blocker inventory. |
+| `v0.72.0-source` | Pending stacked PR, not tagged | Release merge handoff runtime candidate and PR checks are matched to blocker inventory. |
+| `v0.73.0-source` | Pending stacked PR, not tagged | Source tag readiness rejects stale requested tags outside blocker inventory latest candidate. |
+| `v0.74.0-source` | Pending stacked PR, not tagged | Source tag readiness checks milestone evidence against blocker inventory latest PR. |
+| `v0.75.0-source` | Pending stacked PR, not tagged | Source tag readiness checks milestone release flags remain source-only. |
+| `v0.76.0-source` | Pending stacked PR, not tagged | Source tag readiness checks blocker inventory release flags remain source-only. |
+| `v0.77.0-source` | Pending stacked PR, not tagged | Source tag readiness checks open blocker evidence is present. |
+| `v0.78.0-source` | Pending stacked PR, not tagged | Source tag readiness checks open blocker identifiers are present. |
+| `v0.79.0-source` | Pending stacked PR, not tagged | Source tag readiness checks open blocker status is present. |
+| `v0.80.0-source` | Pending stacked PR, not tagged | Source tag readiness checks blocker required-before-tag flags are explicit. |
+| `v0.81.0-source` | Pending stacked PR, not tagged | Source tag readiness checks source-readiness milestone status is present. |
+| `v0.82.0-source` | Pending stacked PR, not tagged | Source tag readiness checks source-readiness milestone evidence is present. |
+| `v0.83.0-source` | Pending stacked PR, not tagged | Source tag readiness checks source-readiness milestone scope is present. |
+| `v0.84.0-source` | Pending stacked PR, not tagged | Source tag readiness writes read-only summaries for release merge handoff. |
+| `v0.85.0-source` | Pending stacked PR, not tagged | Source tag readiness records input fingerprints for release evidence. |
+| `v0.86.0-source` | Pending stacked PR, not tagged | Release merge handoff carries tag-readiness input fingerprints into maintainer evidence. |
+| `v0.87.0-source` | Pending stacked PR, not tagged | Publication dry-run fingerprints evidence bundle and release notes for handoff proof. |
+| `v0.88.0-source` | Pending stacked PR, not tagged | Release evidence bundle records and carries source preflight input fingerprints. |
+| `v0.89.0-source` | Pending stacked PR, not tagged | Source preflight records artifact fingerprints for release proof. |
+| `v0.90.0-source` | Pending stacked PR, not tagged | Release evidence, publication dry-run, and handoff verify artifact fingerprint integrity. |
+| `v0.91.0-source` | Pending stacked PR, not tagged | Release evidence, publication dry-run, and handoff verify commit SHA consistency. |
+| `v0.92.0-source` | Pending stacked PR, not tagged | Source preflight and handoff verify resolved ref commit SHA consistency. |
+| `v0.93.0-source` | Pending stacked PR, not tagged | Release stack status and handoff carry the latest PR URL for maintainer review. |
+| `v0.94.0-source` | Pending stacked PR, not tagged | Release stack status and handoff verify latest PR URLs stay inside the expected public repo. |
+| `v0.95.0-source` | Pending stacked PR, not tagged | Release handoff verifies GitHub status expected PR URL prefixes match the public repo boundary. |
+| `v0.96.0-source` | Pending stacked PR, not tagged | Release handoff verifies GitHub status counts match the stack and required checks. |
+| `v0.97.0-source` | Pending stacked PR, not tagged | Release handoff verifies GitHub status pull request entries are present and aligned. |
+| `v0.98.0-source` | Pending stacked PR, not tagged | Release handoff verifies GitHub status PR sequence matches the merge-order stack. |
+| `v0.99.0-source` | Pending stacked PR, not tagged | Release handoff verifies GitHub status PR base/head refs match the merge-order stack. |
+| `v0.100.0-source` | Pending stacked PR, not tagged | Release handoff verifies every GitHub status PR URL matches the expected public repo and PR number. |
+| `v0.101.0-source` | Pending stacked PR, not tagged | Release handoff verifies every GitHub status PR is clean and not draft. |
+| `v0.102.0-source` | Pending stacked PR, not tagged | Release handoff verifies per-PR required GitHub status checks before maintainer review. |
+| `v0.103.0-source` | Pending stacked PR, not tagged | Release handoff verifies per-check GitHub Actions trace evidence before maintainer review. |
+| `v0.104.0-source` | Pending stacked PR, not tagged | Publication dry-run verifies the evidence bundle preflight input fingerprint before maintainer review. |
+| `v0.105.0-source` | Pending stacked PR, not tagged | Release handoff verifies publication dry-run preflight input fingerprints before maintainer review. |
+| `v0.106.0-source` | Pending stacked PR, not tagged | Release handoff verifies publication dry-run evidence-bundle and release-notes input fingerprints before maintainer review. |
+| `v0.107.0-source` | Pending stacked PR, not tagged | Release handoff verifies tag readiness blocker-inventory and source-readiness input fingerprints before maintainer review. |
+| `v0.108.0-source` | Pending stacked PR, not tagged | Release handoff verifies publication dry-run artifact fingerprints against the real proof files before maintainer review. |
+| `v0.109.0-source` | Pending stacked PR, not tagged | Release handoff verifies optional GitHub ruleset report input fingerprints before maintainer review. |
+| `v0.110.0-source` | Pending stacked PR, not tagged | Release evidence rejects malformed GitHub ruleset reports before enforcement claims can reach maintainer review. |
+| `v0.111.0-source` | Pending stacked PR, not tagged | Publication dry-run rejects malformed GitHub ruleset reports before manual release review. |
+| `v0.112.0-source` | Pending stacked PR, not tagged | Release handoff rejects malformed GitHub ruleset reports before maintainer handoff. |
+| `v0.113.0-source` | Pending stacked PR, not tagged | Release evidence, publication dry-run, and handoff reject GitHub ruleset reports for the wrong repository or branch. |
+| `v0.114.0-source` | Pending stacked PR, not tagged | Release evidence, publication dry-run, and handoff reject `ok` ruleset reports with missing or failed verifier checks. |
+| `v0.115.0-source` | Pending stacked PR, not tagged | Release evidence, publication dry-run, and handoff reject ruleset report checks without traceable name or status fields. |
+| `v0.116.0-source` | Pending stacked PR, not tagged | Release evidence, publication dry-run, and handoff reject ruleset reports whose required status checks do not match the canonical CI list. |
+| `v0.117.0-source` | Pending stacked PR, not tagged | Release evidence, publication dry-run, and handoff reject ruleset reports whose passing checks do not cover every canonical required CI job. |
+| `v0.118.0-source` | Pending stacked PR, not tagged | GitHub ruleset verifier reports covered required status checks explicitly, and release gates reject `ok` reports whose covered checks do not match the canonical CI list. |
+| `v0.119.0-source` | Pending stacked PR, not tagged | Release evidence, publication dry-run, and handoff reject GitHub ruleset reports without a fresh `checked_at` timestamp. |
+| `v0.120.0-source` | Pending stacked PR, not tagged | Release handoff rejects stale generated input summaries before maintainer review. |
+| `v0.121.0-source` | Pending stacked PR, not tagged | Release evidence and publication dry-run reject stale generated input artifacts before handoff. |
+| `v0.122.0-source` | Pending stacked PR, not tagged | Source tag readiness rejects contradictory blocker inventories that allow tags while blockers or unready status remain. |
+| `v0.123.0-source` | Pending stacked PR, not tagged | Source tag readiness rejects blocker inventories that claim ready status while required blockers remain open. |
+| `v0.124.0-source` | Pending stacked PR, not tagged | Source tag readiness rejects tag allowance while the selected source-readiness milestone is still pending or not tagged. |
+| `v0.125.0-source` | Pending stacked PR, not tagged | Source tag readiness requires an explicit ready milestone status before tag creation can be allowed. |
+| `v0.126.0-source` | Pending stacked PR, not tagged | Source tag readiness requires milestone evidence to match the canonical public repository PR URL. |
+| `v0.127.0-source` | Pending stacked PR, not tagged | Seed validation requires the source tag-readiness evidence policy and canonical PR URL guard phrases. |
+| `v0.128.0-source` | Pending stacked PR, not tagged | Seed validation requires the latest source-readiness milestone evidence to match blocker inventory. |
+| `v0.129.0-source` | Pending stacked PR, not tagged | Seed validation requires the latest merge-order PR and candidate to match blocker inventory. |
+| `v0.130.0-source` | Pending stacked PR, not tagged | Seed validation requires blocker inventory covered range to match base and latest candidates. |
+| `v0.131.0-source` | Pending stacked PR, not tagged | Seed validation requires unique source-readiness milestone tags. |
+| `v0.132.0-source` | Pending stacked PR, not tagged | Seed validation requires stacked PR milestone evidence to use canonical repository PR URLs. |
+| `v0.133.0-source` | Pending stacked PR, not tagged | Seed validation requires unique stacked PR milestone evidence URLs. |
+| `v0.134.0-source` | Pending stacked PR, not tagged | Seed validation requires stacked PR milestone evidence PR numbers to increase with the candidate sequence. |
+| `v0.135.0-source` | Pending stacked PR, not tagged | Seed validation requires source-readiness stacked PR evidence to match the release merge-order stack. |
+| `v0.136.0-source` | Pending stacked PR, not tagged | Seed validation requires release stack GitHub status required checks to match the canonical required-checks seed exactly. |
+| `v0.137.0-source` | Pending stacked PR, not tagged | Seed validation requires active-range source-readiness stacked PR milestones to be covered by the release merge-order stack. |
+| `v0.138.0-source` | Pending stacked PR, not tagged | Source publication packet consolidates release handoff, publication dry-run, source proof artifacts, and source-only flags for manual GitHub Release review. |
+| `v0.139.0-source` | Pending stacked PR, not tagged | Source publication packet validates release handoff and publication dry-run generated_at timestamps before manual GitHub Release review. |
+| `v0.140.0-source` | Pending stacked PR, not tagged | Source publication packet validates handoff-carried publication dry-run fingerprints against the direct dry-run summary before manual release review. |
+| `v0.141.0-source` | Pending stacked PR, not tagged | Source publication packet recalculates release artifact file fingerprints before manual GitHub Release review. |
+| `v0.142.0-source` | Pending stacked PR, not tagged | Source publication packet rejects release artifact paths outside the expected build output roots before manual GitHub Release review. |
+| `v0.143.0-source` | Pending stacked PR, not tagged | Source publication packet rejects unexpected non-source release asset fingerprints before manual GitHub Release review. |
+| `v0.144.0-source` | Pending stacked PR, not tagged | Source publication packet rejects release artifact files whose extensions do not match the source-only artifact contract. |
+| `v0.145.0-source` | Pending stacked PR, not tagged | Source publication packet validates source release artifact contents before manual GitHub Release review. |
+| `v0.146.0-source` | Pending stacked PR, not tagged | Source publication packet validates source release artifact JSON schemas before manual GitHub Release review. |
+| `v0.147.0-source` | Pending stacked PR, not tagged | Source publication packet validates release notes claim and known-limitation markers before manual GitHub Release review. |
+| `v0.148.0-source` | Pending stacked PR, not tagged | Source publication packet validates release notes tag and source archive SHA proof before manual GitHub Release review. |
+| `v0.149.0-source` | Pending stacked PR, not tagged | Source publication packet validates proof manifest source archive SHA binding before manual GitHub Release review. |
+| `v0.150.0-source` | Pending stacked PR, not tagged | Source publication packet validates proof manifest source archive filename binding before manual GitHub Release review. |
+| `v0.151.0-source` | Pending stacked PR, not tagged | Source publication packet validates proof manifest commit SHA binding before manual GitHub Release review. |
+| `v0.152.0-source` | Pending stacked PR, not tagged | Source publication packet validates proof manifest tag binding before manual GitHub Release review. |
+| `v0.153.0-source` | Pending stacked PR, not tagged | Source publication packet validates release evidence bundle tag binding before manual GitHub Release review. |
+| `v0.154.0-source` | Pending stacked PR, not tagged | Source publication packet validates release evidence bundle commit SHA binding before manual GitHub Release review. |
+| `v0.155.0-source` | Pending stacked PR, not tagged | Source publication packet validates release evidence bundle source archive SHA binding before manual GitHub Release review. |
+| `v0.156.0-source` | Pending stacked PR, not tagged | Source publication packet validates release evidence bundle source archive filename binding before manual GitHub Release review. |
+| `v0.157.0-source` | Pending stacked PR, not tagged | Publication dry-run validates release evidence bundle source archive filename binding before manual GitHub Release review. |
+| `v0.158.0-source` | Pending stacked PR, not tagged | Publication dry-run carries the release evidence bundle source archive filename as explicit handoff proof. |
+| `v0.159.0-source` | Pending stacked PR, not tagged | Release merge handoff carries the publication dry-run source archive filename as explicit maintainer proof. |
+| `v0.160.0-source` | Pending stacked PR, not tagged | Source publication packet validates the release handoff publication dry-run source archive filename before manual GitHub Release review. |
+| `v0.161.0-source` | Pending stacked PR, not tagged | Source publication packet carries the release handoff publication dry-run source archive filename as explicit review proof. |
+| `v0.162.0-source` | Pending stacked PR, not tagged | Source publication packet carries and validates the release handoff publication dry-run commit SHA as explicit review proof. |
+| `v0.163.0-source` | Pending stacked PR, not tagged | Release merge handoff carries and requires the publication dry-run source archive SHA-256 as explicit maintainer proof. |
+| `v0.164.0-source` | Pending stacked PR, not tagged | Source publication packet carries and validates the release handoff publication dry-run source archive SHA-256 as explicit review proof. |
+| `v0.165.0-source` | Pending stacked PR, not tagged | Source publication packet carries and validates the release handoff publication dry-run evidence bundle preflight commit SHA as explicit review proof. |
+| `v0.166.0-source` | Pending stacked PR, not tagged | Source publication packet carries and validates the release handoff publication dry-run evidence bundle preflight ref commit SHA as explicit review proof. |
+| `v0.167.0-source` | Pending stacked PR, not tagged | Source publication packet carries and validates the release handoff Windows bundle verifier proof as explicit review evidence. |
+| `v0.168.0-source` | Pending stacked PR, not tagged | Source publication packet carries and validates the release handoff GitHub ruleset report proof as explicit review evidence. |
+| `v0.169.0-source` | Pending stacked PR, not tagged | Source publication gate makes the source publication packet an explicit final manual publish review proof before source-only GitHub Release publication. |
+| `v0.170.0-source` | Pending stacked PR, not tagged | Source publication gate recalculates source publication packet artifact fingerprints before manual source-only GitHub Release publication. |
+| `v0.171.0-source` | Pending stacked PR, not tagged | Source publication gate recalculates source publication packet input fingerprints before manual source-only GitHub Release publication. |
 
 ## Architecture Boundary
 
@@ -126,9 +307,11 @@ boundary.
 |   |-- DEPENDENCY_LICENSE_AUDIT.md
 |   |-- MAINTAINER_CHECKLIST.md
 |   |-- PROJECT_PRINCIPLES.md
+|   |-- GITHUB_TRIAGE.md
 |   |-- SOURCE_IMPORT_PLAYBOOK.md
 |   |-- PRODUCT_VARIANTS.md
 |   |-- OPERATOR_INTEGRATION.md
+|   |-- ENTERPRISE.md
 |   `-- GOVERNANCE.md
 `-- assets/
     |-- brand/
@@ -139,6 +322,8 @@ boundary.
 
 Build instructions are available in
 [docs/BUILD_FROM_SOURCE.md](docs/BUILD_FROM_SOURCE.md).
+Troubleshooting is available in
+[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
 
 Source import tooling is available for maintainers:
 
@@ -171,11 +356,17 @@ Before contributing, read:
 - [CONTRIBUTING.md](CONTRIBUTING.md)
 - [SECURITY.md](SECURITY.md)
 - [BRAND.md](BRAND.md)
+- [docs/README.md](docs/README.md)
+- [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
+- [docs/REQUIRED_CHECKS.md](docs/REQUIRED_CHECKS.md)
+- [docs/DEPENDENCY_UPDATE_POLICY.md](docs/DEPENDENCY_UPDATE_POLICY.md)
 - [docs/MAINTAINER_CHECKLIST.md](docs/MAINTAINER_CHECKLIST.md)
 - [docs/PROJECT_PRINCIPLES.md](docs/PROJECT_PRINCIPLES.md)
+- [docs/GITHUB_TRIAGE.md](docs/GITHUB_TRIAGE.md)
 - [docs/SOURCE_IMPORT_PLAYBOOK.md](docs/SOURCE_IMPORT_PLAYBOOK.md)
 - [docs/PRODUCT_VARIANTS.md](docs/PRODUCT_VARIANTS.md)
 - [docs/OPERATOR_INTEGRATION.md](docs/OPERATOR_INTEGRATION.md)
+- [docs/ENTERPRISE.md](docs/ENTERPRISE.md)
 - [docs/FREE_VPN_CATALOG_GATE.md](docs/FREE_VPN_CATALOG_GATE.md)
 - [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)
 - [docs/GOVERNANCE.md](docs/GOVERNANCE.md)
@@ -201,6 +392,8 @@ Forks and rebuilt clients must not imply that they are official POKROV builds.
 
 This repository is licensed under the GNU General Public License v3.0. See
 [LICENSE](LICENSE).
+
+See [Enterprise boundary](docs/ENTERPRISE.md) for the operator and commercial license boundary. It does not change the GPLv3 license or offer a commercial license by default.
 
 The POKROV name, logos, domains, official channels, signing identities, and
 release distribution channels are governed separately by [BRAND.md](BRAND.md).

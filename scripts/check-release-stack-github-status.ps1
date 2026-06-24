@@ -1,0 +1,240 @@
+param(
+  [string]$PrStatusPath = "",
+  [string]$OutDir = ""
+)
+
+$ErrorActionPreference = "Stop"
+$root = Split-Path -Parent $PSScriptRoot
+$defaultOutputDir = "build\release-stack-github-status"
+
+function Resolve-RepoPath {
+  param([Parameter(Mandatory = $true)][string]$Path)
+
+  if ([System.IO.Path]::IsPathRooted($Path)) {
+    return $Path
+  }
+  return Join-Path $root $Path
+}
+
+function Read-JsonFile {
+  param([Parameter(Mandatory = $true)][string]$Path)
+
+  if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+    throw "Required release stack GitHub status input not found: $Path"
+  }
+  return Get-Content -Raw -LiteralPath $Path | ConvertFrom-Json
+}
+
+function Assert-BuildOutputPath {
+  param([Parameter(Mandatory = $true)][string]$Path)
+
+  $allowedOutputRoot = [System.IO.Path]::GetFullPath((Join-Path $root $defaultOutputDir))
+  $resolvedOutputDir = [System.IO.Path]::GetFullPath($Path)
+  $allowedPrefix = $allowedOutputRoot.TrimEnd(
+    [System.IO.Path]::DirectorySeparatorChar,
+    [System.IO.Path]::AltDirectorySeparatorChar
+  ) + [System.IO.Path]::DirectorySeparatorChar
+  if (
+    $resolvedOutputDir -ne $allowedOutputRoot -and
+    -not $resolvedOutputDir.StartsWith($allowedPrefix, [System.StringComparison]::OrdinalIgnoreCase)
+  ) {
+    throw "Release stack GitHub status output must stay under build\release-stack-github-status."
+  }
+}
+
+function Read-PrStatusSnapshot {
+  param([string]$Path)
+
+  if (-not [string]::IsNullOrWhiteSpace($Path)) {
+    $data = Read-JsonFile -Path (Resolve-RepoPath -Path $Path)
+    foreach ($entry in @($data)) {
+      $entry
+    }
+    return
+  }
+
+  $ghCommand = Get-Command gh -ErrorAction SilentlyContinue
+  if (-not $ghCommand) {
+    throw "GitHub CLI is required when -PrStatusPath is not provided."
+  }
+
+  $json = & gh pr list --state open --json number,url,title,headRefName,baseRefName,mergeStateStatus,isDraft,statusCheckRollup --limit 100
+  if ($LASTEXITCODE -ne 0) {
+    throw "Failed to read pull request status snapshot with gh pr list."
+  }
+  $data = $json | ConvertFrom-Json
+  foreach ($entry in @($data)) {
+    $entry
+  }
+}
+
+Push-Location $root
+try {
+  $seedPath = Join-Path $root "config\release-stack-github-status.seed.json"
+  $mergeOrderPath = Join-Path $root "config\release-merge-order.seed.json"
+  $seed = Read-JsonFile -Path $seedPath
+  $mergeOrder = Read-JsonFile -Path $mergeOrderPath
+  $stack = @($mergeOrder.stack)
+  $requiredChecks = @($seed.required_status_checks)
+  $expectedPrUrlPrefix = [string]$seed.expected_pr_url_prefix
+  $snapshot = @(Read-PrStatusSnapshot -Path $PrStatusPath)
+  $errors = [System.Collections.Generic.List[string]]::new()
+  $checkedPrs = [System.Collections.Generic.List[object]]::new()
+  $cleanPrCount = 0
+  $draftPrCount = 0
+  $uncleanPrCount = 0
+  $successfulCheckCount = 0
+  $failedCheckCount = 0
+  $latestStackPr = if ($stack.Count -gt 0) { [int]$stack[-1].pr } else { 0 }
+  $latestPrUrl = ""
+
+  foreach ($item in $stack) {
+    $prNumber = [int]$item.pr
+    $matches = @($snapshot | Where-Object { [int]$_.number -eq $prNumber })
+    if ($matches.Count -ne 1) {
+      $errors.Add("PR #$prNumber is missing from the GitHub status snapshot")
+      continue
+    }
+
+    $status = $matches[0]
+    $prUrl = [string]$status.url
+    $prErrors = [System.Collections.Generic.List[string]]::new()
+    if ([string]::IsNullOrWhiteSpace($prUrl)) {
+      $prErrors.Add("PR #$prNumber pull request URL is missing")
+    } elseif (-not [string]::IsNullOrWhiteSpace($expectedPrUrlPrefix) -and -not $prUrl.StartsWith($expectedPrUrlPrefix, [System.StringComparison]::Ordinal)) {
+      $prErrors.Add("PR #$prNumber pull request URL does not match expected repository")
+    } elseif ($prUrl -notmatch "/pull/$prNumber$") {
+      $prErrors.Add("PR #$prNumber pull request URL does not match PR number")
+    }
+    if ($prNumber -eq $latestStackPr) {
+      $latestPrUrl = $prUrl
+    }
+    if ($status.baseRefName -ne $item.base) {
+      $prErrors.Add("baseRefName is '$($status.baseRefName)' but expected '$($item.base)'")
+    }
+    if ($status.headRefName -ne $item.head) {
+      $prErrors.Add("headRefName is '$($status.headRefName)' but expected '$($item.head)'")
+    }
+    if ($status.isDraft -eq $true) {
+      $draftPrCount += 1
+      $prErrors.Add("PR #$prNumber is draft")
+    }
+    if ($status.mergeStateStatus -ne "CLEAN") {
+      $uncleanPrCount += 1
+      $prErrors.Add("PR #$prNumber mergeStateStatus is $($status.mergeStateStatus)")
+    } else {
+      $cleanPrCount += 1
+    }
+
+    $prChecks = [System.Collections.Generic.List[object]]::new()
+    $prSuccessfulCheckCount = 0
+    $prFailedCheckCount = 0
+    foreach ($checkName in $requiredChecks) {
+      $checkMatches = @($status.statusCheckRollup | Where-Object { $_.name -eq $checkName })
+      if ($checkMatches.Count -lt 1) {
+        $failedCheckCount += 1
+        $prFailedCheckCount += 1
+        $prChecks.Add([ordered]@{
+            name = [string]$checkName
+            status = "MISSING"
+            conclusion = "MISSING"
+            details_url = ""
+            workflow_name = ""
+          })
+        $prErrors.Add("PR #$prNumber check '$checkName' is missing")
+        continue
+      }
+      $check = $checkMatches[0]
+      $checkStatus = [string]$check.status
+      $checkConclusion = [string]$check.conclusion
+      $checkDetailsUrl = [string]$check.detailsUrl
+      $checkWorkflowName = [string]$check.workflowName
+      $prChecks.Add([ordered]@{
+          name = [string]$checkName
+          status = [string]$checkStatus
+          conclusion = [string]$checkConclusion
+          details_url = [string]$checkDetailsUrl
+          workflow_name = [string]$checkWorkflowName
+        })
+      if ($checkStatus -ne "COMPLETED" -or $checkConclusion -ne "SUCCESS") {
+        $failedCheckCount += 1
+        $prFailedCheckCount += 1
+        $detail = if ($checkConclusion) { $checkConclusion } else { $checkStatus }
+        $prErrors.Add("PR #$prNumber check '$checkName' is $detail")
+      } else {
+        $successfulCheckCount += 1
+        $prSuccessfulCheckCount += 1
+      }
+    }
+
+    foreach ($message in $prErrors) {
+      $errors.Add($message)
+    }
+
+    $checkedPrs.Add([ordered]@{
+        pr = $prNumber
+        url = $prUrl
+        base = $item.base
+        head = $item.head
+        mergeStateStatus = $status.mergeStateStatus
+        isDraft = [bool]$status.isDraft
+        successful_check_count = [int]$prSuccessfulCheckCount
+        failed_check_count = [int]$prFailedCheckCount
+        required_status_check_count = [int]@($requiredChecks).Count
+        checks = @($prChecks)
+        errors = @($prErrors)
+      })
+  }
+
+  $github_status_ok = $true
+  if ($errors.Count -gt 0) {
+    $github_status_ok = $false
+  }
+
+  if ([string]::IsNullOrWhiteSpace($OutDir)) {
+    $OutDir = Join-Path $root $defaultOutputDir
+  } else {
+    $OutDir = Resolve-RepoPath -Path $OutDir
+  }
+  Assert-BuildOutputPath -Path $OutDir
+  New-Item -ItemType Directory -Path $OutDir -Force | Out-Null
+
+  $summaryPath = Join-Path $OutDir "release-stack-github-status.json"
+  $summary = [ordered]@{
+    schema_version = 1
+    generated_at = (Get-Date).ToUniversalTime().ToString("o")
+    read_only = $true
+    github_status_ok = [bool]$github_status_ok
+    stack_count = [int]$stack.Count
+    latest_pr = [int]$latestStackPr
+    latest_pr_url = [string]$latestPrUrl
+    expected_pr_url_prefix = [string]$expectedPrUrlPrefix
+    latest_candidate = if ($stack.Count -gt 0) { $stack[-1].candidate } else { "" }
+    clean_pr_count = [int]$cleanPrCount
+    draft_pr_count = [int]$draftPrCount
+    unclean_pr_count = [int]$uncleanPrCount
+    successful_check_count = [int]$successfulCheckCount
+    failed_check_count = [int]$failedCheckCount
+    required_status_checks = $requiredChecks
+    errors = @($errors)
+    pull_requests = @($checkedPrs)
+  }
+
+  $summaryJson = $summary | ConvertTo-Json -Depth 30
+  [System.IO.File]::WriteAllText($summaryPath, $summaryJson, [System.Text.UTF8Encoding]::new($false))
+
+  if ($github_status_ok) {
+    Write-Host "Release stack GitHub status OK." -ForegroundColor Green
+    Write-Host $summaryPath
+    exit 0
+  }
+
+  Write-Host "Release stack GitHub status failed." -ForegroundColor Red
+  foreach ($errorMessage in $errors) {
+    Write-Host "- $errorMessage"
+  }
+  Write-Host $summaryPath
+  exit 2
+} finally {
+  Pop-Location
+}

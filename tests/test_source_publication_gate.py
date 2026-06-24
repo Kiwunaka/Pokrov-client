@@ -1,0 +1,447 @@
+from __future__ import annotations
+
+import hashlib
+import json
+import subprocess
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def _read(relative_path: str) -> str:
+    return (ROOT / relative_path).read_text(encoding="utf-8")
+
+
+def _read_json(relative_path: str) -> dict:
+    return json.loads(_read(relative_path))
+
+
+def _write_json(path: Path, payload: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload), encoding="utf-8")
+
+
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _repo_relative(path: Path) -> str:
+    return path.relative_to(ROOT).as_posix()
+
+
+def _write_artifact(path: Path, content: bytes) -> dict:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(content)
+    return {
+        "path": _repo_relative(path),
+        "sha256": _sha256(path),
+    }
+
+
+def _fresh_generated_at() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _stale_generated_at() -> str:
+    return (
+        datetime.now(timezone.utc) - timedelta(hours=48)
+    ).isoformat().replace("+00:00", "Z")
+
+
+def _packet_summary(tmp_path: Path, ready: bool = True) -> tuple[Path, dict]:
+    packet_path = (
+        ROOT
+        / "build"
+        / "source-publication-packet"
+        / "test-inputs"
+        / tmp_path.name
+        / "v0.171.0-source"
+        / "source-publication-packet.json"
+    )
+    artifact_root = (
+        ROOT
+        / "build"
+        / "source-publication-gate"
+        / "test-artifacts"
+        / tmp_path.name
+    )
+    release_notes = _write_artifact(
+        artifact_root / "source-release-preflight" / "release-notes.md",
+        b"# v0.171.0-source\n\nsource-only release\n",
+    )
+    proof_manifest = _write_artifact(
+        artifact_root / "source-release-preflight" / "proof.json",
+        b'{"schema_version":1,"source_only":true}\n',
+    )
+    source_archive = _write_artifact(
+        artifact_root / "source-release-preflight" / "source.zip",
+        b"source archive bytes",
+    )
+    release_evidence_bundle = _write_artifact(
+        artifact_root / "release-evidence" / "release-evidence.json",
+        b'{"schema_version":1,"source_only":true}\n',
+    )
+    clean_clone_or_import_proof = _write_artifact(
+        artifact_root / "source-release-preflight" / "preflight.json",
+        b'{"schema_version":1,"source_only":true}\n',
+    )
+    github_ruleset_report = _write_artifact(
+        artifact_root / "release-evidence" / "github-ruleset-report.json",
+        b'{"schema_version":1,"read_only":true,"ok":true}\n',
+    )
+    release_handoff = _write_artifact(
+        ROOT
+        / "build"
+        / "release-merge-handoff"
+        / "test-inputs"
+        / tmp_path.name
+        / "release-merge-handoff.json",
+        b'{"schema_version":1,"read_only":true,"handoff_ready_for_maintainer":true}\n',
+    )
+    publication_dry_run = _write_artifact(
+        ROOT
+        / "build"
+        / "source-release-publication"
+        / "test-inputs"
+        / tmp_path.name
+        / "v0.171.0-source"
+        / "v0.171.0-source-publication-dry-run.json",
+        b'{"schema_version":1,"read_only":true,"ready_for_manual_review":true}\n',
+    )
+    packet = {
+        "schema_version": 1,
+        "tag": "v0.171.0-source",
+        "generated_at": _fresh_generated_at(),
+        "read_only": True,
+        "source_only": True,
+        "manual_publish_only": True,
+        "packet_ready_for_manual_publish_review": ready,
+        "publish_performed": False,
+        "tag_push_performed": False,
+        "asset_upload_performed": False,
+        "no_apk": True,
+        "no_exe": True,
+        "no_store_release": True,
+        "no_trusted_signing_claim": True,
+        "release_notes": release_notes["path"],
+        "proof_manifest": proof_manifest["path"],
+        "source_archive": source_archive["path"],
+        "release_evidence_bundle": release_evidence_bundle["path"],
+        "clean_clone_or_import_proof": clean_clone_or_import_proof["path"],
+        "release_handoff_github_ruleset_report": github_ruleset_report["path"],
+        "blocking_errors": [] if ready else ["source publication packet blocked"],
+        "input_fingerprints": {
+            "release_handoff": release_handoff,
+            "publication_dry_run": publication_dry_run,
+        },
+        "artifact_file_fingerprints": {
+            "release_notes": release_notes,
+            "proof_manifest": proof_manifest,
+            "source_archive": source_archive,
+            "release_evidence_bundle": release_evidence_bundle,
+            "clean_clone_or_import_proof": clean_clone_or_import_proof,
+            "github_ruleset_report": github_ruleset_report,
+        },
+    }
+    _write_json(packet_path, packet)
+    return packet_path, packet
+
+
+def test_source_publication_gate_seed_defines_read_only_final_gate() -> None:
+    seed = _read_json("config/source-publication-gate.seed.json")
+
+    assert seed["script"] == "scripts/check-source-publication-gate.ps1"
+    assert seed["default_output_dir"] == "build/source-publication-gate"
+    assert seed["policy"]["read_only"] is True
+    assert seed["policy"]["source_only"] is True
+    assert seed["policy"]["manual_publish_review_gate"] is True
+    assert seed["policy"]["no_tag_creation"] is True
+    assert seed["policy"]["no_tag_push"] is True
+    assert seed["policy"]["no_github_release_publish"] is True
+    assert seed["policy"]["no_asset_upload"] is True
+    assert seed["policy"]["requires_source_publication_packet_summary"] is True
+    assert seed["policy"]["requires_source_publication_packet_ready"] is True
+    assert seed["policy"]["requires_source_publication_packet_input_fingerprint"] is True
+    assert seed["policy"]["requires_packet_generated_at_freshness"] is True
+    assert seed["policy"]["requires_source_only_flags"] is True
+    assert seed["policy"]["requires_source_publication_packet_input_fingerprint_integrity"] is True
+    assert seed["policy"]["requires_artifact_file_fingerprint_integrity"] is True
+    assert seed["inputs"]["source_publication_packet"].endswith(
+        "v0.171.0-source/source-publication-packet.json"
+    )
+    assert seed["output"]["gate"].endswith(
+        "v0.171.0-source/v0.171.0-source-publication-gate.json"
+    )
+
+
+def test_source_publication_gate_script_is_read_only() -> None:
+    script = _read("scripts/check-source-publication-gate.ps1")
+
+    for phrase in (
+        "source-publication-gate.seed.json",
+        "source_publication_packet",
+        "publication_gate_ready_for_manual_publish",
+        "packet_ready_for_manual_publish_review",
+        "source publication packet is not ready for manual publish review",
+        "source publication packet has stale generated_at timestamp",
+        "source publication packet input fingerprint mismatch",
+        "source publication gate input fingerprint mismatch",
+        "source publication gate artifact fingerprint mismatch",
+        "source publication packet has unsafe source-only flags",
+        "manual_publish_review_gate",
+        "read_only = $true",
+        "publish_performed = $false",
+        "asset_upload_performed = $false",
+        "tag_push_performed = $false",
+        "ComputeHash",
+        "build\\source-publication-gate",
+    ):
+        assert phrase in script
+
+    for forbidden in (
+        "gh release create",
+        "gh release upload",
+        "git tag",
+        "git push",
+        "-X POST",
+        "-X PATCH",
+        "-X PUT",
+        "-X DELETE",
+    ):
+        assert forbidden not in script
+
+
+def test_source_publication_gate_writes_ready_summary(tmp_path: Path) -> None:
+    packet_path, packet = _packet_summary(tmp_path)
+    out_dir = ROOT / "build" / "source-publication-gate" / "test-ready"
+
+    result = subprocess.run(
+        [
+            "powershell",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(ROOT / "scripts" / "check-source-publication-gate.ps1"),
+            "-PacketPath",
+            str(packet_path),
+            "-OutDir",
+            str(out_dir),
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    summary = json.loads(
+        (
+            out_dir
+            / "v0.171.0-source"
+            / "v0.171.0-source-publication-gate.json"
+        ).read_text(encoding="utf-8-sig")
+    )
+
+    assert result.returncode == 0
+    assert summary["read_only"] is True
+    assert summary["manual_publish_review_gate"] is True
+    assert summary["publication_gate_ready_for_manual_publish"] is True
+    assert summary["publish_performed"] is False
+    assert summary["asset_upload_performed"] is False
+    assert summary["tag_push_performed"] is False
+    assert summary["source_publication_packet"] == str(packet_path)
+    assert summary["source_publication_packet_sha256"] == _sha256(packet_path)
+    assert summary["source_publication_packet_generated_at"] == packet["generated_at"]
+    assert summary["packet_artifact_file_fingerprints"] == packet[
+        "artifact_file_fingerprints"
+    ]
+    assert summary["blocking_errors"] == []
+
+
+def test_source_publication_gate_blocks_unready_packet(tmp_path: Path) -> None:
+    packet_path, _packet = _packet_summary(tmp_path, ready=False)
+    out_dir = ROOT / "build" / "source-publication-gate" / "test-unready-packet"
+
+    result = subprocess.run(
+        [
+            "powershell",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(ROOT / "scripts" / "check-source-publication-gate.ps1"),
+            "-PacketPath",
+            str(packet_path),
+            "-OutDir",
+            str(out_dir),
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    summary = json.loads(
+        (
+            out_dir
+            / "v0.171.0-source"
+            / "v0.171.0-source-publication-gate.json"
+        ).read_text(encoding="utf-8-sig")
+    )
+
+    assert result.returncode == 2
+    assert summary["publication_gate_ready_for_manual_publish"] is False
+    assert "source publication packet is not ready for manual publish review" in summary[
+        "blocking_errors"
+    ]
+
+
+def test_source_publication_gate_blocks_stale_packet(tmp_path: Path) -> None:
+    packet_path, packet = _packet_summary(tmp_path)
+    packet["generated_at"] = _stale_generated_at()
+    _write_json(packet_path, packet)
+    out_dir = ROOT / "build" / "source-publication-gate" / "test-stale-packet"
+
+    result = subprocess.run(
+        [
+            "powershell",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(ROOT / "scripts" / "check-source-publication-gate.ps1"),
+            "-PacketPath",
+            str(packet_path),
+            "-OutDir",
+            str(out_dir),
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    summary = json.loads(
+        (
+            out_dir
+            / "v0.171.0-source"
+            / "v0.171.0-source-publication-gate.json"
+        ).read_text(encoding="utf-8-sig")
+    )
+
+    assert result.returncode == 2
+    assert "source publication packet has stale generated_at timestamp" in summary[
+        "blocking_errors"
+    ]
+
+
+def test_source_publication_gate_blocks_artifact_fingerprint_drift(
+    tmp_path: Path,
+) -> None:
+    packet_path, packet = _packet_summary(tmp_path)
+    release_notes_path = ROOT / packet["artifact_file_fingerprints"]["release_notes"][
+        "path"
+    ]
+    release_notes_path.write_text(
+        "# v0.171.0-source\n\nchanged after packet generation\n",
+        encoding="utf-8",
+    )
+    out_dir = ROOT / "build" / "source-publication-gate" / "test-artifact-drift"
+
+    result = subprocess.run(
+        [
+            "powershell",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(ROOT / "scripts" / "check-source-publication-gate.ps1"),
+            "-PacketPath",
+            str(packet_path),
+            "-OutDir",
+            str(out_dir),
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    summary = json.loads(
+        (
+            out_dir
+            / "v0.171.0-source"
+            / "v0.171.0-source-publication-gate.json"
+        ).read_text(encoding="utf-8-sig")
+    )
+
+    assert result.returncode == 2
+    assert "source publication gate artifact fingerprint mismatch" in summary[
+        "blocking_errors"
+    ]
+    assert summary["publication_gate_ready_for_manual_publish"] is False
+
+
+def test_source_publication_gate_blocks_input_fingerprint_drift(
+    tmp_path: Path,
+) -> None:
+    packet_path, packet = _packet_summary(tmp_path)
+    release_handoff_path = ROOT / packet["input_fingerprints"]["release_handoff"][
+        "path"
+    ]
+    release_handoff_path.write_text(
+        '{"schema_version":1,"read_only":true,"changed_after_packet":true}\n',
+        encoding="utf-8",
+    )
+    out_dir = ROOT / "build" / "source-publication-gate" / "test-input-drift"
+
+    result = subprocess.run(
+        [
+            "powershell",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(ROOT / "scripts" / "check-source-publication-gate.ps1"),
+            "-PacketPath",
+            str(packet_path),
+            "-OutDir",
+            str(out_dir),
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    summary = json.loads(
+        (
+            out_dir
+            / "v0.171.0-source"
+            / "v0.171.0-source-publication-gate.json"
+        ).read_text(encoding="utf-8-sig")
+    )
+
+    assert result.returncode == 2
+    assert "source publication gate input fingerprint mismatch" in summary[
+        "blocking_errors"
+    ]
+    assert summary["publication_gate_ready_for_manual_publish"] is False
+
+
+def test_source_publication_gate_is_documented_and_validated() -> None:
+    docs = "\n".join(
+        [
+            _read("docs/RELEASE_BLOCKERS.md"),
+            _read("docs/RELEASE_CHECKLIST.md"),
+            _read("docs/RELEASE_POLICY.md"),
+            _read("scripts/README.md"),
+        ]
+    )
+    validator = _read("scripts/validate-seed.ps1")
+    changelog = _read("CHANGELOG.md")
+
+    assert "check-source-publication-gate.ps1" in docs
+    assert "source publication gate" in docs
+    assert "config\\\\source-publication-gate.seed.json" in validator
+    assert "scripts\\\\check-source-publication-gate.ps1" in validator
+    assert "manual_publish_review_gate" in validator
+    assert "publication_gate_ready_for_manual_publish" in validator
+    assert "source publication gate" in changelog.lower()

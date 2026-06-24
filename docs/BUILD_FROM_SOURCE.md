@@ -36,7 +36,9 @@ The public client has two open-source product lines:
   accepts `vless://`, `trojan://`, `ss://`, and `vmess://` keys, supports local
   multi-profile selection, manual/foreground/in-app scheduled subscription URL
   refresh,
-  Android/Windows QR import, and gated third-party catalog metadata.
+  Android/Windows QR import, and gated third-party catalog metadata. Manual
+  catalog import is disabled unless
+  `OPEN_CLIENT_ENABLE_FREE_CATALOG=true` is supplied.
 - `operator`: white-label client for companies with their own API, cabinet,
   support, billing, and branding.
 
@@ -45,18 +47,59 @@ The `pokrov` variant is reserved for official POKROV service builds.
 Read [PRODUCT_VARIANTS.md](PRODUCT_VARIANTS.md) and
 [OPERATOR_INTEGRATION.md](OPERATOR_INTEGRATION.md) before shipping a fork.
 
-Example community run:
+First-run path for ordinary users:
+
+1. choose the `community` variant
+2. run the dependency bootstrap
+3. start the Android or Windows shell from source
+4. paste a `vless://`, `trojan://`, `ss://`, or `vmess://` key
+5. scan a QR code or add a subscription URL when that is how your provider
+   shares profiles
+
+OS background refresh is not claimed for this source milestone.
+
+First-run path for operators:
+
+1. choose the `operator` variant
+2. run the local fixture backend
+3. export white-label color tokens
+4. implement the minimal managed-profile contract
+5. replace all API, support, privacy, signing, and release surfaces with your
+   own
+
+Generate a seed-backed command before running or building a variant:
 
 ```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\print-build-variant-command.ps1 -Variant community -Platform android
+powershell -ExecutionPolicy Bypass -File .\scripts\print-build-variant-command.ps1 -Variant operator -Platform windows -Action build -Release
+```
+
+The helper prints a PowerShell preview only. It reads
+`config/variants/*.seed.json`, anchors the command inside `apps/android_shell`
+or `apps/windows_shell`, and does not build, sign, write local config, or create
+release artifacts.
+
+Example community run shape:
+
+```powershell
+Push-Location apps/android_shell
 flutter run `
   --dart-define=OPEN_CLIENT_VARIANT=community `
   --dart-define=OPEN_CLIENT_BRAND_NAME="Open Client" `
-  --dart-define=OPEN_CLIENT_ANDROID_PACKAGE_NAME=org.pokrovclient.community
+  --dart-define=OPEN_CLIENT_ANDROID_PACKAGE_NAME=org.pokrovclient.community `
+  --dart-define=OPEN_CLIENT_ENABLE_FREE_CATALOG=false
+Pop-Location
 ```
 
-Example operator run:
+The Free VPN catalog preview is visible in community mode so users can inspect
+the third-party boundary. Manual feed import stays disabled unless you compile
+with `--dart-define=OPEN_CLIENT_ENABLE_FREE_CATALOG=true`; even then, imports
+remain user-initiated and are not official POKROV nodes.
+
+Example operator run shape:
 
 ```powershell
+Push-Location apps/windows_shell
 flutter run `
   --dart-define=OPEN_CLIENT_VARIANT=operator `
   --dart-define=OPEN_CLIENT_BRAND_NAME="Acme VPN" `
@@ -65,6 +108,7 @@ flutter run `
   --dart-define=OPEN_CLIENT_CABINET_URL="https://app.acme.example/" `
   --dart-define=OPEN_CLIENT_SUPPORT_URL="https://support.acme.example/" `
   --dart-define=OPEN_CLIENT_PRIVACY_URL="https://acme.example/privacy/"
+Pop-Location
 ```
 
 Operator forks can export editable color tokens before wiring their own brand
@@ -120,6 +164,24 @@ cmake -S apps/windows_shell/windows -B apps/windows_shell/build/windows/x64 `
 From the repository root:
 
 ```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\doctor.ps1
+```
+
+The contributor doctor is read-only. It checks local commands and required
+public files, then exits without installing dependencies, building artifacts,
+fetching runtime binaries, copying config, or publishing anything. Use JSON
+output when filing a build issue:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\doctor.ps1 -Json
+```
+
+If this fails, use [Troubleshooting](TROUBLESHOOTING.md) before opening a build
+issue.
+
+After the doctor passes, resolve workspace dependencies:
+
+```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\bootstrap-workspace.ps1
 ```
 
@@ -133,6 +195,9 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1 -OfflinePubGet
 
 Native runtime binaries are not committed to this repository. The public seed
 tracks `hiddify/hiddify-core` in `config/runtime-artifacts.seed.json`.
+That manifest is source-only release metadata: it records the upstream release,
+expected archive names, local sync destinations, and current license/binary
+review state without shipping those binaries.
 
 To fetch and place runtime artifacts for local testing:
 
@@ -141,6 +206,13 @@ powershell -ExecutionPolicy Bypass -File .\scripts\fetch-libcore-assets.ps1 -Pla
 ```
 
 Downloaded artifacts land under ignored local folders and must not be committed.
+When an asset entry still uses `PENDING_PUBLIC_BINARY_REVIEW`, the fetch helper
+prints a warning and treats the archive as local-only test material. After a
+public binary review records a real 64-character SHA-256 in the manifest, the
+helper verifies the downloaded archive before extraction or host sync. Before
+extracting, it also lists archive entries and refuses absolute paths, drive
+paths, backslashes, or `..` traversal entries so local runtime archives cannot
+escape the ignored runtime cache or host sync destination.
 
 ## Tests
 
@@ -157,15 +229,39 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1
 ```
 
 By default this runs Flutter tests for the shared packages and imported host
-apps. The Android Gradle unit lane requires Android SDK/JDK compatibility and
-the fetched `libcore.aar`, so it is opt-in:
+apps. CI also runs Android native Gradle unit tests through a source-only stub
+lane:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\run-android-native-tests.ps1 -SourceOnly
+```
+
+The source-only stub lane does not fetch or commit libcore.aar and does not
+prove APK, store, trusted signing, or runtime readiness. It only proves that the
+public Android Kotlin unit tests compile and pass without private runtime
+artifacts.
+
+Maintainers can run the runtime-backed Android native lane after fetching the
+local runtime artifact:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\fetch-libcore-assets.ps1 -Platforms @("android") -SyncToHosts
-powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1 -RunAndroidGradle
+powershell -ExecutionPolicy Bypass -File .\scripts\run-android-native-tests.ps1
 ```
 
 Windows runtime smoke requires the fetched native runtime artifacts.
+
+Run the Windows bundle verifier before source release review:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\verify-windows-bundle.ps1
+```
+
+The Windows bundle verifier writes source-only Windows bundle proof under
+ignored `build/windows-bundle-verifier/`. It checks the public Windows shell
+source paths and refuses committed Windows binaries, archives, signing files,
+or local runtime artifacts. It does not build, sign, package, publish, or
+download runtime artifacts.
 
 ## Clean Clone Proof
 
@@ -182,8 +278,9 @@ For a faster source-boundary-only pass:
 powershell -ExecutionPolicy Bypass -File .\scripts\verify-clean-clone.ps1 -SkipFlutterTests
 ```
 
-The GitHub Actions CI workflow runs the source-import tests, a clean-clone
-source-boundary pass, `flutter analyze`, and the workspace Flutter tests.
+The GitHub Actions CI workflow runs the source-import tests, source-release
+preflight smoke, a clean-clone source-boundary pass, `flutter analyze`, the
+workspace Flutter tests, and the Android native Gradle source-only stub lane.
 
 ## Local Config
 

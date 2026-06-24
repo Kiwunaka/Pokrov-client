@@ -26,10 +26,12 @@ This roadmap describes the public repository path. It is not a release promise.
 ## Phase 3: Public Build And Release Hygiene
 
 - Add CI for analysis and tests. Initial GitHub Actions workflow added.
-- Add dependency license inventory.
+- Add dependency license and generated asset provenance inventories. Initial
+  source-release gates added.
 - Add source import playbook and governance docs.
 - Add product-track documentation and optional public-config catalog gates.
-- Publish checksums with release artifacts.
+- Publish checksums with release artifacts. Initial source-release proof helper
+  added for source-only archives.
 - Keep official release claims aligned with current evidence.
 
 ## Phase 3.5: Optional Free VPN Catalog
@@ -38,7 +40,8 @@ This roadmap describes the public repository path. It is not a release promise.
 - Start with `AvenCores/goida-vpn-configs` as an opt-in candidate.
 - Add reviewed disabled catalog metadata and parser/license gate tests. Initial
   MVP added.
-- Label all third-party feeds clearly in UI and release notes.
+- Label all third-party feeds clearly in UI and release notes. Initial gated
+  import/cache/clear action added for the reviewed candidate feed.
 - Keep official POKROV service and third-party public feeds separate.
 
 ## Phase 3.6: Community Client UX
@@ -58,7 +61,8 @@ This roadmap describes the public repository path. It is not a release promise.
 - Make local-only privacy boundaries visible around keys, QR payloads, and
   subscription URLs.
 - Keep Free VPN catalog copy gated, third-party, and promise-free until the
-  feature is explicitly enabled.
+  feature is explicitly enabled. Manual import now stays behind
+  `OPEN_CLIENT_ENABLE_FREE_CATALOG=true`.
 - Prepare user-facing screenshots and import-flow polish before any binary
   release lane.
 

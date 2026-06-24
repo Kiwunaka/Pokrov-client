@@ -38,6 +38,23 @@ jobs:
         shell: pwsh
         run: .\scripts\validate-seed.ps1
 
+      - name: Run contributor doctor source-boundary smoke
+        shell: pwsh
+        run: .\scripts\doctor.ps1 -SkipCommandChecks
+
+      - name: Run Windows bundle verifier
+        shell: pwsh
+        run: .\scripts\verify-windows-bundle.ps1
+
+      - name: Run source-release preflight smoke
+        shell: pwsh
+        run: |
+          $out = Join-Path $env:RUNNER_TEMP "pokrov-source-release-preflight"
+          .\scripts\source-release-preflight.ps1 `
+            -Tag v9.9.9-source `
+            -OutDir $out `
+            -SkipTestCommands
+
       - name: Run OSS import dry-run wrapper
         shell: pwsh
         run: |
@@ -83,3 +100,26 @@ jobs:
       - name: Run workspace tests
         shell: pwsh
         run: .\scripts\run-tests.ps1
+
+  android-native:
+    name: Android native Gradle unit tests
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Run Android native Gradle unit tests
+        shell: pwsh
+        run: .\scripts\run-android-native-tests.ps1 -SourceOnly

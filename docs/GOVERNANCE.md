@@ -13,6 +13,24 @@ Maintainers are responsible for:
   operations
 - coordinating security reports privately
 
+Review routing is recorded in [.github/CODEOWNERS](../.github/CODEOWNERS) and
+the seed-backed policy at
+[config/codeowners-review.seed.json](../config/codeowners-review.seed.json).
+GitHub repository ruleset or branch protection setup is recorded in
+[GITHUB_RULESET_SETUP.md](GITHUB_RULESET_SETUP.md) and
+[config/github-ruleset.seed.json](../config/github-ruleset.seed.json), but it
+must not be claimed as remotely enforced until maintainers configure and
+observe the GitHub settings.
+Until broader public maintainer roles are established, CODEOWNERS stays
+maintainer-led and routes sensitive source-only areas for review:
+
+- security and support intake
+- source-release policy, changelog, and proof tooling
+- Android and Windows host shells
+- runtime artifacts and source-boundary scripts
+- operator contracts and OpenAPI fixtures
+- public triage templates, labels, and CI
+
 ## Contribution Model
 
 The project welcomes focused pull requests that improve:
@@ -26,6 +44,10 @@ The project welcomes focused pull requests that improve:
 - dependency and asset license clarity
 
 Maintainers may close broad, speculative, unsafe, or off-scope issues.
+
+CODEOWNERS routing does not turn a fork or PR into an official POKROV build.
+Official release, signing, store, backend, and support claims still require the
+separate evidence gates described in the release policy.
 
 ## Decision Rules
 

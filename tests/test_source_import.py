@@ -208,6 +208,14 @@ fixture=trojan://secret@example.com:443
     assert all(finding.line != 5 for finding in findings)
 
 
+def test_default_policy_allows_seed_validator_text() -> None:
+    root = Path(__file__).resolve().parents[1]
+    policy = load_policy(policy_path())
+    text = (root / "scripts" / "validate-seed.ps1").read_text(encoding="utf-8")
+
+    assert scan_text(text, allowed_hosts=policy.allowed_hosts) == []
+
+
 def test_scan_file_blocks_unknown_binary_artifacts(tmp_path: Path) -> None:
     source = tmp_path / "source"
     staging = tmp_path / "staging"

@@ -29,6 +29,7 @@ enum AccessLane {
   trialPremium,
   bonusPremium,
   paidUnlimited,
+  localProfiles,
   freeMonthly,
   freeSoftMode,
 }
@@ -150,6 +151,8 @@ extension AccessLanePresentation on AccessLane {
         return 'Бонусный доступ';
       case AccessLane.paidUnlimited:
         return 'Премиум';
+      case AccessLane.localProfiles:
+        return 'Локальные профили';
       case AccessLane.freeMonthly:
         return 'Базовый режим';
       case AccessLane.freeSoftMode:
@@ -165,6 +168,8 @@ extension AccessLanePresentation on AccessLane {
         return 'Привяжите Telegram, чтобы получить +10 дней к доступу.';
       case AccessLane.paidUnlimited:
         return 'Платный доступ открывает полный пул доступных узлов без месячного лимита трафика.';
+      case AccessLane.localProfiles:
+        return 'Профили, ключи и URL-подписки хранятся локально. Open Client не предоставляет узлы POKROV по умолчанию.';
       case AccessLane.freeMonthly:
         return 'После полного доступа остается базовый режим: бесплатный узел и возобновляемый лимит.';
       case AccessLane.freeSoftMode:
@@ -258,8 +263,16 @@ class FreeTierPolicy {
   String get speedSummary => 'до $speedMbps Мбит/с на IP';
   String get deviceSummary =>
       deviceLimit == 1 ? '1 устройство' : 'до $deviceLimit устройств';
-  String get nodePoolLabel =>
-      nodePool.trim().toLowerCase() == 'nl-free' ? 'Бесплатный узел' : nodePool;
+  String get nodePoolLabel {
+    final normalized = nodePool.trim().toLowerCase();
+    if (normalized == 'nl-free') {
+      return 'Бесплатный узел';
+    }
+    if (normalized == 'local-user-profiles') {
+      return 'Свои ключи';
+    }
+    return nodePool;
+  }
 }
 
 class RuntimeProfile {

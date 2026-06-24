@@ -1,4 +1,5 @@
 import json
+from urllib.parse import urlparse
 from pathlib import Path
 
 from tools.free_vpn_catalog.catalog_gate import (
@@ -16,21 +17,55 @@ def test_free_vpn_catalog_candidate_is_gated_and_attributed() -> None:
     catalog = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
 
     assert catalog["enabled_by_default"] is False
+    assert catalog["manual_import_build_define"] == "OPEN_CLIENT_ENABLE_FREE_CATALOG"
+    assert catalog["manual_import_default"] is False
     assert catalog["requires_user_opt_in"] is True
     assert catalog["official_pokrov_nodes"] is False
+    assert catalog["provenance_policy"] == {
+        "network_fetch_in_ci": False,
+        "runtime_fetch_default": False,
+        "allowed_feed_hosts": ["github.com"],
+        "forbid_official_pokrov_hosts": True,
+        "release_notes_required_copy": [
+            "third-party public configs",
+            "not official POKROV nodes",
+            "user-initiated",
+            "no speed, privacy, uptime, safety, legality, or availability promise",
+        ],
+    }
     assert catalog["refresh_policy"]["mode"] == "manual"
+    assert catalog["refresh_policy"]["cache_locally"] is True
+    assert (
+        catalog["refresh_policy"]["cache_storage"]
+        == "local_profile_records_with_source_kind_third_party_catalog"
+    )
+    assert catalog["refresh_policy"]["entry_source_kind"] == "third_party_catalog"
+    assert catalog["refresh_policy"]["manual_import_action_required"] is True
+    assert catalog["refresh_policy"]["clear_action_required"] is True
+    assert (
+        catalog["refresh_policy"]["clear_action_scope"]
+        == "third_party_catalog_profiles_only"
+    )
+    assert catalog["refresh_policy"]["candidate_default_feed_id"] == "githubmirror-1"
     assert catalog["refresh_policy"]["offline_behavior"]
     assert catalog["refresh_policy"]["raw_unavailable_behavior"]
 
     source = catalog["sources"][0]
     assert source["id"] == "avencores-goida-vpn-configs"
     assert source["license"] == "GPL-3.0"
+    assert source["license_url"].endswith("/AvenCores/goida-vpn-configs/blob/main/LICENSE")
     assert source["attribution"]
+    assert source["attribution_required"] is True
     assert source["label"] == "Third-party public configs"
     assert source["review_status"] == "reviewed_candidate_disabled"
+    assert source["observed_evidence"]
     assert source["update_cadence"]
     assert source["freshness_expectation"]
     assert source["feeds"]
+    assert any(
+        feed["id"] == catalog["refresh_policy"]["candidate_default_feed_id"]
+        for feed in source["feeds"]
+    )
 
 
 def test_free_vpn_catalog_copy_keeps_third_party_boundary() -> None:
@@ -38,8 +73,52 @@ def test_free_vpn_catalog_copy_keeps_third_party_boundary() -> None:
     copy = " ".join(catalog["ui_copy"])
 
     assert "not official POKROV nodes" in copy
+    assert "stores imported entries locally" in copy
+    assert "clear them" in copy
     forbidden_claims = ["fastest", "safest", "private", "uptime", "legal"]
     assert not any(claim in copy.lower() for claim in forbidden_claims)
+
+
+def test_free_vpn_catalog_feed_urls_stay_on_reviewed_public_hosts() -> None:
+    catalog = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
+    allowed_hosts = set(catalog["provenance_policy"]["allowed_feed_hosts"])
+    forbidden_hosts = {
+        "pokrov.space",
+        "api.pokrov.space",
+        "app.pokrov.space",
+        "connect.pokrov.space",
+        "pay.pokrov.space",
+        "kiwunaka.space",
+    }
+
+    for source in catalog["sources"]:
+        for feed in source["feeds"]:
+            parsed = urlparse(feed["url"])
+            assert parsed.scheme == "https"
+            assert parsed.netloc in allowed_hosts
+            assert parsed.netloc not in forbidden_hosts
+            assert ".." not in parsed.path
+
+    assert catalog["provenance_policy"]["network_fetch_in_ci"] is False
+    assert catalog["provenance_policy"]["runtime_fetch_default"] is False
+
+
+def test_free_vpn_catalog_release_note_copy_is_explicit() -> None:
+    catalog = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
+    docs = "\n".join(
+        [
+            (ROOT / "docs" / "FREE_VPN_CATALOG_GATE.md").read_text(
+                encoding="utf-8"
+            ),
+            (ROOT / "docs" / "RELEASE_CHECKLIST.md").read_text(encoding="utf-8"),
+            (ROOT / "docs" / "releases" / "source-readiness-v0.2-v0.3.md").read_text(
+                encoding="utf-8"
+            ),
+        ]
+    )
+
+    for phrase in catalog["provenance_policy"]["release_notes_required_copy"]:
+        assert phrase in docs
 
 
 def test_catalog_parser_contract_matches_seed_metadata() -> None:

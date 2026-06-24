@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-06-15",
+  "mode": "setup_guidance_not_remote_enforcement",
+  "docs": "docs/GITHUB_RULESET_SETUP.md",
+  "verifier_script": "scripts/check-github-ruleset.ps1",
+  "target_branches": ["main"],
+  "required_status_checks": [
+    "Source import and public tree checks",
+    "Flutter analyze and tests",
+    "Android native Gradle unit tests"
+  ],
+  "policy": {
+    "repository_ruleset_preferred": true,
+    "branch_protection_fallback_supported": true,
+    "remote_enforcement_not_claimed": true,
+    "pull_request_required": true,
+    "required_status_checks_required": true,
+    "codeowners_review_required": true,
+    "conversation_resolution_required": true,
+    "block_force_pushes_required": true,
+    "block_branch_deletion_required": true,
+    "bypass_must_be_explicit_and_minimal": true,
+    "verifier_is_read_only": true,
+    "verifier_report_only_supported": true,
+    "verifier_not_required_in_ci_until_remote_settings_exist": true,
+    "verifier_reports_checked_at": true,
+    "verifier_reports_covered_required_status_checks": true
+  },
+  "manual_verification_required": [
+    "GitHub repository ruleset or branch protection is active for main",
+    "Required status checks exactly match config/required-checks.seed.json",
+    "CODEOWNERS review is required for matching paths",
+    "Conversations must be resolved before merge",
+    "Force pushes and branch deletion are blocked for protected targets",
+    "A test pull request without required checks cannot be merged"
+  ],
+  "forbidden_claims_until_observed": [
+    "remote branch protection is enforced",
+    "repository rulesets are active",
+    "all maintainers are blocked from bypass",
+    "GitHub settings prove binary release readiness",
+    "GitHub settings prove trusted signing or store readiness"
+  ],
+  "official_reference_topics": [
+    "GitHub rulesets overview",
+    "GitHub ruleset rules",
+    "GitHub protected branches"
+  ]
+}

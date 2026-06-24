@@ -6,7 +6,7 @@ info:
     Minimal operator-owned API contract for branded forks of the open-source
     client. Operators provide their own backend, billing, support, signing, and
     privacy policy. This contract does not grant access to official POKROV
-    infrastructure.
+    infrastructure. Contract version: 2026-06-operator-v1.
 servers:
   - url: http://127.0.0.1:8765
     description: Local fixture server
@@ -30,6 +30,9 @@ paths:
     post:
       summary: Create or resume a client session
       security: []
+      parameters:
+        - $ref: "#/components/parameters/XRequestId"
+        - $ref: "#/components/parameters/XClientVersion"
       requestBody:
         required: true
         content:
@@ -45,11 +48,16 @@ paths:
                 $ref: "#/components/schemas/StartTrialResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/ServerError"
   /api/client/route-policy:
     post:
       summary: Store the route mode selected by the client
+      parameters:
+        - $ref: "#/components/parameters/XRequestId"
+        - $ref: "#/components/parameters/XClientVersion"
       requestBody:
         required: true
         content:
@@ -65,9 +73,14 @@ paths:
                 $ref: "#/components/schemas/OkResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
   /api/client/profile/managed:
     get:
       summary: Return a runtime managed profile
+      parameters:
+        - $ref: "#/components/parameters/XRequestId"
+        - $ref: "#/components/parameters/XClientVersion"
       responses:
         "200":
           description: sing-box-compatible profile material for the client.
@@ -77,6 +90,8 @@ paths:
                 $ref: "#/components/schemas/ManagedProfileResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/ServerError"
   /api/redeem:
@@ -225,7 +240,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/OkResponse"
-  /api/client/support/tickets:
+  /api/tickets:
     get:
       summary: List support tickets
       responses:
@@ -250,7 +265,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TicketResponse"
-  /api/client/support/tickets/{ticket_id}:
+  /api/tickets/{ticket_id}:
     get:
       summary: Get a support ticket
       parameters:
@@ -262,7 +277,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TicketResponse"
-  /api/client/support/tickets/{ticket_id}/messages:
+  /api/tickets/{ticket_id}/messages:
     post:
       summary: Add a support ticket message
       parameters:
@@ -292,19 +307,79 @@ components:
       required: true
       schema:
         type: string
+    XRequestId:
+      name: X-Request-ID
+      in: header
+      required: false
+      description: >
+        Client-generated trace ID. Operators should echo it on every response
+        and include it in redacted support logs.
+      schema:
+        type: string
+    XClientVersion:
+      name: X-Client-Version
+      in: header
+      required: false
+      description: Source or operator app version used for compatibility gates.
+      schema:
+        type: string
   responses:
     Unauthorized:
       description: Session is missing or rejected.
+      headers:
+        X-Request-ID:
+          $ref: "#/components/headers/XRequestId"
+        X-API-Version:
+          $ref: "#/components/headers/XApiVersion"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    RateLimited:
+      description: Request was rate limited.
+      headers:
+        X-Request-ID:
+          $ref: "#/components/headers/XRequestId"
+        X-API-Version:
+          $ref: "#/components/headers/XApiVersion"
+        Retry-After:
+          $ref: "#/components/headers/RetryAfter"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
     ServerError:
       description: Operator service error.
+      headers:
+        X-Request-ID:
+          $ref: "#/components/headers/XRequestId"
+        X-API-Version:
+          $ref: "#/components/headers/XApiVersion"
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+  headers:
+    XRequestId:
+      description: Echoed request ID. If the request omitted one, the server may generate it.
+      schema:
+        type: string
+    XApiVersion:
+      description: Current operator contract version, for example `2026-06-operator-v1`.
+      schema:
+        type: string
+    RetryAfter:
+      description: Seconds before retrying a rate-limited request.
+      schema:
+        type: integer
+    Deprecation:
+      description: Optional deprecation signal for compatible migrations.
+      schema:
+        type: string
+    Sunset:
+      description: Optional deadline for retiring an older route or field.
+      schema:
+        type: string
   schemas:
     HealthResponse:
       type: object
@@ -323,12 +398,36 @@ components:
     ErrorResponse:
       type: object
       required: [ok, error]
+      description: >
+        Standard error envelope. Clients should treat `error.code` as stable
+        and `error.message` as user-support/debug text.
       properties:
         ok:
           type: boolean
           const: false
         error:
+          $ref: "#/components/schemas/ErrorDetail"
+    ErrorDetail:
+      type: object
+      required: [code, message, request_id, retryable]
+      properties:
+        code:
           type: string
+          enum:
+            - bad_request
+            - unauthorized
+            - forbidden
+            - not_found
+            - rate_limited
+            - server_error
+        message:
+          type: string
+        request_id:
+          type: string
+        retryable:
+          type: boolean
+        retry_after_seconds:
+          type: integer
     StartTrialRequest:
       type: object
       required: [install_id, platform]
@@ -353,10 +452,19 @@ components:
       properties:
         session:
           type: object
-          required: [session_token]
+          required: [session_token, token_type, expires_in, refresh_after]
           properties:
             session_token:
               type: string
+            token_type:
+              type: string
+              enum: [Bearer]
+            expires_in:
+              type: integer
+              description: Token lifetime in seconds.
+            refresh_after:
+              type: integer
+              description: Suggested refresh point in seconds before expiry.
             account_id:
               type: string
         provisioning:
@@ -370,11 +478,14 @@ components:
               type: boolean
             managed_manifest:
               type: object
-              required: [url]
+              required: [url, version]
               properties:
                 url:
                   type: string
                   example: /api/client/profile/managed
+                version:
+                  type: string
+                  example: operator-v1
     RoutePolicyRequest:
       type: object
       properties:

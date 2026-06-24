@@ -1,12 +1,33 @@
 {
   "schema": 1,
   "enabled_by_default": false,
+  "manual_import_build_define": "OPEN_CLIENT_ENABLE_FREE_CATALOG",
+  "manual_import_default": false,
   "requires_user_opt_in": true,
   "official_pokrov_nodes": false,
+  "provenance_policy": {
+    "network_fetch_in_ci": false,
+    "runtime_fetch_default": false,
+    "allowed_feed_hosts": [
+      "github.com"
+    ],
+    "forbid_official_pokrov_hosts": true,
+    "release_notes_required_copy": [
+      "third-party public configs",
+      "not official POKROV nodes",
+      "user-initiated",
+      "no speed, privacy, uptime, safety, legality, or availability promise"
+    ]
+  },
   "refresh_policy": {
     "mode": "manual",
     "cache_locally": true,
+    "cache_storage": "local_profile_records_with_source_kind_third_party_catalog",
+    "entry_source_kind": "third_party_catalog",
+    "manual_import_action_required": true,
     "clear_action_required": true,
+    "clear_action_scope": "third_party_catalog_profiles_only",
+    "candidate_default_feed_id": "githubmirror-1",
     "offline_behavior": "show_cached_entries_if_present_otherwise_empty",
     "raw_unavailable_behavior": "preserve_previous_imported_entries",
     "freshness_warning_after_minutes": 60
@@ -32,9 +53,16 @@
       "label": "Third-party public configs",
       "repository": "https://github.com/AvenCores/goida-vpn-configs",
       "license": "GPL-3.0",
+      "license_url": "https://github.com/AvenCores/goida-vpn-configs/blob/main/LICENSE",
       "attribution": "AvenCores/goida-vpn-configs",
+      "attribution_required": true,
       "review_status": "reviewed_candidate_disabled",
       "observed_on": "2026-06-13",
+      "observed_evidence": [
+        "GitHub repository license badge shows GPL-3.0.",
+        "Repository README describes public subscription TXT feeds.",
+        "Repository README describes automated updates every 9 minutes."
+      ],
       "update_cadence": "README says generated TXT feeds update every 9 minutes through GitHub Actions.",
       "freshness_expectation": "Treat feeds as stale after 60 minutes and keep the last cached entries if GitHub raw is unavailable.",
       "notes": [
