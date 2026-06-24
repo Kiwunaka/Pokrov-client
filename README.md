@@ -225,6 +225,7 @@ Source release status:
 | `v0.163.0-source` | Pending stacked PR, not tagged | Release merge handoff carries and requires the publication dry-run source archive SHA-256 as explicit maintainer proof. |
 | `v0.164.0-source` | Pending stacked PR, not tagged | Source publication packet carries and validates the release handoff publication dry-run source archive SHA-256 as explicit review proof. |
 | `v0.165.0-source` | Pending stacked PR, not tagged | Source publication packet carries and validates the release handoff publication dry-run evidence bundle preflight commit SHA as explicit review proof. |
+| `v0.166.0-source` | Pending stacked PR, not tagged | Source publication packet carries and validates the release handoff publication dry-run evidence bundle preflight ref commit SHA as explicit review proof. |
 
 ## Which App Should I Use?
 

@@ -916,6 +916,7 @@ try {
   $releaseHandoffPublicationCommitSha = [string]$releaseHandoff.publication_dry_run_commit_sha
   $releaseHandoffPublicationSourceArchiveSha256 = [string]$releaseHandoff.publication_dry_run_source_archive_sha256
   $releaseHandoffPublicationPreflightCommitSha = [string]$releaseHandoff.publication_dry_run_evidence_bundle_preflight_commit_sha
+  $releaseHandoffPublicationPreflightRefCommitSha = [string]$releaseHandoff.publication_dry_run_evidence_bundle_preflight_ref_commit_sha
   if ([string]::IsNullOrWhiteSpace($releaseHandoffPublicationSourceArchive)) {
     Add-BlockingError -Errors $blockingErrors -Message "release handoff summary is missing publication_dry_run_source_archive"
   }
@@ -954,6 +955,16 @@ try {
     $releaseHandoffPublicationPreflightCommitSha -ne [string]$publicationDryRun.evidence_bundle_preflight_commit_sha
   ) {
     Add-BlockingError -Errors $blockingErrors -Message "release handoff publication dry-run evidence bundle preflight commit SHA mismatch"
+  }
+
+  if ([string]::IsNullOrWhiteSpace($releaseHandoffPublicationPreflightRefCommitSha)) {
+    Add-BlockingError -Errors $blockingErrors -Message "release handoff summary is missing publication_dry_run_evidence_bundle_preflight_ref_commit_sha"
+  }
+  elseif (
+    -not [string]::IsNullOrWhiteSpace([string]$publicationDryRun.evidence_bundle_preflight_ref_commit_sha) -and
+    $releaseHandoffPublicationPreflightRefCommitSha -ne [string]$publicationDryRun.evidence_bundle_preflight_ref_commit_sha
+  ) {
+    Add-BlockingError -Errors $blockingErrors -Message "release handoff publication dry-run evidence bundle preflight ref commit SHA mismatch"
   }
 
   $artifactRootSpecs = @(
@@ -1185,6 +1196,7 @@ try {
     release_handoff_publication_dry_run_commit_sha = $releaseHandoffPublicationCommitSha
     release_handoff_publication_dry_run_source_archive_sha256 = $releaseHandoffPublicationSourceArchiveSha256
     release_handoff_publication_dry_run_evidence_bundle_preflight_commit_sha = $releaseHandoffPublicationPreflightCommitSha
+    release_handoff_publication_dry_run_evidence_bundle_preflight_ref_commit_sha = $releaseHandoffPublicationPreflightRefCommitSha
     release_handoff_publication_dry_run_evidence_bundle_input_fingerprints = $releaseHandoffPublicationEvidenceBundleFingerprints
     release_handoff_publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $releaseHandoffPublicationArtifactFingerprints
     artifact_file_fingerprints = $artifactFileFingerprints

@@ -367,6 +367,11 @@ that the source publication packet carries and validates the release handoff
 publication dry-run evidence bundle preflight commit SHA as explicit review
 proof; it is not tagged and does not ship APK/EXE binaries.
 
+Source readiness note: `v0.166.0-source` is a pending stacked PR for verifying
+that the source publication packet carries and validates the release handoff
+publication dry-run evidence bundle preflight ref commit SHA as explicit review
+proof; it is not tagged and does not ship APK/EXE binaries.
+
 Source readiness note: `v0.53.0-source` is a pending stacked PR for Windows
 verifier CI/preflight enforcement; it is not tagged and does not ship APK/EXE
 binaries.
