@@ -1148,6 +1148,7 @@ try {
     proof_manifest_proof_requirements = @("proof_manifest.tag", "proof_manifest.commit_sha", "proof_manifest.source_archive", "proof_manifest.source_archive_sha256", "publication_dry_run.tag", "publication_dry_run.commit_sha", "publication_dry_run.source_archive_sha256")
     release_evidence_bundle_proof_requirements = @("release_evidence_bundle.tag", "release_evidence_bundle.commit_sha", "release_evidence_bundle.source_archive", "release_evidence_bundle.source_archive_sha256", "publication_dry_run.tag", "publication_dry_run.commit_sha", "publication_dry_run.source_archive_sha256")
     release_handoff_publication_dry_run_input_fingerprints = $releaseHandoffPublicationInputFingerprints
+    release_handoff_publication_dry_run_source_archive = $releaseHandoffPublicationSourceArchive
     release_handoff_publication_dry_run_evidence_bundle_input_fingerprints = $releaseHandoffPublicationEvidenceBundleFingerprints
     release_handoff_publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $releaseHandoffPublicationArtifactFingerprints
     artifact_file_fingerprints = $artifactFileFingerprints

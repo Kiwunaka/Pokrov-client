@@ -730,6 +730,12 @@
       "candidate": "v0.160.0-source",
       "base": "codex/v0.159-release-handoff-carries-dry-run-archive-name",
       "head": "codex/v0.160-publication-packet-handoff-archive-name-binding"
+    },
+    {
+      "pr": 182,
+      "candidate": "v0.161.0-source",
+      "base": "codex/v0.160-publication-packet-handoff-archive-name-binding",
+      "head": "codex/v0.161-publication-packet-carries-handoff-archive-name"
     }
   ]
 }
