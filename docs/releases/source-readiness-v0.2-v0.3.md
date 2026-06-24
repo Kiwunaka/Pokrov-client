@@ -1,10 +1,36 @@
-# Source Readiness: v0.2-v0.166
+# Source Readiness: v0.2-v0.167
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
 checklist is run on the exact commit. The machine-readable readiness inventory
 lives in
 [`config/source-release-readiness.seed.json`](../../config/source-release-readiness.seed.json).
+
+## v0.167.0-source Candidate
+
+Status: pending stacked PR, not tagged.
+
+Current evidence:
+
+- PR #188: source publication packet carries and validates the release handoff
+  Windows bundle verifier proof as explicit review evidence
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the source preflight, release evidence bundle, publication dry-run, tag
+  readiness, release merge handoff, and source publication packet commands from
+  the same candidate
+- confirm the generated source publication packet carries
+  `release_handoff_windows_bundle_verifier_ok` and
+  `release_handoff_windows_bundle_verifier_summary`
+- confirm missing release handoff Windows bundle verifier fields block packet
+  generation
+- confirm mismatched release handoff Windows bundle verifier status or summary
+  blocks packet generation
+- keep release notes source-only with no APK, EXE, store, trusted-signing, or
+  official binary claims
 
 ## v0.166.0-source Candidate
 

@@ -405,8 +405,11 @@ production readiness without matching public evidence.
 - Added source publication packet validation and output for the release handoff
   publication dry-run evidence bundle preflight ref commit SHA so manual review
   keeps explicit preflight ref commit proof in the final packet.
+- Added source publication packet validation and output for the release handoff
+  Windows bundle verifier proof so manual review keeps explicit Windows proof in
+  the final packet.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.166.0-source` candidates.
+  `v0.167.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -578,6 +581,7 @@ production readiness without matching public evidence.
 | `v0.164.0-source` | Pending stacked PR, not tagged | PR #185 |
 | `v0.165.0-source` | Pending stacked PR, not tagged | PR #186 |
 | `v0.166.0-source` | Pending stacked PR, not tagged | PR #187 |
+| `v0.167.0-source` | Pending stacked PR, not tagged | PR #188 |
 
 ### Still Source-Only
 
