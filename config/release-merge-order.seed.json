@@ -712,6 +712,12 @@
       "candidate": "v0.157.0-source",
       "base": "codex/v0.156-source-publication-packet-evidence-archive-name",
       "head": "codex/v0.157-source-publication-evidence-archive-name"
+    },
+    {
+      "pr": 179,
+      "candidate": "v0.158.0-source",
+      "base": "codex/v0.157-source-publication-evidence-archive-name",
+      "head": "codex/v0.158-source-publication-dry-run-archive-name-proof"
     }
   ]
 }

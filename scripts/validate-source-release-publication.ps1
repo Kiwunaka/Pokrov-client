@@ -475,6 +475,7 @@ try {
     evidence_bundle = $resolvedEvidenceBundlePath
     release_notes = $resolvedReleaseNotesPath
     commit_sha = $evidence.commit_sha
+    source_archive = $evidence.source_archive
     source_archive_sha256 = $evidence.source_archive_sha256
     input_fingerprints = [ordered]@{
       evidence_bundle = Get-InputFingerprint -Path $resolvedEvidenceBundlePath
