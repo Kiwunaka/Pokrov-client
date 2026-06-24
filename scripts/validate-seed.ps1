@@ -60,6 +60,7 @@ $requiredFiles = @(
   "config\\release-stack-github-status.seed.json",
   "config\\release-merge-handoff.seed.json",
   "config\\source-publication-packet.seed.json",
+  "config\\source-publication-gate.seed.json",
   "config\\required-checks.seed.json",
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
@@ -150,6 +151,7 @@ $requiredFiles = @(
   "scripts\\check-release-stack-github-status.ps1",
   "scripts\\prepare-release-merge-handoff.ps1",
   "scripts\\prepare-source-publication-packet.ps1",
+  "scripts\\check-source-publication-gate.ps1",
   "scripts\\verify-windows-bundle.ps1",
   "scripts\\prepare-source-release.ps1",
   "scripts\\render-source-release-notes.ps1",
@@ -178,6 +180,7 @@ $jsonFiles = @(
   "config\\release-stack-github-status.seed.json",
   "config\\release-merge-handoff.seed.json",
   "config\\source-publication-packet.seed.json",
+  "config\\source-publication-gate.seed.json",
   "config\\required-checks.seed.json",
   "config\\runtime-profile.seed.json",
   "config\\runtime-artifacts.seed.json",
@@ -1728,6 +1731,66 @@ if (Test-Path -LiteralPath $sourcePublicationPacketPath -PathType Leaf) {
     if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
       $docText = Get-Content -Raw -LiteralPath $fullDocPath
       foreach ($requiredPhrase in @("prepare-source-publication-packet.ps1", "source publication packet")) {
+        if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+          $manifestErrors.Add("$docPath must include '$requiredPhrase'")
+        }
+      }
+    }
+  }
+}
+
+$sourcePublicationGatePath = Join-Path $root "config\\source-publication-gate.seed.json"
+if (Test-Path -LiteralPath $sourcePublicationGatePath -PathType Leaf) {
+  $sourcePublicationGate = Get-Content -Raw -LiteralPath $sourcePublicationGatePath | ConvertFrom-Json
+
+  if ($sourcePublicationGate.script -ne "scripts/check-source-publication-gate.ps1") {
+    $manifestErrors.Add("config\\source-publication-gate.seed.json must point to scripts/check-source-publication-gate.ps1")
+  }
+  if ($sourcePublicationGate.default_output_dir -ne "build/source-publication-gate") {
+    $manifestErrors.Add("config\\source-publication-gate.seed.json must keep default output under ignored build/source-publication-gate")
+  }
+  foreach ($field in @("read_only", "source_only", "manual_publish_review_gate", "no_tag_creation", "no_tag_push", "no_github_release_publish", "no_asset_upload", "requires_source_publication_packet_summary", "requires_source_publication_packet_ready", "requires_source_publication_packet_input_fingerprint", "requires_packet_generated_at_freshness", "requires_source_only_flags", "writes_only_ignored_build_output")) {
+    if ($sourcePublicationGate.policy.$field -ne $true) {
+      $manifestErrors.Add("config\\source-publication-gate.seed.json policy.$field must remain true")
+    }
+  }
+  if ($sourcePublicationGate.input_roots.source_publication_packet -ne "build/source-publication-packet") {
+    $manifestErrors.Add("config\\source-publication-gate.seed.json input_roots.source_publication_packet must stay under build/source-publication-packet")
+  }
+  $releaseBlockerInventoryPath = Join-Path $root "config\\release-blocker-inventory.seed.json"
+  if (Test-Path -LiteralPath $releaseBlockerInventoryPath -PathType Leaf) {
+    $releaseBlockerInventory = Get-Content -Raw -LiteralPath $releaseBlockerInventoryPath | ConvertFrom-Json
+    $latestCandidate = [string]$releaseBlockerInventory.tracked_candidates.latest_candidate
+    $expectedPacketPath = "build/source-publication-packet/$latestCandidate/source-publication-packet.json"
+    $expectedGatePath = "build/source-publication-gate/$latestCandidate/$latestCandidate-publication-gate.json"
+    if ([string]$sourcePublicationGate.inputs.source_publication_packet -ne $expectedPacketPath) {
+      $manifestErrors.Add("config\\source-publication-gate.seed.json inputs.source_publication_packet must track latest_candidate from config\\release-blocker-inventory.seed.json")
+    }
+    if ([string]$sourcePublicationGate.output.gate -ne $expectedGatePath) {
+      $manifestErrors.Add("config\\source-publication-gate.seed.json output.gate must track latest_candidate from config\\release-blocker-inventory.seed.json")
+    }
+  }
+
+  $sourcePublicationGateScriptPath = Join-Path $root "scripts\\check-source-publication-gate.ps1"
+  if (Test-Path -LiteralPath $sourcePublicationGateScriptPath -PathType Leaf) {
+    $sourcePublicationGateScript = Get-Content -Raw -LiteralPath $sourcePublicationGateScriptPath
+    foreach ($requiredPhrase in @("source-publication-gate.seed.json", "source_publication_packet", "publication_gate_ready_for_manual_publish", "packet_ready_for_manual_publish_review", "source publication packet is not ready for manual publish review", "source publication packet has stale generated_at timestamp", "source publication packet input fingerprint mismatch", "source publication packet has unsafe source-only flags", "manual_publish_review_gate", "read_only = `$true", "publish_performed = `$false", "asset_upload_performed = `$false", "tag_push_performed = `$false", "ComputeHash", "build\source-publication-gate")) {
+      if ($sourcePublicationGateScript.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+        $manifestErrors.Add("scripts\\check-source-publication-gate.ps1 must include '$requiredPhrase'")
+      }
+    }
+    foreach ($forbiddenPhrase in @("git merge", "git push", "git tag", "gh pr merge", "gh release create", "gh release upload", "gh api", "-X POST", "-X PATCH", "-X PUT", "-X DELETE")) {
+      if ($sourcePublicationGateScript.IndexOf($forbiddenPhrase, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+        $manifestErrors.Add("scripts\\check-source-publication-gate.ps1 must remain read-only and must not include '$forbiddenPhrase'")
+      }
+    }
+  }
+
+  foreach ($docPath in @("docs\\RELEASE_BLOCKERS.md", "docs\\RELEASE_CHECKLIST.md", "docs\\RELEASE_POLICY.md", "scripts\\README.md")) {
+    $fullDocPath = Join-Path $root $docPath
+    if (Test-Path -LiteralPath $fullDocPath -PathType Leaf) {
+      $docText = Get-Content -Raw -LiteralPath $fullDocPath
+      foreach ($requiredPhrase in @("check-source-publication-gate.ps1", "source publication gate")) {
         if ($docText.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
           $manifestErrors.Add("$docPath must include '$requiredPhrase'")
         }

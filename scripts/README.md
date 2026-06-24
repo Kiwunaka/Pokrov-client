@@ -97,6 +97,12 @@ Current helpers:
   unreadable release artifact contents, rejects JSON proof artifacts outside
   their expected source-only schema contracts, and it does not
   merge, tag, push, publish, or upload anything
+- `check-source-publication-gate.ps1`: final read-only source publication gate
+  that consumes `build/source-publication-packet/<tag>/source-publication-packet.json`,
+  writes ignored `build/source-publication-gate/` output, records packet
+  SHA-256/input/artifact proof, and blocks manual source-only publication when
+  the packet is stale, unsafe, or not ready for manual publish review; it does
+  not merge, tag, push, publish, upload assets, or create a GitHub Release
 - `verify-windows-bundle.ps1`: Windows bundle verifier for source-only Windows
   bundle proof; checks required Windows shell source paths and rejects
   committed Windows binaries, archives, signing files, or local runtime

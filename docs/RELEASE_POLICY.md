@@ -72,6 +72,15 @@ JSON proof artifacts must also match their expected source-only schema
 contracts. It is
 not a publisher and does not merge, tag, push, publish, or upload assets.
 
+Use `scripts/check-source-publication-gate.ps1` as the final source publication gate
+after the source publication packet exists. It consumes
+`build/source-publication-packet/<tag>/source-publication-packet.json`, records
+the packet SHA-256 and carried input/artifact fingerprints, and blocks manual
+source-only publication when the packet is stale, unsafe, or not ready for
+manual publish review. It writes only ignored `build/source-publication-gate/`
+output and does not merge, tag, push, publish, upload assets, or create a GitHub
+Release.
+
 Required checks and release gates are summarized in
 [REQUIRED_CHECKS.md](REQUIRED_CHECKS.md). That page documents the expected
 GitHub check names, including `Source import and public tree checks` and
