@@ -265,6 +265,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.162.0-source` | Pending stacked PR, not tagged | Source publication packet carries and validates the release handoff publication dry-run commit SHA as explicit review proof. |
 | `v0.163.0-source` | Pending stacked PR, not tagged | Release merge handoff carries and requires the publication dry-run source archive SHA-256 as explicit maintainer proof. |
 | `v0.164.0-source` | Pending stacked PR, not tagged | Source publication packet carries and validates the release handoff publication dry-run source archive SHA-256 as explicit review proof. |
+| `v0.165.0-source` | Pending stacked PR, not tagged | Source publication packet carries and validates the release handoff publication dry-run evidence bundle preflight commit SHA as explicit review proof. |
 
 ## Architecture Boundary
 
