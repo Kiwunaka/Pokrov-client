@@ -373,8 +373,11 @@ production readiness without matching public evidence.
 - Added source publication packet release-evidence source archive SHA checks so
   manual GitHub Release review is blocked when the evidence bundle points at a
   different source archive than the selected publication dry-run.
+- Added source publication packet release-evidence source archive filename
+  checks so manual GitHub Release review is blocked when the evidence bundle
+  names a different source archive than the selected publication dry-run.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.155.0-source` candidates.
+  `v0.156.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -535,6 +538,7 @@ production readiness without matching public evidence.
 | `v0.153.0-source` | Pending stacked PR, not tagged | PR #174 |
 | `v0.154.0-source` | Pending stacked PR, not tagged | PR #175 |
 | `v0.155.0-source` | Pending stacked PR, not tagged | PR #176 |
+| `v0.156.0-source` | Pending stacked PR, not tagged | PR #177 |
 
 ### Still Source-Only
 

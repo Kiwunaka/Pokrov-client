@@ -316,6 +316,8 @@ def test_release_evidence_bundle_script_writes_bundle_from_fixture(tmp_path: Pat
     assert bundle["windows_bundle_verifier_summary"].endswith(
         "windows-bundle-verifier.json"
     )
+    assert bundle["source_archive"] == str(source)
+    assert bundle["source_archive_sha256"] == _sha256(source)
     assert bundle["github_ruleset_ok"] is False
     assert bundle["github_enforcement_claim_allowed"] is False
     assert bundle["input_fingerprints"]["preflight_summary"]["sha256"] == _sha256(

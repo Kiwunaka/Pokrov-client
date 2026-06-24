@@ -376,6 +376,7 @@ try {
     preflight_summary = $resolvedPreflightSummaryPath
     proof_manifest = $preflightSummary.proof_manifest
     release_notes = $preflightSummary.release_notes
+    source_archive = $preflightSummary.source_archive
     source_archive_sha256 = $preflightSummary.source_archive_sha256
     input_fingerprints = $inputFingerprints
     preflight_artifact_fingerprints = $preflightSummary.artifact_fingerprints

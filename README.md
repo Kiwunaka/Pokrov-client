@@ -215,6 +215,7 @@ Source release status:
 | `v0.153.0-source` | Pending stacked PR, not tagged | Source publication packet validates release evidence bundle tag binding before manual GitHub Release review. |
 | `v0.154.0-source` | Pending stacked PR, not tagged | Source publication packet validates release evidence bundle commit SHA binding before manual GitHub Release review. |
 | `v0.155.0-source` | Pending stacked PR, not tagged | Source publication packet validates release evidence bundle source archive SHA binding before manual GitHub Release review. |
+| `v0.156.0-source` | Pending stacked PR, not tagged | Source publication packet validates release evidence bundle source archive filename binding before manual GitHub Release review. |
 
 ## Which App Should I Use?
 
