@@ -700,6 +700,12 @@
       "candidate": "v0.155.0-source",
       "base": "codex/v0.154-source-publication-packet-evidence-commit",
       "head": "codex/v0.155-source-publication-packet-evidence-archive-sha"
+    },
+    {
+      "pr": 177,
+      "candidate": "v0.156.0-source",
+      "base": "codex/v0.155-source-publication-packet-evidence-archive-sha",
+      "head": "codex/v0.156-source-publication-packet-evidence-archive-name"
     }
   ]
 }

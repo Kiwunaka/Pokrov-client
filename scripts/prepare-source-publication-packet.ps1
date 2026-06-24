@@ -532,6 +532,37 @@ function Add-ReleaseEvidenceBundleSourceArchiveShaErrors {
   }
 }
 
+function Add-ReleaseEvidenceBundleSourceArchiveNameErrors {
+  param(
+    [System.Collections.Generic.List[string]]$Errors,
+    [object]$Fingerprint,
+    [string]$SourceArchivePath
+  )
+
+  $resolvedPath = Get-NormalizedFingerprintPath -Path ([string]$Fingerprint.path)
+  if (
+    [string]::IsNullOrWhiteSpace($resolvedPath) -or
+    -not (Test-Path -LiteralPath $resolvedPath -PathType Leaf)
+  ) {
+    return
+  }
+
+  try {
+    $evidenceBundlePayload = Get-Content -Raw -LiteralPath $resolvedPath | ConvertFrom-Json
+    $evidenceBundleSourceArchiveName = [System.IO.Path]::GetFileName((Get-NormalizedFingerprintPath -Path ([string]$evidenceBundlePayload.source_archive)))
+    $sourceArchiveName = [System.IO.Path]::GetFileName((Get-NormalizedFingerprintPath -Path $SourceArchivePath))
+    if (
+      [string]::IsNullOrWhiteSpace($evidenceBundleSourceArchiveName) -or
+      [string]::IsNullOrWhiteSpace($sourceArchiveName) -or
+      -not $evidenceBundleSourceArchiveName.Equals($sourceArchiveName, [System.StringComparison]::OrdinalIgnoreCase)
+    ) {
+      Add-BlockingError -Errors $Errors -Message "source publication packet release evidence bundle source archive name mismatch"
+    }
+  } catch {
+    Add-BlockingError -Errors $Errors -Message "source publication packet release evidence bundle source archive name mismatch"
+  }
+}
+
 function Test-ArtifactTruthyFlag {
   param(
     [object]$Payload,
@@ -636,7 +667,8 @@ function Add-ArtifactSchemaErrors {
           $schemaOk -and
           (Test-ArtifactCommitShaField -Payload $payload -FieldName "commit_sha") -and
           (Test-ArtifactCommitShaField -Payload $payload -FieldName "preflight_commit_sha") -and
-          (Test-ArtifactCommitShaField -Payload $payload -FieldName "preflight_ref_commit_sha")
+          (Test-ArtifactCommitShaField -Payload $payload -FieldName "preflight_ref_commit_sha") -and
+          -not [string]::IsNullOrWhiteSpace([string]$payload.source_archive)
         )
       }
     } elseif ($SchemaContract -eq "windows_bundle_verifier") {
@@ -999,6 +1031,11 @@ try {
     -Fingerprint $releaseEvidenceBundle `
     -SourceArchiveSha256 ([string]$publicationDryRun.source_archive_sha256)
 
+  Add-ReleaseEvidenceBundleSourceArchiveNameErrors `
+    -Errors $blockingErrors `
+    -Fingerprint $releaseEvidenceBundle `
+    -SourceArchivePath ([string]$sourceArchive.path)
+
   foreach ($artifactSchemaSpec in @(
     [ordered]@{ name = "release_evidence_bundle"; value = $releaseEvidenceBundle; contract = [string]$seed.artifact_schema_contracts.release_evidence_bundle },
     [ordered]@{ name = "proof_manifest"; value = $proofManifest; contract = [string]$seed.artifact_schema_contracts.proof_manifest },
@@ -1098,7 +1135,7 @@ try {
     release_notes_required_markers = @($seed.release_notes_required_markers)
     release_notes_proof_requirements = @("publication_dry_run.tag", "publication_dry_run.source_archive_sha256")
     proof_manifest_proof_requirements = @("proof_manifest.tag", "proof_manifest.commit_sha", "proof_manifest.source_archive", "proof_manifest.source_archive_sha256", "publication_dry_run.tag", "publication_dry_run.commit_sha", "publication_dry_run.source_archive_sha256")
-    release_evidence_bundle_proof_requirements = @("release_evidence_bundle.tag", "release_evidence_bundle.commit_sha", "release_evidence_bundle.source_archive_sha256", "publication_dry_run.tag", "publication_dry_run.commit_sha", "publication_dry_run.source_archive_sha256")
+    release_evidence_bundle_proof_requirements = @("release_evidence_bundle.tag", "release_evidence_bundle.commit_sha", "release_evidence_bundle.source_archive", "release_evidence_bundle.source_archive_sha256", "publication_dry_run.tag", "publication_dry_run.commit_sha", "publication_dry_run.source_archive_sha256")
     release_handoff_publication_dry_run_input_fingerprints = $releaseHandoffPublicationInputFingerprints
     release_handoff_publication_dry_run_evidence_bundle_input_fingerprints = $releaseHandoffPublicationEvidenceBundleFingerprints
     release_handoff_publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $releaseHandoffPublicationArtifactFingerprints
