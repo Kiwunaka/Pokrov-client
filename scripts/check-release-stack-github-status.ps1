@@ -58,7 +58,7 @@ function Read-PrStatusSnapshot {
     throw "GitHub CLI is required when -PrStatusPath is not provided."
   }
 
-  $json = & gh pr list --state open --json number,url,title,headRefName,baseRefName,mergeStateStatus,isDraft,statusCheckRollup --limit 100
+  $json = & gh pr list --state all --json number,url,title,headRefName,baseRefName,state,mergeStateStatus,isDraft,statusCheckRollup --limit 200
   if ($LASTEXITCODE -ne 0) {
     throw "Failed to read pull request status snapshot with gh pr list."
   }
@@ -66,6 +66,35 @@ function Read-PrStatusSnapshot {
   foreach ($entry in @($data)) {
     $entry
   }
+}
+
+function Test-PostMergePrState {
+  param(
+    [string]$State,
+    [string]$MergeStateStatus
+  )
+  return (
+    @("CLOSED", "MERGED") -contains $State -and
+    @("DIRTY", "UNKNOWN") -contains $MergeStateStatus
+  )
+}
+
+function Test-HistoricalMissingCheckException {
+  param(
+    [object[]]$Exceptions,
+    [int]$PrNumber,
+    [string]$CheckName
+  )
+  foreach ($exception in @($Exceptions)) {
+    if (
+      [string]$exception.check -eq $CheckName -and
+      $PrNumber -ge [int]$exception.min_pr -and
+      $PrNumber -le [int]$exception.max_pr
+    ) {
+      return $true
+    }
+  }
+  return $false
 }
 
 Push-Location $root
@@ -76,6 +105,7 @@ try {
   $mergeOrder = Read-JsonFile -Path $mergeOrderPath
   $stack = @($mergeOrder.stack)
   $requiredChecks = @($seed.required_status_checks)
+  $historicalMissingCheckExceptions = @($seed.historical_missing_check_exceptions)
   $expectedPrUrlPrefix = [string]$seed.expected_pr_url_prefix
   $snapshot = @(Read-PrStatusSnapshot -Path $PrStatusPath)
   $errors = [System.Collections.Generic.List[string]]::new()
@@ -85,6 +115,7 @@ try {
   $uncleanPrCount = 0
   $successfulCheckCount = 0
   $failedCheckCount = 0
+  $historicalMissingCheckCount = 0
   $latestStackPr = if ($stack.Count -gt 0) { [int]$stack[-1].pr } else { 0 }
   $latestPrUrl = ""
 
@@ -109,7 +140,14 @@ try {
     if ($prNumber -eq $latestStackPr) {
       $latestPrUrl = $prUrl
     }
-    if ($status.baseRefName -ne $item.base) {
+    $prState = [string]$status.state
+    $mergeStateStatus = [string]$status.mergeStateStatus
+    $allowPromotionBaseMismatch = (
+      $prNumber -eq $latestStackPr -and
+      @("CLOSED", "MERGED") -contains $prState -and
+      [string]$status.baseRefName -eq "main"
+    )
+    if ($status.baseRefName -ne $item.base -and -not $allowPromotionBaseMismatch) {
       $prErrors.Add("baseRefName is '$($status.baseRefName)' but expected '$($item.base)'")
     }
     if ($status.headRefName -ne $item.head) {
@@ -119,9 +157,13 @@ try {
       $draftPrCount += 1
       $prErrors.Add("PR #$prNumber is draft")
     }
-    if ($status.mergeStateStatus -ne "CLEAN") {
+    $isCleanOrMerged = (
+      $mergeStateStatus -eq "CLEAN" -or
+      (Test-PostMergePrState -State $prState -MergeStateStatus $mergeStateStatus)
+    )
+    if (-not $isCleanOrMerged) {
       $uncleanPrCount += 1
-      $prErrors.Add("PR #$prNumber mergeStateStatus is $($status.mergeStateStatus)")
+      $prErrors.Add("PR #$prNumber mergeStateStatus is $mergeStateStatus")
     } else {
       $cleanPrCount += 1
     }
@@ -129,9 +171,23 @@ try {
     $prChecks = [System.Collections.Generic.List[object]]::new()
     $prSuccessfulCheckCount = 0
     $prFailedCheckCount = 0
+    $prHistoricalMissingCheckCount = 0
     foreach ($checkName in $requiredChecks) {
       $checkMatches = @($status.statusCheckRollup | Where-Object { $_.name -eq $checkName })
       if ($checkMatches.Count -lt 1) {
+        if (Test-HistoricalMissingCheckException -Exceptions $historicalMissingCheckExceptions -PrNumber $prNumber -CheckName $checkName) {
+          $historicalMissingCheckCount += 1
+          $prHistoricalMissingCheckCount += 1
+          $prChecks.Add([ordered]@{
+              name = [string]$checkName
+              status = "NOT_APPLICABLE"
+              conclusion = "HISTORICAL_MISSING"
+              details_url = ""
+              workflow_name = ""
+              historical_exception = $true
+            })
+          continue
+        }
         $failedCheckCount += 1
         $prFailedCheckCount += 1
         $prChecks.Add([ordered]@{
@@ -176,10 +232,12 @@ try {
         url = $prUrl
         base = $item.base
         head = $item.head
-        mergeStateStatus = $status.mergeStateStatus
+        state = $prState
+        mergeStateStatus = $mergeStateStatus
         isDraft = [bool]$status.isDraft
         successful_check_count = [int]$prSuccessfulCheckCount
         failed_check_count = [int]$prFailedCheckCount
+        historical_missing_check_count = [int]$prHistoricalMissingCheckCount
         required_status_check_count = [int]@($requiredChecks).Count
         checks = @($prChecks)
         errors = @($prErrors)
@@ -215,7 +273,9 @@ try {
     unclean_pr_count = [int]$uncleanPrCount
     successful_check_count = [int]$successfulCheckCount
     failed_check_count = [int]$failedCheckCount
+    historical_missing_check_count = [int]$historicalMissingCheckCount
     required_status_checks = $requiredChecks
+    historical_missing_check_exceptions = $historicalMissingCheckExceptions
     errors = @($errors)
     pull_requests = @($checkedPrs)
   }

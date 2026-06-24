@@ -53,6 +53,7 @@ def _snapshot_for_stack(
     draft_pr: int | None = None,
     dirty_pr: int | None = None,
     failed_check_pr: int | None = None,
+    merged: bool = False,
 ) -> list[dict]:
     stack = _read_json("config/release-merge-order.seed.json")["stack"]
     snapshot: list[dict] = []
@@ -67,6 +68,7 @@ def _snapshot_for_stack(
                 "headRefName": item["head"],
                 "isDraft": pr_number == draft_pr,
                 "mergeStateStatus": "DIRTY" if pr_number == dirty_pr else "CLEAN",
+                "state": "MERGED" if merged else "OPEN",
                 "statusCheckRollup": [
                     _check_run(
                         "Source import and public tree checks",
@@ -108,6 +110,18 @@ def test_release_stack_github_status_seed_defines_read_only_policy() -> None:
         "Flutter analyze and tests",
         "Android native Gradle unit tests",
     ]
+    assert seed["historical_missing_check_exceptions"] == [
+        {
+            "check": "Android native Gradle unit tests",
+            "min_pr": 61,
+            "max_pr": 69,
+            "reason": (
+                "Android native Gradle unit tests was introduced after the first "
+                "source-release stack PRs; final source preflight and current main "
+                "checks cover the release candidate."
+            ),
+        }
+    ]
 
 
 def test_release_stack_github_status_script_is_read_only() -> None:
@@ -117,13 +131,16 @@ def test_release_stack_github_status_script_is_read_only() -> None:
         "release-stack-github-status.seed.json",
         "release-merge-order.seed.json",
         "gh pr list",
+        "--state all",
         "url",
+        "state",
         "latest_pr_url",
         "pull request URL is missing",
         "pull request URL does not match expected repository",
         "expected_pr_url_prefix",
         "successful_check_count",
         "failed_check_count",
+        "historical_missing_check_count",
         "required_status_check_count",
         "checks = @($prChecks)",
         "detailsUrl",
@@ -228,6 +245,50 @@ def test_release_stack_github_status_command_accepts_clean_snapshot(
     ]
     assert summary["clean_pr_count"] == summary["stack_count"]
     assert summary["successful_check_count"] == summary["stack_count"] * 3
+    assert summary["errors"] == []
+
+
+def test_release_stack_github_status_accepts_merged_clean_snapshot(
+    tmp_path: Path,
+) -> None:
+    snapshot_path = tmp_path / "prs.merged.json"
+    snapshot = _snapshot_for_stack(merged=True)
+    for entry in snapshot:
+        entry["mergeStateStatus"] = "UNKNOWN"
+    _write_snapshot(snapshot_path, snapshot)
+    out_dir = ROOT / "build" / "release-stack-github-status" / "test-output"
+    shutil.rmtree(out_dir, ignore_errors=True)
+
+    try:
+        subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "check-release-stack-github-status.ps1"),
+                "-PrStatusPath",
+                str(snapshot_path),
+                "-OutDir",
+                str(out_dir),
+            ],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        summary = json.loads(
+            (out_dir / "release-stack-github-status.json").read_text(
+                encoding="utf-8-sig"
+            )
+        )
+    finally:
+        shutil.rmtree(out_dir, ignore_errors=True)
+
+    assert summary["github_status_ok"] is True
+    assert summary["clean_pr_count"] == summary["stack_count"]
+    assert summary["unclean_pr_count"] == 0
     assert summary["errors"] == []
 
 

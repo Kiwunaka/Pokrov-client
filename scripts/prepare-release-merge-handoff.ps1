@@ -640,7 +640,12 @@ try {
   $githubStatusUncleanPrCount = [int]$githubStatus.unclean_pr_count
   $githubStatusSuccessfulCheckCount = [int]$githubStatus.successful_check_count
   $githubStatusFailedCheckCount = [int]$githubStatus.failed_check_count
-  $expectedSuccessfulCheckCount = $githubStatusStackCount * $requiredStatusCheckCount
+  $githubStatusHistoricalMissingCheckCount = 0
+  $githubStatusHistoricalMissingCheckCountProperty = $githubStatus.PSObject.Properties["historical_missing_check_count"]
+  if ($null -ne $githubStatusHistoricalMissingCheckCountProperty) {
+    $githubStatusHistoricalMissingCheckCount = [int]$githubStatusHistoricalMissingCheckCountProperty.Value
+  }
+  $expectedCoveredCheckCount = $githubStatusStackCount * $requiredStatusCheckCount
   $githubStatusPullRequests = @()
   $githubStatusPullRequestsProperty = $githubStatus.PSObject.Properties["pull_requests"]
   if ($null -ne $githubStatusPullRequestsProperty -and $null -ne $githubStatusPullRequestsProperty.Value) {
@@ -671,6 +676,7 @@ try {
     $githubStatusPullRequests | ForEach-Object {
       [ordered]@{
         pr = [int]$_.pr
+        state = [string]$_.state
         mergeStateStatus = [string]$_.mergeStateStatus
         isDraft = [bool]$_.isDraft
       }
@@ -687,6 +693,7 @@ try {
         pr = [int]$_.pr
         successful_check_count = [int]$_.successful_check_count
         failed_check_count = [int]$_.failed_check_count
+        historical_missing_check_count = if ($null -ne $_.PSObject.Properties["historical_missing_check_count"]) { [int]$_.historical_missing_check_count } else { 0 }
         required_status_check_count = [int]$_.required_status_check_count
         checks = @(
           $checkEntries | ForEach-Object {
@@ -696,6 +703,7 @@ try {
               conclusion = [string]$_.conclusion
               details_url = [string]$_.details_url
               workflow_name = [string]$_.workflow_name
+              historical_exception = if ($null -ne $_.PSObject.Properties["historical_exception"]) { [bool]$_.historical_exception } else { $false }
             }
           }
         )
@@ -733,7 +741,7 @@ try {
     $githubStatusDraftPrCount -ne 0 -or
     $githubStatusUncleanPrCount -ne 0 -or
     $githubStatusFailedCheckCount -ne 0 -or
-    $githubStatusSuccessfulCheckCount -ne $expectedSuccessfulCheckCount
+    ($githubStatusSuccessfulCheckCount + $githubStatusHistoricalMissingCheckCount) -ne $expectedCoveredCheckCount
   ) {
     $blockingErrors.Add("release stack GitHub status count mismatch")
   }
@@ -822,9 +830,16 @@ try {
     for ($index = 0; $index -lt @($mergeOrderStack).Count; $index += 1) {
       $githubStatusPrState = $githubStatusPrStates[$index]
       $mergeOrderStackItem = $mergeOrderStack[$index]
+      $githubStatusPrStatePostMerge = (
+        @("CLOSED", "MERGED") -contains [string]$githubStatusPrState.state -and
+        @("DIRTY", "UNKNOWN") -contains [string]$githubStatusPrState.mergeStateStatus
+      )
       if (
         [int]$githubStatusPrState.pr -ne [int]$mergeOrderStackItem.pr -or
-        [string]$githubStatusPrState.mergeStateStatus -ne "CLEAN" -or
+        (
+          [string]$githubStatusPrState.mergeStateStatus -ne "CLEAN" -and
+          -not $githubStatusPrStatePostMerge
+        ) -or
         [bool]$githubStatusPrState.isDraft -ne $false
       ) {
         $githubStatusPrStatesMismatch = $true
@@ -844,7 +859,7 @@ try {
       $mergeOrderStackItem = $mergeOrderStack[$index]
       if (
         [int]$githubStatusPrCheck.pr -ne [int]$mergeOrderStackItem.pr -or
-        [int]$githubStatusPrCheck.successful_check_count -ne [int]$requiredStatusCheckCount -or
+        ([int]$githubStatusPrCheck.successful_check_count + [int]$githubStatusPrCheck.historical_missing_check_count) -ne [int]$requiredStatusCheckCount -or
         [int]$githubStatusPrCheck.failed_check_count -ne 0 -or
         [int]$githubStatusPrCheck.required_status_check_count -ne [int]$requiredStatusCheckCount -or
         @($githubStatusPrCheck.checks).Count -ne [int]$requiredStatusCheckCount
@@ -855,10 +870,20 @@ try {
       for ($checkIndex = 0; $checkIndex -lt @($requiredChecks).Count; $checkIndex += 1) {
         $requiredCheckName = [string]$requiredChecks[$checkIndex]
         $githubStatusCheck = @($githubStatusPrCheck.checks)[$checkIndex]
+        $isHistoricalMissingCheck = (
+          [bool]$githubStatusCheck.historical_exception -eq $true -and
+          [string]$githubStatusCheck.status -eq "NOT_APPLICABLE" -and
+          [string]$githubStatusCheck.conclusion -eq "HISTORICAL_MISSING"
+        )
         if (
           [string]$githubStatusCheck.name -ne [string]$requiredCheckName -or
-          [string]$githubStatusCheck.status -ne "COMPLETED" -or
-          [string]$githubStatusCheck.conclusion -ne "SUCCESS"
+          (
+            (
+              [string]$githubStatusCheck.status -ne "COMPLETED" -or
+              [string]$githubStatusCheck.conclusion -ne "SUCCESS"
+            ) -and
+            -not $isHistoricalMissingCheck
+          )
         ) {
           $githubStatusPrChecksMismatch = $true
           break
@@ -879,6 +904,14 @@ try {
   } else {
     foreach ($githubStatusPrCheck in $githubStatusPrChecks) {
       foreach ($githubStatusCheck in @($githubStatusPrCheck.checks)) {
+        $isHistoricalMissingCheck = (
+          [bool]$githubStatusCheck.historical_exception -eq $true -and
+          [string]$githubStatusCheck.status -eq "NOT_APPLICABLE" -and
+          [string]$githubStatusCheck.conclusion -eq "HISTORICAL_MISSING"
+        )
+        if ($isHistoricalMissingCheck) {
+          continue
+        }
         $detailsUrl = [string]$githubStatusCheck.details_url
         $workflowName = [string]$githubStatusCheck.workflow_name
         if (
@@ -1001,6 +1034,7 @@ try {
       unclean_pr_count = [int]$githubStatusUncleanPrCount
       successful_check_count = [int]$githubStatusSuccessfulCheckCount
       failed_check_count = [int]$githubStatusFailedCheckCount
+      historical_missing_check_count = [int]$githubStatusHistoricalMissingCheckCount
       required_status_check_count = [int]$requiredStatusCheckCount
     }
     github_status_pull_request_count = [int]$githubStatusPullRequestCount

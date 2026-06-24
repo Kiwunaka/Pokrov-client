@@ -1463,7 +1463,7 @@ if (Test-Path -LiteralPath $releaseStackGithubStatusPath -PathType Leaf) {
   $releaseStackGithubStatusScriptPath = Join-Path $root "scripts\\check-release-stack-github-status.ps1"
   if (Test-Path -LiteralPath $releaseStackGithubStatusScriptPath -PathType Leaf) {
     $releaseStackGithubStatusScript = Get-Content -Raw -LiteralPath $releaseStackGithubStatusScriptPath
-    foreach ($requiredPhrase in @("release-stack-github-status.seed.json", "release-merge-order.seed.json", "gh pr list", "url", "latest_pr_url", "expected_pr_url_prefix", "pull request URL is missing", "pull request URL does not match expected repository", "successful_check_count", "failed_check_count", "required_status_check_count", "checks = @(`$prChecks)", "detailsUrl", "workflowName", "details_url", "workflow_name", "mergeStateStatus", "statusCheckRollup", "build\release-stack-github-status", "github_status_ok = `$true")) {
+    foreach ($requiredPhrase in @("release-stack-github-status.seed.json", "release-merge-order.seed.json", "gh pr list", "url", "latest_pr_url", "expected_pr_url_prefix", "pull request URL is missing", "pull request URL does not match expected repository", "successful_check_count", "failed_check_count", "historical_missing_check_count", "required_status_check_count", "checks = @(`$prChecks)", "detailsUrl", "workflowName", "details_url", "workflow_name", "mergeStateStatus", "statusCheckRollup", "build\release-stack-github-status", "github_status_ok = `$true")) {
       if ($releaseStackGithubStatusScript.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
         $manifestErrors.Add("scripts\\check-release-stack-github-status.ps1 must include '$requiredPhrase'")
       }
