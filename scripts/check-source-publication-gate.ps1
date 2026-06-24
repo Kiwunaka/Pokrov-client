@@ -90,6 +90,9 @@ try {
   $blockingErrors = [System.Collections.Generic.List[string]]::new()
   $tag = [string]$packet.tag
   if ([string]::IsNullOrWhiteSpace($tag)) {
+    $tag = [string]$packet.latest_candidate
+  }
+  if ([string]::IsNullOrWhiteSpace($tag)) {
     $tag = "unknown-source"
   }
 

@@ -259,6 +259,44 @@ def test_source_publication_gate_writes_ready_summary(tmp_path: Path) -> None:
     assert summary["blocking_errors"] == []
 
 
+def test_source_publication_gate_uses_latest_candidate_when_tag_is_absent(
+    tmp_path: Path,
+) -> None:
+    packet_path, packet = _packet_summary(tmp_path)
+    packet["latest_candidate"] = packet.pop("tag")
+    _write_json(packet_path, packet)
+    out_dir = ROOT / "build" / "source-publication-gate" / "test-latest-candidate"
+
+    result = subprocess.run(
+        [
+            "powershell",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(ROOT / "scripts" / "check-source-publication-gate.ps1"),
+            "-PacketPath",
+            str(packet_path),
+            "-OutDir",
+            str(out_dir),
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    summary_path = (
+        out_dir
+        / "v0.172.0-source"
+        / "v0.172.0-source-publication-gate.json"
+    )
+    summary = json.loads(summary_path.read_text(encoding="utf-8-sig"))
+
+    assert result.returncode == 0
+    assert summary["tag"] == "v0.172.0-source"
+    assert summary["publication_gate_ready_for_manual_publish"] is True
+
+
 def test_source_publication_gate_blocks_unready_packet(tmp_path: Path) -> None:
     packet_path, _packet = _packet_summary(tmp_path, ready=False)
     out_dir = ROOT / "build" / "source-publication-gate" / "test-unready-packet"

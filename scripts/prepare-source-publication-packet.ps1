@@ -1167,6 +1167,7 @@ try {
   $packetReady = ($blockingErrors.Count -eq 0)
   $packet = [ordered]@{
     schema_version = 1
+    tag = $packetTag
     generated_at = (Get-Date).ToUniversalTime().ToString("o")
     read_only = $true
     source_only = $true
