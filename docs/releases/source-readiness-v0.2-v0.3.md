@@ -1,10 +1,35 @@
-# Source Readiness: v0.2-v0.169
+# Source Readiness: v0.2-v0.170
 
 This document records source readiness after `v0.1.0-source`. It is not a
 GitHub Release by itself. Tags must be created separately after the release
 checklist is run on the exact commit. The machine-readable readiness inventory
 lives in
 [`config/source-release-readiness.seed.json`](../../config/source-release-readiness.seed.json).
+
+## v0.170.0-source Candidate
+
+Status: pending stacked PR, not tagged.
+
+Current evidence:
+
+- PR #191: source publication gate recalculates source publication packet
+  artifact fingerprints before manual source-only GitHub Release publication
+
+Required before tagging:
+
+- merge the stacked PR sequence through `main`
+- choose the exact commit SHA
+- run the source preflight, release evidence bundle, publication dry-run, tag
+  readiness, release merge handoff, source publication packet, and source
+  publication gate commands from the same candidate
+- confirm `scripts/check-source-publication-gate.ps1` writes
+  `build/source-publication-gate/v0.170.0-source/v0.170.0-source-publication-gate.json`
+  with `publication_gate_ready_for_manual_publish: true`
+- confirm edited, missing, or mismatched artifact files referenced by
+  `artifact_file_fingerprints` return exit `2` and keep
+  `publication_gate_ready_for_manual_publish: false`
+- keep the source-only boundary: no APK, EXE, store release, trusted signing, or
+  official binary claim
 
 ## v0.169.0-source Candidate
 

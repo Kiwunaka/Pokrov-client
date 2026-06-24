@@ -784,6 +784,12 @@
       "candidate": "v0.169.0-source",
       "base": "codex/v0.168-publication-packet-carries-handoff-ruleset-proof",
       "head": "codex/v0.169-source-publication-final-gate"
+    },
+    {
+      "pr": 191,
+      "candidate": "v0.170.0-source",
+      "base": "codex/v0.169-source-publication-final-gate",
+      "head": "codex/v0.170-source-publication-gate-artifact-integrity"
     }
   ]
 }

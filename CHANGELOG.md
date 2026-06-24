@@ -414,8 +414,11 @@ production readiness without matching public evidence.
 - Added a read-only source publication gate that consumes the source
   publication packet as the final manual publish review proof before source-only
   GitHub Release publication.
+- Added source publication gate artifact fingerprint integrity checks so manual
+  source-only publication is blocked if release artifacts drift after the source
+  publication packet is generated.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.169.0-source` candidates.
+  `v0.170.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -590,6 +593,7 @@ production readiness without matching public evidence.
 | `v0.167.0-source` | Pending stacked PR, not tagged | PR #188 |
 | `v0.168.0-source` | Pending stacked PR, not tagged | PR #189 |
 | `v0.169.0-source` | Pending stacked PR, not tagged | PR #190 |
+| `v0.170.0-source` | Pending stacked PR, not tagged | PR #191 |
 
 ### Still Source-Only
 
