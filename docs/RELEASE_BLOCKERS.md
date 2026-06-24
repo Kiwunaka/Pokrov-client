@@ -92,8 +92,9 @@ source publication packet exists. The command is read-only, writes ignored
 `build/source-publication-gate/` output, records the packet SHA-256 and carried
 input/artifact fingerprints, and blocks manual source-only publication when the
 packet is stale, unsafe, not ready for manual publish review, or points at
-artifact files whose current SHA-256 no longer matches the packet. It does not
-merge, tag, push, publish, upload assets, or create a GitHub Release.
+input summaries or artifact files whose current SHA-256 no longer matches the
+packet. It does not merge, tag, push, publish, upload assets, or create a
+GitHub Release.
 
 ## Evidence Rules
 

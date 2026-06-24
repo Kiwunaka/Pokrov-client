@@ -790,6 +790,12 @@
       "candidate": "v0.170.0-source",
       "base": "codex/v0.169-source-publication-final-gate",
       "head": "codex/v0.170-source-publication-gate-artifact-integrity"
+    },
+    {
+      "pr": 192,
+      "candidate": "v0.171.0-source",
+      "base": "codex/v0.170-source-publication-gate-artifact-integrity",
+      "head": "codex/v0.171-source-publication-gate-input-integrity"
     }
   ]
 }

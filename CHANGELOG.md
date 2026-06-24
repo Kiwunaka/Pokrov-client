@@ -417,8 +417,11 @@ production readiness without matching public evidence.
 - Added source publication gate artifact fingerprint integrity checks so manual
   source-only publication is blocked if release artifacts drift after the source
   publication packet is generated.
+- Added source publication gate input fingerprint integrity checks so manual
+  source-only publication is blocked if release handoff or publication dry-run
+  summaries drift after the source publication packet is generated.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.170.0-source` candidates.
+  `v0.171.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -594,6 +597,7 @@ production readiness without matching public evidence.
 | `v0.168.0-source` | Pending stacked PR, not tagged | PR #189 |
 | `v0.169.0-source` | Pending stacked PR, not tagged | PR #190 |
 | `v0.170.0-source` | Pending stacked PR, not tagged | PR #191 |
+| `v0.171.0-source` | Pending stacked PR, not tagged | PR #192 |
 
 ### Still Source-Only
 

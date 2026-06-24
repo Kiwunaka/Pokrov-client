@@ -1749,7 +1749,7 @@ if (Test-Path -LiteralPath $sourcePublicationGatePath -PathType Leaf) {
   if ($sourcePublicationGate.default_output_dir -ne "build/source-publication-gate") {
     $manifestErrors.Add("config\\source-publication-gate.seed.json must keep default output under ignored build/source-publication-gate")
   }
-  foreach ($field in @("read_only", "source_only", "manual_publish_review_gate", "no_tag_creation", "no_tag_push", "no_github_release_publish", "no_asset_upload", "requires_source_publication_packet_summary", "requires_source_publication_packet_ready", "requires_source_publication_packet_input_fingerprint", "requires_packet_generated_at_freshness", "requires_source_only_flags", "requires_artifact_file_fingerprint_integrity", "writes_only_ignored_build_output")) {
+  foreach ($field in @("read_only", "source_only", "manual_publish_review_gate", "no_tag_creation", "no_tag_push", "no_github_release_publish", "no_asset_upload", "requires_source_publication_packet_summary", "requires_source_publication_packet_ready", "requires_source_publication_packet_input_fingerprint", "requires_source_publication_packet_input_fingerprint_integrity", "requires_packet_generated_at_freshness", "requires_source_only_flags", "requires_artifact_file_fingerprint_integrity", "writes_only_ignored_build_output")) {
     if ($sourcePublicationGate.policy.$field -ne $true) {
       $manifestErrors.Add("config\\source-publication-gate.seed.json policy.$field must remain true")
     }
@@ -1774,7 +1774,7 @@ if (Test-Path -LiteralPath $sourcePublicationGatePath -PathType Leaf) {
   $sourcePublicationGateScriptPath = Join-Path $root "scripts\\check-source-publication-gate.ps1"
   if (Test-Path -LiteralPath $sourcePublicationGateScriptPath -PathType Leaf) {
     $sourcePublicationGateScript = Get-Content -Raw -LiteralPath $sourcePublicationGateScriptPath
-    foreach ($requiredPhrase in @("source-publication-gate.seed.json", "source_publication_packet", "publication_gate_ready_for_manual_publish", "packet_ready_for_manual_publish_review", "source publication packet is not ready for manual publish review", "source publication packet has stale generated_at timestamp", "source publication packet input fingerprint mismatch", "source publication gate artifact fingerprint mismatch", "source publication packet has unsafe source-only flags", "manual_publish_review_gate", "read_only = `$true", "publish_performed = `$false", "asset_upload_performed = `$false", "tag_push_performed = `$false", "ComputeHash", "build\source-publication-gate")) {
+    foreach ($requiredPhrase in @("source-publication-gate.seed.json", "source_publication_packet", "publication_gate_ready_for_manual_publish", "packet_ready_for_manual_publish_review", "source publication packet is not ready for manual publish review", "source publication packet has stale generated_at timestamp", "source publication packet input fingerprint mismatch", "source publication gate input fingerprint mismatch", "source publication gate artifact fingerprint mismatch", "source publication packet has unsafe source-only flags", "manual_publish_review_gate", "read_only = `$true", "publish_performed = `$false", "asset_upload_performed = `$false", "tag_push_performed = `$false", "ComputeHash", "build\source-publication-gate")) {
       if ($sourcePublicationGateScript.IndexOf($requiredPhrase, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
         $manifestErrors.Add("scripts\\check-source-publication-gate.ps1 must include '$requiredPhrase'")
       }

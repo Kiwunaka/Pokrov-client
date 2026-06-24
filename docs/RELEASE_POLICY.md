@@ -77,10 +77,10 @@ after the source publication packet exists. It consumes
 `build/source-publication-packet/<tag>/source-publication-packet.json`, records
 the packet SHA-256 and carried input/artifact fingerprints, and blocks manual
 source-only publication when the packet is stale, unsafe, not ready for manual
-publish review, or points at artifact files whose current SHA-256 no longer
-matches the packet. It writes only ignored `build/source-publication-gate/`
-output and does not merge, tag, push, publish, upload assets, or create a GitHub
-Release.
+publish review, or points at input summaries or artifact files whose current
+SHA-256 no longer matches the packet. It writes only ignored
+`build/source-publication-gate/` output and does not merge, tag, push, publish,
+upload assets, or create a GitHub Release.
 
 Required checks and release gates are summarized in
 [REQUIRED_CHECKS.md](REQUIRED_CHECKS.md). That page documents the expected

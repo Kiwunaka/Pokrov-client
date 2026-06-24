@@ -153,6 +153,21 @@ try {
         [string]$fingerprint.sha256 -notmatch "^[0-9a-fA-F]{64}$"
       ) {
         Add-BlockingError -Errors $blockingErrors -Message "source publication packet input fingerprint mismatch"
+        continue
+      }
+      $fingerprintPath = [string]$fingerprint.path
+      if (-not (Test-PathUnderRoot -Path $fingerprintPath -AllowedRoot "build")) {
+        Add-BlockingError -Errors $blockingErrors -Message "source publication gate input fingerprint mismatch"
+        continue
+      }
+      $resolvedFingerprintPath = Resolve-RepoPath -Path $fingerprintPath
+      if (-not (Test-Path -LiteralPath $resolvedFingerprintPath -PathType Leaf)) {
+        Add-BlockingError -Errors $blockingErrors -Message "source publication gate input fingerprint mismatch"
+        continue
+      }
+      $currentFingerprintSha = Get-Sha256 -Path $resolvedFingerprintPath
+      if ($currentFingerprintSha -ne ([string]$fingerprint.sha256).ToLowerInvariant()) {
+        Add-BlockingError -Errors $blockingErrors -Message "source publication gate input fingerprint mismatch"
       }
     }
   }
