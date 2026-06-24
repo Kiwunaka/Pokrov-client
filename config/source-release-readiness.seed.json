@@ -1728,6 +1728,17 @@
       "ships_exe": false,
       "store_release": false,
       "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.157.0-source",
+      "status": "stacked_pr_pending_not_tagged",
+      "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/178",
+      "scope": "Publication dry-run validates release evidence bundle source archive filename binding before manual GitHub Release review.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
     }
   ]
 }

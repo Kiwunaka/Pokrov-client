@@ -25,6 +25,7 @@
     "github_enforcement_claim_requires_bundle_approval": true,
     "windows_bundle_verifier_claim_requires_bundle_proof": true,
     "requires_evidence_bundle_preflight_artifact_fingerprint_integrity": true,
+    "requires_evidence_bundle_source_archive_name_binding": true,
     "requires_evidence_bundle_preflight_commit_sha_consistency": true,
     "requires_evidence_bundle_preflight_ref_commit_sha_consistency": true,
     "requires_evidence_bundle_ruleset_report_shape": true,
