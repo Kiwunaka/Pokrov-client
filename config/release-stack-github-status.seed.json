@@ -23,5 +23,13 @@
     "Source import and public tree checks",
     "Flutter analyze and tests",
     "Android native Gradle unit tests"
+  ],
+  "historical_missing_check_exceptions": [
+    {
+      "check": "Android native Gradle unit tests",
+      "min_pr": 61,
+      "max_pr": 69,
+      "reason": "Android native Gradle unit tests was introduced after the first source-release stack PRs; final source preflight and current main checks cover the release candidate."
+    }
   ]
 }
