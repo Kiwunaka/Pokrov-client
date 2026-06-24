@@ -125,6 +125,16 @@ def test_source_release_preflight_script_documents_full_release_checks() -> None
     assert "SHA256" in script
     assert "ComputeHash" in script
     assert "run-tests.ps1" in script
+    assert "Clean Flutter generated files after test commands" in script
+    assert "knownFlutterGeneratedTrackedPaths" in script
+    assert "knownFlutterGeneratedLocalPaths" in script
+    assert "GeneratedPluginRegistrant.java" in script
+    assert "generated_plugin_registrant.cc" in script
+    assert "generated_plugins.cmake" in script
+    assert "apps/android_shell/android/local.properties" in script
+    assert "Refusing to auto-clean pre-existing changes" in script
+    assert "git restore --" in script
+    assert "Refusing to remove generated path outside repository root" in script
     assert "prepare-source-release.ps1" in script
     assert "render-source-release-notes.ps1" in script
     assert "check-source-release-copy.ps1" in script
