@@ -55,6 +55,80 @@ function Get-ArtifactFingerprint {
   }
 }
 
+function Test-PathUnderRoot {
+  param(
+    [Parameter(Mandatory = $true)][string]$Path,
+    [Parameter(Mandatory = $true)][string]$Root
+  )
+
+  $resolvedRoot = [System.IO.Path]::GetFullPath($Root).TrimEnd([System.IO.Path]::DirectorySeparatorChar, [System.IO.Path]::AltDirectorySeparatorChar)
+  $resolvedPath = [System.IO.Path]::GetFullPath($Path)
+  return $resolvedPath.StartsWith(
+    $resolvedRoot + [System.IO.Path]::DirectorySeparatorChar,
+    [System.StringComparison]::OrdinalIgnoreCase
+  )
+}
+
+function Get-GitStatusForPath {
+  param([Parameter(Mandatory = $true)][string]$Path)
+
+  return @(git status --short -- $Path)
+}
+
+function Get-KnownFlutterGeneratedState {
+  param(
+    [Parameter(Mandatory = $true)][string[]]$TrackedPaths,
+    [Parameter(Mandatory = $true)][string[]]$LocalPaths
+  )
+
+  $trackedStatus = @{}
+  foreach ($path in $TrackedPaths) {
+    $trackedStatus[$path] = @(Get-GitStatusForPath -Path $path)
+  }
+
+  $localExists = @{}
+  foreach ($path in $LocalPaths) {
+    $localExists[$path] = Test-Path -LiteralPath (Join-Path $root $path)
+  }
+
+  return [ordered]@{
+    tracked_status = $trackedStatus
+    local_exists = $localExists
+  }
+}
+
+function Reset-KnownFlutterGeneratedTestFiles {
+  param(
+    [Parameter(Mandatory = $true)][string[]]$TrackedPaths,
+    [Parameter(Mandatory = $true)][string[]]$LocalPaths,
+    [Parameter(Mandatory = $true)][hashtable]$PreTestTrackedStatus,
+    [Parameter(Mandatory = $true)][hashtable]$PreTestLocalExists
+  )
+
+  foreach ($path in $TrackedPaths) {
+    $preExistingStatus = @($PreTestTrackedStatus[$path])
+    $currentStatus = @(Get-GitStatusForPath -Path $path)
+    if ($preExistingStatus.Count -gt 0 -and $currentStatus.Count -gt 0) {
+      throw "Refusing to auto-clean pre-existing changes in $path before source release proof."
+    }
+    if ($preExistingStatus.Count -eq 0 -and $currentStatus.Count -gt 0) {
+      git restore -- $path
+      Assert-LastExitCode "git restore -- $path failed"
+    }
+  }
+
+  foreach ($path in $LocalPaths) {
+    $resolvedPath = Join-Path $root $path
+    $existedBefore = [bool]$PreTestLocalExists[$path]
+    if (-not $existedBefore -and (Test-Path -LiteralPath $resolvedPath)) {
+      if (-not (Test-PathUnderRoot -Path $resolvedPath -Root $root)) {
+        throw "Refusing to remove generated path outside repository root: $resolvedPath"
+      }
+      Remove-Item -LiteralPath $resolvedPath -Force
+    }
+  }
+}
+
 function Assert-SourceOnlyProof {
   param([Parameter(Mandatory = $true)][object]$Proof)
 
@@ -87,8 +161,19 @@ try {
   $releaseNotesPath = Join-Path $resolvedOutDir "$Tag-release-notes.md"
   $summaryPath = Join-Path $resolvedOutDir "$Tag-source-preflight.json"
   $windowsBundleVerifierSummaryPath = Join-Path $root "build\windows-bundle-verifier\windows-bundle-verifier.json"
+  $knownFlutterGeneratedTrackedPaths = @(
+    "apps/android_shell/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java",
+    "apps/windows_shell/windows/flutter/generated_plugin_registrant.cc",
+    "apps/windows_shell/windows/flutter/generated_plugins.cmake"
+  )
+  $knownFlutterGeneratedLocalPaths = @(
+    "apps/android_shell/android/local.properties"
+  )
 
   New-Item -ItemType Directory -Path $resolvedOutDir -Force | Out-Null
+  $preTestKnownFlutterGeneratedState = Get-KnownFlutterGeneratedState `
+    -TrackedPaths $knownFlutterGeneratedTrackedPaths `
+    -LocalPaths $knownFlutterGeneratedLocalPaths
 
   if ($SkipTestCommands) {
     Write-Host "Skipping test commands by request. Use this only for local/CI smoke tests, not for publishing." -ForegroundColor Yellow
@@ -127,6 +212,14 @@ try {
         powershell -ExecutionPolicy Bypass -File .\scripts\run-tests.ps1
         Assert-LastExitCode "run-tests.ps1 failed"
       }
+    }
+
+    Invoke-Step "Clean Flutter generated files after test commands" {
+      Reset-KnownFlutterGeneratedTestFiles `
+        -TrackedPaths $knownFlutterGeneratedTrackedPaths `
+        -LocalPaths $knownFlutterGeneratedLocalPaths `
+        -PreTestTrackedStatus $preTestKnownFlutterGeneratedState.tracked_status `
+        -PreTestLocalExists $preTestKnownFlutterGeneratedState.local_exists
     }
   }
 
