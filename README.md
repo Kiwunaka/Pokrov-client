@@ -220,6 +220,7 @@ Source release status:
 | `v0.158.0-source` | Pending stacked PR, not tagged | Publication dry-run carries the release evidence bundle source archive filename as explicit handoff proof. |
 | `v0.159.0-source` | Pending stacked PR, not tagged | Release merge handoff carries the publication dry-run source archive filename as explicit maintainer proof. |
 | `v0.160.0-source` | Pending stacked PR, not tagged | Source publication packet validates the release handoff publication dry-run source archive filename before manual GitHub Release review. |
+| `v0.161.0-source` | Pending stacked PR, not tagged | Source publication packet carries the release handoff publication dry-run source archive filename as explicit review proof. |
 
 ## Which App Should I Use?
 
