@@ -11,9 +11,9 @@
   "trusted_signing_claim": false,
   "tracked_candidates": {
     "base_candidate": "v0.1.0-source",
-    "latest_candidate": "v0.167.0-source",
-    "latest_stacked_pr": 188,
-    "covered_range": "v0.1.0-source through v0.167.0-source",
+    "latest_candidate": "v0.168.0-source",
+    "latest_stacked_pr": 189,
+    "covered_range": "v0.1.0-source through v0.168.0-source",
     "tag_creation_allowed": false
   },
   "blockers": [

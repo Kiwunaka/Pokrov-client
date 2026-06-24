@@ -369,6 +369,9 @@ try {
   if ($publicationDryRun.windows_bundle_verifier_ok -ne $true -or [string]::IsNullOrWhiteSpace([string]$publicationDryRun.windows_bundle_verifier_summary)) {
     $blockingErrors.Add("publication dry-run missing Windows bundle verifier proof")
   }
+  if ([string]::IsNullOrWhiteSpace([string]$publicationDryRun.github_ruleset_report)) {
+    $blockingErrors.Add("publication dry-run missing GitHub ruleset report proof")
+  }
   $publicationDryRunCommitSha = [string]$publicationDryRun.commit_sha
   $publicationDryRunEvidenceBundlePreflightCommitSha = [string]$publicationDryRun.evidence_bundle_preflight_commit_sha
   $publicationDryRunEvidenceBundlePreflightRefCommitSha = [string]$publicationDryRun.evidence_bundle_preflight_ref_commit_sha
@@ -1017,12 +1020,14 @@ try {
       $publicationDryRun.no_store_release -eq $true -and
       $publicationDryRun.no_trusted_signing_claim -eq $true -and
       $publicationDryRun.windows_bundle_verifier_ok -eq $true -and
-      -not [string]::IsNullOrWhiteSpace([string]$publicationDryRun.windows_bundle_verifier_summary)
+      -not [string]::IsNullOrWhiteSpace([string]$publicationDryRun.windows_bundle_verifier_summary) -and
+      -not [string]::IsNullOrWhiteSpace([string]$publicationDryRun.github_ruleset_report)
     )
     publication_ready_for_manual_review = [bool]$publicationDryRun.ready_for_manual_review
     publication_dry_run = [string]$publicationDryRun.tag
     windows_bundle_verifier_ok = [bool]$publicationDryRun.windows_bundle_verifier_ok
     windows_bundle_verifier_summary = [string]$publicationDryRun.windows_bundle_verifier_summary
+    github_ruleset_report = [string]$publicationDryRun.github_ruleset_report
     open_blocker_count = [int]$tagOpenBlockerCount
     blocking_errors = @($blockingErrors)
     input_error_count = [int]@($inputErrors).Count

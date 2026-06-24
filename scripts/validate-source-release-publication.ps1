@@ -379,14 +379,10 @@ try {
     -not [string]::IsNullOrWhiteSpace([string]$rulesetFingerprint.sha256) -and
     [string]$rulesetFingerprint.sha256 -match "^[0-9a-fA-F]{64}$"
   )
-  if ($rulesetFingerprintPresent) {
-    Assert-RulesetReportInputFingerprintIntegrity -Fingerprint $rulesetFingerprint
-  } elseif (
-    $evidence.github_enforcement_claim_allowed -eq $true -or
-    -not [string]::IsNullOrWhiteSpace([string]$evidence.github_ruleset_report)
-  ) {
+  if (-not $rulesetFingerprintPresent) {
     throw "Publication dry-run refused evidence bundle is missing github ruleset report input fingerprint."
   }
+  Assert-RulesetReportInputFingerprintIntegrity -Fingerprint $rulesetFingerprint
 
   $evidenceBundlePreflightArtifactFingerprints = $null
   $artifactFingerprintProperty = $evidence.PSObject.Properties["preflight_artifact_fingerprints"]
@@ -488,6 +484,7 @@ try {
     windows_bundle_verifier_ok = [bool]$evidence.windows_bundle_verifier_ok
     windows_bundle_verifier_summary = $evidence.windows_bundle_verifier_summary
     github_ruleset_ok = $evidence.github_ruleset_ok
+    github_ruleset_report = $evidence.github_ruleset_report
     github_enforcement_claim_allowed = $evidence.github_enforcement_claim_allowed
     source_only = [bool]$evidence.source_only
     no_apk = [bool]$evidence.no_apk

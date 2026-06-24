@@ -71,6 +71,27 @@ def _write_preflight_fixture(tmp_path: Path) -> Path:
     return preflight
 
 
+def _write_ruleset_fixture(tmp_path: Path) -> Path:
+    ruleset = tmp_path / "github-ruleset-report.json"
+    ruleset.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "ok": True,
+                "read_only": True,
+                "checked_at": _fresh_ruleset_checked_at(),
+                "repository": "Kiwunaka/Pokrov-client",
+                "branch": "main",
+                "required_status_checks": REQUIRED_STATUS_CHECKS,
+                "covered_required_status_checks": REQUIRED_STATUS_CHECKS,
+                "checks": REQUIRED_RULESET_CHECKS,
+            }
+        ),
+        encoding="utf-8",
+    )
+    return ruleset
+
+
 def _preflight_input_fingerprints(preflight: Path) -> dict:
     return {
         "preflight_summary": {
@@ -215,6 +236,7 @@ def test_publication_dry_run_script_is_local_only() -> None:
         "evidence preflight commit SHA does not match resolved ref commit SHA",
         "evidence source archive name mismatch",
         "evidence bundle is missing input fingerprints",
+        "evidence bundle is missing github ruleset report input fingerprint",
         "evidence bundle preflight summary fingerprint mismatch",
         "evidence bundle is missing preflight artifact fingerprints",
         "artifact fingerprint mismatch",
@@ -243,11 +265,28 @@ def test_publication_dry_run_writes_summary_from_fixtures(tmp_path: Path) -> Non
     proof = tmp_path / "proof.json"
     source = tmp_path / "source.zip"
     windows = tmp_path / "windows-bundle-verifier.json"
+    ruleset = tmp_path / "github-ruleset-report.json"
     out_dir = tmp_path / "out"
 
     proof.write_text('{"source_only":true}', encoding="utf-8")
     source.write_bytes(b"source archive")
     windows.write_text('{"windows_bundle_ok":true}', encoding="utf-8")
+    ruleset.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "ok": True,
+                "read_only": True,
+                "checked_at": _fresh_ruleset_checked_at(),
+                "repository": "Kiwunaka/Pokrov-client",
+                "branch": "main",
+                "required_status_checks": REQUIRED_STATUS_CHECKS,
+                "covered_required_status_checks": REQUIRED_STATUS_CHECKS,
+                "checks": REQUIRED_RULESET_CHECKS,
+            }
+        ),
+        encoding="utf-8",
+    )
     notes.write_text(
         "\n".join(
             [
@@ -287,9 +326,16 @@ def test_publication_dry_run_writes_summary_from_fixtures(tmp_path: Path) -> Non
                 "source_archive_sha256": _sha256(source),
                 "windows_bundle_verifier_ok": True,
                 "windows_bundle_verifier_summary": str(windows),
-                "github_ruleset_ok": False,
-                "github_enforcement_claim_allowed": False,
-                "input_fingerprints": _preflight_input_fingerprints(preflight),
+                "github_ruleset_ok": True,
+                "github_ruleset_report": str(ruleset),
+                "github_enforcement_claim_allowed": True,
+                "input_fingerprints": {
+                    **_preflight_input_fingerprints(preflight),
+                    "github_ruleset_report": {
+                        "path": str(ruleset),
+                        "sha256": _sha256(ruleset),
+                    },
+                },
                 "preflight_artifact_fingerprints": {
                     "proof_manifest": {"path": str(proof), "sha256": _sha256(proof)},
                     "release_notes": {"path": str(notes), "sha256": _sha256(notes)},
@@ -338,7 +384,8 @@ def test_publication_dry_run_writes_summary_from_fixtures(tmp_path: Path) -> Non
     assert summary["dry_run_only"] is True
     assert summary["publish_performed"] is False
     assert summary["tag_push_performed"] is False
-    assert summary["github_enforcement_claim_allowed"] is False
+    assert summary["github_enforcement_claim_allowed"] is True
+    assert summary["github_ruleset_report"] == str(ruleset)
     assert summary["commit_sha"] == "a" * 40
     assert summary["evidence_bundle_preflight_commit_sha"] == "a" * 40
     assert summary["evidence_bundle_preflight_ref_commit_sha"] == "a" * 40
@@ -614,6 +661,93 @@ def test_publication_dry_run_rejects_stale_preflight_input_fingerprint(
     assert result.returncode != 0
     assert not (out_dir / "v9.9.9-source-publication-dry-run.json").exists()
     assert "evidence bundle preflight summary fingerprint mismatch" in (
+        result.stderr + result.stdout
+    )
+
+
+def test_publication_dry_run_rejects_missing_github_ruleset_report_proof(
+    tmp_path: Path,
+) -> None:
+    evidence = tmp_path / "evidence.json"
+    notes = tmp_path / "release-notes.md"
+    preflight = _write_preflight_fixture(tmp_path)
+    proof = tmp_path / "proof.json"
+    source = tmp_path / "source.zip"
+    windows = tmp_path / "windows-bundle-verifier.json"
+    out_dir = tmp_path / "out"
+
+    proof.write_text('{"source_only":true}', encoding="utf-8")
+    source.write_bytes(b"source archive")
+    windows.write_text('{"windows_bundle_ok":true}', encoding="utf-8")
+    notes.write_text(_release_notes_text(_sha256(source)), encoding="utf-8")
+    evidence.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
+                "tag": "v9.9.9-source",
+                "commit_sha": "a" * 40,
+                "preflight_commit_sha": "a" * 40,
+                "preflight_ref_commit_sha": "a" * 40,
+                "source_only": True,
+                "no_apk": True,
+                "no_exe": True,
+                "no_store_release": True,
+                "no_trusted_signing_claim": True,
+                "forbidden_file_count": 0,
+                "source_archive": str(source),
+                "source_archive_sha256": _sha256(source),
+                "windows_bundle_verifier_ok": True,
+                "windows_bundle_verifier_summary": str(windows),
+                "github_ruleset_ok": False,
+                "github_enforcement_claim_allowed": False,
+                "input_fingerprints": _preflight_input_fingerprints(preflight),
+                "preflight_artifact_fingerprints": {
+                    "proof_manifest": {"path": str(proof), "sha256": _sha256(proof)},
+                    "release_notes": {"path": str(notes), "sha256": _sha256(notes)},
+                    "source_archive": {"path": str(source), "sha256": _sha256(source)},
+                    "windows_bundle_verifier_summary": {
+                        "path": str(windows),
+                        "sha256": _sha256(windows),
+                    },
+                },
+                "release_boundary": {
+                    "ships_apk": False,
+                    "ships_exe": False,
+                    "store_release": False,
+                    "trusted_signing_claim": False,
+                    "official_binary_claim": False,
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [
+            "powershell",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(ROOT / "scripts" / "validate-source-release-publication.ps1"),
+            "-Tag",
+            "v9.9.9-source",
+            "-EvidenceBundlePath",
+            str(evidence),
+            "-ReleaseNotesPath",
+            str(notes),
+            "-OutDir",
+            str(out_dir),
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode != 0
+    assert not (out_dir / "v9.9.9-source-publication-dry-run.json").exists()
+    assert "evidence bundle is missing github ruleset report input fingerprint" in (
         result.stderr + result.stdout
     )
 
@@ -1380,6 +1514,7 @@ def test_publication_dry_run_rejects_evidence_without_preflight_artifact_fingerp
     evidence = tmp_path / "evidence.json"
     notes = tmp_path / "release-notes.md"
     preflight = _write_preflight_fixture(tmp_path)
+    ruleset = _write_ruleset_fixture(tmp_path)
     out_dir = tmp_path / "out"
 
     evidence.write_text(
@@ -1400,9 +1535,16 @@ def test_publication_dry_run_rejects_evidence_without_preflight_artifact_fingerp
                 "source_archive_sha256": "b" * 64,
                 "windows_bundle_verifier_ok": True,
                 "windows_bundle_verifier_summary": "build/windows-bundle-verifier/windows-bundle-verifier.json",
-                "github_ruleset_ok": False,
-                "github_enforcement_claim_allowed": False,
-                "input_fingerprints": _preflight_input_fingerprints(preflight),
+                "github_ruleset_ok": True,
+                "github_ruleset_report": str(ruleset),
+                "github_enforcement_claim_allowed": True,
+                "input_fingerprints": {
+                    **_preflight_input_fingerprints(preflight),
+                    "github_ruleset_report": {
+                        "path": str(ruleset),
+                        "sha256": _sha256(ruleset),
+                    },
+                },
                 "release_boundary": {
                     "ships_apk": False,
                     "ships_exe": False,
@@ -1474,6 +1616,7 @@ def test_publication_dry_run_rejects_stale_release_notes_artifact_fingerprint(
     proof = tmp_path / "proof.json"
     source = tmp_path / "source.zip"
     windows = tmp_path / "windows-bundle-verifier.json"
+    ruleset = _write_ruleset_fixture(tmp_path)
     out_dir = tmp_path / "out"
 
     proof.write_text('{"source_only":true}', encoding="utf-8")
@@ -1518,9 +1661,16 @@ def test_publication_dry_run_rejects_stale_release_notes_artifact_fingerprint(
                 "source_archive_sha256": _sha256(source),
                 "windows_bundle_verifier_ok": True,
                 "windows_bundle_verifier_summary": str(windows),
-                "github_ruleset_ok": False,
-                "github_enforcement_claim_allowed": False,
-                "input_fingerprints": _preflight_input_fingerprints(preflight),
+                "github_ruleset_ok": True,
+                "github_ruleset_report": str(ruleset),
+                "github_enforcement_claim_allowed": True,
+                "input_fingerprints": {
+                    **_preflight_input_fingerprints(preflight),
+                    "github_ruleset_report": {
+                        "path": str(ruleset),
+                        "sha256": _sha256(ruleset),
+                    },
+                },
                 "preflight_artifact_fingerprints": {
                     "proof_manifest": {"path": str(proof), "sha256": _sha256(proof)},
                     "release_notes": {"path": str(notes), "sha256": "0" * 64},
@@ -1578,6 +1728,7 @@ def test_publication_dry_run_rejects_evidence_source_archive_name_mismatch(
     proof = tmp_path / "proof.json"
     source = tmp_path / "source.zip"
     windows = tmp_path / "windows-bundle-verifier.json"
+    ruleset = _write_ruleset_fixture(tmp_path)
     out_dir = tmp_path / "out"
 
     proof.write_text('{"source_only":true}', encoding="utf-8")
@@ -1603,9 +1754,16 @@ def test_publication_dry_run_rejects_evidence_source_archive_name_mismatch(
                 "source_archive_sha256": _sha256(source),
                 "windows_bundle_verifier_ok": True,
                 "windows_bundle_verifier_summary": str(windows),
-                "github_ruleset_ok": False,
-                "github_enforcement_claim_allowed": False,
-                "input_fingerprints": _preflight_input_fingerprints(preflight),
+                "github_ruleset_ok": True,
+                "github_ruleset_report": str(ruleset),
+                "github_enforcement_claim_allowed": True,
+                "input_fingerprints": {
+                    **_preflight_input_fingerprints(preflight),
+                    "github_ruleset_report": {
+                        "path": str(ruleset),
+                        "sha256": _sha256(ruleset),
+                    },
+                },
                 "preflight_artifact_fingerprints": {
                     "proof_manifest": {"path": str(proof), "sha256": _sha256(proof)},
                     "release_notes": {"path": str(notes), "sha256": _sha256(notes)},
@@ -1663,6 +1821,7 @@ def test_publication_dry_run_rejects_evidence_commit_sha_mismatch(
     proof = tmp_path / "proof.json"
     source = tmp_path / "source.zip"
     windows = tmp_path / "windows-bundle-verifier.json"
+    ruleset = _write_ruleset_fixture(tmp_path)
     out_dir = tmp_path / "out"
 
     proof.write_text('{"source_only":true}', encoding="utf-8")
@@ -1706,9 +1865,16 @@ def test_publication_dry_run_rejects_evidence_commit_sha_mismatch(
                 "source_archive_sha256": _sha256(source),
                 "windows_bundle_verifier_ok": True,
                 "windows_bundle_verifier_summary": str(windows),
-                "github_ruleset_ok": False,
-                "github_enforcement_claim_allowed": False,
-                "input_fingerprints": _preflight_input_fingerprints(preflight),
+                "github_ruleset_ok": True,
+                "github_ruleset_report": str(ruleset),
+                "github_enforcement_claim_allowed": True,
+                "input_fingerprints": {
+                    **_preflight_input_fingerprints(preflight),
+                    "github_ruleset_report": {
+                        "path": str(ruleset),
+                        "sha256": _sha256(ruleset),
+                    },
+                },
                 "preflight_artifact_fingerprints": {
                     "proof_manifest": {"path": str(proof), "sha256": _sha256(proof)},
                     "release_notes": {"path": str(notes), "sha256": _sha256(notes)},
@@ -1768,6 +1934,7 @@ def test_publication_dry_run_rejects_evidence_ref_commit_sha_mismatch(
     proof = tmp_path / "proof.json"
     source = tmp_path / "source.zip"
     windows = tmp_path / "windows-bundle-verifier.json"
+    ruleset = _write_ruleset_fixture(tmp_path)
     out_dir = tmp_path / "out"
 
     proof.write_text('{"source_only":true}', encoding="utf-8")
@@ -1811,9 +1978,16 @@ def test_publication_dry_run_rejects_evidence_ref_commit_sha_mismatch(
                 "source_archive_sha256": _sha256(source),
                 "windows_bundle_verifier_ok": True,
                 "windows_bundle_verifier_summary": str(windows),
-                "github_ruleset_ok": False,
-                "github_enforcement_claim_allowed": False,
-                "input_fingerprints": _preflight_input_fingerprints(preflight),
+                "github_ruleset_ok": True,
+                "github_ruleset_report": str(ruleset),
+                "github_enforcement_claim_allowed": True,
+                "input_fingerprints": {
+                    **_preflight_input_fingerprints(preflight),
+                    "github_ruleset_report": {
+                        "path": str(ruleset),
+                        "sha256": _sha256(ruleset),
+                    },
+                },
                 "preflight_artifact_fingerprints": {
                     "proof_manifest": {"path": str(proof), "sha256": _sha256(proof)},
                     "release_notes": {"path": str(notes), "sha256": _sha256(notes)},

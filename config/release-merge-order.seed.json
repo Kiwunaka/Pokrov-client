@@ -772,6 +772,12 @@
       "candidate": "v0.167.0-source",
       "base": "codex/v0.166-publication-packet-carries-handoff-preflight-ref",
       "head": "codex/v0.167-publication-packet-carries-handoff-windows-proof"
+    },
+    {
+      "pr": 189,
+      "candidate": "v0.168.0-source",
+      "base": "codex/v0.167-publication-packet-carries-handoff-windows-proof",
+      "head": "codex/v0.168-publication-packet-carries-handoff-ruleset-proof"
     }
   ]
 }
