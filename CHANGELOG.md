@@ -385,8 +385,10 @@ production readiness without matching public evidence.
 - Added release merge handoff source archive filename output so maintainer
   handoff carries the publication dry-run archive name in addition to commit and
   fingerprint proof.
+- Added source publication packet validation for the release handoff publication
+  dry-run source archive filename before manual GitHub Release review.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.159.0-source` candidates.
+  `v0.160.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -551,6 +553,7 @@ production readiness without matching public evidence.
 | `v0.157.0-source` | Pending stacked PR, not tagged | PR #178 |
 | `v0.158.0-source` | Pending stacked PR, not tagged | PR #179 |
 | `v0.159.0-source` | Pending stacked PR, not tagged | PR #180 |
+| `v0.160.0-source` | Pending stacked PR, not tagged | PR #181 |
 
 ### Still Source-Only
 
