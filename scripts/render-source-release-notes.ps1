@@ -108,6 +108,7 @@ $(Format-List -Items $Included)
 ## Not Included
 
 - No APK or EXE binaries.
+- No EXE installer or portable binary.
 - No store release.
 - No trusted Windows signing claim.
 - No official POKROV backend, billing, admin, deployment, signing, or private release evidence.
