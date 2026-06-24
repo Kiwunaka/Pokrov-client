@@ -796,6 +796,12 @@
       "candidate": "v0.171.0-source",
       "base": "codex/v0.170-source-publication-gate-artifact-integrity",
       "head": "codex/v0.171-source-publication-gate-input-integrity"
+    },
+    {
+      "pr": 193,
+      "candidate": "v0.172.0-source",
+      "base": "codex/v0.171-source-publication-gate-input-integrity",
+      "head": "codex/promote-v0.171-source-stack"
     }
   ]
 }

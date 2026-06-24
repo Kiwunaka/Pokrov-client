@@ -2,10 +2,10 @@
 
 This document mirrors
 [`config/release-blocker-inventory.seed.json`](../config/release-blocker-inventory.seed.json).
-It records why the current source-readiness candidates are not ready for tag by
-default.
+It records whether the current source-readiness candidate is ready for an
+annotated source tag.
 
-The current public source line is not ready for tag until every required blocker
+The current public source line is ready for tag only when every required blocker
 is cleared for the exact source candidate. This page is about source tags only.
 It does not authorize APK, EXE, store release, trusted signing, official binary,
 runtime connectivity, or production support claims.
@@ -30,12 +30,13 @@ Every source tag requires these manual maintainer step checks:
 
 ## Current Status
 
-Status: not ready for tag.
+Status: ready for tag.
 
-The blocker inventory deliberately uses `pending_maintainer_review` and
-`manual_owner_test` status labels. Local CI can prove many source gates, but it
-cannot choose the release commit, merge the PR stack, create the annotated tag,
-review final public copy, or manually publish a GitHub Release.
+The blocker inventory uses `ready_for_tag` only after the source-readiness stack
+is merged to `main`, the exact tag commit is selected, local gates are green,
+and source-only release boundaries are reviewed. It still does not create the
+annotated tag, push a tag, publish a GitHub Release, or upload any release
+assets.
 
 Run `scripts/check-source-tag-readiness.ps1 -Tag <tag>` for a local source tag readiness
 summary. The command is read-only, writes ignored

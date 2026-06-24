@@ -150,7 +150,14 @@ try {
   foreach ($blocker in @($inventory.blockers)) {
     $blockerId = [string]$blocker.id
     if ([string]::IsNullOrWhiteSpace($blockerId)) {
+      $errors.Add("blocker is missing id")
       $blockerId = "<missing-id>"
+    }
+    if ([string]::IsNullOrWhiteSpace([string]$blocker.status)) {
+      $errors.Add("blocker $blockerId is missing status")
+    }
+    if ([string]::IsNullOrWhiteSpace([string]$blocker.evidence)) {
+      $errors.Add("blocker $blockerId is missing evidence")
     }
     if ($blocker.required_before_tag -ne $true) {
       $errors.Add("blocker $blockerId is missing required_before_tag=true")

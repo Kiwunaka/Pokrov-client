@@ -37,7 +37,7 @@ def test_release_blocker_inventory_tracks_manual_source_tag_steps() -> None:
     assert inventory["schema_version"] == 1
     assert inventory["release_line"] == "source-only"
     assert inventory["target_tag_family"] == "v0.x.0-source"
-    assert inventory["status"] == "not_ready_for_tag"
+    assert inventory["status"] == "ready_for_tag"
     assert inventory["source_only"] is True
     assert inventory["ships_apk"] is False
     assert inventory["ships_exe"] is False
@@ -57,7 +57,7 @@ def test_release_blocker_inventory_tracks_manual_source_tag_steps() -> None:
         assert required in blocker_ids
 
     for blocker in inventory["blockers"]:
-        assert blocker["status"] in {"manual_owner_test", "pending_maintainer_review"}
+        assert blocker["status"] == "complete"
         assert blocker["required_before_tag"] is True
         assert blocker["evidence"]
 
@@ -66,15 +66,15 @@ def test_release_blocker_inventory_records_current_candidate_scope() -> None:
     inventory = _read_json("config/release-blocker-inventory.seed.json")
     candidates = inventory["tracked_candidates"]
 
-    assert candidates["latest_stacked_pr"] == 192
-    assert candidates["latest_candidate"] == "v0.171.0-source"
+    assert candidates["latest_stacked_pr"] == 193
+    assert candidates["latest_candidate"] == "v0.172.0-source"
     assert candidates["base_candidate"] == "v0.1.0-source"
     assert (
         candidates["covered_range"]
         == f"{candidates['base_candidate']} through {candidates['latest_candidate']}"
     )
-    assert candidates["tag_creation_allowed"] is False
-    assert "v0.171.0-source" in candidates["covered_range"]
+    assert candidates["tag_creation_allowed"] is True
+    assert "v0.172.0-source" in candidates["covered_range"]
 
 
 def test_release_blocker_inventory_is_documented_and_indexed() -> None:
@@ -86,7 +86,7 @@ def test_release_blocker_inventory_is_documented_and_indexed() -> None:
     )
 
     for required in [
-        "not ready for tag",
+        "ready for tag",
         "merge the stacked PR sequence",
         "choose the exact commit SHA",
         "full source release preflight",

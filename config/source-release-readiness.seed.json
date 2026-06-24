@@ -1893,6 +1893,17 @@
       "ships_exe": false,
       "store_release": false,
       "trusted_signing_claim": false
+    },
+    {
+      "tag": "v0.172.0-source",
+      "status": "ready_for_tag",
+      "evidence": "https://github.com/Kiwunaka/Pokrov-client/pull/193",
+      "scope": "Merged source-readiness stack through v0.171.0-source to main, closed superseded stacked PRs, merged dependency hygiene PRs #194 through #197, and records the final source-only tag commit through source preflight at tag time.",
+      "source_only": true,
+      "ships_apk": false,
+      "ships_exe": false,
+      "store_release": false,
+      "trusted_signing_claim": false
     }
   ]
 }

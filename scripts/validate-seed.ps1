@@ -743,6 +743,11 @@ if (Test-Path -LiteralPath $changelogPolicyPath -PathType Leaf) {
           if ($changelogText.IndexOf($expectedStatus, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
             $manifestErrors.Add("CHANGELOG.md must list '$($milestone.tag)' as Pending stacked PR, not tagged")
           }
+        } elseif ($milestone.status -eq "ready_for_tag") {
+          $expectedStatus = "$($milestone.tag)`` | Ready for source tag"
+          if ($changelogText.IndexOf($expectedStatus, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
+            $manifestErrors.Add("CHANGELOG.md must list '$($milestone.tag)' as Ready for source tag")
+          }
         } elseif ($milestone.status -eq "not_tagged") {
           $expectedStatus = "$($milestone.tag)`` | Not tagged"
           if ($changelogText.IndexOf($expectedStatus, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
@@ -2056,7 +2061,7 @@ if (Test-Path -LiteralPath $sourceReadinessPath -PathType Leaf) {
         $manifestErrors.Add("config\\source-release-readiness.seed.json milestone '$milestoneTag' must keep $field false")
       }
     }
-    if ($milestoneStatus -ne "tagged" -and $milestoneStatus -notmatch "not_tagged") {
+    if ($milestoneStatus -notin @("tagged", "ready_for_tag") -and $milestoneStatus -notmatch "not_tagged") {
       $manifestErrors.Add("config\\source-release-readiness.seed.json pending milestone '$milestoneTag' must include not_tagged in status")
     }
   }

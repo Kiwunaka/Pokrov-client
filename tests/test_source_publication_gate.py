@@ -57,7 +57,7 @@ def _packet_summary(tmp_path: Path, ready: bool = True) -> tuple[Path, dict]:
         / "source-publication-packet"
         / "test-inputs"
         / tmp_path.name
-        / "v0.171.0-source"
+        / "v0.172.0-source"
         / "source-publication-packet.json"
     )
     artifact_root = (
@@ -69,7 +69,7 @@ def _packet_summary(tmp_path: Path, ready: bool = True) -> tuple[Path, dict]:
     )
     release_notes = _write_artifact(
         artifact_root / "source-release-preflight" / "release-notes.md",
-        b"# v0.171.0-source\n\nsource-only release\n",
+        b"# v0.172.0-source\n\nsource-only release\n",
     )
     proof_manifest = _write_artifact(
         artifact_root / "source-release-preflight" / "proof.json",
@@ -106,13 +106,13 @@ def _packet_summary(tmp_path: Path, ready: bool = True) -> tuple[Path, dict]:
         / "source-release-publication"
         / "test-inputs"
         / tmp_path.name
-        / "v0.171.0-source"
-        / "v0.171.0-source-publication-dry-run.json",
+        / "v0.172.0-source"
+        / "v0.172.0-source-publication-dry-run.json",
         b'{"schema_version":1,"read_only":true,"ready_for_manual_review":true}\n',
     )
     packet = {
         "schema_version": 1,
-        "tag": "v0.171.0-source",
+        "tag": "v0.172.0-source",
         "generated_at": _fresh_generated_at(),
         "read_only": True,
         "source_only": True,
@@ -169,10 +169,10 @@ def test_source_publication_gate_seed_defines_read_only_final_gate() -> None:
     assert seed["policy"]["requires_source_publication_packet_input_fingerprint_integrity"] is True
     assert seed["policy"]["requires_artifact_file_fingerprint_integrity"] is True
     assert seed["inputs"]["source_publication_packet"].endswith(
-        "v0.171.0-source/source-publication-packet.json"
+        "v0.172.0-source/source-publication-packet.json"
     )
     assert seed["output"]["gate"].endswith(
-        "v0.171.0-source/v0.171.0-source-publication-gate.json"
+        "v0.172.0-source/v0.172.0-source-publication-gate.json"
     )
 
 
@@ -238,8 +238,8 @@ def test_source_publication_gate_writes_ready_summary(tmp_path: Path) -> None:
     summary = json.loads(
         (
             out_dir
-            / "v0.171.0-source"
-            / "v0.171.0-source-publication-gate.json"
+            / "v0.172.0-source"
+            / "v0.172.0-source-publication-gate.json"
         ).read_text(encoding="utf-8-sig")
     )
 
@@ -284,8 +284,8 @@ def test_source_publication_gate_blocks_unready_packet(tmp_path: Path) -> None:
     summary = json.loads(
         (
             out_dir
-            / "v0.171.0-source"
-            / "v0.171.0-source-publication-gate.json"
+            / "v0.172.0-source"
+            / "v0.172.0-source-publication-gate.json"
         ).read_text(encoding="utf-8-sig")
     )
 
@@ -323,8 +323,8 @@ def test_source_publication_gate_blocks_stale_packet(tmp_path: Path) -> None:
     summary = json.loads(
         (
             out_dir
-            / "v0.171.0-source"
-            / "v0.171.0-source-publication-gate.json"
+            / "v0.172.0-source"
+            / "v0.172.0-source-publication-gate.json"
         ).read_text(encoding="utf-8-sig")
     )
 
@@ -342,7 +342,7 @@ def test_source_publication_gate_blocks_artifact_fingerprint_drift(
         "path"
     ]
     release_notes_path.write_text(
-        "# v0.171.0-source\n\nchanged after packet generation\n",
+        "# v0.172.0-source\n\nchanged after packet generation\n",
         encoding="utf-8",
     )
     out_dir = ROOT / "build" / "source-publication-gate" / "test-artifact-drift"
@@ -368,8 +368,8 @@ def test_source_publication_gate_blocks_artifact_fingerprint_drift(
     summary = json.loads(
         (
             out_dir
-            / "v0.171.0-source"
-            / "v0.171.0-source-publication-gate.json"
+            / "v0.172.0-source"
+            / "v0.172.0-source-publication-gate.json"
         ).read_text(encoding="utf-8-sig")
     )
 
@@ -414,8 +414,8 @@ def test_source_publication_gate_blocks_input_fingerprint_drift(
     summary = json.loads(
         (
             out_dir
-            / "v0.171.0-source"
-            / "v0.171.0-source-publication-gate.json"
+            / "v0.172.0-source"
+            / "v0.172.0-source-publication-gate.json"
         ).read_text(encoding="utf-8-sig")
     )
 

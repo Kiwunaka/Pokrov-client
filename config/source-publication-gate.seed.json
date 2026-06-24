@@ -20,12 +20,12 @@
     "writes_only_ignored_build_output": true
   },
   "inputs": {
-    "source_publication_packet": "build/source-publication-packet/v0.171.0-source/source-publication-packet.json"
+    "source_publication_packet": "build/source-publication-packet/v0.172.0-source/source-publication-packet.json"
   },
   "input_roots": {
     "source_publication_packet": "build/source-publication-packet"
   },
   "output": {
-    "gate": "build/source-publication-gate/v0.171.0-source/v0.171.0-source-publication-gate.json"
+    "gate": "build/source-publication-gate/v0.172.0-source/v0.172.0-source-publication-gate.json"
   }
 }
