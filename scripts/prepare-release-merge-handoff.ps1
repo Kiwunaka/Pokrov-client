@@ -917,7 +917,7 @@ try {
         if (
           [string]::IsNullOrWhiteSpace($detailsUrl) -or
           -not $detailsUrl.StartsWith($githubActionsJobUrlPrefix, [System.StringComparison]::Ordinal) -or
-          $detailsUrl -notmatch "/jobs/" -or
+          $detailsUrl -notmatch "/jobs?/" -or
           [string]::IsNullOrWhiteSpace($workflowName)
         ) {
           $githubStatusPrCheckTraceMismatch = $true

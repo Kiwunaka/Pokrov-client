@@ -3603,6 +3603,55 @@ def test_release_merge_handoff_accepts_merged_unknown_github_status(
     assert summary["blocking_errors"] == []
 
 
+def test_release_merge_handoff_accepts_github_job_detail_url(
+    tmp_path: Path,
+) -> None:
+    merge_path, github_path, tag_path, publication_path = _write_input_summaries(
+        tmp_path
+    )
+    github_summary = json.loads(github_path.read_text(encoding="utf-8"))
+    github_summary["pull_requests"][0]["checks"][0][
+        "details_url"
+    ] = "https://github.com/Kiwunaka/Pokrov-client/actions/runs/123/job/source-import"
+    _write_json(github_path, github_summary)
+    out_dir = ROOT / "build" / "release-merge-handoff" / "test-output"
+    shutil.rmtree(out_dir, ignore_errors=True)
+
+    try:
+        subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "prepare-release-merge-handoff.ps1"),
+                "-MergeOrderPath",
+                str(merge_path),
+                "-GithubStatusPath",
+                str(github_path),
+                "-TagReadinessPath",
+                str(tag_path),
+                "-PublicationDryRunPath",
+                str(publication_path),
+                "-OutDir",
+                str(out_dir),
+            ],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        summary = json.loads(
+            (out_dir / "release-merge-handoff.json").read_text(encoding="utf-8-sig")
+        )
+    finally:
+        shutil.rmtree(out_dir, ignore_errors=True)
+
+    assert summary["handoff_ready_for_maintainer"] is True
+    assert summary["blocking_errors"] == []
+
+
 def test_release_merge_handoff_blocks_github_status_pr_checks_mismatch(
     tmp_path: Path,
 ) -> None:
