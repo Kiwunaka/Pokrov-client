@@ -76,8 +76,9 @@ Use `scripts/check-source-publication-gate.ps1` as the final source publication 
 after the source publication packet exists. It consumes
 `build/source-publication-packet/<tag>/source-publication-packet.json`, records
 the packet SHA-256 and carried input/artifact fingerprints, and blocks manual
-source-only publication when the packet is stale, unsafe, or not ready for
-manual publish review. It writes only ignored `build/source-publication-gate/`
+source-only publication when the packet is stale, unsafe, not ready for manual
+publish review, or points at artifact files whose current SHA-256 no longer
+matches the packet. It writes only ignored `build/source-publication-gate/`
 output and does not merge, tag, push, publish, upload assets, or create a GitHub
 Release.
 

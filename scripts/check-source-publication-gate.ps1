@@ -46,6 +46,14 @@ function Get-InputFingerprint {
   }
 }
 
+function Resolve-RepoPath {
+  param([string]$Path)
+  if ([System.IO.Path]::IsPathRooted($Path)) {
+    return [System.IO.Path]::GetFullPath($Path)
+  }
+  return [System.IO.Path]::GetFullPath((Join-Path $root $Path))
+}
+
 function Add-BlockingError {
   param(
     [System.Collections.Generic.List[string]]$Errors,
@@ -150,6 +158,33 @@ try {
   }
   if ($null -eq $packet.artifact_file_fingerprints) {
     Add-BlockingError -Errors $blockingErrors -Message "source publication packet is missing artifact file fingerprints"
+  } else {
+    foreach ($artifactProperty in @($packet.artifact_file_fingerprints.PSObject.Properties)) {
+      $artifactFingerprint = $artifactProperty.Value
+      $artifactPath = [string]$artifactFingerprint.path
+      $artifactSha = [string]$artifactFingerprint.sha256
+      if (
+        [string]::IsNullOrWhiteSpace($artifactPath) -or
+        [string]::IsNullOrWhiteSpace($artifactSha) -or
+        $artifactSha -notmatch "^[0-9a-fA-F]{64}$"
+      ) {
+        Add-BlockingError -Errors $blockingErrors -Message "source publication gate artifact fingerprint mismatch"
+        continue
+      }
+      if (-not (Test-PathUnderRoot -Path $artifactPath -AllowedRoot "build")) {
+        Add-BlockingError -Errors $blockingErrors -Message "source publication gate artifact fingerprint mismatch"
+        continue
+      }
+      $resolvedArtifactPath = Resolve-RepoPath -Path $artifactPath
+      if (-not (Test-Path -LiteralPath $resolvedArtifactPath -PathType Leaf)) {
+        Add-BlockingError -Errors $blockingErrors -Message "source publication gate artifact fingerprint mismatch"
+        continue
+      }
+      $currentArtifactSha = Get-Sha256 -Path $resolvedArtifactPath
+      if ($currentArtifactSha -ne $artifactSha.ToLowerInvariant()) {
+        Add-BlockingError -Errors $blockingErrors -Message "source publication gate artifact fingerprint mismatch"
+      }
+    }
   }
 
   $packetFingerprint = Get-InputFingerprint -Path $PacketPath

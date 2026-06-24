@@ -101,8 +101,9 @@ Current helpers:
   that consumes `build/source-publication-packet/<tag>/source-publication-packet.json`,
   writes ignored `build/source-publication-gate/` output, records packet
   SHA-256/input/artifact proof, and blocks manual source-only publication when
-  the packet is stale, unsafe, or not ready for manual publish review; it does
-  not merge, tag, push, publish, upload assets, or create a GitHub Release
+  the packet is stale, unsafe, not ready for manual publish review, or points at
+  artifact files whose current SHA-256 no longer matches the packet; it does not
+  merge, tag, push, publish, upload assets, or create a GitHub Release
 - `verify-windows-bundle.ps1`: Windows bundle verifier for source-only Windows
   bundle proof; checks required Windows shell source paths and rejects
   committed Windows binaries, archives, signing files, or local runtime
