@@ -66,9 +66,9 @@ def _release_handoff_summary(
         "tag_push_performed": False,
         "ready_for_tag": False,
         "tag_creation_allowed": False,
-        "latest_candidate": "v0.162.0-source",
-        "latest_pr": 183,
-        "latest_pr_url": "https://github.com/Kiwunaka/Pokrov-client/pull/183",
+        "latest_candidate": "v0.163.0-source",
+        "latest_pr": 184,
+        "latest_pr_url": "https://github.com/Kiwunaka/Pokrov-client/pull/184",
         "publication_dry_run_ok": True,
         "publication_dry_run_commit_sha": publication_summary["commit_sha"],
         "publication_dry_run_source_archive": publication_summary["source_archive"],
@@ -106,7 +106,7 @@ def _publication_dry_run_summary(tmp_path: Path, ready: bool = True) -> dict:
     release_notes.write_text(
         "\n".join(
             [
-                "# v0.162.0-source",
+                "# v0.163.0-source",
                 "",
                 "This is a source-only release for manual GitHub Release review.",
                 "",
@@ -136,7 +136,7 @@ def _publication_dry_run_summary(tmp_path: Path, ready: bool = True) -> dict:
     release_notes.write_text(
         "\n".join(
             [
-                "# v0.162.0-source",
+                "# v0.163.0-source",
                 "",
                 "This is a source-only release for manual GitHub Release review.",
                 "",
@@ -170,7 +170,7 @@ def _publication_dry_run_summary(tmp_path: Path, ready: bool = True) -> dict:
         proof_manifest,
         {
             "schema_version": 1,
-            "tag": "v0.162.0-source",
+            "tag": "v0.163.0-source",
             "commit_sha": "a" * 40,
             "source_archive": "source.zip",
             "source_archive_sha256": _sha256(source_archive),
@@ -187,7 +187,7 @@ def _publication_dry_run_summary(tmp_path: Path, ready: bool = True) -> dict:
         evidence_bundle,
         {
             "schema_version": 1,
-            "tag": "v0.162.0-source",
+            "tag": "v0.163.0-source",
             "commit_sha": "a" * 40,
             "preflight_commit_sha": "a" * 40,
             "preflight_ref_commit_sha": "a" * 40,
@@ -208,7 +208,7 @@ def _publication_dry_run_summary(tmp_path: Path, ready: bool = True) -> dict:
         clean_clone,
         {
             "schema_version": 1,
-            "tag": "v0.162.0-source",
+            "tag": "v0.163.0-source",
             "source_only": True,
             "no_apk": True,
             "no_exe": True,
@@ -242,7 +242,7 @@ def _publication_dry_run_summary(tmp_path: Path, ready: bool = True) -> dict:
         "schema_version": 1,
         "generated_at": _fresh_generated_at(),
         "read_only": True,
-        "tag": "v0.162.0-source",
+        "tag": "v0.163.0-source",
         "commit_sha": "a" * 40,
         "source_only": True,
         "dry_run_only": True,
@@ -316,7 +316,7 @@ def _write_input_summaries(
         / "source-release-publication"
         / "test-inputs"
         / suffix
-        / "v0.162.0-source-publication-dry-run.json"
+        / "v0.163.0-source-publication-dry-run.json"
     )
     publication_summary = _publication_dry_run_summary(tmp_path, publication_ready)
     _write_json(publication_path, publication_summary)
@@ -416,7 +416,7 @@ def test_source_publication_packet_seed_defines_manual_publish_policy() -> None:
         "build/release-merge-handoff/release-merge-handoff.json"
     )
     assert seed["inputs"]["publication_dry_run"].endswith(
-        "v0.162.0-source-publication-dry-run.json"
+        "v0.163.0-source-publication-dry-run.json"
     )
     assert seed["artifact_roots"] == {
         "release_notes": "build/source-release-preflight",
@@ -608,7 +608,7 @@ def test_source_publication_packet_command_writes_review_packet(
 
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -625,9 +625,9 @@ def test_source_publication_packet_command_writes_review_packet(
     assert packet["no_exe"] is True
     assert packet["no_store_release"] is True
     assert packet["no_trusted_signing_claim"] is True
-    assert packet["latest_candidate"] == "v0.162.0-source"
-    assert packet["latest_pr"] == 183
-    assert packet["latest_pr_url"] == "https://github.com/Kiwunaka/Pokrov-client/pull/183"
+    assert packet["latest_candidate"] == "v0.163.0-source"
+    assert packet["latest_pr"] == 184
+    assert packet["latest_pr_url"] == "https://github.com/Kiwunaka/Pokrov-client/pull/184"
     assert packet["release_notes"]["sha256"]
     assert packet["proof_manifest"]["sha256"]
     assert packet["source_archive"]["sha256"] == packet["source_archive_sha256"]
@@ -758,7 +758,7 @@ def test_source_publication_packet_rejects_blocked_inputs(tmp_path: Path) -> Non
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -808,7 +808,7 @@ def test_source_publication_packet_rejects_missing_artifact_fingerprint(
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -857,7 +857,7 @@ def test_source_publication_packet_rejects_stale_handoff_publication_dry_run_fin
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -906,7 +906,7 @@ def test_source_publication_packet_rejects_handoff_publication_source_archive_na
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -956,7 +956,7 @@ def test_source_publication_packet_rejects_missing_handoff_publication_commit_sh
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -1005,7 +1005,7 @@ def test_source_publication_packet_rejects_handoff_publication_commit_sha_mismat
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -1056,7 +1056,7 @@ def test_source_publication_packet_rejects_handoff_carried_artifact_fingerprint_
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -1110,7 +1110,7 @@ def test_source_publication_packet_rejects_stale_artifact_file_fingerprint(
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -1188,7 +1188,7 @@ def test_source_publication_packet_rejects_source_archive_with_binary_extension(
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -1263,7 +1263,7 @@ def test_source_publication_packet_rejects_invalid_source_archive_zip(
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -1282,7 +1282,7 @@ def test_source_publication_packet_rejects_release_notes_without_claim_guards(
     handoff_path, publication_path = _write_input_summaries(tmp_path)
     publication = json.loads(publication_path.read_text(encoding="utf-8"))
     release_notes_path = Path(publication["input_fingerprints"]["release_notes"]["path"])
-    release_notes_path.write_text("# v0.162.0-source\n", encoding="utf-8")
+    release_notes_path.write_text("# v0.163.0-source\n", encoding="utf-8")
     thin_notes_fingerprint = {
         "path": str(release_notes_path),
         "sha256": _sha256(release_notes_path),
@@ -1337,7 +1337,7 @@ def test_source_publication_packet_rejects_release_notes_without_claim_guards(
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -1359,7 +1359,7 @@ def test_source_publication_packet_rejects_release_notes_with_wrong_source_sha(
     release_notes_path.write_text(
         "\n".join(
             [
-                "# v0.162.0-source",
+                "# v0.163.0-source",
                 "",
                 "This is a source-only release for manual GitHub Release review.",
                 "",
@@ -1441,7 +1441,7 @@ def test_source_publication_packet_rejects_release_notes_with_wrong_source_sha(
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -1515,7 +1515,7 @@ def test_source_publication_packet_rejects_invalid_proof_manifest_schema(
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -1591,7 +1591,7 @@ def test_source_publication_packet_rejects_proof_manifest_source_sha_mismatch(
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -1667,7 +1667,7 @@ def test_source_publication_packet_rejects_proof_manifest_source_archive_name_mi
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -1743,7 +1743,7 @@ def test_source_publication_packet_rejects_proof_manifest_commit_sha_mismatch(
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -1819,7 +1819,7 @@ def test_source_publication_packet_rejects_proof_manifest_tag_mismatch(
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -1891,7 +1891,7 @@ def test_source_publication_packet_rejects_release_evidence_bundle_tag_mismatch(
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -1963,7 +1963,7 @@ def test_source_publication_packet_rejects_release_evidence_bundle_commit_sha_mi
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -2035,7 +2035,7 @@ def test_source_publication_packet_rejects_release_evidence_bundle_source_archiv
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -2107,7 +2107,7 @@ def test_source_publication_packet_rejects_release_evidence_bundle_source_archiv
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -2181,7 +2181,7 @@ def test_source_publication_packet_rejects_artifact_path_outside_expected_root(
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -2247,7 +2247,7 @@ def test_source_publication_packet_rejects_unexpected_release_asset_fingerprint(
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -2295,7 +2295,7 @@ def test_source_publication_packet_rejects_stale_or_unparseable_input_generated_
         )
         packet = json.loads(
             (
-                out_dir / "v0.162.0-source" / "source-publication-packet.json"
+                out_dir / "v0.163.0-source" / "source-publication-packet.json"
             ).read_text(encoding="utf-8-sig")
         )
     finally:
@@ -2339,7 +2339,7 @@ def test_source_publication_packet_rejects_non_build_output(tmp_path: Path) -> N
     )
 
     assert result.returncode != 0
-    assert not (out_dir / "v0.162.0-source" / "source-publication-packet.json").exists()
+    assert not (out_dir / "v0.163.0-source" / "source-publication-packet.json").exists()
     assert "build\\source-publication-packet" in (result.stderr + result.stdout)
 
 
