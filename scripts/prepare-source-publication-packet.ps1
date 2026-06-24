@@ -912,6 +912,17 @@ try {
     Add-BlockingError -Errors $blockingErrors -Message "release handoff latest candidate must match publication dry-run tag"
   }
 
+  $releaseHandoffPublicationSourceArchive = [string]$releaseHandoff.publication_dry_run_source_archive
+  if ([string]::IsNullOrWhiteSpace($releaseHandoffPublicationSourceArchive)) {
+    Add-BlockingError -Errors $blockingErrors -Message "release handoff summary is missing publication_dry_run_source_archive"
+  }
+  elseif (
+    -not [string]::IsNullOrWhiteSpace([string]$publicationDryRun.source_archive) -and
+    $releaseHandoffPublicationSourceArchive -ne [string]$publicationDryRun.source_archive
+  ) {
+    Add-BlockingError -Errors $blockingErrors -Message "release handoff publication dry-run source archive name mismatch"
+  }
+
   $artifactRootSpecs = @(
     [ordered]@{ name = "release_notes"; value = $releaseNotes; root = [string]$seed.artifact_roots.release_notes },
     [ordered]@{ name = "release_evidence_bundle"; value = $releaseEvidenceBundle; root = [string]$seed.artifact_roots.release_evidence_bundle },
