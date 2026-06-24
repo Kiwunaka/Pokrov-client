@@ -917,6 +917,8 @@ try {
   $releaseHandoffPublicationSourceArchiveSha256 = [string]$releaseHandoff.publication_dry_run_source_archive_sha256
   $releaseHandoffPublicationPreflightCommitSha = [string]$releaseHandoff.publication_dry_run_evidence_bundle_preflight_commit_sha
   $releaseHandoffPublicationPreflightRefCommitSha = [string]$releaseHandoff.publication_dry_run_evidence_bundle_preflight_ref_commit_sha
+  $releaseHandoffWindowsBundleVerifierOkProperty = $releaseHandoff.PSObject.Properties["windows_bundle_verifier_ok"]
+  $releaseHandoffWindowsBundleVerifierSummary = [string]$releaseHandoff.windows_bundle_verifier_summary
   if ([string]::IsNullOrWhiteSpace($releaseHandoffPublicationSourceArchive)) {
     Add-BlockingError -Errors $blockingErrors -Message "release handoff summary is missing publication_dry_run_source_archive"
   }
@@ -965,6 +967,23 @@ try {
     $releaseHandoffPublicationPreflightRefCommitSha -ne [string]$publicationDryRun.evidence_bundle_preflight_ref_commit_sha
   ) {
     Add-BlockingError -Errors $blockingErrors -Message "release handoff publication dry-run evidence bundle preflight ref commit SHA mismatch"
+  }
+
+  if ($null -eq $releaseHandoffWindowsBundleVerifierOkProperty) {
+    Add-BlockingError -Errors $blockingErrors -Message "release handoff summary is missing windows_bundle_verifier_ok"
+  }
+  elseif ([bool]$releaseHandoffWindowsBundleVerifierOkProperty.Value -ne [bool]$publicationDryRun.windows_bundle_verifier_ok) {
+    Add-BlockingError -Errors $blockingErrors -Message "release handoff Windows bundle verifier status mismatch"
+  }
+
+  if ([string]::IsNullOrWhiteSpace($releaseHandoffWindowsBundleVerifierSummary)) {
+    Add-BlockingError -Errors $blockingErrors -Message "release handoff summary is missing windows_bundle_verifier_summary"
+  }
+  elseif (
+    -not [string]::IsNullOrWhiteSpace([string]$publicationDryRun.windows_bundle_verifier_summary) -and
+    $releaseHandoffWindowsBundleVerifierSummary -ne [string]$publicationDryRun.windows_bundle_verifier_summary
+  ) {
+    Add-BlockingError -Errors $blockingErrors -Message "release handoff Windows bundle verifier summary mismatch"
   }
 
   $artifactRootSpecs = @(
@@ -1171,6 +1190,8 @@ try {
     clean_clone_or_import_proof = $cleanCloneOrImportProof
     windows_bundle_verifier_ok = [bool]$publicationDryRun.windows_bundle_verifier_ok
     windows_bundle_verifier_summary = [string]$publicationDryRun.windows_bundle_verifier_summary
+    release_handoff_windows_bundle_verifier_ok = if ($null -ne $releaseHandoffWindowsBundleVerifierOkProperty) { [bool]$releaseHandoffWindowsBundleVerifierOkProperty.Value } else { $null }
+    release_handoff_windows_bundle_verifier_summary = $releaseHandoffWindowsBundleVerifierSummary
     input_fingerprints = [ordered]@{
       release_handoff = Get-InputFingerprint -Path $releaseHandoffPath
       publication_dry_run = $publicationDryRunActualFingerprint

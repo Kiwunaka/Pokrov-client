@@ -766,6 +766,12 @@
       "candidate": "v0.166.0-source",
       "base": "codex/v0.165-publication-packet-carries-handoff-preflight-commit",
       "head": "codex/v0.166-publication-packet-carries-handoff-preflight-ref"
+    },
+    {
+      "pr": 188,
+      "candidate": "v0.167.0-source",
+      "base": "codex/v0.166-publication-packet-carries-handoff-preflight-ref",
+      "head": "codex/v0.167-publication-packet-carries-handoff-windows-proof"
     }
   ]
 }
