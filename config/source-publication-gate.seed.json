@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "script": "scripts/check-source-publication-gate.ps1",
+  "default_output_dir": "build/source-publication-gate",
+  "policy": {
+    "read_only": true,
+    "source_only": true,
+    "manual_publish_review_gate": true,
+    "no_tag_creation": true,
+    "no_tag_push": true,
+    "no_github_release_publish": true,
+    "no_asset_upload": true,
+    "requires_source_publication_packet_summary": true,
+    "requires_source_publication_packet_ready": true,
+    "requires_source_publication_packet_input_fingerprint": true,
+    "requires_packet_generated_at_freshness": true,
+    "requires_source_only_flags": true,
+    "writes_only_ignored_build_output": true
+  },
+  "inputs": {
+    "source_publication_packet": "build/source-publication-packet/v0.169.0-source/source-publication-packet.json"
+  },
+  "input_roots": {
+    "source_publication_packet": "build/source-publication-packet"
+  },
+  "output": {
+    "gate": "build/source-publication-gate/v0.169.0-source/v0.169.0-source-publication-gate.json"
+  }
+}

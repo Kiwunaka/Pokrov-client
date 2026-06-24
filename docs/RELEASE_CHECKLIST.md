@@ -86,6 +86,13 @@ Use this checklist before publishing a public source or binary release.
   configured. JSON proof artifacts must also match their expected source-only
   schema contracts. It
   does not merge, tag, push, publish, or upload anything.
+- `powershell -ExecutionPolicy Bypass -File .\scripts\check-source-publication-gate.ps1`
+  runs the final source publication gate against the generated source
+  publication packet. It writes ignored `build/source-publication-gate/` output,
+  records the packet SHA-256 plus packet input/artifact fingerprints, and blocks
+  manual source-only publication when the packet is stale, unsafe, or not ready
+  for manual publish review. It does not merge, tag, push, publish, upload
+  assets, or create a GitHub Release.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\verify-windows-bundle.ps1`
   runs the Windows bundle verifier and writes source-only Windows bundle proof
   under ignored `build/windows-bundle-verifier/`; it checks required Windows

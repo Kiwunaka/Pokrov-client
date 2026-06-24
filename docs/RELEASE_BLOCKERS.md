@@ -87,6 +87,13 @@ proof artifacts must also match their expected source-only schema contracts
 before manual GitHub Release review. The packet is only a manual review aid; it
 does not merge, tag, push, publish, or upload anything.
 
+Run `scripts/check-source-publication-gate.ps1` as the final local source publication gate after the
+source publication packet exists. The command is read-only, writes ignored
+`build/source-publication-gate/` output, records the packet SHA-256 and carried
+input/artifact fingerprints, and blocks manual source-only publication when the
+packet is stale, unsafe, or not ready for manual publish review. It does not
+merge, tag, push, publish, upload assets, or create a GitHub Release.
+
 ## Evidence Rules
 
 Do not mark a blocker complete from intent or memory. Use current evidence:

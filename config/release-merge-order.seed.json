@@ -778,6 +778,12 @@
       "candidate": "v0.168.0-source",
       "base": "codex/v0.167-publication-packet-carries-handoff-windows-proof",
       "head": "codex/v0.168-publication-packet-carries-handoff-ruleset-proof"
+    },
+    {
+      "pr": 190,
+      "candidate": "v0.169.0-source",
+      "base": "codex/v0.168-publication-packet-carries-handoff-ruleset-proof",
+      "head": "codex/v0.169-source-publication-final-gate"
     }
   ]
 }
