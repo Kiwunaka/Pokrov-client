@@ -914,6 +914,7 @@ try {
 
   $releaseHandoffPublicationSourceArchive = [string]$releaseHandoff.publication_dry_run_source_archive
   $releaseHandoffPublicationCommitSha = [string]$releaseHandoff.publication_dry_run_commit_sha
+  $releaseHandoffPublicationSourceArchiveSha256 = [string]$releaseHandoff.publication_dry_run_source_archive_sha256
   if ([string]::IsNullOrWhiteSpace($releaseHandoffPublicationSourceArchive)) {
     Add-BlockingError -Errors $blockingErrors -Message "release handoff summary is missing publication_dry_run_source_archive"
   }
@@ -932,6 +933,16 @@ try {
     $releaseHandoffPublicationCommitSha -ne [string]$publicationDryRun.commit_sha
   ) {
     Add-BlockingError -Errors $blockingErrors -Message "release handoff publication dry-run commit SHA mismatch"
+  }
+
+  if ([string]::IsNullOrWhiteSpace($releaseHandoffPublicationSourceArchiveSha256)) {
+    Add-BlockingError -Errors $blockingErrors -Message "release handoff summary is missing publication_dry_run_source_archive_sha256"
+  }
+  elseif (
+    -not [string]::IsNullOrWhiteSpace([string]$publicationDryRun.source_archive_sha256) -and
+    $releaseHandoffPublicationSourceArchiveSha256 -ne [string]$publicationDryRun.source_archive_sha256
+  ) {
+    Add-BlockingError -Errors $blockingErrors -Message "release handoff publication dry-run source archive SHA mismatch"
   }
 
   $artifactRootSpecs = @(
@@ -1161,6 +1172,7 @@ try {
     release_handoff_publication_dry_run_input_fingerprints = $releaseHandoffPublicationInputFingerprints
     release_handoff_publication_dry_run_source_archive = $releaseHandoffPublicationSourceArchive
     release_handoff_publication_dry_run_commit_sha = $releaseHandoffPublicationCommitSha
+    release_handoff_publication_dry_run_source_archive_sha256 = $releaseHandoffPublicationSourceArchiveSha256
     release_handoff_publication_dry_run_evidence_bundle_input_fingerprints = $releaseHandoffPublicationEvidenceBundleFingerprints
     release_handoff_publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $releaseHandoffPublicationArtifactFingerprints
     artifact_file_fingerprints = $artifactFileFingerprints
