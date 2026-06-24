@@ -165,6 +165,7 @@ def test_publication_dry_run_seed_defines_no_publish_policy() -> None:
         seed["policy"]["requires_evidence_bundle_source_archive_name_binding"]
         is True
     )
+    assert seed["policy"]["carries_source_archive_name"] is True
     assert (
         seed["policy"]["requires_evidence_bundle_preflight_commit_sha_consistency"]
         is True
@@ -341,6 +342,7 @@ def test_publication_dry_run_writes_summary_from_fixtures(tmp_path: Path) -> Non
     assert summary["commit_sha"] == "a" * 40
     assert summary["evidence_bundle_preflight_commit_sha"] == "a" * 40
     assert summary["evidence_bundle_preflight_ref_commit_sha"] == "a" * 40
+    assert summary["source_archive"] == str(source)
     assert summary["windows_bundle_verifier_ok"] is True
     assert summary["windows_bundle_verifier_summary"].endswith(
         "windows-bundle-verifier.json"

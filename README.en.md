@@ -258,6 +258,7 @@ does not provide POKROV nodes or a default free service.
 | `v0.155.0-source` | Pending stacked PR, not tagged | Source publication packet validates release evidence bundle source archive SHA binding before manual GitHub Release review. |
 | `v0.156.0-source` | Pending stacked PR, not tagged | Source publication packet validates release evidence bundle source archive filename binding before manual GitHub Release review. |
 | `v0.157.0-source` | Pending stacked PR, not tagged | Publication dry-run validates release evidence bundle source archive filename binding before manual GitHub Release review. |
+| `v0.158.0-source` | Pending stacked PR, not tagged | Publication dry-run carries the release evidence bundle source archive filename as explicit handoff proof. |
 
 ## Architecture Boundary
 
