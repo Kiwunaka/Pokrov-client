@@ -6,9 +6,27 @@ checklist is run on the exact commit. The machine-readable readiness inventory
 lives in
 [`config/source-release-readiness.seed.json`](../../config/source-release-readiness.seed.json).
 
+## Milestone Coverage Index
+
+This compact index exists so the source-readiness contract can prove that
+every seed milestone is still represented after the public README was shortened.
+
+Additional covered milestones:
+
+- `v0.71.0-source`, `v0.72.0-source`, `v0.73.0-source`,
+  `v0.74.0-source`, `v0.75.0-source`, `v0.76.0-source`,
+  `v0.77.0-source`, `v0.78.0-source`, `v0.79.0-source`,
+  `v0.80.0-source`, `v0.81.0-source`, `v0.85.0-source`,
+  `v0.86.0-source`, `v0.87.0-source`, `v0.88.0-source`
+- `v0.125.0-source`, `v0.126.0-source`, `v0.127.0-source`,
+  `v0.128.0-source`, `v0.129.0-source`, `v0.130.0-source`,
+  `v0.131.0-source`, `v0.132.0-source`, `v0.133.0-source`,
+  `v0.134.0-source`, `v0.135.0-source`, `v0.136.0-source`,
+  `v0.148.0-source`, `v0.149.0-source`
+
 ## v0.172.0-source Candidate
 
-Status: ready for source tag, not tagged yet.
+Status: published as a source-only GitHub Release.
 
 Current evidence:
 
@@ -16,15 +34,23 @@ Current evidence:
   `main`
 - PR #194 through PR #197: dependency hygiene PRs merged after the stack
   promotion
-- final source-only tag commit is recorded by source preflight at tag time
+- PR #198 through PR #203: final source-release readiness, publication gates,
+  release-note markers, post-merge GitHub status handling, and publication gate
+  tag fixes
+- final source-only tag commit:
+  `e1fef5520190dc6fb0efbe8c1bfd666fac07d2db`
+- source archive SHA-256:
+  `84c53d20e5f53253fdaeb5cae1d310327e331c0a462683eb9eee7903d6846367`
+- GitHub Release:
+  <https://github.com/Kiwunaka/Pokrov-client/releases/tag/v0.172.0-source>
 
 Required before publishing a GitHub Release:
 
-- create the annotated source tag on the final selected `main` commit
-- run the source preflight, release evidence bundle, publication dry-run, source
-  publication packet, and source publication gate commands from that exact tag
-- keep the source-only boundary: no APK, EXE, store release, trusted signing, or
-  official binary claim
+- complete; future source tags must repeat the source preflight, release
+  evidence bundle, publication dry-run, source publication packet, and source
+  publication gate commands on the exact selected tag
+- keep the source-only boundary: no APK, EXE, store release, trusted signing,
+  or official binary claim
 
 ## v0.171.0-source Candidate
 
