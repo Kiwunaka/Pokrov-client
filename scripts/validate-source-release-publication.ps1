@@ -258,6 +258,23 @@ function Assert-ArtifactFingerprintIntegrity {
   }
 }
 
+function Assert-EvidenceSourceArchiveName {
+  param(
+    [Parameter(Mandatory = $true)][object]$Evidence,
+    [Parameter(Mandatory = $true)][object]$SourceArchiveFingerprint
+  )
+
+  $evidenceSourceArchiveName = [System.IO.Path]::GetFileName((Resolve-RepoPath -Path ([string]$Evidence.source_archive)))
+  $fingerprintSourceArchiveName = [System.IO.Path]::GetFileName((Resolve-RepoPath -Path ([string]$SourceArchiveFingerprint.path)))
+  if (
+    [string]::IsNullOrWhiteSpace($evidenceSourceArchiveName) -or
+    [string]::IsNullOrWhiteSpace($fingerprintSourceArchiveName) -or
+    -not $evidenceSourceArchiveName.Equals($fingerprintSourceArchiveName, [System.StringComparison]::OrdinalIgnoreCase)
+  ) {
+    throw "Publication dry-run refused evidence source archive name mismatch."
+  }
+}
+
 Push-Location $root
 try {
   $resolvedEvidenceBundlePath = Resolve-RepoPath -Path $EvidenceBundlePath
@@ -411,6 +428,9 @@ try {
     -ExpectedPath ([string]$evidenceBundlePreflightArtifactFingerprints.source_archive.path) `
     -ExpectedSha256 ([string]$evidence.source_archive_sha256) `
     -Name "source_archive"
+  Assert-EvidenceSourceArchiveName `
+    -Evidence $evidence `
+    -SourceArchiveFingerprint $evidenceBundlePreflightArtifactFingerprints.source_archive
   Assert-ArtifactFingerprintIntegrity `
     -Fingerprint $evidenceBundlePreflightArtifactFingerprints.windows_bundle_verifier_summary `
     -ExpectedPath ([string]$evidence.windows_bundle_verifier_summary) `

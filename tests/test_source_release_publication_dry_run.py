@@ -162,6 +162,10 @@ def test_publication_dry_run_seed_defines_no_publish_policy() -> None:
         is True
     )
     assert (
+        seed["policy"]["requires_evidence_bundle_source_archive_name_binding"]
+        is True
+    )
+    assert (
         seed["policy"]["requires_evidence_bundle_preflight_commit_sha_consistency"]
         is True
     )
@@ -208,6 +212,7 @@ def test_publication_dry_run_script_is_local_only() -> None:
         "evidence_bundle_preflight_ref_commit_sha",
         "evidence commit SHA does not match preflight commit SHA",
         "evidence preflight commit SHA does not match resolved ref commit SHA",
+        "evidence source archive name mismatch",
         "evidence bundle is missing input fingerprints",
         "evidence bundle preflight summary fingerprint mismatch",
         "evidence bundle is missing preflight artifact fingerprints",
@@ -277,6 +282,7 @@ def test_publication_dry_run_writes_summary_from_fixtures(tmp_path: Path) -> Non
                 "no_store_release": True,
                 "no_trusted_signing_claim": True,
                 "forbidden_file_count": 0,
+                "source_archive": str(source),
                 "source_archive_sha256": _sha256(source),
                 "windows_bundle_verifier_ok": True,
                 "windows_bundle_verifier_summary": str(windows),
@@ -1559,6 +1565,91 @@ def test_publication_dry_run_rejects_stale_release_notes_artifact_fingerprint(
     assert result.returncode != 0
     assert not (out_dir / "v9.9.9-source-publication-dry-run.json").exists()
     assert "artifact fingerprint mismatch" in (result.stderr + result.stdout)
+
+
+def test_publication_dry_run_rejects_evidence_source_archive_name_mismatch(
+    tmp_path: Path,
+) -> None:
+    evidence = tmp_path / "evidence.json"
+    notes = tmp_path / "release-notes.md"
+    preflight = _write_preflight_fixture(tmp_path)
+    proof = tmp_path / "proof.json"
+    source = tmp_path / "source.zip"
+    windows = tmp_path / "windows-bundle-verifier.json"
+    out_dir = tmp_path / "out"
+
+    proof.write_text('{"source_only":true}', encoding="utf-8")
+    source.write_bytes(b"source archive")
+    windows.write_text('{"windows_bundle_ok":true}', encoding="utf-8")
+    notes.write_text(_release_notes_text(_sha256(source)), encoding="utf-8")
+    evidence.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "generated_at": _fresh_input_generated_at(),
+                "tag": "v9.9.9-source",
+                "commit_sha": "a" * 40,
+                "preflight_commit_sha": "a" * 40,
+                "preflight_ref_commit_sha": "a" * 40,
+                "source_only": True,
+                "no_apk": True,
+                "no_exe": True,
+                "no_store_release": True,
+                "no_trusted_signing_claim": True,
+                "forbidden_file_count": 0,
+                "source_archive": "other-source.zip",
+                "source_archive_sha256": _sha256(source),
+                "windows_bundle_verifier_ok": True,
+                "windows_bundle_verifier_summary": str(windows),
+                "github_ruleset_ok": False,
+                "github_enforcement_claim_allowed": False,
+                "input_fingerprints": _preflight_input_fingerprints(preflight),
+                "preflight_artifact_fingerprints": {
+                    "proof_manifest": {"path": str(proof), "sha256": _sha256(proof)},
+                    "release_notes": {"path": str(notes), "sha256": _sha256(notes)},
+                    "source_archive": {"path": str(source), "sha256": _sha256(source)},
+                    "windows_bundle_verifier_summary": {
+                        "path": str(windows),
+                        "sha256": _sha256(windows),
+                    },
+                },
+                "release_boundary": {
+                    "ships_apk": False,
+                    "ships_exe": False,
+                    "store_release": False,
+                    "trusted_signing_claim": False,
+                    "official_binary_claim": False,
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [
+            "powershell",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(ROOT / "scripts" / "validate-source-release-publication.ps1"),
+            "-Tag",
+            "v9.9.9-source",
+            "-EvidenceBundlePath",
+            str(evidence),
+            "-ReleaseNotesPath",
+            str(notes),
+            "-OutDir",
+            str(out_dir),
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode != 0
+    assert not (out_dir / "v9.9.9-source-publication-dry-run.json").exists()
+    assert "evidence source archive name mismatch" in (result.stderr + result.stdout)
 
 
 def test_publication_dry_run_rejects_evidence_commit_sha_mismatch(
