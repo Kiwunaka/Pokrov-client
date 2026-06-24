@@ -570,7 +570,10 @@ try {
   ) {
     $blockingErrors.Add("publication dry-run artifact fingerprints mismatch")
   }
-  if (
+  if ([string]::IsNullOrWhiteSpace([string]$publicationDryRun.source_archive_sha256)) {
+    $blockingErrors.Add("publication dry-run summary is missing source_archive_sha256")
+  }
+  elseif (
     -not [string]::IsNullOrWhiteSpace([string]$publicationDryRun.source_archive_sha256) -and
     -not [string]::IsNullOrWhiteSpace([string]$publicationDryRunEvidenceBundlePreflightArtifactFingerprints.source_archive.sha256) -and
     [string]$publicationDryRun.source_archive_sha256 -ne [string]$publicationDryRunEvidenceBundlePreflightArtifactFingerprints.source_archive.sha256
@@ -969,6 +972,7 @@ try {
     publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $publicationDryRunEvidenceBundlePreflightArtifactFingerprints
     publication_dry_run_commit_sha = $publicationDryRunCommitSha
     publication_dry_run_source_archive = [string]$publicationDryRun.source_archive
+    publication_dry_run_source_archive_sha256 = [string]$publicationDryRun.source_archive_sha256
     publication_dry_run_evidence_bundle_preflight_commit_sha = $publicationDryRunEvidenceBundlePreflightCommitSha
     publication_dry_run_evidence_bundle_preflight_ref_commit_sha = $publicationDryRunEvidenceBundlePreflightRefCommitSha
     input_generated_at = [ordered]@{

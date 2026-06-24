@@ -742,6 +742,12 @@
       "candidate": "v0.162.0-source",
       "base": "codex/v0.161-publication-packet-carries-handoff-archive-name",
       "head": "codex/v0.162-publication-packet-carries-handoff-commit-sha"
+    },
+    {
+      "pr": 184,
+      "candidate": "v0.163.0-source",
+      "base": "codex/v0.162-publication-packet-carries-handoff-commit-sha",
+      "head": "codex/v0.163-release-handoff-carries-dry-run-archive-sha"
     }
   ]
 }

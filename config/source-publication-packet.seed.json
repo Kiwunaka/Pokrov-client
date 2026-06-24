@@ -58,7 +58,7 @@
   },
   "inputs": {
     "release_handoff": "build/release-merge-handoff/release-merge-handoff.json",
-    "publication_dry_run": "build/source-release-publication/v0.162.0-source/v0.162.0-source-publication-dry-run.json"
+    "publication_dry_run": "build/source-release-publication/v0.163.0-source/v0.163.0-source-publication-dry-run.json"
   },
   "input_roots": {
     "release_handoff": "build/release-merge-handoff",
@@ -141,7 +141,7 @@
     "publication_dry_run.source_archive_sha256"
   ],
   "output": {
-    "packet": "build/source-publication-packet/v0.162.0-source/source-publication-packet.json"
+    "packet": "build/source-publication-packet/v0.163.0-source/source-publication-packet.json"
   },
   "required_source_only_flags": [
     "source_only",
