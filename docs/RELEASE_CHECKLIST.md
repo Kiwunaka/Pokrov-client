@@ -91,9 +91,9 @@ Use this checklist before publishing a public source or binary release.
   publication packet. It writes ignored `build/source-publication-gate/` output,
   records the packet SHA-256 plus packet input/artifact fingerprints, and blocks
   manual source-only publication when the packet is stale, unsafe, not ready for
-  manual publish review, or points at artifact files whose current SHA-256 no
-  longer matches the packet. It does not merge, tag, push, publish, upload
-  assets, or create a GitHub Release.
+  manual publish review, or points at input summaries or artifact files whose
+  current SHA-256 no longer matches the packet. It does not merge, tag, push,
+  publish, upload assets, or create a GitHub Release.
 - `powershell -ExecutionPolicy Bypass -File .\scripts\verify-windows-bundle.ps1`
   runs the Windows bundle verifier and writes source-only Windows bundle proof
   under ignored `build/windows-bundle-verifier/`; it checks required Windows
