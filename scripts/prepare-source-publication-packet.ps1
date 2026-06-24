@@ -913,6 +913,7 @@ try {
   }
 
   $releaseHandoffPublicationSourceArchive = [string]$releaseHandoff.publication_dry_run_source_archive
+  $releaseHandoffPublicationCommitSha = [string]$releaseHandoff.publication_dry_run_commit_sha
   if ([string]::IsNullOrWhiteSpace($releaseHandoffPublicationSourceArchive)) {
     Add-BlockingError -Errors $blockingErrors -Message "release handoff summary is missing publication_dry_run_source_archive"
   }
@@ -921,6 +922,16 @@ try {
     $releaseHandoffPublicationSourceArchive -ne [string]$publicationDryRun.source_archive
   ) {
     Add-BlockingError -Errors $blockingErrors -Message "release handoff publication dry-run source archive name mismatch"
+  }
+
+  if ([string]::IsNullOrWhiteSpace($releaseHandoffPublicationCommitSha)) {
+    Add-BlockingError -Errors $blockingErrors -Message "release handoff summary is missing publication_dry_run_commit_sha"
+  }
+  elseif (
+    -not [string]::IsNullOrWhiteSpace([string]$publicationDryRun.commit_sha) -and
+    $releaseHandoffPublicationCommitSha -ne [string]$publicationDryRun.commit_sha
+  ) {
+    Add-BlockingError -Errors $blockingErrors -Message "release handoff publication dry-run commit SHA mismatch"
   }
 
   $artifactRootSpecs = @(
@@ -1149,6 +1160,7 @@ try {
     release_evidence_bundle_proof_requirements = @("release_evidence_bundle.tag", "release_evidence_bundle.commit_sha", "release_evidence_bundle.source_archive", "release_evidence_bundle.source_archive_sha256", "publication_dry_run.tag", "publication_dry_run.commit_sha", "publication_dry_run.source_archive_sha256")
     release_handoff_publication_dry_run_input_fingerprints = $releaseHandoffPublicationInputFingerprints
     release_handoff_publication_dry_run_source_archive = $releaseHandoffPublicationSourceArchive
+    release_handoff_publication_dry_run_commit_sha = $releaseHandoffPublicationCommitSha
     release_handoff_publication_dry_run_evidence_bundle_input_fingerprints = $releaseHandoffPublicationEvidenceBundleFingerprints
     release_handoff_publication_dry_run_evidence_bundle_preflight_artifact_fingerprints = $releaseHandoffPublicationArtifactFingerprints
     artifact_file_fingerprints = $artifactFileFingerprints
