@@ -859,11 +859,6 @@ try {
   }
 
   foreach ($fieldName in @("preflight_summary", "github_ruleset_report")) {
-    $handoffHasField = Test-FingerprintField -Container $releaseHandoffPublicationEvidenceBundleFingerprints -FieldName $fieldName
-    $publicationHasField = Test-FingerprintField -Container $publicationEvidenceBundleFingerprints -FieldName $fieldName
-    if ($fieldName -eq "github_ruleset_report" -and -not $handoffHasField -and -not $publicationHasField) {
-      continue
-    }
     Add-FingerprintIntegrityErrors `
       -Errors $blockingErrors `
       -Expected (Get-FingerprintObject -Container $releaseHandoffPublicationEvidenceBundleFingerprints -FieldName $fieldName) `
@@ -919,6 +914,7 @@ try {
   $releaseHandoffPublicationPreflightRefCommitSha = [string]$releaseHandoff.publication_dry_run_evidence_bundle_preflight_ref_commit_sha
   $releaseHandoffWindowsBundleVerifierOkProperty = $releaseHandoff.PSObject.Properties["windows_bundle_verifier_ok"]
   $releaseHandoffWindowsBundleVerifierSummary = [string]$releaseHandoff.windows_bundle_verifier_summary
+  $releaseHandoffGithubRulesetReport = [string]$releaseHandoff.github_ruleset_report
   if ([string]::IsNullOrWhiteSpace($releaseHandoffPublicationSourceArchive)) {
     Add-BlockingError -Errors $blockingErrors -Message "release handoff summary is missing publication_dry_run_source_archive"
   }
@@ -984,6 +980,16 @@ try {
     $releaseHandoffWindowsBundleVerifierSummary -ne [string]$publicationDryRun.windows_bundle_verifier_summary
   ) {
     Add-BlockingError -Errors $blockingErrors -Message "release handoff Windows bundle verifier summary mismatch"
+  }
+
+  if ([string]::IsNullOrWhiteSpace([string]$publicationDryRun.github_ruleset_report)) {
+    Add-BlockingError -Errors $blockingErrors -Message "publication dry-run summary is missing github_ruleset_report"
+  }
+  elseif ([string]::IsNullOrWhiteSpace($releaseHandoffGithubRulesetReport)) {
+    Add-BlockingError -Errors $blockingErrors -Message "release handoff summary is missing github_ruleset_report"
+  }
+  elseif ($releaseHandoffGithubRulesetReport -ne [string]$publicationDryRun.github_ruleset_report) {
+    Add-BlockingError -Errors $blockingErrors -Message "release handoff GitHub ruleset report mismatch"
   }
 
   $artifactRootSpecs = @(
@@ -1192,6 +1198,7 @@ try {
     windows_bundle_verifier_summary = [string]$publicationDryRun.windows_bundle_verifier_summary
     release_handoff_windows_bundle_verifier_ok = if ($null -ne $releaseHandoffWindowsBundleVerifierOkProperty) { [bool]$releaseHandoffWindowsBundleVerifierOkProperty.Value } else { $null }
     release_handoff_windows_bundle_verifier_summary = $releaseHandoffWindowsBundleVerifierSummary
+    release_handoff_github_ruleset_report = $releaseHandoffGithubRulesetReport
     input_fingerprints = [ordered]@{
       release_handoff = Get-InputFingerprint -Path $releaseHandoffPath
       publication_dry_run = $publicationDryRunActualFingerprint

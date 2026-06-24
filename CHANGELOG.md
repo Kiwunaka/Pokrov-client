@@ -408,8 +408,11 @@ production readiness without matching public evidence.
 - Added source publication packet validation and output for the release handoff
   Windows bundle verifier proof so manual review keeps explicit Windows proof in
   the final packet.
+- Added source publication packet validation and output for the release handoff
+  GitHub ruleset report proof so manual review keeps explicit repository
+  protection proof in the final packet.
 - Updated source-readiness tracking through the green stacked PR sequence up to
-  `v0.167.0-source` candidates.
+  `v0.168.0-source` candidates.
 
 ### Source Readiness Candidates
 
@@ -582,6 +585,7 @@ production readiness without matching public evidence.
 | `v0.165.0-source` | Pending stacked PR, not tagged | PR #186 |
 | `v0.166.0-source` | Pending stacked PR, not tagged | PR #187 |
 | `v0.167.0-source` | Pending stacked PR, not tagged | PR #188 |
+| `v0.168.0-source` | Pending stacked PR, not tagged | PR #189 |
 
 ### Still Source-Only
 

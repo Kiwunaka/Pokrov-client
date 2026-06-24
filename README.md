@@ -227,6 +227,7 @@ Source release status:
 | `v0.165.0-source` | Pending stacked PR, not tagged | Source publication packet carries and validates the release handoff publication dry-run evidence bundle preflight commit SHA as explicit review proof. |
 | `v0.166.0-source` | Pending stacked PR, not tagged | Source publication packet carries and validates the release handoff publication dry-run evidence bundle preflight ref commit SHA as explicit review proof. |
 | `v0.167.0-source` | Pending stacked PR, not tagged | Source publication packet carries and validates the release handoff Windows bundle verifier proof as explicit review evidence. |
+| `v0.168.0-source` | Pending stacked PR, not tagged | Source publication packet carries and validates the release handoff GitHub ruleset report proof as explicit review evidence. |
 
 ## Which App Should I Use?
 

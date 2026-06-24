@@ -94,7 +94,7 @@ def _merge_order_summary(ok: bool = True) -> dict:
             "base": f"codex/v0.{pr_number - 22}-source",
             "head": f"codex/v0.{pr_number - 21}-source",
         }
-        for pr_number in range(62, 189)
+        for pr_number in range(62, 190)
     ]
     return {
         "schema_version": 1,
@@ -102,9 +102,9 @@ def _merge_order_summary(ok: bool = True) -> dict:
         "read_only": True,
         "merge_order_ok": ok,
         "linear_base_to_head_chain": ok,
-        "stack_count": 127,
-        "latest_pr": 188,
-        "latest_candidate": "v0.167.0-source",
+        "stack_count": 128,
+        "latest_pr": 189,
+        "latest_candidate": "v0.168.0-source",
         "errors": [] if ok else ["PR #159 base must equal previous head"],
         "stack": stack,
     }
@@ -160,22 +160,22 @@ def _github_status_summary(ok: bool = True) -> dict:
             "checks": _github_status_pr_checks(),
             "errors": [],
         }
-        for pr_number in range(62, 189)
+        for pr_number in range(62, 190)
     ]
     return {
         "schema_version": 1,
         "generated_at": _fresh_input_generated_at(),
         "read_only": True,
         "github_status_ok": ok,
-        "stack_count": 127,
-        "latest_pr": 188,
-        "latest_pr_url": "https://github.com/Kiwunaka/Pokrov-client/pull/188",
+        "stack_count": 128,
+        "latest_pr": 189,
+        "latest_pr_url": "https://github.com/Kiwunaka/Pokrov-client/pull/189",
         "expected_pr_url_prefix": "https://github.com/Kiwunaka/Pokrov-client/pull/",
-        "latest_candidate": "v0.167.0-source",
-        "clean_pr_count": 127 if ok else 62,
+        "latest_candidate": "v0.168.0-source",
+        "clean_pr_count": 128 if ok else 62,
         "draft_pr_count": 0,
         "unclean_pr_count": 0 if ok else 1,
-        "successful_check_count": 381 if ok else 194,
+        "successful_check_count": 384 if ok else 194,
         "failed_check_count": 0 if ok else 1,
         "pull_requests": pull_requests,
         "errors": [] if ok else ["PR #159 check 'Flutter analyze and tests' is FAILURE"],
@@ -199,7 +199,7 @@ def _tag_readiness_summary(ready: bool = False) -> dict:
         "schema_version": 1,
         "generated_at": _fresh_input_generated_at(),
         "read_only": True,
-        "tag": "v0.167.0-source",
+        "tag": "v0.168.0-source",
         "ready_for_tag": ready,
         "source_only": True,
         "ships_apk": False,
@@ -207,8 +207,8 @@ def _tag_readiness_summary(ready: bool = False) -> dict:
         "store_release": False,
         "trusted_signing_claim": False,
         "tag_creation_allowed": ready,
-        "latest_candidate": "v0.167.0-source",
-        "latest_stacked_pr": 188,
+        "latest_candidate": "v0.168.0-source",
+        "latest_stacked_pr": 189,
         "input_fingerprints": {
             "blocker_inventory": {
                 "path": "config/release-blocker-inventory.seed.json",
@@ -229,7 +229,7 @@ def _publication_dry_run_summary(ok: bool = True) -> dict:
         "schema_version": 1,
         "generated_at": _fresh_input_generated_at(),
         "read_only": True,
-        "tag": "v0.167.0-source",
+        "tag": "v0.168.0-source",
         "commit_sha": "a" * 40,
         "evidence_bundle_preflight_commit_sha": "a" * 40,
         "evidence_bundle_preflight_ref_commit_sha": "a" * 40,
@@ -246,28 +246,31 @@ def _publication_dry_run_summary(ok: bool = True) -> dict:
         "windows_bundle_verifier_summary": (
             "build/windows-bundle-verifier/windows-bundle-verifier.json" if ok else ""
         ),
+        "github_ruleset_report": (
+            "build/release-evidence/github-ruleset-report.json" if ok else ""
+        ),
         "source_archive": "source.zip",
         "source_archive_sha256": "2" * 64,
         "input_fingerprints": {
             "evidence_bundle": {
-                "path": "build/release-evidence/v0.167.0-source/release-evidence.json",
+                "path": "build/release-evidence/v0.168.0-source/release-evidence.json",
                 "sha256": "c" * 64,
             },
             "release_notes": {
-                "path": "build/source-release/v0.167.0-source/release-notes.md",
+                "path": "build/source-release/v0.168.0-source/release-notes.md",
                 "sha256": "d" * 64,
             },
         },
         "evidence_bundle_input_fingerprints": {
             "preflight_summary": {
-                "path": "build/source-release-preflight/v0.167.0-source/preflight.json",
+                "path": "build/source-release-preflight/v0.168.0-source/preflight.json",
                 "sha256": "e" * 64,
             },
         },
         "evidence_bundle_preflight_artifact_fingerprints": {
             "proof_manifest": {"path": "proof.json", "sha256": "f" * 64},
             "release_notes": {
-                "path": "build/source-release/v0.167.0-source/release-notes.md",
+                "path": "build/source-release/v0.168.0-source/release-notes.md",
                 "sha256": "d" * 64,
             },
             "source_archive": {"path": "source.zip", "sha256": "2" * 64},
@@ -351,7 +354,7 @@ def _write_publication_input_fixtures(tmp_path: Path) -> tuple[Path, Path]:
     evidence_bundle = tmp_path / "release-evidence.json"
     evidence_bundle.write_text('{"source_only":true}', encoding="utf-8")
     release_notes = tmp_path / "release-notes.md"
-    release_notes.write_text("# v0.167.0-source\n", encoding="utf-8")
+    release_notes.write_text("# v0.168.0-source\n", encoding="utf-8")
     return evidence_bundle, release_notes
 
 
@@ -458,7 +461,7 @@ def _write_input_summaries(
             / "source-tag-readiness"
             / "test-inputs"
             / suffix
-            / "v0.167.0-source-tag-readiness.json"
+            / "v0.168.0-source-tag-readiness.json"
         )
         publication_path = (
             ROOT
@@ -466,13 +469,13 @@ def _write_input_summaries(
             / "source-release-publication"
             / "test-inputs"
             / suffix
-            / "v0.167.0-source-publication-dry-run.json"
+            / "v0.168.0-source-publication-dry-run.json"
         )
     else:
         merge_path = tmp_path / "release-merge-order.json"
         github_path = tmp_path / "release-stack-github-status.json"
-        tag_path = tmp_path / "v0.167.0-source-tag-readiness.json"
-        publication_path = tmp_path / "v0.167.0-source-publication-dry-run.json"
+        tag_path = tmp_path / "v0.168.0-source-tag-readiness.json"
+        publication_path = tmp_path / "v0.168.0-source-publication-dry-run.json"
     for path in (merge_path, github_path, tag_path, publication_path):
         path.parent.mkdir(parents=True, exist_ok=True)
     blocker_inventory, source_readiness = _write_tag_readiness_input_fixtures(tmp_path)
@@ -739,6 +742,7 @@ def test_release_merge_handoff_script_is_read_only() -> None:
         "tag readiness summary is missing input fingerprints",
         "publication dry-run summary is missing input fingerprints",
         "publication dry-run summary is missing evidence bundle input fingerprints",
+        "publication dry-run missing GitHub ruleset report proof",
         "publication dry-run preflight input fingerprint mismatch",
         "publication dry-run summary is missing evidence bundle preflight artifact fingerprints",
         "publication dry-run summary is missing source_archive_sha256",
@@ -859,17 +863,17 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
     assert summary["manual_tag_required"] is True
     assert summary["publish_performed"] is False
     assert summary["tag_push_performed"] is False
-    assert summary["latest_candidate"] == "v0.167.0-source"
-    assert summary["latest_pr"] == 188
-    assert summary["latest_pr_url"] == "https://github.com/Kiwunaka/Pokrov-client/pull/188"
+    assert summary["latest_candidate"] == "v0.168.0-source"
+    assert summary["latest_pr"] == 189
+    assert summary["latest_pr_url"] == "https://github.com/Kiwunaka/Pokrov-client/pull/189"
     assert summary["expected_pr_url_prefix"] == (
         "https://github.com/Kiwunaka/Pokrov-client/pull/"
     )
     assert summary["github_status_expected_pr_url_prefix"] == (
         "https://github.com/Kiwunaka/Pokrov-client/pull/"
     )
-    assert summary["blocker_inventory_latest_candidate"] == "v0.167.0-source"
-    assert summary["blocker_inventory_latest_pr"] == 188
+    assert summary["blocker_inventory_latest_candidate"] == "v0.168.0-source"
+    assert summary["blocker_inventory_latest_pr"] == 189
     assert summary["source_only"] is True
     assert summary["no_apk"] is True
     assert summary["no_exe"] is True
@@ -881,6 +885,7 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
     assert summary["windows_bundle_verifier_summary"].endswith(
         "windows-bundle-verifier.json"
     )
+    assert summary["github_ruleset_report"].endswith("github-ruleset-report.json")
     assert summary["input_fingerprints"]["merge_order"]["sha256"] == _sha256(
         merge_path
     )
@@ -897,7 +902,7 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
         "sha256"
     ] == _sha256(publication_path)
     assert summary["input_fingerprints"]["publication_dry_run"]["path"].endswith(
-        "v0.167.0-source-publication-dry-run.json"
+        "v0.168.0-source-publication-dry-run.json"
     )
     assert summary["tag_readiness_input_fingerprints"]["blocker_inventory"][
         "sha256"
@@ -1002,37 +1007,37 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
         "publication_dry_run": 1,
     }
     assert summary["input_stack_counts"] == {
-        "merge_order": 127,
-        "github_status": 127,
+        "merge_order": 128,
+        "github_status": 128,
     }
     assert summary["github_status_counts"] == {
-        "stack_count": 127,
-        "clean_pr_count": 127,
+        "stack_count": 128,
+        "clean_pr_count": 128,
         "draft_pr_count": 0,
         "unclean_pr_count": 0,
-        "successful_check_count": 381,
+        "successful_check_count": 384,
         "failed_check_count": 0,
         "required_status_check_count": 3,
     }
-    assert summary["github_status_pull_request_count"] == 127
-    assert summary["github_status_pr_sequence"] == list(range(62, 189))
+    assert summary["github_status_pull_request_count"] == 128
+    assert summary["github_status_pr_sequence"] == list(range(62, 190))
     assert summary["github_status_pr_refs"][0] == {
         "pr": 62,
         "base": "codex/v0.40-source",
         "head": "codex/v0.41-source",
     }
     assert summary["github_status_pr_refs"][-1] == {
-        "pr": 188,
-        "base": "codex/v0.166-source",
-        "head": "codex/v0.167-source",
+        "pr": 189,
+        "base": "codex/v0.167-source",
+        "head": "codex/v0.168-source",
     }
     assert summary["github_status_pr_urls"][0] == {
         "pr": 62,
         "url": "https://github.com/Kiwunaka/Pokrov-client/pull/62",
     }
     assert summary["github_status_pr_urls"][-1] == {
-        "pr": 188,
-        "url": "https://github.com/Kiwunaka/Pokrov-client/pull/188",
+        "pr": 189,
+        "url": "https://github.com/Kiwunaka/Pokrov-client/pull/189",
     }
     assert summary["github_status_pr_states"][0] == {
         "pr": 62,
@@ -1040,7 +1045,7 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
         "isDraft": False,
     }
     assert summary["github_status_pr_states"][-1] == {
-        "pr": 188,
+        "pr": 189,
         "mergeStateStatus": "CLEAN",
         "isDraft": False,
     }
@@ -1052,7 +1057,7 @@ def test_release_merge_handoff_writes_handoff_summary(tmp_path: Path) -> None:
         "checks": _github_status_pr_checks(),
     }
     assert summary["github_status_pr_checks"][-1] == {
-        "pr": 188,
+        "pr": 189,
         "successful_check_count": 3,
         "failed_check_count": 0,
         "required_status_check_count": 3,
@@ -1078,15 +1083,15 @@ def test_release_merge_handoff_uses_seed_default_input_paths(tmp_path: Path) -> 
         ROOT
         / "build"
         / "source-tag-readiness"
-        / "v0.167.0-source"
-        / "v0.167.0-source-tag-readiness.json"
+        / "v0.168.0-source"
+        / "v0.168.0-source-tag-readiness.json"
     )
     default_publication_path = (
         ROOT
         / "build"
         / "source-release-publication"
-        / "v0.167.0-source"
-        / "v0.167.0-source-publication-dry-run.json"
+        / "v0.168.0-source"
+        / "v0.168.0-source-publication-dry-run.json"
     )
     out_dir = ROOT / "build" / "release-merge-handoff"
     summary_path = out_dir / "release-merge-handoff.json"
@@ -1121,13 +1126,17 @@ def test_release_merge_handoff_uses_seed_default_input_paths(tmp_path: Path) -> 
         proof_manifest, source_archive, windows_bundle_verifier = (
             _write_publication_artifact_fixtures(tmp_path)
         )
+        ruleset = _write_ruleset_report_fixture(tmp_path)
         _write_json(
             default_publication_path,
             _attach_publication_artifact_fingerprints(
                 _attach_publication_input_fingerprints(
-                    _attach_preflight_input_fingerprint(
-                        _publication_dry_run_summary(),
-                        preflight,
+                    _attach_ruleset_report_input_fingerprint(
+                        _attach_preflight_input_fingerprint(
+                            _publication_dry_run_summary(),
+                            preflight,
+                        ),
+                        ruleset,
                     ),
                     evidence_bundle,
                     release_notes,
@@ -1155,10 +1164,10 @@ def test_release_merge_handoff_uses_seed_default_input_paths(tmp_path: Path) -> 
         assert result.returncode == 0, result.stderr + result.stdout
         summary = json.loads(summary_path.read_text(encoding="utf-8-sig"))
         assert summary["handoff_ready_for_maintainer"] is True
-        assert summary["latest_candidate"] == "v0.167.0-source"
-        assert summary["latest_pr"] == 188
-        assert summary["blocker_inventory_latest_candidate"] == "v0.167.0-source"
-        assert summary["blocker_inventory_latest_pr"] == 188
+        assert summary["latest_candidate"] == "v0.168.0-source"
+        assert summary["latest_pr"] == 189
+        assert summary["blocker_inventory_latest_candidate"] == "v0.168.0-source"
+        assert summary["blocker_inventory_latest_pr"] == 189
         assert summary["publication_dry_run_ok"] is True
         assert summary["source_only"] is True
         assert summary["no_apk"] is True
@@ -1250,7 +1259,7 @@ def test_release_merge_handoff_blocks_mismatched_input_candidates(
         / "source-release-publication"
         / "test-inputs"
         / suffix
-        / "v0.167.0-source-publication-dry-run.json"
+        / "v0.168.0-source-publication-dry-run.json"
     )
     for path in (merge_path, github_path, tag_path, publication_path):
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -3131,7 +3140,7 @@ def test_release_merge_handoff_blocks_latest_pr_url_wrong_repository(
         tmp_path
     )
     github_summary = json.loads(github_path.read_text(encoding="utf-8"))
-    github_summary["latest_pr_url"] = "https://github.com/example/fork/pull/188"
+    github_summary["latest_pr_url"] = "https://github.com/example/fork/pull/189"
     _write_json(github_path, github_summary)
     out_dir = ROOT / "build" / "release-merge-handoff" / "test-output"
     shutil.rmtree(out_dir, ignore_errors=True)
@@ -3737,6 +3746,61 @@ def test_release_merge_handoff_blocks_failed_publication_dry_run(
         "blocking_errors"
     ]
     assert "publication dry-run missing Windows bundle verifier proof" in summary[
+        "blocking_errors"
+    ]
+
+
+def test_release_merge_handoff_blocks_missing_publication_github_ruleset_report(
+    tmp_path: Path,
+) -> None:
+    merge_path, github_path, tag_path, publication_path = _write_input_summaries(
+        tmp_path
+    )
+    publication = json.loads(publication_path.read_text(encoding="utf-8"))
+    publication.pop("github_ruleset_report")
+    publication["evidence_bundle_input_fingerprints"].pop("github_ruleset_report")
+    _write_json(publication_path, publication)
+    out_dir = (
+        ROOT
+        / "build"
+        / "release-merge-handoff"
+        / "test-missing-github-ruleset-report"
+    )
+    shutil.rmtree(out_dir, ignore_errors=True)
+
+    try:
+        result = subprocess.run(
+            [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(ROOT / "scripts" / "prepare-release-merge-handoff.ps1"),
+                "-MergeOrderPath",
+                str(merge_path),
+                "-GithubStatusPath",
+                str(github_path),
+                "-TagReadinessPath",
+                str(tag_path),
+                "-PublicationDryRunPath",
+                str(publication_path),
+                "-OutDir",
+                str(out_dir),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        summary = json.loads(
+            (out_dir / "release-merge-handoff.json").read_text(encoding="utf-8-sig")
+        )
+    finally:
+        shutil.rmtree(out_dir, ignore_errors=True)
+
+    assert result.returncode == 2
+    assert "publication dry-run missing GitHub ruleset report proof" in summary[
         "blocking_errors"
     ]
 

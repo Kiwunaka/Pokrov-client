@@ -42,6 +42,8 @@
     "carries_release_handoff_publication_dry_run_evidence_bundle_preflight_ref_commit_sha": true,
     "requires_release_handoff_windows_bundle_verifier_binding": true,
     "carries_release_handoff_windows_bundle_verifier_proof": true,
+    "requires_release_handoff_github_ruleset_report_binding": true,
+    "carries_release_handoff_github_ruleset_report_proof": true,
     "requires_publication_dry_run_carried_input_fingerprint_integrity": true,
     "requires_publication_dry_run_carried_artifact_fingerprint_integrity": true,
     "requires_publication_artifact_file_fingerprint_integrity": true,
@@ -66,7 +68,7 @@
   },
   "inputs": {
     "release_handoff": "build/release-merge-handoff/release-merge-handoff.json",
-    "publication_dry_run": "build/source-release-publication/v0.167.0-source/v0.167.0-source-publication-dry-run.json"
+    "publication_dry_run": "build/source-release-publication/v0.168.0-source/v0.168.0-source-publication-dry-run.json"
   },
   "input_roots": {
     "release_handoff": "build/release-merge-handoff",
@@ -149,7 +151,7 @@
     "publication_dry_run.source_archive_sha256"
   ],
   "output": {
-    "packet": "build/source-publication-packet/v0.167.0-source/source-publication-packet.json"
+    "packet": "build/source-publication-packet/v0.168.0-source/source-publication-packet.json"
   },
   "required_source_only_flags": [
     "source_only",
