@@ -33,6 +33,10 @@
 
 ---
 
+<p align="center">
+  <img src="assets/brand/open-source-showroom.png" alt="POKROV Client open-source направления: обычный клиент, operator-ready source и честная source-only граница" width="100%">
+</p>
+
 ## Что Это
 
 POKROV Client - публичный source-only репозиторий Android/Windows клиента.
@@ -51,6 +55,16 @@ Contract markers:
 - forks and operator builds are not official POKROV builds
 - Enterprise boundary and commercial license notes live in
   [Enterprise](docs/ENTERPRISE.md); no commercial license is offered by default.
+
+## Flow Preview
+
+<p align="center">
+  <img src="assets/brand/client-flow-loop.gif" alt="Local-first import flow: ключи, локальный parser, routing и operator build boundary" width="100%">
+</p>
+
+Это визуальная карта публичного направления: локальный импорт, локальный
+парсер, routing controls и граница operator-owned build. Она не обещает
+официальный APK, EXE, store build, trusted signing или live POKROV service.
 
 ## Два Главных Направления
 
