@@ -4,6 +4,18 @@ This repository is a source-only public client workspace. Start here when you
 need to build from source, choose a product track, review the operator contract,
 or prepare a source-only release.
 
+<p align="center">
+  <img src="../assets/brand/open-source-showroom.png" alt="POKROV Client public source tracks" width="100%">
+</p>
+
+## At A Glance
+
+| Lane | Use it for | First doc |
+| --- | --- | --- |
+| Personal client | Local keys, QR codes, subscriptions, routing controls, and opt-in third-party public configs. | [Build from source](BUILD_FROM_SOURCE.md) |
+| Operator client | Your backend, your brand, your support, your signing, your distribution. | [Operator integration](OPERATOR_INTEGRATION.md) |
+| Maintainer trust | Source-only release proof, branch protection, checks, and honest release notes. | [Release policy](RELEASE_POLICY.md) |
+
 ## First Steps
 
 - [Build from source](BUILD_FROM_SOURCE.md): local requirements, variants,

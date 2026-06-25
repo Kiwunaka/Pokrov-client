@@ -24,6 +24,10 @@
 
 ---
 
+<p align="center">
+  <img src="assets/brand/open-source-showroom.png" alt="POKROV Client open-source tracks: personal client, operator-ready source, and honest source-only boundary" width="100%">
+</p>
+
 ## Choose Your Track
 
 | Track | For | Start |
@@ -31,6 +35,14 @@
 | [Personal Key Client](README.en.md#personal-key-client) | People using their own keys, QR codes, or subscription URLs. | Build the community variant and import locally. |
 | [Operator / Company Client](README.en.md#operator--company-client) | Teams shipping a client for their own VPN service. | Read the operator contract, white-label docs, and API fixture. |
 | [POKROV Service Mode](README.en.md#official-pokrov-service-mode) | Official POKROV builds only. | Use official private release gates and channels. |
+
+## Flow Preview
+
+<p align="center">
+  <img src="assets/brand/client-flow-loop.gif" alt="Local-first import flow animation for keys, local parser, routing, and operator build boundary" width="100%">
+</p>
+
+This visual is a repository-safe product map, not a binary-release claim.
 
 ## Current Source Release
 

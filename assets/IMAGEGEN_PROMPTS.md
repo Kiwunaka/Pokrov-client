@@ -7,6 +7,10 @@ The images intentionally avoid embedded text. README copy, badges, headings,
 and release-status wording stay in Markdown so the repository remains readable,
 localizable, and easy to correct.
 
+Scripted visual assets added on 2026-06-25 use a deterministic local Pillow
+renderer. They are repository-safe presentation graphics, not app screenshots,
+binary release claims, or private-service evidence.
+
 ## `brand/pokrov-oss-hero.png`
 
 ```text
@@ -47,4 +51,41 @@ Composition: wide 3:1 aspect ratio, clear left-to-right structure, elegant arrow
 Style: premium editorial tech, calm, credible open-source documentation art, slightly dimensional glass and metal, no cartoon style.
 Color: left ivory and emerald, right graphite and deep green, thin blue connection accent.
 Avoid: any readable text, letters, numbers, brand logos, people, flags, lock clichés that look cheap, clutter, watermarks, fake UI screenshots.
+```
+
+## `brand/open-source-showroom.png`
+
+```text
+Use case: repository-showroom
+Asset type: GitHub README visual map, scripted raster PNG
+Primary request: Create a premium open-source project showroom card for POKROV Client.
+Scene/backdrop: dark editorial tray on a warm neutral canvas with three clear cards.
+Cards: Personal client, Operator ready, Honest boundary.
+Purpose: communicate the two public tracks and the source-only release boundary without implying official binaries.
+Generation: local deterministic Pillow renderer on 2026-06-25.
+Avoid: app screenshots, private endpoints, store badges, APK/EXE claims, official binary claims, support/payment claims.
+```
+
+## `brand/repo-social-preview.png`
+
+```text
+Use case: repository-social-preview
+Asset type: GitHub social preview candidate, scripted raster PNG
+Primary request: Create a premium public repository social card for POKROV Client.
+Message: Open client. Private ops. Android and Windows source foundation for local keys, subscriptions, QR import, routing, and operator builds.
+Purpose: repository settings social preview candidate only; not a release artifact.
+Generation: local deterministic Pillow renderer on 2026-06-25.
+Avoid: official APK/EXE availability, store release, trusted signing, private service proof, QR payloads, live endpoints, personal data.
+```
+
+## `brand/client-flow-loop.gif`
+
+```text
+Use case: README-flow-preview
+Asset type: Lightweight animated GIF
+Primary request: Show the source-safe product flow without fake screenshots.
+Flow: KEY / QR -> LOCAL PARSER -> ROUTING -> OPERATOR BUILD.
+Purpose: make the README feel alive while preserving the source-only boundary.
+Generation: local deterministic Pillow renderer on 2026-06-25.
+Avoid: real keys, QR payloads, private endpoints, user data, speed/privacy promises, APK/EXE claims, store badges.
 ```

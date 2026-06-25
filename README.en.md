@@ -33,6 +33,10 @@
 
 ---
 
+<p align="center">
+  <img src="assets/brand/open-source-showroom.png" alt="POKROV Client open-source tracks: personal client, operator-ready source, and honest source-only boundary" width="100%">
+</p>
+
 ## What This Is
 
 POKROV Client is the public source repository for an Android and Windows VPN
@@ -51,6 +55,16 @@ Contract markers:
 - forks and operator builds are not official POKROV builds
 - Enterprise boundary and commercial license notes live in
   [Enterprise](docs/ENTERPRISE.md); no commercial license is offered by default.
+
+## Flow Preview
+
+<p align="center">
+  <img src="assets/brand/client-flow-loop.gif" alt="Local-first import flow animation for keys, local parser, routing, and operator build boundary" width="100%">
+</p>
+
+The preview shows the public product shape only: local import, local parsing,
+routing controls, and an operator-owned build boundary. It does not claim an
+official APK, EXE, store build, trusted signing, or live POKROV service.
 
 ## Tracks
 
