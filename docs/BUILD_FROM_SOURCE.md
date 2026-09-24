@@ -5,11 +5,15 @@ verification, not an official release-signing guide.
 
 ## Requirements
 
-- Flutter SDK compatible with Dart `>=3.0.0 <4.0.0`
+- Flutter SDK `3.44.6`, matching the pinned CI version
 - PowerShell
 - Android Studio or Android SDK for Android work
 - Visual Studio with Desktop development workload for Windows work
 - Git and network access for dependency resolution
+
+CI pins Flutter to keep the source snapshot compatible with its Gradle wrapper
+and analyzer rules. Update the SDK together with those contracts; a moving
+`stable` channel can require a newer Gradle version before this project is ready.
 
 ## Workspace Layout
 
